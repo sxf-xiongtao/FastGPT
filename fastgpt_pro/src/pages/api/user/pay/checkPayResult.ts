@@ -6,10 +6,9 @@ import { PaySchema } from '@/types/mongoSchema';
 import dayjs from 'dayjs';
 import { WXPay } from '@/service/utils/pay';
 import { formatPrice } from '@/utils/user';
-import { withNextCors } from '@/service/utils/tools';
 
 /* 校验支付结果 */
-export default withNextCors(async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { payId } = req.query as { payId: string };
 
@@ -113,4 +112,4 @@ export default withNextCors(async function handler(req: NextApiRequest, res: Nex
       error: err
     });
   }
-});
+}

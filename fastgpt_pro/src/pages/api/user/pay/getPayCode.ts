@@ -4,10 +4,9 @@ import { authUser } from '@/service/utils/auth';
 import { Pay, connectToDatabase } from '@/service/mongo';
 import { PRICE_SCALE } from '@/constants/common';
 import { WXPay } from '@/service/utils/pay';
-import { withNextCors } from '@/service/utils/tools';
 
 /* 获取支付二维码 */
-export default withNextCors(async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     let { amount = 0 } = req.query as { amount: string };
     amount = +amount;
@@ -39,4 +38,4 @@ export default withNextCors(async function handler(req: NextApiRequest, res: Nex
       error: err
     });
   }
-});
+}

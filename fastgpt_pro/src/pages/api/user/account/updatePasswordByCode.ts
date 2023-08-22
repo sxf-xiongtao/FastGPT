@@ -5,9 +5,8 @@ import { connectToDatabase } from '@/service/mongo';
 import { UserAuthTypeEnum } from '@/constants/common';
 import { generateToken, setCookie } from '@/service/utils/tools';
 import { authCode } from './sendCode';
-import { withNextCors } from '@/service/utils/tools';
 
-export default withNextCors(async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const { username, code, password } = req.body;
 
@@ -62,4 +61,4 @@ export default withNextCors(async function handler(req: NextApiRequest, res: Nex
       error: err
     });
   }
-});
+}

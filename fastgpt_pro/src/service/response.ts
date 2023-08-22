@@ -6,7 +6,7 @@ import {
   ERROR_RESPONSE,
   ERROR_ENUM
 } from './errorCode';
-import { clearCookie, sseResponse, addLog } from './utils/tools';
+import { clearCookie, addLog } from './utils/tools';
 
 export interface ResponseType<T = any> {
   code: number;
@@ -54,15 +54,15 @@ export const jsonRes = <T = any>(
 
     addLog.error(msg, {
       message: msg,
-      stack: error.stack,
-      ...(error.config && {
+      stack: error?.stack,
+      ...(error?.config && {
         config: {
           headers: error.config.headers,
           url: error.config.url,
           data: error.config.data
         }
       }),
-      ...(error.response && {
+      ...(error?.response && {
         response: {
           status: error.response.status,
           statusText: error.response.statusText

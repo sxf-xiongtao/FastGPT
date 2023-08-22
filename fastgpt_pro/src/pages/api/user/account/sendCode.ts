@@ -6,7 +6,6 @@ import * as OpenApi from '@alicloud/openapi-client';
 import * as Util from '@alicloud/tea-util';
 import { connectToDatabase, AuthCode } from '@/service/mongo';
 import axios from 'axios';
-import { withNextCors } from '@/service/utils/tools';
 import { customAlphabet } from 'nanoid';
 import requestIp from 'request-ip';
 import { Obj2Query } from '@/utils/tools';
@@ -19,18 +18,19 @@ enum UserAuthTypeEnum {
 
 const expiredMinute = 5;
 
-export default withNextCors(async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { username, type, googleToken } = req.body as {
       username: string;
       type: `${UserAuthTypeEnum}`;
       googleToken: string;
     };
+
+    await connectToDatabase();
+
     if (!username || !type) {
       throw new Error('缺少参数');
     }
-
-    await connectToDatabase();
 
     // google auth
     global.systemConfig.auth.googleServiceVerKey &&
@@ -77,7 +77,7 @@ export default withNextCors(async function handler(req: NextApiRequest, res: Nex
       error: err
     });
   }
-});
+}
 
 export const sendEmailCode = (email: string, code: string, type: `${UserAuthTypeEnum}`) => {
   const emailMap: { [key: string]: any } = {
