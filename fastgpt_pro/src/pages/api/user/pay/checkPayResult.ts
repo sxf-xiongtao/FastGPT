@@ -6,10 +6,13 @@ import { PaySchema } from '@/types/mongoSchema';
 import dayjs from 'dayjs';
 import { WXPay } from '@/service/utils/pay';
 import { formatPrice } from '@/utils/user';
+import { connectToDatabase } from '@/service/mongo';
 
 /* 校验支付结果 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
+    await connectToDatabase();
+
     const { payId } = req.query as { payId: string };
 
     const { userId } = await authUser({ req, authToken: true });

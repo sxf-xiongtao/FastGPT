@@ -2,14 +2,19 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@/service/response';
 import axios from 'axios';
 import { authUser } from '@/service/utils/auth';
+import { connectToDatabase } from '@/service/mongo';
+import { getErrText } from '@/utils/tools';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
+    await connectToDatabase();
+
     const { text } = req.body as { text: string };
-    if (!text)
-      return {
+    if (!text) {
+      return jsonRes(res, {
         message: 'SUCCESS'
-      };
+      });
+    }
 
     await authUser({ req, authRoot: true });
 
@@ -22,8 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     jsonRes(res);
   } catch (error) {
     jsonRes(res, {
-      code: 500,
-      error
+      data: getErrText(error, '内容安全校验不通过')
     });
   }
 }

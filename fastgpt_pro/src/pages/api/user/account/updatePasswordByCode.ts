@@ -10,11 +10,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   try {
     const { username, code, password } = req.body;
 
+    await connectToDatabase();
+
     if (!username || !code || !password) {
       throw new Error('缺少参数');
     }
-
-    await connectToDatabase();
 
     // 验证码校验
     await authCode({
