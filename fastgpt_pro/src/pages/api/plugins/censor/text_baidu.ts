@@ -39,7 +39,9 @@ async function getAccessToken() {
 }
 
 // 发出请求
-async function sendTextCensor(text: string) {
+async function sendTextCensor(text: string): Promise<{
+  message: string;
+}> {
   try {
     const accessToken = global.store.BAIDU_TEXT_CENSOR_TOKEN;
     const requestUrl = `https://aip.baidubce.com/rest/2.0/solution/v1/text_censor/v2/user_defined?access_token=${accessToken}`;
@@ -75,7 +77,4 @@ async function sendTextCensor(text: string) {
     console.log(err);
     return Promise.reject(err);
   }
-  return {
-    message: 'SUCCESS'
-  };
 }

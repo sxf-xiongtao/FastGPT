@@ -1,6 +1,6 @@
 import type { NextApiRequest } from 'next';
 import Cookie from 'cookie';
-import { User } from '../mongo';
+import { User, OpenApi } from '../mongo';
 import { ERROR_ENUM } from '../errorCode';
 import { authJWT } from './tools';
 
