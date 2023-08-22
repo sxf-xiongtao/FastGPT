@@ -53,7 +53,7 @@ export const jsonRes = <T = any>(
     }
 
     addLog.error(msg, {
-      message: error.message,
+      message: msg,
       stack: error.stack,
       ...(error.config && {
         config: {

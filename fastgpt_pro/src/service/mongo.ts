@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { startQueue } from './utils/tools';
 import { initService, initLogger } from './init';
 
 /**
@@ -28,9 +27,6 @@ export async function connectToDatabase(): Promise<void> {
     console.log('error->', 'mongo connect error');
     global.mongodb = null;
   }
-
-  // init function
-  startQueue();
 }
 
 export * from './models/authCode';
@@ -38,3 +34,4 @@ export * from './models/user';
 export * from './models/pay';
 export * from './models/openapi';
 export * from './models/image';
+export * from './models/promotionRecord';

@@ -2,8 +2,6 @@ import type { NextApiResponse, NextApiHandler, NextApiRequest } from 'next';
 import NextCors from 'nextjs-cors';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import { generateQA } from '../events/generateQA';
-import { generateVector } from '../events/generateVector';
 import { ERROR_ENUM } from '../errorCode';
 
 /* 密码加密 */
@@ -57,23 +55,13 @@ export function withNextCors(handler: NextApiHandler): NextApiHandler {
     const origin = req.headers.origin;
     await NextCors(req, res, {
       methods,
-      origin: origin,
+      origin,
       optionsSuccessStatus: 200
     });
 
     return handler(req, res);
   };
 }
-
-/* start task */
-export const startQueue = () => {
-  for (let i = 0; i < global.systemEnv.qaMaxProcess; i++) {
-    generateQA();
-  }
-  for (let i = 0; i < global.systemEnv.vectorMaxProcess; i++) {
-    generateVector();
-  }
-};
 
 export const sseResponse = ({
   res,

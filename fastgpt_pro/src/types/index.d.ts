@@ -22,6 +22,7 @@ export type SystemConfigType = {
     BAIDU_TEXT_CENSOR_CLIENTSECRET: string;
   };
   auth: {
+    googleServiceVerKey: string;
     email: {
       service: string;
       user: string;
@@ -32,6 +33,16 @@ export type SystemConfigType = {
       SNED_PHONE_ACCESSSECRET: string;
       SNED_PHONE_SIGNNAME: string;
       SNED_PHONE_TEMPLATE: string;
+    };
+  };
+  pay: {
+    wx: {
+      WX_APPID: string;
+      WX_MCHID: string;
+      WX_SERIAL_NO: string;
+      WX_V3_CODE: string;
+      WX_NOTIFY_URL: string;
+      WX_PRIVATE_KEY: string;
     };
   };
 };

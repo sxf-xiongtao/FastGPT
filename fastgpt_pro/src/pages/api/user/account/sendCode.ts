@@ -5,7 +5,11 @@ import Dysmsapi, * as dysmsapi from '@alicloud/dysmsapi20170525';
 import * as OpenApi from '@alicloud/openapi-client';
 import * as Util from '@alicloud/tea-util';
 import { connectToDatabase, AuthCode } from '@/service/mongo';
+import axios from 'axios';
+import { withNextCors } from '@/service/utils/tools';
 import { customAlphabet } from 'nanoid';
+import requestIp from 'request-ip';
+import { Obj2Query } from '@/utils/tools';
 const nanoid = customAlphabet('123456789', 6);
 
 enum UserAuthTypeEnum {
@@ -15,17 +19,26 @@ enum UserAuthTypeEnum {
 
 const expiredMinute = 5;
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default withNextCors(async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { username, type } = req.body as {
+    const { username, type, googleToken } = req.body as {
       username: string;
       type: `${UserAuthTypeEnum}`;
+      googleToken: string;
     };
     if (!username || !type) {
       throw new Error('缺少参数');
     }
 
     await connectToDatabase();
+
+    // google auth
+    global.systemConfig.auth.googleServiceVerKey &&
+      (await authGoogleToken({
+        secret: global.systemConfig.auth.googleServiceVerKey,
+        response: googleToken,
+        remoteip: requestIp.getClientIp(req) || undefined
+      }));
 
     // 判断 1 分钟内是否有重复数据
     const authCode = await AuthCode.findOne({
@@ -64,22 +77,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       error: err
     });
   }
-}
-
-const emailMap: { [key: string]: any } = {
-  [UserAuthTypeEnum.register]: {
-    subject: `注册 ${global.systemConfig.system.title} 账号`,
-    html: (code: string) =>
-      `<div>您正在注册 ${global.systemConfig.system.title} 账号，验证码为：${code}</div>`
-  },
-  [UserAuthTypeEnum.findPassword]: {
-    subject: `修改 ${global.systemConfig.system.title} 密码`,
-    html: (code: string) =>
-      `<div>您正在修改 ${global.systemConfig.system.title} 账号密码，验证码为：${code}</div>`
-  }
-};
+});
 
 export const sendEmailCode = (email: string, code: string, type: `${UserAuthTypeEnum}`) => {
+  const emailMap: { [key: string]: any } = {
+    [UserAuthTypeEnum.register]: {
+      subject: `注册 ${global.systemConfig.system.title} 账号`,
+      html: (code: string) =>
+        `<div>您正在注册 ${global.systemConfig.system.title} 账号，验证码为：${code}</div>`
+    },
+    [UserAuthTypeEnum.findPassword]: {
+      subject: `修改 ${global.systemConfig.system.title} 密码`,
+      html: (code: string) =>
+        `<div>您正在修改 ${global.systemConfig.system.title} 账号密码，验证码为：${code}</div>`
+    }
+  };
+
   const mailTransport = nodemailer.createTransport({
     // host: 'smtp.qq.phone',
     service: global.systemConfig.auth.email.service,
@@ -129,4 +142,45 @@ export const sendPhoneCode = async (phone: string, code: string) => {
   if (res.body.code !== 'OK') {
     return Promise.reject(res.body.message || '发送短信失败');
   }
+};
+
+export const authCode = async ({
+  username,
+  code,
+  type
+}: {
+  username: string;
+  code: string;
+  type: `${UserAuthTypeEnum}`;
+}) => {
+  const result = await AuthCode.findOne({
+    username,
+    type,
+    code,
+    expiredTime: { $gte: Date.now() }
+  });
+
+  if (!result) {
+    return Promise.reject('验证码错误');
+  }
+
+  return 'SUCCESS';
+};
+
+// service run
+export const authGoogleToken = async (data: {
+  secret: string;
+  response: string;
+  remoteip?: string;
+}) => {
+  const res = await axios.post<{
+    score?: number;
+    success: boolean;
+    'error-codes': string[];
+  }>(`https://www.recaptcha.net/recaptcha/api/siteverify?${Obj2Query(data)}`);
+
+  if (res.data.success) {
+    return Promise.resolve('');
+  }
+  return Promise.reject(res?.data?.['error-codes']?.[0] || '非法环境');
 };

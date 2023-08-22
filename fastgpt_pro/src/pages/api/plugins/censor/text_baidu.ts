@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@/service/response';
 import axios from 'axios';
+import { authUser } from '@/service/utils/auth';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -9,6 +10,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return {
         message: 'SUCCESS'
       };
+
+    await authUser({ req, authRoot: true });
 
     const time = Date.now();
 
@@ -19,6 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     jsonRes(res);
   } catch (error) {
     jsonRes(res, {
+      code: 500,
       error
     });
   }
@@ -53,7 +57,6 @@ async function sendTextCensor(text: string) {
 
     if (data.error_code === 282909) {
       console.log('内容太长了', text.length);
-
       return {
         message: 'SUCCESS'
       };
@@ -70,6 +73,7 @@ async function sendTextCensor(text: string) {
   } catch (err) {
     console.log('百度内容安全校验异常');
     console.log(err);
+    return Promise.reject(err);
   }
   return {
     message: 'SUCCESS'

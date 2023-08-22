@@ -23,7 +23,7 @@ const AuthCodeSchema = new Schema({
 });
 
 try {
-  AuthCodeSchema.index({ expiredTime: 1 }, { expireAfterSeconds: 1 * 60 });
+  AuthCodeSchema.index({ expiredTime: 1 }, { expireAfterSeconds: 6 * 60 });
 } catch (error) {
   console.log(error);
 }
