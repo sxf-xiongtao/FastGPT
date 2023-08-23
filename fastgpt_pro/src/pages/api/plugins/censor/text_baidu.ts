@@ -20,11 +20,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const time = Date.now();
 
-    await sendTextCensor(text);
+    const response = await sendTextCensor(text);
 
     console.log(`安全校验, 长度: ${text.length},时间: ${Date.now() - time}ms `);
 
-    jsonRes(res);
+    jsonRes(res, {
+      data: response
+    });
   } catch (error) {
     jsonRes(res, {
       data: getErrText(error, '内容安全校验不通过')
@@ -44,6 +46,7 @@ async function getAccessToken() {
 
 // 发出请求
 async function sendTextCensor(text: string): Promise<{
+  code?: number;
   message: string;
 }> {
   try {
@@ -73,12 +76,18 @@ async function sendTextCensor(text: string): Promise<{
         message: 'SUCCESS'
       };
     }
-    console.log(data, text);
 
-    return Promise.reject(data.data?.[0]?.msg || '您的内容不合规');
+    console.log('违规关键词', data?.data?.[0]?.hits?.[0]?.words);
+
+    return {
+      code: 5000,
+      message: `${data.data?.[0]?.msg || '您的内容不合规'}`
+    };
   } catch (err) {
     console.log('百度内容安全校验异常');
     console.log(err);
-    return Promise.reject(err);
+    return {
+      message: '百度内容安全校验异常'
+    };
   }
 }
