@@ -1,10 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@/service/response';
 import { User } from '@/service/models/user';
-import { connectToDatabase } from '@/service/mongo';
+import { connectToDatabase, promotionRecord } from '@/service/mongo';
 import { generateToken, setCookie } from '@/service/utils/tools';
-import { UserAuthTypeEnum } from '@/constants/common';
+import { PRICE_SCALE, UserAuthTypeEnum } from '@/constants/common';
 import { authCode } from './sendCode';
+import { formatPrice } from '@/utils/user';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -40,6 +41,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const token = generateToken(user._id);
     setCookie(res, token);
 
+    sendRegisterPromotion({
+      userId: inviterId,
+      objUId: user._id,
+      registerName: username
+    });
+
     jsonRes(res, {
       data: {
         user,
@@ -52,4 +59,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       error: err
     });
   }
+}
+
+export async function sendRegisterPromotion({
+  registerName,
+  userId,
+  objUId
+}: {
+  registerName: string;
+  userId: string;
+  objUId: string;
+}) {
+  try {
+    if (!userId || registerName.includes('@')) return;
+
+    const amount = 5 * PRICE_SCALE;
+
+    try {
+      await User.findByIdAndUpdate(userId, {
+        $inc: { balance: amount }
+      });
+    } catch (error) {
+      return setTimeout(() => {
+        sendRegisterPromotion({ registerName, userId, objUId });
+      }, 2000);
+    }
+    await promotionRecord.create({
+      userId,
+      objUId,
+      type: 'register',
+      amount: formatPrice(amount)
+    });
+  } catch (error) {}
 }

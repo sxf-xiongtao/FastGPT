@@ -63,20 +63,6 @@ export function withNextCors(handler: NextApiHandler): NextApiHandler {
   };
 }
 
-export const sseResponse = ({
-  res,
-  event,
-  data
-}: {
-  res: NextApiResponse;
-  event?: string;
-  data: string;
-}) => {
-  if (res.closed) return;
-  event && res.write(`event: ${event}\n`);
-  res.write(`data: ${data}\n\n`);
-};
-
 /* add logger */
 export const addLog = {
   info: (msg: string, obj?: Record<string, any>) => {

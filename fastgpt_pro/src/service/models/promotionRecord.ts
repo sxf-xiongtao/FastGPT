@@ -8,6 +8,7 @@ const PromotionRecordSchema = new Schema({
     required: true
   },
   objUId: {
+    // 被邀请人
     type: Schema.Types.ObjectId,
     ref: 'user',
     required: false
