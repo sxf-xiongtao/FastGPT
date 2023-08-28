@@ -1,12 +1,11 @@
-// @ts-ignore
-import Payment from 'wxpay-v3';
+import { Payment } from './payment';
 import { customAlphabet } from 'nanoid';
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 20);
 
 export class WXPay {
-  getPayment() {
+  async getPayment() {
     try {
-      return new Payment({
+      const payment = new Payment({
         appid: global.systemConfig?.pay?.wx?.WX_APPID,
         mchid: global.systemConfig?.pay?.wx?.WX_MCHID,
         private_key: global.systemConfig?.pay?.wx?.WX_PRIVATE_KEY,
@@ -14,6 +13,8 @@ export class WXPay {
         apiv3_private_key: global.systemConfig?.pay?.wx?.WX_V3_CODE,
         notify_url: global.systemConfig?.pay?.wx?.WX_NOTIFY_URL
       });
+      await payment.init();
+      return payment;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -22,7 +23,7 @@ export class WXPay {
     try {
       const payment = await this.getPayment();
       const res = await payment.native({
-        description: 'Fast GPT 余额充值',
+        description: `${global.systemConfig.system.title} 余额充值`,
         out_trade_no: payId,
         amount: {
           total: amount
