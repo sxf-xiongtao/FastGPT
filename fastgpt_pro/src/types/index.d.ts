@@ -14,29 +14,34 @@ export type PagingData<T> = {
 export type RequestPaging = { pageNum: number; pageSize: number; [key]: any };
 
 export type SystemConfigType = {
+  license: string;
   system: {
     title: string;
   };
-  censor: {
-    BAIDU_TEXT_CENSOR_CLIENTID: string;
-    BAIDU_TEXT_CENSOR_CLIENTSECRET: string;
+  censor?: {
+    BAIDU_TEXT_CENSOR_CLIENTID?: string;
+    BAIDU_TEXT_CENSOR_CLIENTSECRET?: string;
   };
-  auth: {
-    googleServiceVerKey: string;
-    email: {
+  auth?: {
+    googleServiceVerKey?: string;
+    git?: {
+      key: string;
+      secret: string;
+    };
+    email?: {
       service: string;
       user: string;
       pass: string;
     };
-    phone: {
+    phone?: {
       SNED_PHONE_ACCESSKEYID: string;
       SNED_PHONE_ACCESSSECRET: string;
       SNED_PHONE_SIGNNAME: string;
       SNED_PHONE_TEMPLATE: string;
     };
   };
-  pay: {
-    wx: {
+  pay?: {
+    wx?: {
       WX_APPID: string;
       WX_MCHID: string;
       WX_SERIAL_NO: string;
@@ -47,6 +52,11 @@ export type SystemConfigType = {
   };
 };
 
+export type LicenseDataType = {
+  maxRegister: number;
+  exp: number;
+};
+
 declare global {
   var mongodb: Mongoose | string | null;
   var pgClient: Pool | null;
@@ -55,4 +65,5 @@ declare global {
 
   var systemConfig: SystemConfigType;
   var store: Record<string, any>;
+  var licenseData: LicenseDataType;
 }

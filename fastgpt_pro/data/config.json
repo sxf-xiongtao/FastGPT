@@ -1,1 +1,38 @@
-{}
+{
+  "license": "",
+  "system": {
+    "title": ""
+  },
+  "censor": {
+    "BAIDU_TEXT_CENSOR_CLIENTID": "",
+    "BAIDU_TEXT_CENSOR_CLIENTSECRET": ""
+  },
+  "auth": {
+    "googleServiceVerKey": "",
+    "git": {
+      "key": "",
+      "secret": ""
+    },
+    "email": {
+      "service": "qq",
+      "user": "",
+      "pass": ""
+    },
+    "phone": {
+      "SNED_PHONE_ACCESSKEYID": "",
+      "SNED_PHONE_ACCESSSECRET": "",
+      "SNED_PHONE_SIGNNAME": "",
+      "SNED_PHONE_TEMPLATE": ""
+    }
+  },
+  "pay": {
+    "wx": {
+      "WX_APPID": "",
+      "WX_MCHID": "",
+      "WX_V3_CODE": "",
+      "WX_NOTIFY_URL": "",
+      "WX_SERIAL_NO": "",
+      "WX_PRIVATE_KEY": ""
+    }
+  }
+}

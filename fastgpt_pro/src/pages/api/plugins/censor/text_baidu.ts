@@ -9,6 +9,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     await connectToDatabase();
 
+    if (!global.systemConfig?.censor?.BAIDU_TEXT_CENSOR_CLIENTID) {
+      return jsonRes(res, {
+        data: {
+          message: 'success'
+        }
+      });
+    }
+
     const { text } = req.body as { text: string };
     if (!text) {
       return jsonRes(res, {
@@ -36,7 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 // 获取access_token
 async function getAccessToken() {
-  const url = `https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${global.systemConfig.censor.BAIDU_TEXT_CENSOR_CLIENTID}&client_secret=${global.systemConfig.censor.BAIDU_TEXT_CENSOR_CLIENTSECRET}`;
+  const url = `https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${global.systemConfig?.censor?.BAIDU_TEXT_CENSOR_CLIENTID}&client_secret=${global.systemConfig?.censor?.BAIDU_TEXT_CENSOR_CLIENTSECRET}`;
   const response = await axios.post(url);
 
   console.log('获取百度内容安全 token', response.data.access_token);

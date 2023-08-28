@@ -7,12 +7,12 @@ export class WXPay {
   getPayment() {
     try {
       return new Payment({
-        appid: global.systemConfig.pay.wx.WX_APPID,
-        mchid: global.systemConfig.pay.wx.WX_MCHID,
-        private_key: global.systemConfig.pay.wx.WX_PRIVATE_KEY,
-        serial_no: global.systemConfig.pay.wx.WX_SERIAL_NO,
-        apiv3_private_key: global.systemConfig.pay.wx.WX_V3_CODE,
-        notify_url: global.systemConfig.pay.wx.WX_NOTIFY_URL
+        appid: global.systemConfig?.pay?.wx?.WX_APPID,
+        mchid: global.systemConfig?.pay?.wx?.WX_MCHID,
+        private_key: global.systemConfig?.pay?.wx?.WX_PRIVATE_KEY,
+        serial_no: global.systemConfig?.pay?.wx?.WX_SERIAL_NO,
+        apiv3_private_key: global.systemConfig?.pay?.wx?.WX_V3_CODE,
+        notify_url: global.systemConfig?.pay?.wx?.WX_NOTIFY_URL
       });
     } catch (error) {
       return Promise.reject(error);

@@ -32,6 +32,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       throw new Error('该用户已被注册');
     }
 
+    await authMaxUsers();
+
     const user = await User.create({
       username,
       password,
@@ -91,4 +93,10 @@ export async function sendRegisterPromotion({
       amount: formatPrice(amount)
     });
   } catch (error) {}
+}
+
+export async function authMaxUsers() {
+  const usersCount = await User.countDocuments();
+
+  if (usersCount > global.licenseData.maxRegister) return Promise.reject('超过最大用户数');
 }

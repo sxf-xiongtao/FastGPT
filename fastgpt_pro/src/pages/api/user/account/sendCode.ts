@@ -33,9 +33,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // google auth
-    global.systemConfig.auth.googleServiceVerKey &&
+    global.systemConfig?.auth?.googleServiceVerKey &&
       (await authGoogleToken({
-        secret: global.systemConfig.auth.googleServiceVerKey,
+        secret: global.systemConfig?.auth?.googleServiceVerKey,
         response: googleToken,
         remoteip: requestIp.getClientIp(req) || undefined
       }));
@@ -82,30 +82,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 export const sendEmailCode = (email: string, code: string, type: `${UserAuthTypeEnum}`) => {
   const emailMap: { [key: string]: any } = {
     [UserAuthTypeEnum.register]: {
-      subject: `注册 ${global.systemConfig.system.title} 账号`,
+      subject: `注册 ${global.systemConfig?.system?.title} 账号`,
       html: (code: string) =>
-        `<div>您正在注册 ${global.systemConfig.system.title} 账号，验证码为：${code}</div>`
+        `<div>您正在注册 ${global.systemConfig?.system?.title} 账号，验证码为：${code}</div>`
     },
     [UserAuthTypeEnum.findPassword]: {
-      subject: `修改 ${global.systemConfig.system.title} 密码`,
+      subject: `修改 ${global.systemConfig?.system?.title} 密码`,
       html: (code: string) =>
-        `<div>您正在修改 ${global.systemConfig.system.title} 账号密码，验证码为：${code}</div>`
+        `<div>您正在修改 ${global.systemConfig?.system?.title} 账号密码，验证码为：${code}</div>`
     }
   };
 
   const mailTransport = nodemailer.createTransport({
     // host: 'smtp.qq.phone',
-    service: global.systemConfig.auth.email.service,
+    service: global.systemConfig?.auth?.email?.service,
     secure: true, //安全方式发送,建议都加上
     auth: {
-      user: global.systemConfig.auth.email.user,
-      pass: global.systemConfig.auth.email.pass
+      user: global.systemConfig?.auth?.email?.user,
+      pass: global.systemConfig?.auth?.email?.pass
     }
   });
 
   return new Promise((resolve, reject) => {
     const options = {
-      from: `"${global.systemConfig.system.title}" ${global.systemConfig.auth.email.user}`,
+      from: `"${global.systemConfig?.system?.title}" ${global.systemConfig?.auth?.email?.user}`,
       to: email,
       subject: emailMap[type]?.subject,
       html: emailMap[type]?.html(code)
@@ -122,10 +122,10 @@ export const sendEmailCode = (email: string, code: string, type: `${UserAuthType
 };
 
 export const sendPhoneCode = async (phone: string, code: string) => {
-  const accessKeyId = global.systemConfig.auth.phone.SNED_PHONE_ACCESSKEYID;
-  const accessKeySecret = global.systemConfig.auth.phone.SNED_PHONE_ACCESSSECRET;
-  const signName = global.systemConfig.auth.phone.SNED_PHONE_SIGNNAME;
-  const templateCode = global.systemConfig.auth.phone.SNED_PHONE_TEMPLATE;
+  const accessKeyId = global.systemConfig?.auth?.phone?.SNED_PHONE_ACCESSKEYID;
+  const accessKeySecret = global.systemConfig?.auth?.phone?.SNED_PHONE_ACCESSSECRET;
+  const signName = global.systemConfig?.auth?.phone?.SNED_PHONE_SIGNNAME;
+  const templateCode = global.systemConfig?.auth?.phone?.SNED_PHONE_TEMPLATE;
   const endpoint = 'dysmsapi.aliyuncs.com';
 
   const sendSmsRequest = new dysmsapi.SendSmsRequest({
