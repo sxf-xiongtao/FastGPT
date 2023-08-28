@@ -79,17 +79,19 @@ async function sendTextCensor(text: string): Promise<{
       };
     }
 
-    if (data.conclusionType === 1) {
+    const hitsWord = data?.data?.[0]?.hits?.[0]?.words;
+
+    if (hitsWord) {
+      console.log('违规关键词', data?.data?.[0]?.hits?.[0]?.words);
+
       return {
-        message: 'SUCCESS'
+        code: 5000,
+        message: `${data.data?.[0]?.msg || '您的内容不合规'}`
       };
     }
 
-    console.log('违规关键词', data?.data?.[0]?.hits?.[0]?.words);
-
     return {
-      code: 5000,
-      message: `${data.data?.[0]?.msg || '您的内容不合规'}`
+      message: 'SUCCESS'
     };
   } catch (err) {
     console.log('百度内容安全校验异常');
