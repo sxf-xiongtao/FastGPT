@@ -102,10 +102,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       await Pay.findByIdAndUpdate(payId, {
         status: 'CLOSED'
       });
-      return jsonRes(res, {
-        code: 500,
-        data: '订单已过期'
-      });
+      throw new Error('订单已过期');
     }
     throw new Error(payRes?.trade_state_desc || '订单无效');
   } catch (err) {
