@@ -4,15 +4,13 @@ import dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });
 
 const mongoUrl = process.env.MONGODB_URI;
-const mongoDBName = process.env.MONGODB_NAME;
 
-if (!mongoUrl || !mongoDBName) {
+if (!mongoUrl) {
   throw new Error('db error');
 }
 
 mongoose
   .connect(mongoUrl, {
-    dbName: mongoDBName,
     bufferCommands: true,
     maxPoolSize: 5,
     minPoolSize: 1,
