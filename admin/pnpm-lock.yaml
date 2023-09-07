@@ -48,8 +48,8 @@ dependencies:
     specifier: ^12.3.1
     version: registry.npmmirror.com/react-i18next@12.3.1(i18next@22.5.1)(react-dom@18.2.0)(react@18.2.0)
   tushan:
-    specifier: ^0.3.1
-    version: registry.npmmirror.com/tushan@0.3.1(prop-types@15.8.1)
+    specifier: ^0.3.4
+    version: registry.npmmirror.com/tushan@0.3.4(prop-types@15.8.1)
 
 devDependencies:
   '@types/jsonexport':
@@ -5078,11 +5078,11 @@ packages:
     version: 2.6.2
     dev: false
 
-  registry.npmmirror.com/tushan@0.3.1(prop-types@15.8.1):
-    resolution: {integrity: sha512-C/mBqpbhehWjllyoKSpf41kIwkcbxdVJPcLngKgF7dsjhLL5nRMIA6UW7rXyUHXm28HyKGHpd5c6in9k0W32RQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/tushan/-/tushan-0.3.1.tgz}
-    id: registry.npmmirror.com/tushan/0.3.1
+  registry.npmmirror.com/tushan@0.3.4(prop-types@15.8.1):
+    resolution: {integrity: sha512-y2z1wUaZTFO9MJj+sMJzn9xQ08VvdUwEWgVsRRiUKEaSkTOUHl2qqGDrE961X/gGnGcW/yHdzBYObwL44jUxiA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/tushan/-/tushan-0.3.4.tgz}
+    id: registry.npmmirror.com/tushan/0.3.4
     name: tushan
-    version: 0.3.1
+    version: 0.3.4
     dependencies:
       '@arco-design/web-react': registry.npmmirror.com/@arco-design/web-react@2.49.1(@types/react@18.0.28)(react-dom@18.2.0)(react@18.2.0)
       '@tanstack/react-query': registry.npmmirror.com/@tanstack/react-query@4.29.12(react-dom@18.2.0)(react@18.2.0)

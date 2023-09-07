@@ -1,22 +1,22 @@
 # Install dependencies only when needed
-FROM node:current-alpine AS builder
-RUN npm config set registry https://registry.npmmirror.com/
-RUN apk add --no-cache libc6-compat && npm install -g pnpm
-RUN pnpm config set registry https://registry.npmmirror.com/
-
+FROM node:18 AS builder
 WORKDIR /app
+
+RUN npm install -g pnpm
+
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV VITE_PUBLIC_SERVER_URL ''
 # Install dependencies based on the preferred package manager
+
 COPY . .
 RUN \
-  [ -f pnpm-lock.yaml ] && pnpm install --ignore-scripts || \
+  [ -f pnpm-lock.yaml ] && pnpm install || \
   (echo "Lockfile not found." && exit 1)
 
 RUN pnpm build
 
 # Production image, copy all the files and run next
-FROM node:current-alpine AS runner
+FROM node:18 AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
@@ -35,13 +35,14 @@ COPY --from=builder /app/server.js ./server.js
 COPY --from=builder /app/service ./service
 COPY --from=builder /app/dist ./dist
 
-RUN npm config set registry https://registry.npmmirror.com/
 RUN npm install -g pnpm
-RUN pnpm config set registry https://registry.npmmirror.com/
-RUN pnpm install --ignore-scripts --prod
-RUN npm remove -g pnpm --ignore-scripts
+RUN pnpm install --prod
+RUN npm remove -g pnpm
 
 ENV PORT=3001
+ARG LICENSE_KEY
+ENV LICENSE_KEY=${LICENSE_KEY}
+
 
 EXPOSE 3001
 

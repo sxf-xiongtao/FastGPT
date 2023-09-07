@@ -1,11 +1,11 @@
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 
 export const authLicense = async () =>
   new Promise((resolve, reject) => {
     const license = process.env.LICENSE;
     if (!license) return reject('license is null');
 
-    const key = 'LABRING_FASTGPT_GPT_LICENSE';
+    const key = process.env.LICENSE_KEY;
 
     jwt.verify(license, key, function (err, decoded) {
       if (err || !decoded.maxRegister) {

@@ -14,9 +14,10 @@ export enum AuthUserTypeEnum {
 export const authLicense = async () =>
   new Promise((resolve, reject) => {
     const license = global.systemConfig.license;
+
     if (!license) return reject('license is null');
 
-    const key = 'LABRING_FASTGPT_GPT_LICENSE';
+    const key = process.env.LICENSE_KEY;
 
     // @ts-ignore
     jwt.verify(license, key, function (err, decoded: LicenseDataType) {
