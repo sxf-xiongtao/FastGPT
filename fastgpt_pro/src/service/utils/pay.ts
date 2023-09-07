@@ -29,6 +29,10 @@ export class WXPay {
           total: amount
         }
       });
+      const data = JSON.parse(res.data);
+      if (!data.code_url) {
+        throw new Error(data.message || '获取支付二维码失败');
+      }
 
       return JSON.parse(res.data).code_url as string;
     } catch (error) {
