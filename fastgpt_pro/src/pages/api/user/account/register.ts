@@ -37,7 +37,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const user = await User.create({
       username,
       password,
-      inviterId: inviterId ? inviterId : undefined
+      inviterId: inviterId ? inviterId : undefined,
+      balance: (global.systemConfig.system?.userDefaultBalance || 2) * PRICE_SCALE
     });
 
     const token = generateToken(user._id);

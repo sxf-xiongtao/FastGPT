@@ -8,6 +8,7 @@ import { parseQueryString } from '@/utils/tools';
 import { authMaxUsers } from './register';
 import { customAlphabet } from 'nanoid';
 import { connectToDatabase } from '@/service/mongo';
+import { PRICE_SCALE } from '@/constants/common';
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 8);
 
 type GithubAccessTokenType = {
@@ -104,7 +105,8 @@ export async function registerUser({
     username,
     avatar,
     password: nanoid(),
-    inviterId: inviterId ? inviterId : undefined
+    inviterId: inviterId ? inviterId : undefined,
+    balance: (global.systemConfig.system?.userDefaultBalance || 2) * PRICE_SCALE
   });
 
   // 根据 id 获取用户信息
