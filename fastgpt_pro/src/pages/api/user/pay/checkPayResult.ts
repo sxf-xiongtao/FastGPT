@@ -1,12 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@/service/response';
-import { User, Pay, promotionRecord } from '@/service/mongo';
+import { User, Pay, PromotionRecord } from '@/service/mongo';
 import { authUser } from '@/service/utils/auth';
 import { PaySchema } from '@/types/mongoSchema';
 import dayjs from 'dayjs';
 import { WXPay } from '@/service/utils/pay';
 import { formatPrice } from '@/utils/user';
 import { connectToDatabase } from '@/service/mongo';
+import { createOnePromotion } from '@/service/account/promotion';
 
 /* 校验支付结果 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -57,21 +58,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           });
 
           // 增加邀请者的收益
-          if (inviter) {
-            try {
-              const amount = (payOrder.price * inviter.promotionRate) / 100;
-              await Promise.all([
-                User.findByIdAndUpdate(inviterId, {
-                  $inc: { balance: amount }
-                }),
-                promotionRecord.create({
-                  userId: inviterId,
-                  objUId: userId,
-                  type: 'pay',
-                  amount: formatPrice(amount)
-                })
-              ]);
-            } catch (error) {}
+          if (inviter && inviterId) {
+            const amount = (payOrder.price * inviter.promotionRate) / 100;
+            createOnePromotion({
+              userId: inviterId,
+              objUId: userId,
+              type: 'pay',
+              amount
+            });
           }
 
           return jsonRes(res, {

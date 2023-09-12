@@ -3,11 +3,11 @@ import { jsonRes } from '@/service/response';
 import { User } from '@/service/models/user';
 import { connectToDatabase } from '@/service/mongo';
 import { generateToken, setCookie } from '@/service/utils/tools';
-import { UserAuthTypeEnum } from '@/constants/common';
+import { PRICE_SCALE, UserAuthTypeEnum } from '@/constants/common';
 import { authCode } from '../../inform/sendAuthCode';
 import { authMaxUsers } from '@/service/auth/user';
 import { createUserByUsername } from '@/service/account';
-import { sendRegisterPromotion } from '@/service/account/promotion';
+import { createOnePromotion } from '@/service/account/promotion';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -45,11 +45,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const token = generateToken(user._id);
     setCookie(res, token);
 
-    sendRegisterPromotion({
-      userId: inviterId,
-      objUId: user._id,
-      registerName: username
-    });
+    if (!username.includes('@')) {
+      createOnePromotion({
+        userId: inviterId,
+        objUId: user._id,
+        type: 'register',
+        amount: 5 * PRICE_SCALE
+      });
+    }
 
     jsonRes(res, {
       data: {

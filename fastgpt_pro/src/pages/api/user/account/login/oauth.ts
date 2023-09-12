@@ -106,15 +106,14 @@ export async function authGoogle(code: string, callbackUrl: string) {
     `https://oauth2.googleapis.com/token?client_id=${global.systemConfig?.auth?.google?.clientId}&client_secret=${global.systemConfig?.auth?.google?.secret}&code=${code}&redirect_uri=${callbackUrl}&grant_type=authorization_code`
   );
 
-  const { name, sub, picture } = jwt.decode(data.id_token) as {
+  const { sub, picture } = jwt.decode(data.id_token) as {
     sub: string;
-    name: string;
     picture: string;
   };
 
   if (!sub) throw new Error('fail to get google openid');
 
-  const username = `google-${name}`.replace(/\s/g, '');
+  const username = `google-${sub}`;
 
   return {
     avatarUrl: picture,
