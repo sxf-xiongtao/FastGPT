@@ -25,8 +25,12 @@ export type SystemConfigType = {
   };
   auth?: {
     googleServiceVerKey?: string;
-    git?: {
-      key: string;
+    github?: {
+      clientId: string;
+      secret: string;
+    };
+    google?: {
+      clientId: string;
       secret: string;
     };
     email?: {

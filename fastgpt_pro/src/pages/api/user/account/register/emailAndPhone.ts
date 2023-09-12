@@ -2,14 +2,16 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@/service/response';
 import { User } from '@/service/models/user';
 import { connectToDatabase } from '@/service/mongo';
-import { UserAuthTypeEnum } from '@/constants/common';
 import { generateToken, setCookie } from '@/service/utils/tools';
-import { authCode } from './sendCode';
+import { UserAuthTypeEnum } from '@/constants/common';
+import { authCode } from '../../inform/sendAuthCode';
+import { authMaxUsers } from '@/service/auth/user';
+import { createUserByUsername } from '@/service/account';
+import { sendRegisterPromotion } from '@/service/account/promotion';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
-    const { username, code, password } = req.body;
-
+    const { username, code, password, inviterId } = req.body;
     await connectToDatabase();
 
     if (!username || !code || !password) {
@@ -19,35 +21,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     // 验证码校验
     await authCode({
       username,
-      code,
-      type: UserAuthTypeEnum.findPassword
+      type: UserAuthTypeEnum.register,
+      code
     });
 
-    if (!authCode) {
-      throw new Error('验证码错误');
-    }
-
-    // 更新对应的记录
-    await User.updateOne(
-      {
-        username
-      },
-      {
-        password
-      }
-    );
-
-    // 根据 username 获取用户信息
-    const user = await User.findOne({
+    // 重名校验
+    const authRepeat = await User.findOne({
       username
     });
 
-    if (!user) {
-      throw new Error('获取用户信息异常');
+    if (authRepeat) {
+      throw new Error('该用户已被注册');
     }
+
+    await authMaxUsers();
+
+    const user = await createUserByUsername({
+      username,
+      password,
+      inviterId
+    });
 
     const token = generateToken(user._id);
     setCookie(res, token);
+
+    sendRegisterPromotion({
+      userId: inviterId,
+      objUId: user._id,
+      registerName: username
+    });
 
     jsonRes(res, {
       data: {

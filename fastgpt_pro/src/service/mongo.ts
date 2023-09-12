@@ -50,3 +50,4 @@ export * from './models/pay';
 export * from './models/openapi';
 export * from './models/image';
 export * from './models/promotionRecord';
+export * from './models/inform';

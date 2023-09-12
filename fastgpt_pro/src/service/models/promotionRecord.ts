@@ -1,5 +1,6 @@
 import { Schema, model, models, Model } from 'mongoose';
 import { PromotionRecordSchema as PromotionRecordType } from '@/types/mongoSchema';
+import { formatPrice } from '@/utils/user';
 
 const PromotionRecordSchema = new Schema({
   userId: {
@@ -24,9 +25,10 @@ const PromotionRecordSchema = new Schema({
   },
   amount: {
     type: Number,
-    required: true
+    required: true,
+    set: (val: number) => formatPrice(val)
   }
 });
 
-export const promotionRecord: Model<PromotionRecordType> =
+export const PromotionRecord: Model<PromotionRecordType> =
   models['promotionRecord'] || model('promotionRecord', PromotionRecordSchema);
