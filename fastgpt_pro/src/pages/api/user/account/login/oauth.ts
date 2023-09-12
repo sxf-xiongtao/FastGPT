@@ -14,15 +14,16 @@ import { createHashPassword } from '@/utils/tools';
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     await connectToDatabase();
-    const { type, code, inviterId } = req.query as {
+    const { type, code, inviterId, callbackUrl } = req.body as {
       type: 'github' | 'google';
       code: string;
       inviterId?: string;
+      callbackUrl: string;
     };
 
     const { username, avatarUrl } = await (async () => {
       if (type === 'github') return authGithub(code);
-      if (type === 'google') return authGoogle(code);
+      if (type === 'google') return authGoogle(code, callbackUrl);
       return Promise.reject('type error');
     })();
 
@@ -61,6 +62,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       throw new Error(err);
     }
   } catch (err) {
+    console.log(err);
+
     jsonRes(res, {
       code: 500,
       error: err
@@ -98,36 +101,9 @@ export async function authGithub(code: string) {
   };
 }
 
-export async function authGoogle(code: string) {
-  async function getBase64FromRemote(url: string) {
-    try {
-      const res = await fetch(url);
-      const blob = await res.blob();
-      const blobToBase64 = (blob: Blob) =>
-        new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(blob);
-          reader.onload = () => {
-            const dataUrl = reader.result;
-            resolve(dataUrl);
-          };
-          reader.onerror = (error) => {
-            reject(error);
-          };
-        });
-
-      return await blobToBase64(blob);
-    } catch {
-      return '';
-    }
-  }
-
+export async function authGoogle(code: string, callbackUrl: string) {
   const { data } = await axios.post<{ id_token: string }>(
-    `https://oauth2.googleapis.com/token?client_id=${
-      global.systemConfig?.auth?.google?.clientId
-    }&client_secret=${
-      global.systemConfig?.auth?.google?.secret
-    }&code=${code}&redirect_uri=${`callbackUrl`}&grant_type=authorization_code`
+    `https://oauth2.googleapis.com/token?client_id=${global.systemConfig?.auth?.google?.clientId}&client_secret=${global.systemConfig?.auth?.google?.secret}&code=${code}&redirect_uri=${callbackUrl}&grant_type=authorization_code`
   );
 
   const { name, sub, picture } = jwt.decode(data.id_token) as {
@@ -136,13 +112,12 @@ export async function authGoogle(code: string) {
     picture: string;
   };
 
-  const avatar_url = (await getBase64FromRemote(picture)) as string;
   if (!sub) throw new Error('fail to get google openid');
 
   const username = `google-${name}`;
 
   return {
-    avatarUrl: avatar_url,
+    avatarUrl: picture,
     username
   };
 }
