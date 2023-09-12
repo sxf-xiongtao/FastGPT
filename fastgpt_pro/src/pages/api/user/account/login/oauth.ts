@@ -114,7 +114,7 @@ export async function authGoogle(code: string, callbackUrl: string) {
 
   if (!sub) throw new Error('fail to get google openid');
 
-  const username = `google-${name}`;
+  const username = `google-${name}`.replace(/\s/g, '');
 
   return {
     avatarUrl: picture,
