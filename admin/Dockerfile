@@ -1,34 +1,22 @@
-# Install dependencies only when needed
+# Build stage
 FROM node:18 AS builder
 WORKDIR /app
 
-RUN npm install -g pnpm
+COPY package.json pnpm-lock.yaml* ./
 
-ENV NEXT_TELEMETRY_DISABLED 1
-ENV VITE_PUBLIC_SERVER_URL ''
-# Install dependencies based on the preferred package manager
+RUN npm install -g pnpm
+RUN pnpm install
 
 COPY . .
-RUN \
-  [ -f pnpm-lock.yaml ] && pnpm install || \
-  (echo "Lockfile not found." && exit 1)
 
 RUN pnpm build
 
-# Production image, copy all the files and run next
-FROM node:18 AS runner
+# Production stage
+FROM node:18-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
-
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-RUN sed -i 's/https/http/' /etc/apk/repositories
-RUN apk add curl \
-  && apk add ca-certificates \
-  && update-ca-certificates
 
 COPY package.json pnpm-lock.yaml* ./
 COPY --from=builder /app/server.js ./server.js
@@ -42,7 +30,6 @@ RUN npm remove -g pnpm
 ENV PORT=3001
 ARG LICENSE_KEY
 ENV LICENSE_KEY=${LICENSE_KEY}
-
 
 EXPOSE 3001
 
