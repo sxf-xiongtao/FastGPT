@@ -8,7 +8,7 @@ export const useKbRoute = (app) => {
       const start = parseInt(req.query._start) || 0;
       const end = parseInt(req.query._end) || 20;
       const order = req.query._order === 'DESC' ? -1 : 1;
-      const sort = req.query._sort || '_id';
+      const sort = req.query._sort === 'id' ? '_id' : req.query._sort || '_id';
       const tag = req.query.tag || '';
       const name = req.query.name || '';
 
@@ -36,7 +36,7 @@ export const useKbRoute = (app) => {
         const kb = kbRaw.toObject();
 
         const orderedKb = {
-          id: kb._id.toString(),
+          _id: kb._id.toString(),
           userId: kb.userId,
           name: kb.name,
           tags: kb.tags,

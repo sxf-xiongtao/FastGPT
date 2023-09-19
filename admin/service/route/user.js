@@ -67,7 +67,7 @@ export const useUserRoute = (app) => {
       const start = parseInt(req.query._start) || 0;
       const end = parseInt(req.query._end) || 20;
       const order = req.query._order === 'DESC' ? -1 : 1;
-      const sort = req.query._sort || 'createTime';
+      const sort = req.query._sort === 'id' ? '_id' : req.query._sort || '_id';
       const username = req.query.username || '';
       const where = {
         username: { $regex: username, $options: 'i' }
@@ -82,7 +82,7 @@ export const useUserRoute = (app) => {
         const obj = user.toObject();
         return {
           ...obj,
-          id: obj._id,
+          _id: obj._id,
           balance: formatPrice(obj.balance),
           createTime: dayjs(obj.createTime).format('YYYY/MM/DD HH:mm'),
           password: ''
@@ -146,8 +146,8 @@ export const useUserRoute = (app) => {
     try {
       const start = parseInt(req.query._start) || 0;
       const end = parseInt(req.query._end) || 20;
-      const order = req.query._order === 'DESC' ? -1 : 1;
-      const sort = req.query._sort || '_id';
+      const order = req.query._order === 'ASC' ? 1 : -1;
+      const sort = req.query._sort === 'id' ? '_id' : req.query._sort || '_id';
       const userId = req.query.userId || '';
       const where = userId ? { userId: userId } : {};
 
@@ -164,9 +164,9 @@ export const useUserRoute = (app) => {
         const pay = payRaw.toObject();
 
         const orderedPay = {
-          id: pay._id.toString(),
+          _id: pay._id.toString(),
           userId: pay.userId,
-          price: pay.price,
+          price: pay.price / PRICE_SCALE,
           orderId: pay.orderId,
           status: pay.status,
           createTime: dayjs(pay.createTime).format('YYYY/MM/DD HH:mm')

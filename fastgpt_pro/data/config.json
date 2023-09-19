@@ -9,8 +9,12 @@
   },
   "auth": {
     "googleServiceVerKey": "",
-    "git": {
-      "key": "",
+    "github": {
+      "clientId": "",
+      "secret": ""
+    },
+    "google": {
+      "clientId": "",
       "secret": ""
     },
     "email": {

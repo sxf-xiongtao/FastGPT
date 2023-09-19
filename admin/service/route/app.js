@@ -8,13 +8,13 @@ export const useAppRoute = (app) => {
       const start = parseInt(req.query._start) || 0;
       const end = parseInt(req.query._end) || 20;
       const order = req.query._order === 'DESC' ? -1 : 1;
-      const sort = req.query._sort;
+      const sort = req.query._sort === 'id' ? '_id' : req.query._sort || '_id';
       const name = req.query.name || '';
-      const id = req.query.id || '';
+      const _id = req.query._id || '';
 
       const where = {
         ...(name && { name: { $regex: name, $options: 'i' } }),
-        ...(id && { _id: id })
+        ...(_id && { _id })
       };
 
       const modelsRaw = await App.find(where)
@@ -28,7 +28,7 @@ export const useAppRoute = (app) => {
         const app = modelRaw.toObject();
 
         const orderedModel = {
-          id: app._id.toString(),
+          _id: app._id.toString(),
           userId: app.userId,
           name: app.name,
           intro: app.intro,
