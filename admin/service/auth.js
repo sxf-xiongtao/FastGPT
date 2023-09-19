@@ -5,13 +5,15 @@ export const authLicense = async () =>
     const license = process.env.LICENSE;
     if (!license) return reject('license is null');
 
-    const key = process.env.LICENSE_KEY;
+    const key = 'LABRING_FASTGPT_GPT_LICENSE';
 
     jwt.verify(license, key, function (err, decoded) {
       if (err || !decoded.maxRegister) {
         reject('license is error');
         return;
       }
+
+      console.log(`license loaded: ${JSON.stringify(decoded)}`);
 
       resolve('');
     });

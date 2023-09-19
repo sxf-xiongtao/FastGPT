@@ -6,22 +6,14 @@ const adminAuth = {
 };
 const authSecret = process.env.ADMIN_SECRET;
 
-const postParent = () => {
-  fetch(`${process.env.PARENT_URL}/api/system/updateEnv`, {
-    headers: {
-      rootkey: process.env.PARENT_ROOT_KEY
-    }
-  });
-};
-
 export const useSystemRoute = (app) => {
   app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+
     if (!adminAuth.username || !adminAuth.password) {
       res.status(401).end('Server not set env: ADMIN_USER, ADMIN_PASS');
       return;
     }
-
-    const { username, password } = req.body;
 
     if (username === adminAuth.username && password === adminAuth.password) {
       // 用户名和密码都正确，返回token

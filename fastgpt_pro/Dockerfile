@@ -59,8 +59,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 
 ENV PORT=3000
-ARG LICENSE_KEY
-ENV LICENSE_KEY=${LICENSE_KEY}
 
 EXPOSE 3000
 

@@ -17,7 +17,7 @@ export const authLicense = async () =>
 
     if (!license) return reject('license is null');
 
-    const key = process.env.LICENSE_KEY;
+    const key = 'LABRING_FASTGPT_GPT_LICENSE';
 
     // @ts-ignore
     jwt.verify(license, key, function (err, decoded: LicenseDataType) {

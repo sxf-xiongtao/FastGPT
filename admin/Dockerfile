@@ -8,6 +8,7 @@ RUN npm install -g pnpm
 RUN pnpm install
 
 COPY . .
+ENV VITE_PUBLIC_SERVER_URL=''
 
 RUN pnpm build
 
@@ -28,8 +29,6 @@ RUN pnpm install --prod
 RUN npm remove -g pnpm
 
 ENV PORT=3001
-ARG LICENSE_KEY
-ENV LICENSE_KEY=${LICENSE_KEY}
 
 EXPOSE 3001
 
