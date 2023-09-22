@@ -82,7 +82,7 @@ export const useUserRoute = (app) => {
         const obj = user.toObject();
         return {
           ...obj,
-          _id: obj._id,
+          id: obj._id,
           balance: formatPrice(obj.balance),
           createTime: dayjs(obj.createTime).format('YYYY/MM/DD HH:mm'),
           password: ''
@@ -125,16 +125,20 @@ export const useUserRoute = (app) => {
   // 修改用户信息
   app.put('/users/:id', auth(), async (req, res) => {
     try {
-      const _id = req.params.id;
+      const id = req.params.id;
 
       let { username, password, balance = 0 } = req.body;
 
-      const result = await User.findByIdAndUpdate(_id, {
+      const result = await User.findByIdAndUpdate(id, {
         ...(username && { username }),
         ...(password && { password: hashPassword(hashPassword(password)) }),
         ...(balance && { balance: balance * PRICE_SCALE })
       });
-      res.json(result);
+
+      res.json({
+        ...result.toObject(),
+        ...(balance && { balance: formatPrice(balance * PRICE_SCALE) })
+      });
     } catch (err) {
       console.log(`Error updating user: ${err}`);
       res.status(500).json({ error: 'Error updating user' });
@@ -164,7 +168,7 @@ export const useUserRoute = (app) => {
         const pay = payRaw.toObject();
 
         const orderedPay = {
-          _id: pay._id.toString(),
+          id: pay._id.toString(),
           userId: pay.userId,
           price: pay.price / PRICE_SCALE,
           orderId: pay.orderId,

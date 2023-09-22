@@ -36,7 +36,7 @@ export const useKbRoute = (app) => {
         const kb = kbRaw.toObject();
 
         const orderedKb = {
-          _id: kb._id.toString(),
+          id: kb._id.toString(),
           userId: kb.userId,
           name: kb.name,
           tags: kb.tags,

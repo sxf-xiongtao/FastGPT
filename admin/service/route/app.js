@@ -10,11 +10,11 @@ export const useAppRoute = (app) => {
       const order = req.query._order === 'DESC' ? -1 : 1;
       const sort = req.query._sort === 'id' ? '_id' : req.query._sort || '_id';
       const name = req.query.name || '';
-      const _id = req.query._id || '';
+      const id = req.query.id || '';
 
       const where = {
         ...(name && { name: { $regex: name, $options: 'i' } }),
-        ...(_id && { _id })
+        ...(id && { _id: id })
       };
 
       const modelsRaw = await App.find(where)
@@ -28,7 +28,7 @@ export const useAppRoute = (app) => {
         const app = modelRaw.toObject();
 
         const orderedModel = {
-          _id: app._id.toString(),
+          id: app._id.toString(),
           userId: app.userId,
           name: app.name,
           intro: app.intro,
@@ -54,14 +54,14 @@ export const useAppRoute = (app) => {
   // 修改 app 信息
   app.put('/apps/:id', auth(), async (req, res) => {
     try {
-      const _id = req.params.id;
+      const id = req.params.id;
 
       let {
         share: { isShare, topNum },
         intro
       } = req.body;
 
-      await App.findByIdAndUpdate(_id, {
+      await App.findByIdAndUpdate(id, {
         $set: {
           intro: intro,
           'share.topNum': Number(topNum),
