@@ -2,10 +2,9 @@
   "name": "fastgpt-pro",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "prepare": "husky install",
-    "format": "prettier --config \"./.prettierrc.js\" --write \"./pro/**/src/**/*.{ts,tsx,scss}\""
+    "format": "prettier --config \"./.prettierrc.js\" --write \"./**/src/**/*.{ts,tsx,scss}\""
   },
   "keywords": [],
   "author": "",
@@ -15,6 +14,6 @@
     "prettier": "^2.8.7"
   },
   "lint-staged": {
-    "./pro/**/**/*.{ts,tsx,scss}": "npm run format"
+    "./**/**/*.{ts,tsx,scss}": "npm run format"
   }
 }

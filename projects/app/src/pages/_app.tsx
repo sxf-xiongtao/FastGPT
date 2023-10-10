@@ -1,13 +1,11 @@
 import type { AppProps } from 'next/app';
-import Script from 'next/script';
 import Head from 'next/head';
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
 import { theme } from '@/constants/theme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import NProgress from 'nprogress'; //nprogress module
+import NProgress from 'nprogress';
 import Router from 'next/router';
-import { appWithTranslation, useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
+import { appWithTranslation } from 'next-i18next';
 
 import 'nprogress/nprogress.css';
 import '@/styles/reset.scss';
@@ -29,10 +27,6 @@ const queryClient = new QueryClient({
 });
 
 function App({ Component, pageProps }: AppProps) {
-  const router = useRouter();
-  const { hiId } = router.query as { hiId?: string };
-  const { i18n } = useTranslation();
-
   return (
     <>
       <Head>
