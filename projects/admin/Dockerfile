@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml* ./
 
 RUN npm install -g pnpm
-RUN pnpm install --production
+RUN pnpm install
 
 # Build stage
 FROM node:18 AS builder
