@@ -9,12 +9,14 @@ RUN pnpm install
 
 # Build stage
 FROM node:18 AS builder
+WORKDIR /app
 
 COPY . .
 COPY --from=deps /app/node_modules ./node_modules
 
 ENV VITE_PUBLIC_SERVER_URL=''
 
+RUN npm install -g pnpm
 RUN pnpm build
 
 # Production stage
