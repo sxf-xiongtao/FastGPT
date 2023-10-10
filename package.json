@@ -1,5 +1,5 @@
 {
-  "name": "fastgpt-private",
+  "name": "fastgpt-pro",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,7 +9,6 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
   "devDependencies": {
     "husky": "^8.0.3",
     "lint-staged": "^13.2.1",
