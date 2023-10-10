@@ -9,7 +9,7 @@ on:
     tags:
       - 'v*.*.*'
 jobs:
-  build-admin-images:
+  build-fastgpt-admin-images:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
