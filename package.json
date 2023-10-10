@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "prepare": "husky install",
-    "format": "prettier --config \"./.prettierrc.js\" --write \"./**/src/**/*.{ts,tsx,scss}\""
+    "format": "prettier --config \"./.prettierrc.js\" --write \"./pro/**/src/**/*.{ts,tsx,scss}\""
   },
   "keywords": [],
   "author": "",
@@ -16,9 +16,6 @@
     "prettier": "^2.8.7"
   },
   "lint-staged": {
-    "./**/**/*.{ts,tsx,scss}": "npm run format"
-  },
-  "dependencies": {
-    "fastgpt-private": "link:"
+    "./pro/**/**/*.{ts,tsx,scss}": "npm run format"
   }
 }
