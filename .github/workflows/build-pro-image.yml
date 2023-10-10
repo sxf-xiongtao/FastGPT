@@ -2,6 +2,9 @@ name: Build fastgpt-plus images and copy image to docker hub
 on:
   workflow_dispatch:
   push:
+    paths:
+      - 'projects/app/**'
+      - 'FastGPT/packages/**'
     branches:
       - 'main'
     tags:
