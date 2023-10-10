@@ -1,13 +1,13 @@
-name: Build fastgpt-plus images and copy image to docker hub
+name: Build fastgpt-admin images and copy image to docker hub
 on:
   workflow_dispatch:
   push:
     branches:
-      - 'fastgpt_pro'
+      - 'main'
     tags:
       - 'v*.*.*'
 jobs:
-  build-plus-images:
+  build-admin-images:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
@@ -32,20 +32,20 @@ jobs:
       - name: Set DOCKER_REPO_TAGGED based on branch or tag
         run: |
           if [[ "${{ github.ref_name }}" == "main" ]]; then
-            echo "DOCKER_REPO_TAGGED=ghcr.io/${{ github.repository_owner }}/fastgpt-plus:latest" >> $GITHUB_ENV
+            echo "DOCKER_REPO_TAGGED=ghcr.io/${{ github.repository_owner }}/fastgpt-admin:latest" >> $GITHUB_ENV
           else
-            echo "DOCKER_REPO_TAGGED=ghcr.io/${{ github.repository_owner }}/fastgpt-plus:${{ github.ref_name }}" >> $GITHUB_ENV
+            echo "DOCKER_REPO_TAGGED=ghcr.io/${{ github.repository_owner }}/fastgpt-admin:${{ github.ref_name }}" >> $GITHUB_ENV
           fi
 
       - name: Build and publish image for main branch or tag push event
         env:
           DOCKER_REPO_TAGGED: ${{ env.DOCKER_REPO_TAGGED }}
         run: |
-          cd plus && \
+          cd projects/admin && \
           docker buildx build \
           --platform linux/amd64,linux/arm64 \
           --label "org.opencontainers.image.source=  https://github.com/  ${{ github.repository_owner }}/FastGPT" \
-          --label "org.opencontainers.image.description=fastgpt-plus image" \
+          --label "org.opencontainers.image.description=fastgpt-admin image" \
           --label "org.opencontainers.image.licenses=MIT" \
           --push \
           -t ${DOCKER_REPO_TAGGED} \
