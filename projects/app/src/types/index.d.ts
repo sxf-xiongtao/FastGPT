@@ -58,8 +58,10 @@ export type SystemConfigType = {
 };
 
 export type LicenseDataType = {
+  startTime: string;
+  expTime: string;
+  company: string;
   maxRegister: number;
-  exp: number;
 };
 
 declare global {

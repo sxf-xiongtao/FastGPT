@@ -1,12 +1,12 @@
 import express from 'express';
 import cors from 'cors';
-import { initAuthLicense } from './service/auth.js';
+import { authLicense } from './service/auth.js';
 import { useUserRoute } from './service/route/user.js';
 import { useAppRoute } from './service/route/app.js';
 import { useKbRoute } from './service/route/kb.js';
 import { useSystemRoute } from './service/route/system.js';
 
-initAuthLicense();
+authLicense();
 
 const app = express();
 app.use(cors());

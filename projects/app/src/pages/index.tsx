@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Box } from '@chakra-ui/react';
-import { serviceSideProps } from '@/utils/i18n';
+import { serviceSideProps } from '@/utils/web/i18n';
 import { strIsLink } from '@fastgpt/common/tools/str';
 
 const Home = () => {

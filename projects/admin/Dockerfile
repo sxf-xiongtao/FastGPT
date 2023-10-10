@@ -1,13 +1,18 @@
-# Build stage
-FROM node:18 AS builder
+# install
+FROM node:18 AS deps
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml* ./
 
 RUN npm install -g pnpm
-RUN pnpm install
+RUN pnpm install --production
+
+# Build stage
+FROM node:18 AS builder
 
 COPY . .
+COPY --from=deps /app/node_modules ./node_modules
+
 ENV VITE_PUBLIC_SERVER_URL=''
 
 RUN pnpm build

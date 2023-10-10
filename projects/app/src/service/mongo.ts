@@ -1,8 +1,7 @@
 import mongoose from 'mongoose';
 import { initService, initLogger } from './init';
-import { authLicense } from './utils/auth';
+import { authLicense } from '@/utils/service/common/license';
 import { exit } from 'process';
-import dayjs from 'dayjs';
 
 /**
  * connect MongoDB and init data
@@ -17,18 +16,6 @@ export async function connectToDatabase(): Promise<void> {
   initLogger();
 
   try {
-    await authLicense();
-  } catch (error) {
-    console.log(error);
-    return exit(1);
-  }
-
-  console.log('license load', {
-    maxRegister: global.licenseData.maxRegister,
-    expiredTime: dayjs(global.licenseData.exp * 1000).format('YYYY-MM-DD')
-  });
-
-  try {
     mongoose.set('strictQuery', true);
     global.mongodb = await mongoose.connect(process.env.MONGODB_URI as string, {
       bufferCommands: true,
@@ -36,6 +23,13 @@ export async function connectToDatabase(): Promise<void> {
       maxPoolSize: Number(process.env.DB_MAX_LINK || 5),
       minPoolSize: 2
     });
+
+    try {
+      await authLicense();
+    } catch (error) {
+      console.log(error);
+      return exit(1);
+    }
 
     console.log('mongo connected');
   } catch (error) {

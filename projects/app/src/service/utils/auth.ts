@@ -3,36 +3,12 @@ import Cookie from 'cookie';
 import { User, OpenApi } from '../mongo';
 import { ERROR_ENUM } from '../errorCode';
 import { authJWT } from './tools';
-import jwt from 'jsonwebtoken';
 
 export enum AuthUserTypeEnum {
   token = 'token',
   root = 'root',
   apikey = 'apikey'
 }
-
-export const authLicense = async () =>
-  new Promise((resolve, reject) => {
-    const license = global.systemConfig.license;
-
-    if (!license) return reject('license is null');
-
-    const key = 'LABRING_FASTGPT_GPT_LICENSE';
-
-    // @ts-ignore
-    jwt.verify(license, key, function (err, decoded: LicenseDataType) {
-      console.log(decoded);
-
-      if (err || !decoded.maxRegister) {
-        reject('license is error');
-        return;
-      }
-
-      global.licenseData = decoded;
-
-      resolve('');
-    });
-  });
 
 export const authCookieToken = async (cookie?: string, token?: string): Promise<string> => {
   // 获取 cookie

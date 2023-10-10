@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { LicenseDataType } from '@/types';
 
 export const LICENSE_PUBLIC_KEY = `-----BEGIN PRIVATE KEY-----
 MIIJRAIBADANBgkqhkiG9w0BAQEFAASCCS4wggkqAgEAAoICAQCr52U/PTCo1vrn
@@ -56,7 +57,7 @@ SN2dSdtwlojkOB6cVqpn8vvziPL0ERVD
 
 export async function authLicense() {
   try {
-    const license = process.env.LICENSE;
+    const license = global.systemConfig.license;
     const buffer = Buffer.from(license, 'base64');
     const decrypted = crypto.privateDecrypt(
       {
@@ -65,17 +66,17 @@ export async function authLicense() {
       },
       buffer
     );
-    const licenseData = JSON.parse(decrypted.toString('utf8'));
+    const licenseData = JSON.parse(decrypted.toString('utf8')) as LicenseDataType;
 
     // auth date
     if (new Date(licenseData.expTime).getTime() < Date.now()) {
-      throw new Error('License 已过期');
+      return Promise.reject('License 已过期');
     }
 
-    console.log(`商业版管理端加载成功，${licenseData.company}, 过期时间: ${licenseData.expTime}`);
+    console.log(`商业版插件加载成功，${licenseData.company}, 过期时间: ${licenseData.expTime}`);
     return;
   } catch (error) {
     console.log(error);
-    throw new Error('License 不合法');
+    return Promise.reject('License 不合法');
   }
 }
