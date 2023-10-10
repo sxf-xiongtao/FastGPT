@@ -6,7 +6,7 @@ import { strIsLink } from '@fastgpt/common/tools/str';
 const Home = () => {
   console.log(strIsLink('sdsds'), '===');
 
-  return null;
+  return <Box>这是FastGPT Pro</Box>;
 };
 export async function getServerSideProps(content: any) {
   return {
