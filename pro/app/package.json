@@ -23,7 +23,6 @@
     "@emotion/styled": "^11.10.6",
     "@dqbd/tiktoken": "^1.0.7",
     "@mozilla/readability": "^0.4.4",
-    "@next/font": "13.1.6",
     "@peculiar/x509": "^1.9.5",
     "@tanstack/react-query": "^4.24.10",
     "@types/nprogress": "^0.2.0",

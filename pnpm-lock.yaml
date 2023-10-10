@@ -18,10 +18,23 @@ importers:
         specifier: ^2.8.7
         version: registry.npmmirror.com/prettier@2.8.7
 
-  fastgpt/packages/common: {}
-
-  fastgpt/packages/core:
+  FastGPT/packages/common:
     dependencies:
+      '@fastgpt/core':
+        specifier: workspace:*
+        version: link:../core
+      '@fastgpt/support':
+        specifier: workspace:*
+        version: link:../support
+
+  FastGPT/packages/core:
+    dependencies:
+      '@fastgpt/common':
+        specifier: workspace:*
+        version: link:../common
+      '@fastgpt/support':
+        specifier: workspace:*
+        version: link:../support
       openai:
         specifier: ^3.3.0
         version: registry.npmmirror.com/openai@3.3.0
@@ -33,7 +46,14 @@ importers:
         specifier: ^0.0.4
         version: registry.npmmirror.com/@types/tunnel@0.0.4
 
-  fastgpt/packages/support: {}
+  FastGPT/packages/support:
+    dependencies:
+      '@fastgpt/common':
+        specifier: workspace:*
+        version: link:../common
+      '@fastgpt/core':
+        specifier: workspace:*
+        version: link:../core
 
   pro/admin:
     dependencies:
@@ -148,19 +168,16 @@ importers:
         version: registry.npmmirror.com/@emotion/styled@11.10.6(@emotion/react@11.10.6)(@types/react@18.0.28)(react@18.2.0)
       '@fastgpt/common':
         specifier: workspace:*
-        version: link:../../fastgpt/packages/common
+        version: link:../../FastGPT/packages/common
       '@fastgpt/core':
         specifier: workspace:*
-        version: link:../../fastgpt/packages/core
+        version: link:../../FastGPT/packages/core
       '@fastgpt/support':
         specifier: workspace:*
-        version: link:../../fastgpt/packages/support
+        version: link:../../FastGPT/packages/support
       '@mozilla/readability':
         specifier: ^0.4.4
         version: registry.npmmirror.com/@mozilla/readability@0.4.4
-      '@next/font':
-        specifier: 13.1.6
-        version: registry.npmmirror.com/@next/font@13.1.6
       '@peculiar/x509':
         specifier: ^1.9.5
         version: registry.npmmirror.com/@peculiar/x509@1.9.5
@@ -4762,12 +4779,6 @@ packages:
     resolution: {integrity: sha512-dUseBIQVax+XtdJPzhwww4GetTjlkRSsXeQnisIJWBaHsnxYcN2RGzsPHi58D6qnkATjnhuAtQTJmR1hKYQQPg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@next/env/-/env-13.5.2.tgz}
     name: '@next/env'
     version: 13.5.2
-    dev: false
-
-  registry.npmmirror.com/@next/font@13.1.6:
-    resolution: {integrity: sha512-AITjmeb1RgX1HKMCiA39ztx2mxeAyxl4ljv2UoSBUGAbFFMg8MO7YAvjHCgFhD39hL7YTbFjol04e/BPBH5RzQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@next/font/-/font-13.1.6.tgz}
-    name: '@next/font'
-    version: 13.1.6
     dev: false
 
   registry.npmmirror.com/@next/swc-darwin-arm64@13.5.2:
