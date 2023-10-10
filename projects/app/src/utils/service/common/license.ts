@@ -72,8 +72,8 @@ export async function authLicense() {
     if (new Date(licenseData.expTime).getTime() < Date.now()) {
       return Promise.reject('License 已过期');
     }
-
-    console.log(`商业版插件加载成功，${licenseData.company}, 过期时间: ${licenseData.expTime}`);
+    global.licenseData = licenseData
+    console.log(`商业版插件加载成功，${licenseData.company}, 过期时间: ${licenseData.expTime}, 最大用户: ${licenseData.maxRegister}`);
     return;
   } catch (error) {
     console.log(error);
