@@ -1,12 +1,13 @@
 /** @type {import('next').NextConfig} */
 const { i18n } = require('./next-i18next.config');
+const path = require('path');
 
 const nextConfig = {
   i18n,
   output: 'standalone',
   reactStrictMode: false,
   compress: true,
-
+  transpilePackages: ['@fastgpt/*'],
   webpack(config, { isServer }) {
     if (!isServer) {
       config.resolve = {
@@ -17,10 +18,6 @@ const nextConfig = {
         }
       };
     }
-    config.experiments = {
-      asyncWebAssembly: true,
-      layers: true
-    };
     config.module = {
       ...config.module,
       rules: config.module.rules.concat([
@@ -34,6 +31,9 @@ const nextConfig = {
     };
 
     return config;
+  },
+  experimental: {
+    outputFileTracingRoot: path.join(__dirname, '../../')
   }
 };
 
