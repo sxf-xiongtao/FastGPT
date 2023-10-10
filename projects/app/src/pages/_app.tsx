@@ -36,7 +36,7 @@ function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>{'FastGPT'}</title>
+        <title>FastGPT</title>
         <meta name="description" content="Embedding + LLM, Build AI knowledge base" />
         <meta
           name="viewport"
@@ -44,9 +44,6 @@ function App({ Component, pageProps }: AppProps) {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Script src="/js/qrcode.min.js" strategy="lazyOnload"></Script>
-      <Script src="/js/pdf.js" strategy="lazyOnload"></Script>
-      <Script src="/js/html2pdf.bundle.min.js" strategy="lazyOnload"></Script>
 
       <QueryClientProvider client={queryClient}>
         <ChakraProvider theme={theme}>
