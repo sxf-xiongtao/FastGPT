@@ -1,4 +1,4 @@
-import { Schema, model, models, Model } from 'mongoose';
+import { Schema, model, models, Model } from '@fastgpt/common/mongo';
 import type { IpLimitSchemaType } from './type.d';
 
 const IpLimitSchema = new Schema({

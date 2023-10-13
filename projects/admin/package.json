@@ -14,7 +14,6 @@
     "@arco-design/web-react": "^2.49.1",
     "concurrently": "^8.1.0",
     "cors": "^2.8.5",
-    "crypto": "^1.0.1",
     "dayjs": "^1.11.8",
     "dotenv": "^16.1.4",
     "express": "^4.18.2",

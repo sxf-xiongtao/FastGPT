@@ -1,7 +1,5 @@
-import type { Mongoose } from 'mongoose';
 import type { Agent } from 'http';
 import type { Pool } from 'pg';
-import type { Logger } from 'winston';
 import { ChatModelItemType, QAModelItemType, VectorModelItemType } from './model';
 
 export type PagingData<T> = {
@@ -65,10 +63,7 @@ export type LicenseDataType = {
 };
 
 declare global {
-  var mongodb: Mongoose | string | null;
   var pgClient: Pool | null;
-
-  var logger: Logger;
 
   var systemConfig: SystemConfigType;
   var store: Record<string, any>;
