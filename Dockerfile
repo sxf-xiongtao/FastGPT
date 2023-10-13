@@ -8,8 +8,12 @@ ARG name
 
 # copy packages and one project
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY ./FastGPT/packages ./FastGPT/packages
 COPY ./projects/$name/package.json ./projects/$name/package.json
+# FastGPT package.json
+COPY ./FastGPT/package.json ./FastGPT/package.json
+COPY ./FastGPT/pnpm-lock.yaml ./FastGPT/pnpm-lock.yaml
+# All packages
+COPY ./FastGPT/packages ./FastGPT/packages
 
 RUN \
   [ -f pnpm-lock.yaml ] && pnpm install || \
@@ -24,11 +28,12 @@ WORKDIR /app
 ARG name
 
 # copy common node_modules and one project node_modules
+COPY pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/FastGPT/packages ./FastGPT/packages
 COPY ./projects/$name ./projects/$name
 COPY --from=deps /app/projects/$name/node_modules ./projects/$name/node_modules
-COPY pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY --from=deps /app/FastGPT/node_modules ./FastGPT/node_modules
+COPY --from=deps /app/FastGPT/packages ./FastGPT/packages
 
 # Uncomment the following line in case you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED 1
