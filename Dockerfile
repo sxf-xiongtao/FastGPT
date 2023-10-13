@@ -8,15 +8,13 @@ ARG name
 
 # copy packages and one project
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY ./projects/$name/package.json ./projects/$name/package.json
+COPY ./projects/$name ./projects/$name
 # All packages
 COPY ./FastGPT/packages ./FastGPT/packages
 
 RUN \
   [ -f pnpm-lock.yaml ] && pnpm install || \
   (echo "Lockfile not found." && exit 1)
-
-RUN pnpm prune
 
 # Rebuild the source code only when needed
 FROM node:current-alpine AS builder
@@ -28,8 +26,7 @@ ARG name
 COPY pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY --from=deps /app/FastGPT/packages ./FastGPT/packages
 COPY --from=deps /app/node_modules ./node_modules
-COPY ./projects/$name ./projects/$name
-COPY --from=deps /app/projects/$name/node_modules ./projects/$name/node_modules
+COPY --from=deps /app/projects/$name ./projects/$name
 
 # Uncomment the following line in case you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED 1
