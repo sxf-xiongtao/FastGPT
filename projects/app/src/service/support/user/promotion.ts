@@ -1,4 +1,4 @@
-import { PromotionRecord } from '../../mongo';
+import { MongoPromotionRecord } from '@/service/models/promotionRecord';
 import { MongoUser } from '@fastgpt/support/user/schema';
 
 export async function createOnePromotion(data: {
@@ -20,7 +20,7 @@ export async function createOnePromotion(data: {
       }, 2000);
     }
     // create promotion record
-    await PromotionRecord.create({
+    await MongoPromotionRecord.create({
       userId,
       objUId,
       type,

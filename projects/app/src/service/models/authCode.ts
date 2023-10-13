@@ -28,5 +28,5 @@ try {
   console.log(error);
 }
 
-export const AuthCode: Model<AuthCodeType> =
+export const MongoAuthCode: Model<AuthCodeType> =
   models['auth_code'] || model('auth_code', AuthCodeSchema);

@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@/service/response';
 import { authUser } from '@fastgpt/support/user/auth';
-import { Pay, connectToDatabase } from '@/service/mongo';
+import { connectToDatabase } from '@/service/mongo';
+import { MongoPay } from '@/service/models/pay';
 import { PRICE_SCALE } from '@/constants/common';
 import { WXPay } from '@/service/support/pay/pay';
 
@@ -19,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { code_url, orderId } = await wxPay.getPayQRUrl(amount);
 
     // add one pay record
-    const payOrder = await Pay.create({
+    const payOrder = await MongoPay.create({
       userId,
       price: amount * PRICE_SCALE,
       orderId

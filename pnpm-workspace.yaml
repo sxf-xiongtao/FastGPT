@@ -1,3 +1,4 @@
 packages:
+  - 'FastGPT'
   - 'FastGPT/packages/*'
   - 'projects/*'

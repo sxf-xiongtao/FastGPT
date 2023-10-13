@@ -26,4 +26,4 @@ const PaySchema = new Schema({
   }
 });
 
-export const Pay: Model<PayType> = models['pay'] || model('pay', PaySchema);
+export const MongoPay: Model<PayType> = models['pay'] || model('pay', PaySchema);

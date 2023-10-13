@@ -1,4 +1,4 @@
-import { Inform } from '../mongo';
+import { MongoInform } from '@/service/models/inform';
 
 export async function sendInform2User(data: {
   userId: string;
@@ -7,6 +7,6 @@ export async function sendInform2User(data: {
   content: string;
 }) {
   try {
-    await Inform.create(data);
+    await MongoInform.create(data);
   } catch (error) {}
 }

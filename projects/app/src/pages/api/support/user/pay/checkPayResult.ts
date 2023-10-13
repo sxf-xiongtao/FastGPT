@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@/service/response';
-import { Pay } from '@/service/mongo';
+import { MongoPay } from '@/service/models/pay';
 import { MongoUser } from '@fastgpt/support/user/schema';
 import { authUser } from '@fastgpt/support/user/auth';
 import { PaySchema } from '@/types/mongoSchema';
@@ -19,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { userId } = await authUser({ req, authToken: true });
 
     // 查找订单记录校验
-    const payOrder = await Pay.findById<PaySchema>(payId);
+    const payOrder = await MongoPay.findById<PaySchema>(payId);
 
     if (!payOrder) {
       throw new Error('订单不存在');
@@ -42,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // 订单已支付
       try {
         // 更新订单状态. 如果没有合适的订单，说明订单重复了
-        const updateRes = await Pay.updateOne(
+        const updateRes = await MongoPay.updateOne(
           {
             _id: payId,
             status: 'NOTPAY'
@@ -76,7 +76,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         console.log(error);
         // roll back status
         try {
-          await Pay.findByIdAndUpdate(payId, {
+          await MongoPay.findByIdAndUpdate(payId, {
             status: 'NOTPAY'
           });
         } catch (error) {}
@@ -93,7 +93,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (payRes.trade_state === 'CLOSED' || diffInHours > 24) {
       // 订单已关闭
-      await Pay.findByIdAndUpdate(payId, {
+      await MongoPay.findByIdAndUpdate(payId, {
         status: 'CLOSED'
       });
       throw new Error('订单已过期');

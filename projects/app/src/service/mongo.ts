@@ -37,9 +37,3 @@ export async function connectToDatabase(): Promise<void> {
     global.mongodb = null;
   }
 }
-
-export * from './models/authCode';
-export * from './models/pay';
-export * from './models/image';
-export * from './models/promotionRecord';
-export * from './models/inform';

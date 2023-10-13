@@ -36,4 +36,4 @@ try {
   console.log(error);
 }
 
-export const Inform: Model<informSchema> = models['inform'] || model('inform', InformSchema);
+export const MongoInform: Model<informSchema> = models['inform'] || model('inform', InformSchema);

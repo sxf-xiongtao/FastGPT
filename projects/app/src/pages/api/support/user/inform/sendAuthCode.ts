@@ -4,7 +4,8 @@ import * as nodemailer from 'nodemailer';
 import Dysmsapi, * as dysmsapi from '@alicloud/dysmsapi20170525';
 import * as OpenApi from '@alicloud/openapi-client';
 import * as Util from '@alicloud/tea-util';
-import { connectToDatabase, AuthCode } from '@/service/mongo';
+import { connectToDatabase } from '@/service/mongo';
+import { MongoAuthCode } from '@/service/models/authCode';
 import axios from 'axios';
 import { customAlphabet } from 'nanoid';
 import requestIp from 'request-ip';
@@ -41,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }));
 
     // 判断 1 分钟内是否有重复数据
-    const authCode = await AuthCode.findOne({
+    const authCode = await MongoAuthCode.findOne({
       username,
       type,
       expiredTime: { $gte: Date.now() + 4 * 60 * 1000 } // 如果有一个记录的过期时间，大于当前+4分钟，说明距离上次发送还没到1分钟。（因为默认创建时，过期时间是未来5分钟）
@@ -54,7 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const code = nanoid();
 
     // 创建 auth 记录
-    await AuthCode.create({
+    await MongoAuthCode.create({
       username,
       type,
       code,
@@ -153,7 +154,7 @@ export const authCode = async ({
   code: string;
   type: `${UserAuthTypeEnum}`;
 }) => {
-  const result = await AuthCode.findOne({
+  const result = await MongoAuthCode.findOne({
     username,
     type,
     code,
