@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@/service/response';
-import { authUser } from '@/service/utils/auth';
-import { User, connectToDatabase } from '@/service/mongo';
+import { connectToDatabase } from '@/service/mongo';
+import { MongoUser } from '@fastgpt/support/user/schema';
+import { authUser } from '@fastgpt/support/user/auth';
 import { getErrText } from '@/utils/tools';
 import { customAlphabet } from 'nanoid';
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 8);
@@ -14,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     await authUser({ req, authRoot: true });
 
-    const users = await User.find(
+    const users = await MongoUser.find(
       {
         username: { $regex: '^git' }
       },
@@ -25,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await Promise.all(
       users.map(async (user) => {
         const password = nanoid();
-        await User.findByIdAndUpdate(user._id, {
+        await MongoUser.findByIdAndUpdate(user._id, {
           password: createHashPassword(password)
         });
         // send default password inform

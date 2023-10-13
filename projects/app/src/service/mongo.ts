@@ -39,9 +39,7 @@ export async function connectToDatabase(): Promise<void> {
 }
 
 export * from './models/authCode';
-export * from './models/user';
 export * from './models/pay';
-export * from './models/openapi';
 export * from './models/image';
 export * from './models/promotionRecord';
 export * from './models/inform';

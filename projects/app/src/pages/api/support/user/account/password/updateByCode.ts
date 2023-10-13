@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@/service/response';
-import { User } from '@/service/models/user';
+import { MongoUser } from '@fastgpt/support/user/schema';
 import { connectToDatabase } from '@/service/mongo';
 import { UserAuthTypeEnum } from '@/constants/common';
 import { generateToken, setCookie } from '@/service/utils/tools';
@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     });
 
     // 更新对应的记录
-    await User.updateOne(
+    await MongoUser.updateOne(
       {
         username
       },
@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     );
 
     // 根据 username 获取用户信息
-    const user = await User.findOne({
+    const user = await MongoUser.findOne({
       username
     });
 

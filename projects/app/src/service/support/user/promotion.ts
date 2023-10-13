@@ -1,4 +1,5 @@
-import { User, PromotionRecord } from '../mongo';
+import { PromotionRecord } from '../../mongo';
+import { MongoUser } from '@fastgpt/support/user/schema';
 
 export async function createOnePromotion(data: {
   userId: string; // 加钱的人
@@ -10,7 +11,7 @@ export async function createOnePromotion(data: {
   try {
     try {
       // user add balance
-      await User.findByIdAndUpdate(userId, {
+      await MongoUser.findByIdAndUpdate(userId, {
         $inc: { balance: amount }
       });
     } catch (error) {

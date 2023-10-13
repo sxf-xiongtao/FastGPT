@@ -1,13 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@/service/response';
-import { User } from '@/service/models/user';
+import { MongoUser } from '@fastgpt/support/user/schema';
 import { connectToDatabase } from '@/service/mongo';
 import { generateToken, setCookie } from '@/service/utils/tools';
 import { PRICE_SCALE, UserAuthTypeEnum } from '@/constants/common';
 import { authCode } from '../../inform/sendAuthCode';
-import { authMaxUsers } from '@/service/auth/user';
-import { createUserByUsername } from '@/service/account';
-import { createOnePromotion } from '@/service/account/promotion';
+import { authMaxUsers } from '@/service/support/user/auth';
+import { createUserByUsername } from '@/service/support/user/tools';
+import { createOnePromotion } from '@/service/support/user/promotion';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     });
 
     // 重名校验
-    const authRepeat = await User.findOne({
+    const authRepeat = await MongoUser.findOne({
       username
     });
 

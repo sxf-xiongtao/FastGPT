@@ -6,7 +6,7 @@ import { connectToDatabase } from '@/service/mongo';
 import jwt from 'jsonwebtoken';
 import { generateToken, setCookie } from '@/service/utils/tools';
 import { sendInform2User } from '@/service/inform';
-import { findUserByUsername, createUserByUsername } from '@/service/account';
+import { findUserByUsername, createUserByUsername } from '@/service/support/user/tools';
 import { customAlphabet } from 'nanoid';
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 8);
 import { createHashPassword } from '@/utils/tools';

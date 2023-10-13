@@ -1,13 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@/service/response';
-import { User, Pay, PromotionRecord } from '@/service/mongo';
-import { authUser } from '@/service/utils/auth';
+import { Pay } from '@/service/mongo';
+import { MongoUser } from '@fastgpt/support/user/schema';
+import { authUser } from '@fastgpt/support/user/auth';
 import { PaySchema } from '@/types/mongoSchema';
 import dayjs from 'dayjs';
-import { WXPay } from '@/service/utils/pay';
-import { formatPrice } from '@/utils/user';
+import { WXPay } from '@/service/support/pay/pay';
 import { connectToDatabase } from '@/service/mongo';
-import { createOnePromotion } from '@/service/account/promotion';
+import { createOnePromotion } from '@/service/support/user/promotion';
 
 /* 校验支付结果 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -28,11 +28,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       throw new Error('订单已结算');
     }
 
-    const user = await User.findById(userId);
+    const user = await MongoUser.findById(userId);
 
     const inviterId = user?.inviterId;
 
-    const inviter = inviterId ? await User.findById(inviterId) : null;
+    const inviter = inviterId ? await MongoUser.findById(inviterId) : null;
 
     const wxPay = new WXPay();
 
@@ -53,7 +53,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         );
         if (updateRes.modifiedCount === 1) {
           // 给用户账号充钱
-          await User.findByIdAndUpdate(userId, {
+          await MongoUser.findByIdAndUpdate(userId, {
             $inc: { balance: payOrder.price }
           });
 

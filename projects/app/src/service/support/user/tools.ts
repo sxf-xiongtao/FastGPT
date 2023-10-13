@@ -1,9 +1,9 @@
-import { authMaxUsers } from '../auth/user';
-import { User } from '../mongo';
+import { authMaxUsers } from '@/service/support/user/auth';
+import { MongoUser } from '@fastgpt/support/user/schema';
 import { PRICE_SCALE } from '@/constants/common';
 
 export async function findUserByUsername({ username }: { username: string }) {
-  const user = await User.findOne({ username });
+  const user = await MongoUser.findOne({ username });
 
   if (!user) {
     return Promise.reject({
@@ -26,7 +26,7 @@ export async function createUserByUsername({
   inviterId?: string;
 }) {
   await authMaxUsers();
-  const response = await User.create({
+  const response = await MongoUser.create({
     username,
     avatar,
     password,

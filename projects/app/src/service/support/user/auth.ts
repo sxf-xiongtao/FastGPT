@@ -1,7 +1,7 @@
-import { User } from '../mongo';
+import { MongoUser } from '@fastgpt/support/user/schema';
 
 export async function authMaxUsers() {
-  const usersCount = await User.countDocuments();
+  const usersCount = await MongoUser.countDocuments();
 
   if (usersCount > global.licenseData.maxRegister) return Promise.reject('超过最大用户数');
 }
