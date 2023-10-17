@@ -1,6 +1,6 @@
 import { authIpLimit } from '@/service/common/ipLimit/tools';
-import { PRICE_SCALE } from '@fastgpt/common/bill/constants';
-import type { AuthLinkLimitProps } from '@fastgpt/support/outLink/auth';
+import { PRICE_SCALE } from '@fastgpt/global/common/bill/constants';
+import type { AuthLinkLimitProps } from '@fastgpt/service/support/outLink/auth';
 import axios from 'axios';
 export type TokenAuthResponseType = {
   success: boolean;

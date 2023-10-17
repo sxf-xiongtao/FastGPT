@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@/service/response';
 import { connectToDatabase } from '@/service/mongo';
-import type { AuthOpenApiLimitProps } from '@fastgpt/support/openapi/auth';
+import type { AuthOpenApiLimitProps } from '@fastgpt/service/support/openapi/auth';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

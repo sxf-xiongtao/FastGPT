@@ -1,5 +1,5 @@
 import { authMaxUsers } from '@/service/support/user/auth';
-import { MongoUser } from '@fastgpt/support/user/schema';
+import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { PRICE_SCALE } from '@/constants/common';
 
 export async function findUserByUsername({ username }: { username: string }) {

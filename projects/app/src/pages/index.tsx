@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Box } from '@chakra-ui/react';
 import { serviceSideProps } from '@/utils/web/i18n';
-import { strIsLink } from '@fastgpt/common/tools/str';
+import { strIsLink } from '@fastgpt/global/common/string/tools';
 
 const Home = () => {
   console.log(strIsLink('sdsds'), '===');

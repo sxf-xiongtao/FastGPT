@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@/service/response';
-import { authUser } from '@fastgpt/support/user/auth';
+import { authUser } from '@fastgpt/service/support/user/auth';
 import { connectToDatabase } from '@/service/mongo';
 import { MongoPay } from '@/service/models/pay';
 import { PRICE_SCALE } from '@/constants/common';

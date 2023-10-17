@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@/service/response';
 import { MongoPay } from '@/service/models/pay';
-import { MongoUser } from '@fastgpt/support/user/schema';
-import { authUser } from '@fastgpt/support/user/auth';
+import { MongoUser } from '@fastgpt/service/support/user/schema';
+import { authUser } from '@fastgpt/service/support/user/auth';
 import { PaySchema } from '@/types/mongoSchema';
 import dayjs from 'dayjs';
 import { WXPay } from '@/service/support/pay/pay';

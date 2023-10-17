@@ -1,7 +1,7 @@
 export type ChatModelItemType = {
   model: string;
   name: string;
-  contextMaxToken: number;
+  maxToken: number;
   quoteMaxToken: number;
   maxTemperature: number;
   price: number;

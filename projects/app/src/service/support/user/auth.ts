@@ -1,4 +1,4 @@
-import { MongoUser } from '@fastgpt/support/user/schema';
+import { MongoUser } from '@fastgpt/service/support/user/schema';
 
 export async function authMaxUsers() {
   const usersCount = await MongoUser.countDocuments();

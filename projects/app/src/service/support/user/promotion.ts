@@ -1,5 +1,5 @@
 import { MongoPromotionRecord } from '@/service/models/promotionRecord';
-import { MongoUser } from '@fastgpt/support/user/schema';
+import { MongoUser } from '@fastgpt/service/support/user/schema';
 
 export async function createOnePromotion(data: {
   userId: string; // 加钱的人

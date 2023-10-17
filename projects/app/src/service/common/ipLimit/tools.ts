@@ -1,4 +1,4 @@
-import type { OutLinkSchema } from '@fastgpt/support/outLink/type';
+import type { OutLinkSchema } from '@fastgpt/global/support/outLink/type.d';
 import { MongoIpLimit } from './schema';
 
 export async function authIpLimit({ ip, outLink }: { ip: string; outLink: OutLinkSchema }) {

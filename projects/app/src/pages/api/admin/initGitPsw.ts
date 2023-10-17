@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@/service/response';
 import { connectToDatabase } from '@/service/mongo';
-import { MongoUser } from '@fastgpt/support/user/schema';
-import { authUser } from '@fastgpt/support/user/auth';
+import { MongoUser } from '@fastgpt/service/support/user/schema';
+import { authUser } from '@fastgpt/service/support/user/auth';
 import { getErrText } from '@/utils/tools';
 import { customAlphabet } from 'nanoid';
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 8);

@@ -1,7 +1,7 @@
 import { initService } from './init';
 import { authLicense } from '@/utils/service/common/license';
 import { exit } from 'process';
-import { connectMongo } from '@fastgpt/common/mongo/init';
+import { connectMongo } from '@fastgpt/service/common/mongo/init';
 
 /**
  * connect MongoDB and init data

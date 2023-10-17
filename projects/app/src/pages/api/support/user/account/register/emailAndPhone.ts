@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@/service/response';
-import { MongoUser } from '@fastgpt/support/user/schema';
+import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { connectToDatabase } from '@/service/mongo';
 import { generateToken, setCookie } from '@/service/utils/tools';
 import { PRICE_SCALE, UserAuthTypeEnum } from '@/constants/common';
