@@ -5,7 +5,7 @@ import { parseQueryString } from '@/utils/tools';
 import { connectToDatabase } from '@/service/mongo';
 import jwt from 'jsonwebtoken';
 import { generateToken, setCookie } from '@/service/utils/tools';
-import { sendInform2User } from '@/service/inform';
+import { sendInform2OneUser } from '@fastgpt/service/support/user/inform/controller';
 import { findUserByUsername, createUserByUsername } from '@/service/support/user/tools';
 import { customAlphabet } from 'nanoid';
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 8);
@@ -46,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
           inviterId
         });
         // send default password inform
-        sendInform2User({
+        sendInform2OneUser({
           userId: user._id,
           type: 'system',
           title: '新用户注册',

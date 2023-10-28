@@ -7,7 +7,7 @@ import { getErrText } from '@/utils/tools';
 import { customAlphabet } from 'nanoid';
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 8);
 import { createHashPassword } from '@/utils/tools';
-import { sendInform2User } from '@/service/inform';
+import { sendInform2OneUser } from '@fastgpt/service/support/user/inform/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           password: createHashPassword(password)
         });
         // send default password inform
-        sendInform2User({
+        sendInform2OneUser({
           userId: user._id,
           type: 'system',
           title: 'Git用户初始密码',

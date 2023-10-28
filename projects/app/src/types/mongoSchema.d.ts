@@ -61,11 +61,6 @@ export interface AppSchema {
   };
 }
 
-export interface CollectionSchema {
-  appId: string;
-  userId: string;
-}
-
 export interface TrainingDataSchema {
   _id: string;
   userId: string;
@@ -121,30 +116,12 @@ export interface BillSchema {
   list: BillListItemType[];
 }
 
-export interface PaySchema {
-  _id: string;
-  userId: string;
-  createTime: Date;
-  price: number;
-  orderId: string;
-  status: 'SUCCESS' | 'REFUND' | 'NOTPAY' | 'CLOSED';
-}
-
 export interface OpenApiSchema {
   _id: string;
   userId: string;
   createTime: Date;
   lastUsedTime?: Date;
   apiKey: String;
-}
-
-export interface PromotionRecordSchema {
-  _id: string;
-  userId: string; // 收益人
-  objUId?: string; // 目标对象（如果是withdraw则为空）
-  type: 'invite' | 'shareModel' | 'withdraw';
-  createTime: Date; // 记录时间
-  amount: number;
 }
 
 export interface OutLinkSchema {

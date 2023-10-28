@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@/service/response';
 import { authUser } from '@fastgpt/service/support/user/auth';
 import { connectToDatabase } from '@/service/mongo';
-import { MongoPay } from '@/service/models/pay';
+import { MongoPay } from '@fastgpt/service/support/wallet/pay/schema';
 import { PRICE_SCALE } from '@/constants/common';
 import { WXPay } from '@/service/support/pay/pay';
 

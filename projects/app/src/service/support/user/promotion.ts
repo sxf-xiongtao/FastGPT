@@ -1,4 +1,4 @@
-import { MongoPromotionRecord } from '@/service/models/promotionRecord';
+import { MongoPromotionRecord } from '@fastgpt/service/support/activity/promotion/schema';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 
 export async function createOnePromotion(data: {
