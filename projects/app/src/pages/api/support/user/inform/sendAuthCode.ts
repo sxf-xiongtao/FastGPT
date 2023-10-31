@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { jsonRes } from '@/service/response';
+import { jsonRes } from '@fastgpt/service/common/response';
 import * as nodemailer from 'nodemailer';
 import Dysmsapi, * as dysmsapi from '@alicloud/dysmsapi20170525';
 import * as OpenApi from '@alicloud/openapi-client';

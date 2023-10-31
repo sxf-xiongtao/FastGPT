@@ -1,9 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { jsonRes } from '@/service/response';
+import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { connectToDatabase } from '@/service/mongo';
-import { generateToken, setCookie } from '@/service/utils/tools';
-import { PRICE_SCALE, UserAuthTypeEnum } from '@/constants/common';
+import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
+import { UserAuthTypeEnum } from '@/constants/common';
+import { PRICE_SCALE } from '@fastgpt/global/common/bill/constants';
 import { authCode } from '../../inform/sendAuthCode';
 import { authMaxUsers } from '@/service/support/user/auth';
 import { createUserByUsername } from '@/service/support/user/tools';
@@ -42,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       inviterId
     });
 
-    const token = generateToken(user._id);
+    const token = createJWT(user._id);
     setCookie(res, token);
 
     if (!username.includes('@')) {

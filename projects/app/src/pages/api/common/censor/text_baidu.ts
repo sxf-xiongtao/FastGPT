@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { jsonRes } from '@/service/response';
+import { jsonRes } from '@fastgpt/service/common/response';
 import axios from 'axios';
 import { authUser } from '@fastgpt/service/support/user/auth';
 import { connectToDatabase } from '@/service/mongo';

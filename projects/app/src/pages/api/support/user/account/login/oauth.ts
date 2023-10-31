@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { jsonRes } from '@/service/response';
+import { jsonRes } from '@fastgpt/service/common/response';
 import axios from 'axios';
 import { parseQueryString } from '@/utils/tools';
 import { connectToDatabase } from '@/service/mongo';
 import jwt from 'jsonwebtoken';
-import { generateToken, setCookie } from '@/service/utils/tools';
+import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
 import { sendInform2OneUser } from '@fastgpt/service/support/user/inform/controller';
 import { findUserByUsername, createUserByUsername } from '@/service/support/user/tools';
 import { customAlphabet } from 'nanoid';
@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     try {
       // try to login
       const user = await findUserByUsername({ username });
-      const token = generateToken(user._id);
+      const token = createJWT(user._id);
       setCookie(res, token);
       jsonRes(res, {
         data: { user, token }
@@ -52,7 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
           title: '新用户注册',
           content: `您的初始密码为: ${password}`
         });
-        const token = generateToken(user._id);
+        const token = createJWT(user._id);
         setCookie(res, token);
         return jsonRes(res, {
           data: { user, token }

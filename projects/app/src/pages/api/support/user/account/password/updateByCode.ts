@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { jsonRes } from '@/service/response';
+import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { connectToDatabase } from '@/service/mongo';
 import { UserAuthTypeEnum } from '@/constants/common';
-import { generateToken, setCookie } from '@/service/utils/tools';
+import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
 import { authCode } from '../../inform/sendAuthCode';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
@@ -42,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       throw new Error('获取用户信息异常');
     }
 
-    const token = generateToken(user._id);
+    const token = createJWT(user._id);
     setCookie(res, token);
 
     jsonRes(res, {
