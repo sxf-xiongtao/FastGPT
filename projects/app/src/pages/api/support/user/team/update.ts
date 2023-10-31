@@ -9,12 +9,12 @@ import { TeamMemberRoleEnum } from '@fastgpt/global/support/user/team/constant';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
-    const { id } = req.body as UpdateTeamProps;
-    const { userId } = await authUser({ req, authToken: true });
+    const body = req.body as UpdateTeamProps;
+    const { userId, tmbId } = await authUser({ req, authToken: true });
 
-    if (await authTeamRole({ userId, teamId: id, role: TeamMemberRoleEnum.owner })) {
+    if (await authTeamRole({ userId, tmbId, role: TeamMemberRoleEnum.owner })) {
       return jsonRes(res, {
-        data: await updateTeam(req.body)
+        data: await updateTeam(body)
       });
     }
 

@@ -2,21 +2,17 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { authUser } from '@fastgpt/service/support/user/auth';
-import { authTeamRole, getTeamInfo } from '@/service/support/user/team/controller';
+import { authTeamRole } from '@/service/support/user/team/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { id } = req.query as { id: string };
     await connectToDatabase();
-    const { userId } = await authUser({ req, authToken: true });
+    const { userId, tmbId } = await authUser({ req, authToken: true });
+    await authTeamRole({ userId, tmbId });
 
-    if (await authTeamRole({ userId, teamId: id })) {
-      return jsonRes(res, {
-        data: getTeamInfo(id)
-      });
-    }
-
-    throw new Error("You don't have permission to operate the team");
+    return jsonRes(res, {
+      data: await authTeamRole({ userId, tmbId })
+    });
   } catch (err) {
     jsonRes(res, {
       code: 500,

@@ -18,36 +18,34 @@ import {
 import { ERROR_ENUM } from '@fastgpt/global/common/error/errorCode';
 
 /* ----------------- auth ----------------- */
-export async function authTeamRole({ userId, teamId, role }: AuthTeamRoleProps) {
+export async function authTeamRole({
+  userId,
+  tmbId,
+  role
+}: AuthTeamRoleProps): Promise<TeamItemType> {
   try {
-    if (!userId || !teamId) {
+    if (!userId || !tmbId) {
       return Promise.reject(ERROR_ENUM.unAuthTeam);
     }
-    console.log(userId, teamId);
 
-    const teamMember = await MongoTeamMember.findOne({ userId, teamId, ...(role && { role }) });
-    if (!teamMember) {
-      return Promise.reject(ERROR_ENUM.unAuthTeam);
-    }
-    return teamMember;
-  } catch (error) {
-    return Promise.reject(error);
-  }
-}
-export async function authTeamMemberRole({ userId, teamMemberId, role }: AuthTeamRoleProps) {
-  try {
-    if (!userId || !teamMemberId) {
-      return Promise.reject(ERROR_ENUM.unAuthTeam);
-    }
-    const teamMember = await MongoTeamMember.findOne({
+    const teamMember = (await MongoTeamMember.findOne({
+      _id: tmbId,
       userId,
-      teamMemberId,
       ...(role && { role })
-    });
+    }).populate('teamId')) as TeamMemberSchemaWithTeam;
     if (!teamMember) {
       return Promise.reject(ERROR_ENUM.unAuthTeam);
     }
-    return teamMember;
+    return {
+      teamId: String(teamMember.teamId._id),
+      teamName: teamMember.teamId.name,
+      avatar: teamMember.teamId.avatar,
+      balance: teamMember.teamId.balance,
+      memberName: teamMember.name,
+      teamMemberId: String(teamMember._id),
+      role: teamMember.role,
+      status: teamMember.status
+    };
   } catch (error) {
     return Promise.reject(error);
   }
@@ -82,14 +80,15 @@ export async function createTeam({ ownerId, name, avatar }: CreateTeamProps & { 
   }
 }
 
-export async function updateTeam({ id, name, avatar }: UpdateTeamProps) {
-  await MongoTeam.findByIdAndUpdate(id, {
+export async function updateTeam({ teamId, name, avatar }: UpdateTeamProps) {
+  await MongoTeam.findByIdAndUpdate(teamId, {
     name,
     avatar
   });
 }
-export async function deleteTeam(id: string) {
-  await MongoTeam.findByIdAndDelete(id);
+export async function deleteTeam(teamId: string) {
+  await MongoTeamMember.deleteMany({ teamId });
+  await MongoTeam.findByIdAndDelete(teamId);
 }
 
 export async function getUserTeams(userId: string): Promise<TeamItemType[]> {

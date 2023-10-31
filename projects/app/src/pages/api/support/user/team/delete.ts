@@ -9,15 +9,11 @@ import { TeamMemberRoleEnum } from '@fastgpt/global/support/user/team/constant';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
-    const { id } = req.body as UpdateTeamProps;
-    const { userId } = await authUser({ req, authToken: true });
-
-    if (await authTeamRole({ userId, teamId: id, role: TeamMemberRoleEnum.owner })) {
-      await deleteTeam(id);
-      return jsonRes(res);
-    }
-
-    throw new Error("You don't have permission to operate the team");
+    const { teamId } = req.body as UpdateTeamProps;
+    const { userId, tmbId } = await authUser({ req, authToken: true });
+    await authTeamRole({ userId, tmbId, role: TeamMemberRoleEnum.owner });
+    await deleteTeam(teamId);
+    return jsonRes(res);
   } catch (err) {
     jsonRes(res, {
       code: 500,

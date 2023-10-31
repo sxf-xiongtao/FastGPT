@@ -4,20 +4,23 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { authUser } from '@fastgpt/service/support/user/auth';
 import { authTeamRole } from '@/service/support/user/team/controller';
-import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
+import { createJWT } from '@fastgpt/service/support/permission/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { teamId } = req.body as { teamId: string };
+    const { tmbId = '' } = req.body as { tmbId: string };
     await connectToDatabase();
     const { userId } = await authUser({ req, authToken: true });
-    const { _id: teamMemberId } = await authTeamRole({ userId, teamId });
-
-    const token = createJWT(userId, teamMemberId);
-    setCookie(res, token);
+    const token = await (async () => {
+      if (tmbId) {
+        await authTeamRole({ userId, tmbId });
+      }
+      const token = createJWT(userId, tmbId);
+      return token;
+    })();
 
     jsonRes(res, {
-      data: token
+      data: { cookie: token }
     });
   } catch (err) {
     jsonRes(res, {
