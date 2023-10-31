@@ -8,10 +8,6 @@ import { TeamMemberRoleMap, TeamMemberStatusMap } from '@fastgpt/global/support/
 export const TeamMemberCollectionName = 'teamMembers';
 
 const TeamMemberSchema = new Schema({
-  name: {
-    type: String,
-    required: true
-  },
   teamId: {
     type: Schema.Types.ObjectId,
     ref: TeamCollectionName,

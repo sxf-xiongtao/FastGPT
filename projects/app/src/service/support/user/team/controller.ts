@@ -9,12 +9,11 @@ import {
   TeamMemberRoleEnum,
   TeamMemberStatusEnum
 } from '@fastgpt/global/support/user/team/constant';
-import {
-  TeamItemType,
-  TeamMemberItemType,
-  TeamMemberSchemaWithTeam,
+import { TeamItemType, TeamMemberItemType } from '@fastgpt/global/support/user/team/type';
+import type {
+  TeamMemberSchemaWithTeamAndUser,
   TeamMemberSchemaWithUser
-} from '@fastgpt/global/support/user/team/type';
+} from '@/global/user/team.d';
 import { ERROR_ENUM } from '@fastgpt/global/common/error/errorCode';
 
 /* ----------------- auth ----------------- */
@@ -32,7 +31,7 @@ export async function authTeamRole({
       _id: tmbId,
       userId,
       ...(role && { role })
-    }).populate('teamId')) as TeamMemberSchemaWithTeam;
+    }).populate('teamId userId')) as TeamMemberSchemaWithTeamAndUser;
     if (!teamMember) {
       return Promise.reject(ERROR_ENUM.unAuthTeam);
     }
@@ -41,7 +40,6 @@ export async function authTeamRole({
       teamName: teamMember.teamId.name,
       avatar: teamMember.teamId.avatar,
       balance: teamMember.teamId.balance,
-      memberName: teamMember.name,
       teamMemberId: String(teamMember._id),
       role: teamMember.role,
       status: teamMember.status
@@ -62,7 +60,6 @@ export async function createTeam({ ownerId, name, avatar }: CreateTeamProps & { 
     });
     id = _id;
     await MongoTeamMember.create({
-      name: 'Owner',
       teamId: _id,
       userId: ownerId,
       role: TeamMemberRoleEnum.owner,
@@ -92,14 +89,14 @@ export async function getUserTeams(userId: string): Promise<TeamItemType[]> {
   const members = (await MongoTeamMember.find({
     userId,
     status: TeamMemberStatusEnum.active
-  }).populate('teamId')) as TeamMemberSchemaWithTeam[];
+  }).populate('teamId userId')) as TeamMemberSchemaWithTeamAndUser[];
 
   return members.map((member) => ({
     teamId: member.teamId._id,
     teamName: member.teamId.name,
     avatar: member.teamId.avatar,
     balance: member.teamId.balance,
-    memberName: member.name,
+    memberName: member.userId,
     teamMemberId: member._id,
     role: member.role,
     status: member.status
@@ -115,7 +112,7 @@ export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType
     userId: item.userId._id,
     teamMemberId: item._id,
     teamId: item.teamId,
-    name: item.name,
+    memberUsername: item.userId.username,
     avatar: item.userId.avatar,
     role: item.role,
     status: item.status
