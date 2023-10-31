@@ -6,61 +6,60 @@ import { connectToDatabase } from '@/service/mongo';
 import jwt from 'jsonwebtoken';
 import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
 import { sendInform2OneUser } from '@fastgpt/service/support/user/inform/controller';
-import { findUserByUsername, createUserByUsername } from '@/service/support/user/tools';
+import { createUserByUsername } from '@/service/support/user/controller';
 import { customAlphabet } from 'nanoid';
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 8);
 import { createHashPassword } from '@/utils/tools';
+import { OAuthEnum } from '@fastgpt/global/support/user/constant';
+import type { OauthLoginProps } from '@fastgpt/global/support/user/api';
+import { MongoUser } from '@fastgpt/service/support/user/schema';
+import { getUserDetail } from '@/service/support/user/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     await connectToDatabase();
-    const { type, code, inviterId, callbackUrl } = req.body as {
-      type: 'github' | 'google';
-      code: string;
-      inviterId?: string;
-      callbackUrl: string;
-    };
+    const { type, code, inviterId, callbackUrl, tmbId } = req.body as OauthLoginProps;
 
     const { username, avatarUrl } = await (async () => {
-      if (type === 'github') return authGithub(code);
-      if (type === 'google') return authGoogle(code, callbackUrl);
+      if (type === OAuthEnum.github) return authGithub(code);
+      if (type === OAuthEnum.google) return authGoogle(code, callbackUrl);
       return Promise.reject('type error');
     })();
 
-    try {
-      // try to login
-      const user = await findUserByUsername({ username });
+    // try to login
+    const user = await MongoUser.findOne({ username }, '_id');
+
+    // register
+    if (!user) {
+      const password = nanoid();
+      const user = await createUserByUsername({
+        username,
+        password: createHashPassword(password),
+        avatar: avatarUrl,
+        inviterId
+      });
+      // send default password inform
+      sendInform2OneUser({
+        userId: user._id,
+        type: 'system',
+        title: '新用户注册',
+        content: `您的初始密码为: ${password}`
+      });
       const token = createJWT(user._id);
       setCookie(res, token);
-      jsonRes(res, {
+      return jsonRes(res, {
         data: { user, token }
       });
-    } catch (err: any) {
-      // if login failed, try to register
-      if (err?.code === 501) {
-        const password = nanoid();
-        const user = await createUserByUsername({
-          username,
-          password: createHashPassword(password),
-          avatar: avatarUrl,
-          inviterId
-        });
-        // send default password inform
-        sendInform2OneUser({
-          userId: user._id,
-          type: 'system',
-          title: '新用户注册',
-          content: `您的初始密码为: ${password}`
-        });
-        const token = createJWT(user._id);
-        setCookie(res, token);
-        return jsonRes(res, {
-          data: { user, token }
-        });
-      }
-      // api error
-      throw new Error(err);
     }
+
+    // login
+    const userInfo = await getUserDetail(user._id, tmbId);
+
+    const token = createJWT(user._id, tmbId);
+    setCookie(res, token);
+    jsonRes(res, {
+      data: { user: userInfo, token }
+    });
   } catch (err) {
     console.log(err);
 

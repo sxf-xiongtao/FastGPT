@@ -7,7 +7,7 @@ import { UserAuthTypeEnum } from '@/constants/common';
 import { PRICE_SCALE } from '@fastgpt/global/common/bill/constants';
 import { authCode } from '../../inform/sendAuthCode';
 import { authMaxUsers } from '@/service/support/user/auth';
-import { createUserByUsername } from '@/service/support/user/tools';
+import { createUserByUsername } from '@/service/support/user/controller';
 import { createOnePromotion } from '@/service/support/user/promotion';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {

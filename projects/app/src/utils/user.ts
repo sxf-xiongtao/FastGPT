@@ -1,4 +1,4 @@
-import { PRICE_SCALE } from '@/constants/common';
+import { PRICE_SCALE } from '@fastgpt/global/common/bill/constants';
 
 /**
  * 把数据库读取到的price，转化成元

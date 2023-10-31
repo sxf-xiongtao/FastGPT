@@ -3,7 +3,7 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { authUser } from '@fastgpt/service/support/user/auth';
 import { connectToDatabase } from '@/service/mongo';
 import { MongoPay } from '@fastgpt/service/support/wallet/pay/schema';
-import { PRICE_SCALE } from '@/constants/common';
+import { PRICE_SCALE } from '@fastgpt/global/common/bill/constants';
 import { WXPay } from '@/service/support/pay/pay';
 
 /* 获取支付二维码 */

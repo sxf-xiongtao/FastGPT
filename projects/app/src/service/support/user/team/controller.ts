@@ -52,9 +52,6 @@ export async function authTeamRole({
 }
 
 /* -------------- team ------------ */
-export async function getTeamInfo(id: string) {
-  return MongoTeam.findById(id);
-}
 export async function createTeam({ ownerId, name, avatar }: CreateTeamProps & { ownerId: string }) {
   let id = '';
   try {
