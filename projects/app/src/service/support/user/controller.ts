@@ -3,7 +3,7 @@ import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { PRICE_SCALE } from '@fastgpt/global/common/bill/constants';
 import { ERROR_ENUM } from '@fastgpt/global/common/error/errorCode';
 import { UserType } from '@fastgpt/global/support/user/type';
-import { authTeamRole } from './team/controller';
+import { getTmbByIdAndUId } from './team/controller';
 
 export async function createUserByUsername({
   username,
@@ -38,7 +38,7 @@ export async function getUserDetail(userId: string, tmbId?: string): Promise<Use
     (async () => {
       if (tmbId) {
         try {
-          const team = await authTeamRole({ userId, tmbId });
+          const team = await getTmbByIdAndUId(tmbId, userId);
           return team;
         } catch (error) {}
       }

@@ -107,6 +107,18 @@ export async function getUserTeams(data: {
 
   return members.map(teamMemberSchema2TeamItemType);
 }
+export async function getTmbByIdAndUId(tmbId: string, userId: string) {
+  const tmb = (await MongoTeamMember.findOne({
+    _id: tmbId,
+    userId
+  }).populate('teamId userId')) as TeamMemberSchemaWithTeamAndUser;
+
+  if (!tmb) {
+    return Promise.reject(ERROR_ENUM.unAuthTeam);
+  }
+
+  return teamMemberSchema2TeamItemType(tmb);
+}
 
 /* --------------- member -------------- */
 export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType[]> {
