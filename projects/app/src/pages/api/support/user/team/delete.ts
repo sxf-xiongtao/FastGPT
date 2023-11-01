@@ -11,7 +11,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await connectToDatabase();
     const { teamId } = req.body as UpdateTeamProps;
     const { tmbId } = await authUser({ req, authToken: true });
-    await authTeamRole({ teamId, tmbId, role: TeamMemberRoleEnum.owner });
+    const tmb = await authTeamRole({ teamId, tmbId, role: TeamMemberRoleEnum.owner });
+
+    // can delete default team
+    if (tmb.defaultTeam) {
+      throw new Error('Can not delete default team');
+    }
+
     await deleteTeam(teamId);
     return jsonRes(res);
   } catch (err) {

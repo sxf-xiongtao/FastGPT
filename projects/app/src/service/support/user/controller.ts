@@ -3,8 +3,9 @@ import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { PRICE_SCALE } from '@fastgpt/global/common/bill/constants';
 import { ERROR_ENUM } from '@fastgpt/global/common/error/errorCode';
 import { UserType } from '@fastgpt/global/support/user/type';
-import { getTmbByIdAndUId } from './team/controller';
+import { getUserDefaultTeam, getUserTeamOrDefaultTeam } from './team/controller';
 
+/* create user and team */
 export async function createUserByUsername({
   username,
   password,
@@ -15,9 +16,9 @@ export async function createUserByUsername({
   password: string;
   avatar?: string;
   inviterId?: string;
-}) {
+}): Promise<UserType> {
   await authMaxUsers();
-  const response = await MongoUser.create({
+  const user = await MongoUser.create({
     username,
     avatar,
     password,
@@ -25,24 +26,22 @@ export async function createUserByUsername({
     balance: (global.systemConfig.system?.userDefaultBalance || 2) * PRICE_SCALE
   });
 
-  const user = response.toJSON();
-  // @ts-ignore
-  delete user.password;
-
-  return user;
+  return {
+    _id: user._id,
+    username: user.username,
+    avatar: user.avatar,
+    balance: user.balance,
+    timezone: user.timezone,
+    promotionRate: user.promotionRate,
+    openaiAccount: user.openaiAccount,
+    team: await getUserDefaultTeam(user._id)
+  };
 }
 
 export async function getUserDetail(userId: string, tmbId?: string): Promise<UserType> {
   const [user, team] = await Promise.all([
     MongoUser.findById(userId),
-    (async () => {
-      if (tmbId) {
-        try {
-          const team = await getTmbByIdAndUId(tmbId, userId);
-          return team;
-        } catch (error) {}
-      }
-    })()
+    getUserTeamOrDefaultTeam(userId, tmbId)
   ]);
 
   if (!user) {

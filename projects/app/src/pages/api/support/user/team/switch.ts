@@ -13,12 +13,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await connectToDatabase();
     const { userId } = await authUser({ req, authToken: true });
 
-    if (!teamId) {
-      return jsonRes(res, {
-        data: { cookie: createJWT(userId) }
-      });
-    }
-
     // auth user in team and get tmbId
     const tmb = await authMemberExistTeam({ userId, teamId });
     if (!tmb) {
@@ -26,7 +20,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     jsonRes(res, {
-      data: { cookie: createJWT(userId, tmb._id) }
+      data: {
+        cookie: createJWT({
+          _id: userId,
+          team: { teamMemberId: tmb._id }
+        })
+      }
     });
   } catch (err) {
     jsonRes(res, {

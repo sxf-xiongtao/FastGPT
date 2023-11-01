@@ -43,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       inviterId
     });
 
-    const token = createJWT(user._id);
+    const token = createJWT(user);
     setCookie(res, token);
 
     if (!username.includes('@')) {

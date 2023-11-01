@@ -45,7 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         title: '新用户注册',
         content: `您的初始密码为: ${password}`
       });
-      const token = createJWT(user._id);
+      const token = createJWT(user);
       setCookie(res, token);
       return jsonRes(res, {
         data: { user, token }
@@ -55,7 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     // login
     const userInfo = await getUserDetail(user._id, tmbId);
 
-    const token = createJWT(user._id, tmbId);
+    const token = createJWT(userInfo);
     setCookie(res, token);
     jsonRes(res, {
       data: { user: userInfo, token }

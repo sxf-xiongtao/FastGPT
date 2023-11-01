@@ -3,8 +3,7 @@ const { Schema, model, models } = connectionMongo;
 import { TeamSchema as TeamType } from '@fastgpt/global/support/user/team/type.d';
 import { userCollectionName } from '@fastgpt/service/support/user/schema';
 import { PRICE_SCALE } from '@fastgpt/global/common/bill/constants';
-
-export const TeamCollectionName = 'teams';
+import { TeamCollectionName } from '@fastgpt/global/support/user/team/constant';
 
 const TeamSchema = new Schema({
   name: {
@@ -20,12 +19,12 @@ const TeamSchema = new Schema({
     default: '/icon/logo.svg'
   },
   createTime: {
-    type: Number,
+    type: Date,
     default: () => Date.now()
   },
   balance: {
     type: Number,
-    default: 2 * PRICE_SCALE
+    default: 0
   },
   maxSize: {
     type: Number,

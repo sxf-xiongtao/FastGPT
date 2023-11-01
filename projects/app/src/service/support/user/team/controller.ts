@@ -21,7 +21,7 @@ import type {
 import { ERROR_ENUM } from '@fastgpt/global/common/error/errorCode';
 
 /* -------- format --------- */
-export function teamMemberSchema2TeamItemType(data: TeamMemberSchemaWithTeamAndUser) {
+export function teamMemberSchema2TeamItemType(data: TeamMemberSchemaWithTeamAndUser): TeamItemType {
   return {
     teamId: String(data.teamId._id),
     teamName: data.teamId.name,
@@ -29,7 +29,8 @@ export function teamMemberSchema2TeamItemType(data: TeamMemberSchemaWithTeamAndU
     balance: data.teamId.balance,
     teamMemberId: String(data._id),
     role: data.role,
-    status: data.status
+    status: data.status,
+    defaultTeam: data.defaultTeam
   };
 }
 /* ----------------- auth ----------------- */
@@ -59,7 +60,12 @@ export async function authTeamRole({
 }
 
 /* -------------- team ------------ */
-export async function createTeam({ ownerId, name, avatar }: CreateTeamProps & { ownerId: string }) {
+export async function createTeam({
+  ownerId,
+  name,
+  avatar,
+  defaultTeam = false
+}: CreateTeamProps & { ownerId: string }) {
   let id = '';
   try {
     const { _id } = await MongoTeam.create({
@@ -72,7 +78,8 @@ export async function createTeam({ ownerId, name, avatar }: CreateTeamProps & { 
       teamId: _id,
       userId: ownerId,
       role: TeamMemberRoleEnum.owner,
-      status: TeamMemberStatusEnum.active
+      status: TeamMemberStatusEnum.active,
+      defaultTeam
     });
     return _id;
   } catch (error) {
@@ -107,6 +114,8 @@ export async function getUserTeams(data: {
 
   return members.map(teamMemberSchema2TeamItemType);
 }
+
+/* ----------- get team ---------- */
 export async function getTmbByIdAndUId(tmbId: string, userId: string) {
   const tmb = (await MongoTeamMember.findOne({
     _id: tmbId,
@@ -118,6 +127,35 @@ export async function getTmbByIdAndUId(tmbId: string, userId: string) {
   }
 
   return teamMemberSchema2TeamItemType(tmb);
+}
+// get default team, if not exit, create one
+export async function getUserDefaultTeam(userId: string) {
+  const tmb = (await MongoTeamMember.findOne({
+    userId,
+    defaultTeam: true
+  }).populate('teamId userId')) as TeamMemberSchemaWithTeamAndUser;
+  if (!tmb) {
+    await createTeam({
+      ownerId: userId,
+      name: 'My Team',
+      avatar: '/icon/logo.svg',
+      defaultTeam: true
+    });
+    return getUserDefaultTeam(userId);
+  }
+  return teamMemberSchema2TeamItemType(tmb);
+}
+// get team by tmbId, if not exit, get default team
+export async function getUserTeamOrDefaultTeam(userId: string, tmbId?: string) {
+  try {
+    if (!tmbId) {
+      return getUserDefaultTeam(userId);
+    }
+    const tmb = await getTmbByIdAndUId(tmbId, userId);
+    return tmb;
+  } catch (error) {
+    return getUserDefaultTeam(userId);
+  }
 }
 
 /* --------------- member -------------- */

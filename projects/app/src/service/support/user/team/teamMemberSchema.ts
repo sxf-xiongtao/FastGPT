@@ -1,11 +1,13 @@
 import { connectionMongo, type Model } from '@fastgpt/service/common/mongo';
 const { Schema, model, models } = connectionMongo;
 import { TeamMemberSchema as TeamMemberType } from '@fastgpt/global/support/user/team/type.d';
-import { TeamCollectionName } from './teamSchema';
 import { userCollectionName } from '@fastgpt/service/support/user/schema';
-import { TeamMemberRoleMap, TeamMemberStatusMap } from '@fastgpt/global/support/user/team/constant';
-
-export const TeamMemberCollectionName = 'team.members';
+import {
+  TeamMemberRoleMap,
+  TeamMemberStatusMap,
+  TeamMemberCollectionName,
+  TeamCollectionName
+} from '@fastgpt/global/support/user/team/constant';
 
 const TeamMemberSchema = new Schema({
   teamId: {
@@ -29,6 +31,10 @@ const TeamMemberSchema = new Schema({
   createTime: {
     type: Date,
     default: () => new Date()
+  },
+  defaultTeam: {
+    type: Boolean,
+    default: false
   }
 });
 
