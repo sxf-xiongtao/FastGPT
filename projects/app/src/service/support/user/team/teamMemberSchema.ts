@@ -25,6 +25,10 @@ const TeamMemberSchema = new Schema({
   status: {
     type: String,
     enum: Object.keys(TeamMemberStatusMap)
+  },
+  createTime: {
+    type: Date,
+    default: () => new Date()
   }
 });
 

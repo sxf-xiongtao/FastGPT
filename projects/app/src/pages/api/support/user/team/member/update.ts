@@ -9,14 +9,15 @@ import { UpdateTeamMemberProps } from '@fastgpt/global/support/user/team/control
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { teamId, memberId, role } = req.body as UpdateTeamMemberProps;
+    const { teamId, memberId, role, status } = req.body as UpdateTeamMemberProps;
     await connectToDatabase();
     const { tmbId } = await authUser({ req, authToken: true });
 
     await authTeamRole({ teamId, tmbId, role: TeamMemberRoleEnum.owner });
 
     await MongoTeamMember.findByIdAndUpdate(memberId, {
-      role
+      ...(role && { role }),
+      ...(status && { status })
     });
 
     jsonRes(res, {});
