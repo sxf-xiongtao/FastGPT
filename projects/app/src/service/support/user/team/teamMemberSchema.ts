@@ -5,7 +5,7 @@ import { TeamCollectionName } from './teamSchema';
 import { userCollectionName } from '@fastgpt/service/support/user/schema';
 import { TeamMemberRoleMap, TeamMemberStatusMap } from '@fastgpt/global/support/user/team/constant';
 
-export const TeamMemberCollectionName = 'teamMembers';
+export const TeamMemberCollectionName = 'team.members';
 
 const TeamMemberSchema = new Schema({
   teamId: {

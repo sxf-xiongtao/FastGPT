@@ -9,9 +9,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const { teamId } = req.query as { teamId: string };
     await connectToDatabase();
-    const { userId, tmbId } = await authUser({ req, authToken: true });
+    const { tmbId } = await authUser({ req, authToken: true });
 
-    await authTeamRole({ userId, tmbId });
+    await authTeamRole({ teamId, tmbId });
 
     jsonRes<TeamMemberItemType[]>(res, {
       data: await getTeamMembers(teamId)

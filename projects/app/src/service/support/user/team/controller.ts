@@ -9,41 +9,50 @@ import {
   TeamMemberRoleEnum,
   TeamMemberStatusEnum
 } from '@fastgpt/global/support/user/team/constant';
-import { TeamItemType, TeamMemberItemType } from '@fastgpt/global/support/user/team/type';
+import {
+  TeamItemType,
+  TeamMemberItemType,
+  TeamMemberSchema
+} from '@fastgpt/global/support/user/team/type';
 import type {
   TeamMemberSchemaWithTeamAndUser,
   TeamMemberSchemaWithUser
 } from '@/global/user/team.d';
 import { ERROR_ENUM } from '@fastgpt/global/common/error/errorCode';
 
+/* -------- format --------- */
+export function teamMemberSchema2TeamItemType(data: TeamMemberSchemaWithTeamAndUser) {
+  return {
+    teamId: String(data.teamId._id),
+    teamName: data.teamId.name,
+    avatar: data.teamId.avatar,
+    balance: data.teamId.balance,
+    teamMemberId: String(data._id),
+    role: data.role,
+    status: data.status
+  };
+}
 /* ----------------- auth ----------------- */
+/* auth teamMember in team role */
 export async function authTeamRole({
-  userId,
+  teamId,
   tmbId,
   role
 }: AuthTeamRoleProps): Promise<TeamItemType> {
   try {
-    if (!userId || !tmbId) {
+    if (!teamId || !tmbId) {
       return Promise.reject(ERROR_ENUM.unAuthTeam);
     }
 
     const teamMember = (await MongoTeamMember.findOne({
       _id: tmbId,
-      userId,
+      teamId,
       ...(role && { role })
     }).populate('teamId userId')) as TeamMemberSchemaWithTeamAndUser;
     if (!teamMember) {
       return Promise.reject(ERROR_ENUM.unAuthTeam);
     }
-    return {
-      teamId: String(teamMember.teamId._id),
-      teamName: teamMember.teamId.name,
-      avatar: teamMember.teamId.avatar,
-      balance: teamMember.teamId.balance,
-      teamMemberId: String(teamMember._id),
-      role: teamMember.role,
-      status: teamMember.status
-    };
+    return teamMemberSchema2TeamItemType(teamMember);
   } catch (error) {
     return Promise.reject(error);
   }
@@ -73,7 +82,6 @@ export async function createTeam({ ownerId, name, avatar }: CreateTeamProps & { 
     return Promise.reject(error);
   }
 }
-
 export async function updateTeam({ teamId, name, avatar }: UpdateTeamProps) {
   await MongoTeam.findByIdAndUpdate(teamId, {
     name,
@@ -84,23 +92,20 @@ export async function deleteTeam(teamId: string) {
   await MongoTeamMember.deleteMany({ teamId });
   await MongoTeam.findByIdAndDelete(teamId);
 }
+export async function getUserTeams(data: {
+  userId?: string;
+  tmbId?: string;
+  status?: TeamMemberSchema['status'];
+  role?: TeamMemberSchema['role'];
+}): Promise<TeamItemType[]> {
+  if (!data.userId && !data.tmbId) {
+    return Promise.reject('userId or tmbId is required');
+  }
+  const members = (await MongoTeamMember.find(data).populate(
+    'teamId userId'
+  )) as TeamMemberSchemaWithTeamAndUser[];
 
-export async function getUserTeams(userId: string): Promise<TeamItemType[]> {
-  const members = (await MongoTeamMember.find({
-    userId,
-    status: TeamMemberStatusEnum.active
-  }).populate('teamId userId')) as TeamMemberSchemaWithTeamAndUser[];
-
-  return members.map((member) => ({
-    teamId: member.teamId._id,
-    teamName: member.teamId.name,
-    avatar: member.teamId.avatar,
-    balance: member.teamId.balance,
-    memberName: member.userId,
-    teamMemberId: member._id,
-    role: member.role,
-    status: member.status
-  }));
+  return members.map(teamMemberSchema2TeamItemType);
 }
 
 /* --------------- member -------------- */
@@ -117,4 +122,23 @@ export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType
     role: item.role,
     status: item.status
   }));
+}
+
+// tmbId exist or userId and teamId has tmb data
+export async function authMemberExistTeam({
+  tmbId,
+  userId,
+  teamId
+}: {
+  tmbId?: string;
+  userId?: string;
+  teamId?: string;
+}) {
+  if (tmbId) {
+    return MongoTeamMember.findOne({ _id: tmbId });
+  }
+  if (userId && teamId) {
+    return MongoTeamMember.findOne({ userId, teamId });
+  }
+  return null;
 }

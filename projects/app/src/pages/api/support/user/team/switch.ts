@@ -3,24 +3,30 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { authUser } from '@fastgpt/service/support/user/auth';
-import { authTeamRole } from '@/service/support/user/team/controller';
+import { authMemberExistTeam } from '@/service/support/user/team/controller';
 import { createJWT } from '@fastgpt/service/support/permission/controller';
+import { ERROR_ENUM } from '@fastgpt/global/common/error/errorCode';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { tmbId = '' } = req.body as { tmbId: string };
+    const { teamId = '' } = req.body as { teamId: string };
     await connectToDatabase();
     const { userId } = await authUser({ req, authToken: true });
-    const token = await (async () => {
-      if (tmbId) {
-        await authTeamRole({ userId, tmbId });
-      }
-      const token = createJWT(userId, tmbId);
-      return token;
-    })();
+
+    if (!teamId) {
+      return jsonRes(res, {
+        data: { cookie: createJWT(userId) }
+      });
+    }
+
+    // auth user in team and get tmbId
+    const tmb = await authMemberExistTeam({ userId, teamId });
+    if (!tmb) {
+      throw new Error(ERROR_ENUM.unAuthTeam);
+    }
 
     jsonRes(res, {
-      data: { cookie: token }
+      data: { cookie: createJWT(userId, tmb._id) }
     });
   } catch (err) {
     jsonRes(res, {

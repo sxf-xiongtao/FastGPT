@@ -10,8 +10,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     await connectToDatabase();
     const { teamId } = req.body as UpdateTeamProps;
-    const { userId, tmbId } = await authUser({ req, authToken: true });
-    await authTeamRole({ userId, tmbId, role: TeamMemberRoleEnum.owner });
+    const { tmbId } = await authUser({ req, authToken: true });
+    await authTeamRole({ teamId, tmbId, role: TeamMemberRoleEnum.owner });
     await deleteTeam(teamId);
     return jsonRes(res);
   } catch (err) {

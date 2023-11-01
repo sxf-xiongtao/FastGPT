@@ -2,23 +2,25 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { authUser } from '@fastgpt/service/support/user/auth';
-import { authTeamRole, updateTeam } from '@/service/support/user/team/controller';
-import { UpdateTeamProps } from '@fastgpt/global/support/user/team/controller';
+import { authTeamRole } from '@/service/support/user/team/controller';
 import { TeamMemberRoleEnum } from '@fastgpt/global/support/user/team/constant';
+import { MongoTeamMember } from '@/service/support/user/team/teamMemberSchema';
+import { DelMemberProps } from '@fastgpt/global/support/user/team/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
+    const { teamId, memberId } = req.query as DelMemberProps;
     await connectToDatabase();
-    const body = req.body as UpdateTeamProps;
     const { tmbId } = await authUser({ req, authToken: true });
 
-    if (await authTeamRole({ teamId: body.teamId, tmbId, role: TeamMemberRoleEnum.owner })) {
-      return jsonRes(res, {
-        data: await updateTeam(body)
-      });
-    }
+    await authTeamRole({ teamId, tmbId, role: TeamMemberRoleEnum.owner });
 
-    throw new Error("You don't have permission to operate the team");
+    await MongoTeamMember.findOneAndDelete({
+      _id: memberId,
+      teamId
+    });
+
+    jsonRes(res, {});
   } catch (err) {
     jsonRes(res, {
       code: 500,
