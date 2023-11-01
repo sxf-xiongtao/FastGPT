@@ -18,7 +18,7 @@ import type {
   TeamMemberSchemaWithTeamAndUser,
   TeamMemberSchemaWithUser
 } from '@/global/user/team.d';
-import { ERROR_ENUM } from '@fastgpt/global/common/error/errorCode';
+import { ERROR_ENUM, TeamErrEnum } from '@fastgpt/global/common/error/errorCode';
 
 /* -------- format --------- */
 export function teamMemberSchema2TeamItemType(data: TeamMemberSchemaWithTeamAndUser): TeamItemType {
@@ -71,7 +71,8 @@ export async function createTeam({
     const { _id } = await MongoTeam.create({
       ownerId,
       name,
-      avatar
+      avatar,
+      maxSize: global.systemConfig.system?.teamDefaultMaxMember || 5
     });
     id = _id;
     await MongoTeamMember.create({
@@ -108,9 +109,9 @@ export async function getUserTeams(data: {
   if (!data.userId && !data.tmbId) {
     return Promise.reject('userId or tmbId is required');
   }
-  const members = (await MongoTeamMember.find(data).populate(
-    'teamId userId'
-  )) as TeamMemberSchemaWithTeamAndUser[];
+  const members = (await MongoTeamMember.find(data)
+    .sort({ defaultTeam: -1 })
+    .populate('teamId userId')) as TeamMemberSchemaWithTeamAndUser[];
 
   return members.map(teamMemberSchema2TeamItemType);
 }
@@ -172,6 +173,23 @@ export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType
     role: item.role,
     status: item.status
   }));
+}
+
+export async function authTeamMaxMember(teamId: string) {
+  const [team, members] = await Promise.all([
+    MongoTeam.findById(teamId, 'maxSize'),
+    MongoTeamMember.countDocuments({ teamId })
+  ]);
+  if (!team) {
+    return Promise.reject('Team not exit');
+  }
+  if (members >= team.maxSize) {
+    return Promise.reject(TeamErrEnum.teamOverSize);
+  }
+  return {
+    maxSize: team.maxSize,
+    memberAmount: members
+  };
 }
 
 // tmbId exist or userId and teamId has tmb data

@@ -28,7 +28,7 @@ const TeamSchema = new Schema({
   },
   maxSize: {
     type: Number,
-    default: 1
+    default: 3
   }
 });
 

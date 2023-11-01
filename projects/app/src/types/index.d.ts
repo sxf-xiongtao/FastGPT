@@ -16,6 +16,7 @@ export type SystemConfigType = {
   system: {
     title: string;
     userDefaultBalance?: number;
+    teamDefaultMaxMember?: number;
   };
   censor?: {
     BAIDU_TEXT_CENSOR_CLIENTID?: string;

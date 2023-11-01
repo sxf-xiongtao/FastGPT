@@ -2,7 +2,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { authUser } from '@fastgpt/service/support/user/auth';
-import { authMemberExistTeam, authTeamRole } from '@/service/support/user/team/controller';
+import {
+  authMemberExistTeam,
+  authTeamMaxMember,
+  authTeamRole
+} from '@/service/support/user/team/controller';
 import type {
   InviteMemberProps,
   InviteMemberResponse
@@ -13,6 +17,7 @@ import {
 } from '@fastgpt/global/support/user/team/constant';
 import { authUserExist } from '@fastgpt/service/support/user/controller';
 import { MongoTeamMember } from '@/service/support/user/team/teamMemberSchema';
+import { TeamErrEnum } from '@fastgpt/global/common/error/errorCode';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -23,15 +28,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     let userMap: InviteMemberResponse = {
       invite: [],
-      inExist: [],
+      inValid: [],
       inTeam: []
     };
 
     // auth username valid
     for await (const username of usernames) {
       const user = await authUserExist({ username });
-      if (!user) {
-        userMap.inExist.push(username);
+      if (!user || username === 'root') {
+        userMap.inValid.push(username);
         continue;
       }
 
@@ -45,6 +50,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // insert teamMember and send inform
     if (userMap.invite.length > 0) {
+      const { maxSize, memberAmount } = await authTeamMaxMember(teamId);
+      if (memberAmount + userMap.invite.length > maxSize) {
+        throw new Error(TeamErrEnum.teamOverSize);
+      }
+
       await MongoTeamMember.insertMany(
         userMap.invite.map((userId) => {
           return {
