@@ -130,7 +130,7 @@ export async function getTmbByIdAndUId(tmbId: string, userId: string) {
   return teamMemberSchema2TeamItemType(tmb);
 }
 // get default team, if not exit, create one
-export async function getUserDefaultTeam(userId: string) {
+export async function getUserDefaultTeam(userId: string): Promise<TeamItemType> {
   const tmb = (await MongoTeamMember.findOne({
     userId,
     defaultTeam: true
