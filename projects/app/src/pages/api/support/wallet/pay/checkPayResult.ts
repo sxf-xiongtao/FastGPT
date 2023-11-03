@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { MongoPay } from '@fastgpt/service/support/wallet/pay/schema';
+import { MongoPay } from '@/service/support/wallet/pay/schema';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { authUser } from '@fastgpt/service/support/user/auth';
 import type { PaySchema } from '@fastgpt/global/support/wallet/pay/type.d';
