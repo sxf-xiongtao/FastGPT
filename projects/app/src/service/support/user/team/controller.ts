@@ -18,7 +18,7 @@ import type {
   TeamMemberSchemaWithTeamAndUser,
   TeamMemberSchemaWithUser
 } from '@/global/user/team.d';
-import { ERROR_ENUM, TeamErrEnum } from '@fastgpt/global/common/error/errorCode';
+import { TeamErrEnum } from '@fastgpt/global/common/error/errorCode';
 
 /* -------- format --------- */
 export function teamMemberSchema2TeamItemType(data: TeamMemberSchemaWithTeamAndUser): TeamItemType {
@@ -27,10 +27,11 @@ export function teamMemberSchema2TeamItemType(data: TeamMemberSchemaWithTeamAndU
     teamName: data.teamId.name,
     avatar: data.teamId.avatar,
     balance: data.teamId.balance,
-    teamMemberId: String(data._id),
+    tmbId: String(data._id),
     role: data.role,
     status: data.status,
-    defaultTeam: data.defaultTeam
+    defaultTeam: data.defaultTeam,
+    canWrite: data.role !== TeamMemberRoleEnum.visitor
   };
 }
 /* ----------------- auth ----------------- */
@@ -42,7 +43,7 @@ export async function authTeamRole({
 }: AuthTeamRoleProps): Promise<TeamItemType> {
   try {
     if (!teamId || !tmbId) {
-      return Promise.reject(ERROR_ENUM.unAuthTeam);
+      return Promise.reject(TeamErrEnum.unAuthTeam);
     }
 
     const teamMember = (await MongoTeamMember.findOne({
@@ -51,7 +52,7 @@ export async function authTeamRole({
       ...(role && { role })
     }).populate('teamId userId')) as TeamMemberSchemaWithTeamAndUser;
     if (!teamMember) {
-      return Promise.reject(ERROR_ENUM.unAuthTeam);
+      return Promise.reject(TeamErrEnum.unAuthTeam);
     }
     return teamMemberSchema2TeamItemType(teamMember);
   } catch (error) {
@@ -124,7 +125,7 @@ export async function getTmbByIdAndUId(tmbId: string, userId: string) {
   }).populate('teamId userId')) as TeamMemberSchemaWithTeamAndUser;
 
   if (!tmb) {
-    return Promise.reject(ERROR_ENUM.unAuthTeam);
+    return Promise.reject(TeamErrEnum.unAuthTeam);
   }
 
   return teamMemberSchema2TeamItemType(tmb);
@@ -166,7 +167,7 @@ export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType
   )) as TeamMemberSchemaWithUser[];
   return members.map((item) => ({
     userId: item.userId._id,
-    teamMemberId: item._id,
+    tmbId: item._id,
     teamId: item.teamId,
     memberUsername: item.userId.username,
     avatar: item.userId.avatar,

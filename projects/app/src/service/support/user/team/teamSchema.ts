@@ -2,7 +2,6 @@ import { connectionMongo, type Model } from '@fastgpt/service/common/mongo';
 const { Schema, model, models } = connectionMongo;
 import { TeamSchema as TeamType } from '@fastgpt/global/support/user/team/type.d';
 import { userCollectionName } from '@fastgpt/service/support/user/schema';
-import { PRICE_SCALE } from '@fastgpt/global/common/bill/constants';
 import { TeamCollectionName } from '@fastgpt/global/support/user/team/constant';
 
 const TeamSchema = new Schema({

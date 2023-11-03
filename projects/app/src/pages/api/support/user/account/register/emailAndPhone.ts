@@ -4,7 +4,7 @@ import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { connectToDatabase } from '@/service/mongo';
 import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
 import { UserAuthTypeEnum } from '@/constants/common';
-import { PRICE_SCALE } from '@fastgpt/global/common/bill/constants';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 import { authCode } from '../../inform/sendAuthCode';
 import { authMaxUsers } from '@/service/support/user/auth';
 import { createUserByUsername } from '@/service/support/user/controller';

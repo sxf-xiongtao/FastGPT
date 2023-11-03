@@ -1,6 +1,6 @@
 import { authMaxUsers } from '@/service/support/user/auth';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { PRICE_SCALE } from '@fastgpt/global/common/bill/constants';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 import { ERROR_ENUM } from '@fastgpt/global/common/error/errorCode';
 import { UserType } from '@fastgpt/global/support/user/type';
 import { getUserDefaultTeam, getUserTeamOrDefaultTeam } from './team/controller';

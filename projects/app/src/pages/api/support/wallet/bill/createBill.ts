@@ -1,0 +1,27 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { jsonRes } from '@fastgpt/service/common/response';
+import { connectToDatabase } from '@/service/mongo';
+import { CreateBillProps } from '@fastgpt/global/support/wallet/bill/api.d';
+import { addLog } from '@fastgpt/service/common/mongo/controller';
+import { MongoTeam } from '@/service/support/user/team/teamSchema';
+import { MongoBill } from '@fastgpt/service/support/wallet/bill/schema';
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    await connectToDatabase();
+    const data = req.body as CreateBillProps;
+
+    await Promise.all([
+      MongoBill.create(data),
+      MongoTeam.findByIdAndUpdate(data.teamId, {
+        $inc: { balance: -data.total }
+      })
+    ]);
+
+    jsonRes(res);
+  } catch (err) {
+    addLog.error('Create Bill Error', err);
+
+    jsonRes(res);
+  }
+}
