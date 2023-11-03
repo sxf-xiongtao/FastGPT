@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
-import { ConcatBillProps } from '@fastgpt/global/support/wallet/bill/type';
+import { ConcatBillProps } from '@fastgpt/global/support/wallet/bill/api.d';
 import { addLog } from '@fastgpt/service/common/mongo/controller';
 import { MongoTeam } from '@/service/support/user/team/teamSchema';
-import { MongoBill } from '@fastgpt/service/common/bill/schema';
+import { MongoBill } from '@fastgpt/service/support/wallet/bill/schema';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
