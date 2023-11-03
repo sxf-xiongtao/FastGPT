@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let { amount = 0 } = req.query as { amount: string };
     amount = +amount;
 
-    const { userId } = await authUser({ req, authToken: true });
+    const { teamId, tmbId } = await authUser({ req, authToken: true });
 
     const wxPay = new WXPay();
 
@@ -21,7 +21,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // add one pay record
     const payOrder = await MongoPay.create({
-      userId,
+      teamId,
+      tmbId,
       price: amount * PRICE_SCALE,
       orderId
     });

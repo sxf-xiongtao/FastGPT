@@ -8,7 +8,7 @@ import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 import { authCode } from '../../inform/sendAuthCode';
 import { authMaxUsers } from '@/service/support/user/auth';
 import { createUserByUsername } from '@/service/support/user/controller';
-import { createOnePromotion } from '@/service/support/user/promotion';
+import { createOnePromotion } from '@/service/support/activity/promotion/promotion';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {

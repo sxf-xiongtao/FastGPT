@@ -7,7 +7,8 @@ import type { PaySchema } from '@fastgpt/global/support/wallet/pay/type.d';
 import dayjs from 'dayjs';
 import { WXPay } from '@/service/support/pay/pay';
 import { connectToDatabase } from '@/service/mongo';
-import { createOnePromotion } from '@/service/support/user/promotion';
+import { createOnePromotion } from '@/service/support/activity/promotion/controller';
+import { MongoTeam } from '@/service/support/user/team/teamSchema';
 
 /* 校验支付结果 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -29,13 +30,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const user = await MongoUser.findById(userId);
-
-    const inviterId = user?.inviterId;
-
-    const inviter = inviterId ? await MongoUser.findById(inviterId) : null;
+    const inviter = user?.inviterId ? await MongoUser.findById(user.inviterId) : null;
 
     const wxPay = new WXPay();
-
     const payRes = await wxPay.getPayResult(payOrder.orderId);
 
     if (payRes.trade_state === 'SUCCESS') {
@@ -52,21 +49,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           }
         );
         if (updateRes.modifiedCount === 1) {
-          // 给用户账号充钱
-          await MongoUser.findByIdAndUpdate(userId, {
+          // Add balance to team
+          await MongoTeam.findByIdAndUpdate(payOrder.teamId, {
             $inc: { balance: payOrder.price }
           });
 
-          // 增加邀请者的收益
-          if (inviter && inviterId) {
-            const amount = (payOrder.price * inviter.promotionRate) / 100;
-            createOnePromotion({
-              userId: inviterId,
-              objUId: userId,
-              type: 'pay',
-              amount
-            });
-          }
+          // 增加邀请者的团队收益
+          // if (inviter) {
+          //   const amount = (payOrder.price * inviter.promotionRate) / 100;
+          //   createOnePromotion({
+          //     userId: inviter._id,
+          //     objUId: userId,
+          //     type: 'pay',
+          //     amount
+          //   });
+          // }
 
           return jsonRes(res, {
             data: '支付成功'
