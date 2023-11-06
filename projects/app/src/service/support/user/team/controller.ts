@@ -18,7 +18,7 @@ import type {
   TeamMemberSchemaWithTeamAndUser,
   TeamMemberSchemaWithUser
 } from '@/global/user/team.d';
-import { TeamErrEnum } from '@fastgpt/global/common/error/errorCode';
+import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 
 /* -------- format --------- */
 export function teamMemberSchema2TeamItemType(data: TeamMemberSchemaWithTeamAndUser): TeamItemType {

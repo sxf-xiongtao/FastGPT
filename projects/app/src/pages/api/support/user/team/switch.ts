@@ -2,10 +2,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
-import { authUser } from '@fastgpt/service/support/user/auth';
+import { authUser } from '@fastgpt/service/support/permission/auth/user';
 import { authMemberExistTeam } from '@/service/support/user/team/controller';
 import { createJWT } from '@fastgpt/service/support/permission/controller';
-import { TeamErrEnum } from '@fastgpt/global/common/error/errorCode';
+import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
-import { authUser } from '@fastgpt/service/support/user/auth';
+import { authUser } from '@fastgpt/service/support/permission/auth/user';
 import { MongoPromotionRecord } from '@fastgpt/service/support/activity/promotion/schema';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
