@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
-import { authUser } from '@fastgpt/service/support/permission/auth/user';
+import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { authTeamRole } from '@/service/support/user/team/controller';
 import { TeamMemberRoleEnum } from '@fastgpt/global/support/user/team/constant';
 import { MongoTeamMember } from '@/service/support/user/team/teamMemberSchema';
@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const { teamId, memberId } = req.query as DelMemberProps;
     await connectToDatabase();
-    const { tmbId } = await authUser({ req, authToken: true });
+    const { tmbId } = await authCert({ req, authToken: true });
 
     await authTeamRole({ teamId, tmbId, role: TeamMemberRoleEnum.owner });
 

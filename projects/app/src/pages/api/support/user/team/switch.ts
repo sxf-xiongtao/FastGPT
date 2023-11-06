@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
-import { authUser } from '@fastgpt/service/support/permission/auth/user';
+import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { authMemberExistTeam } from '@/service/support/user/team/controller';
 import { createJWT } from '@fastgpt/service/support/permission/controller';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const { teamId = '' } = req.body as { teamId: string };
     await connectToDatabase();
-    const { userId } = await authUser({ req, authToken: true });
+    const { userId } = await authCert({ req, authToken: true });
 
     // auth user in team and get tmbId
     const tmb = await authMemberExistTeam({ userId, teamId });

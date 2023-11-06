@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { authUser } from '@fastgpt/service/support/permission/auth/user';
+import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { connectToDatabase } from '@/service/mongo';
 import { MongoPay } from '@/service/support/wallet/pay/schema';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let { amount = 0 } = req.query as { amount: string };
     amount = +amount;
 
-    const { teamId, tmbId } = await authUser({ req, authToken: true });
+    const { teamId, tmbId } = await authCert({ req, authToken: true });
 
     const wxPay = new WXPay();
 

@@ -1,13 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { authUser } from '@fastgpt/service/support/permission/auth/user';
+import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { connectToDatabase } from '@/service/mongo';
 import { MongoPay } from '@/service/support/wallet/pay/schema';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
-    const { userId, tmbId } = await authUser({ req, authToken: true });
+    const { userId, tmbId } = await authCert({ req, authToken: true });
 
     const records = await MongoPay.find({
       $or: [{ userId }, { tmbId }],

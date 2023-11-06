@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
-import type { AuthShareChatInitProps } from '@fastgpt/service/support/outLink/auth';
+import type { AuthShareChatInitProps } from '@fastgpt/global/support/outLink/api.d';
 import axios from 'axios';
 import { TokenAuthResponseType } from '@/service/support/outLink/auth';
 

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
-import { authUser } from '@fastgpt/service/support/permission/auth/user';
+import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { authTeamRole, deleteTeam } from '@/service/support/user/team/controller';
 import { UpdateTeamProps } from '@fastgpt/global/support/user/team/controller';
 import { TeamMemberRoleEnum } from '@fastgpt/global/support/user/team/constant';
@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     await connectToDatabase();
     const { teamId } = req.body as UpdateTeamProps;
-    const { tmbId } = await authUser({ req, authToken: true });
+    const { tmbId } = await authCert({ req, authToken: true });
     const tmb = await authTeamRole({ teamId, tmbId, role: TeamMemberRoleEnum.owner });
 
     // can delete default team

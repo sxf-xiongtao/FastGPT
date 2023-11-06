@@ -3,14 +3,14 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { MongoPromotionRecord } from '@fastgpt/service/support/activity/promotion/schema';
-import { authUser } from '@fastgpt/service/support/permission/auth/user';
+import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import mongoose from '@fastgpt/service/common/mongo';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
-    const { userId } = await authUser({ req, authToken: true });
+    const { userId } = await authCert({ req, authToken: true });
 
     const invitedAmount = await MongoUser.countDocuments({
       inviterId: userId

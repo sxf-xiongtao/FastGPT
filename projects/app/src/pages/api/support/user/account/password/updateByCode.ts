@@ -9,7 +9,7 @@ import { getUserDetail } from '@/service/support/user/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
-    const { username, code, password } = req.body;
+    const { username, code, password, tmbId } = req.body;
 
     await connectToDatabase();
 
@@ -39,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     if (!user) {
       throw new Error('更新用户信息失败');
     }
-    const userInfo = await getUserDetail(user._id);
+    const userInfo = await getUserDetail(tmbId, user._id);
 
     const token = createJWT(userInfo);
     setCookie(res, token);

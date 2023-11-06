@@ -23,6 +23,7 @@ import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 /* -------- format --------- */
 export function teamMemberSchema2TeamItemType(data: TeamMemberSchemaWithTeamAndUser): TeamItemType {
   return {
+    userId: String(data.userId._id),
     teamId: String(data.teamId._id),
     teamName: data.teamId.name,
     avatar: data.teamId.avatar,
@@ -118,11 +119,10 @@ export async function getUserTeams(data: {
 }
 
 /* ----------- get team ---------- */
-export async function getTmbByIdAndUId(tmbId: string, userId: string) {
-  const tmb = (await MongoTeamMember.findOne({
-    _id: tmbId,
-    userId
-  }).populate('teamId userId')) as TeamMemberSchemaWithTeamAndUser;
+export async function getTmbByIdAndUId(tmbId: string) {
+  const tmb = (await MongoTeamMember.findById(tmbId).populate(
+    'teamId userId'
+  )) as TeamMemberSchemaWithTeamAndUser;
 
   if (!tmb) {
     return Promise.reject(TeamErrEnum.unAuthTeam);
@@ -148,16 +148,15 @@ export async function getUserDefaultTeam(userId: string): Promise<TeamItemType> 
   return teamMemberSchema2TeamItemType(tmb);
 }
 // get team by tmbId, if not exit, get default team
-export async function getUserTeamOrDefaultTeam(userId: string, tmbId?: string) {
-  try {
-    if (!tmbId) {
-      return getUserDefaultTeam(userId);
-    }
-    const tmb = await getTmbByIdAndUId(tmbId, userId);
-    return tmb;
-  } catch (error) {
+export async function getUserTeamOrDefaultTeam(tmbId?: string, userId?: string) {
+  if (tmbId) {
+    return getTmbByIdAndUId(tmbId);
+  }
+  if (userId) {
     return getUserDefaultTeam(userId);
   }
+
+  return Promise.reject('tmbId or userId is required');
 }
 
 /* --------------- member -------------- */

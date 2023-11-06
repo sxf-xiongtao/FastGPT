@@ -53,7 +53,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     }
 
     // login
-    const userInfo = await getUserDetail(user._id, tmbId);
+    const userInfo = await getUserDetail(tmbId, user._id);
 
     const token = createJWT(userInfo);
     setCookie(res, token);

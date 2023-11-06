@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { MongoBill } from '@fastgpt/service/support/wallet/bill/schema';
-import { authUser } from '@fastgpt/service/support/permission/auth/user';
+import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { adaptBill } from '@fastgpt/global/support/wallet/bill/tools';
 import { addDays } from 'date-fns';
 
@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       dateEnd: Date;
     };
 
-    const { tmbId } = await authUser({ req, authToken: true });
+    const { tmbId } = await authCert({ req, authToken: true });
 
     const where = {
       tmbId,

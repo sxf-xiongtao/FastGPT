@@ -38,11 +38,9 @@ export async function createUserByUsername({
   };
 }
 
-export async function getUserDetail(userId: string, tmbId?: string): Promise<UserType> {
-  const [user, team] = await Promise.all([
-    MongoUser.findById(userId),
-    getUserTeamOrDefaultTeam(userId, tmbId)
-  ]);
+export async function getUserDetail(tmbId?: string, userId?: string): Promise<UserType> {
+  const team = await getUserTeamOrDefaultTeam(tmbId, userId);
+  const user = await MongoUser.findById(team.userId);
 
   if (!user) {
     return Promise.reject(ERROR_ENUM.unAuthorization);

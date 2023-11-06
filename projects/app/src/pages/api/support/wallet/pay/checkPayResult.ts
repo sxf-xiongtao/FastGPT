@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoPay } from '@/service/support/wallet/pay/schema';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { authUser } from '@fastgpt/service/support/permission/auth/user';
+import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import type { PaySchema } from '@fastgpt/global/support/wallet/pay/type.d';
 import dayjs from 'dayjs';
 import { WXPay } from '@/service/support/pay/pay';
@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { payId } = req.query as { payId: string };
 
-    const { userId } = await authUser({ req, authToken: true });
+    const { userId } = await authCert({ req, authToken: true });
 
     // 查找订单记录校验
     const payOrder = await MongoPay.findById<PaySchema>(payId);
