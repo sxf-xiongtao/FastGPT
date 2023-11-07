@@ -1,5 +1,6 @@
 import { MongoPromotionRecord } from '@fastgpt/service/support/activity/promotion/schema';
-import { MongoUser } from '@fastgpt/service/support/user/schema';
+import { MongoTeamMember } from '@/service/support/user/team/teamMemberSchema';
+import { MongoTeam } from '@/service/support/user/team/teamSchema';
 
 export async function createOnePromotion(data: {
   userId: string; // 加钱的人
@@ -9,9 +10,17 @@ export async function createOnePromotion(data: {
 }) {
   const { userId, objUId, type, amount } = data;
   try {
+    // find default team
+    const tmb = await MongoTeamMember.findOne({
+      userId,
+      defaultTeam: true
+    });
+    if (!tmb) {
+      return;
+    }
     try {
       // user add balance
-      await MongoUser.findByIdAndUpdate(userId, {
+      await MongoTeam.findByIdAndUpdate(tmb.teamId, {
         $inc: { balance: amount }
       });
     } catch (error) {

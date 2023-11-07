@@ -54,16 +54,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             $inc: { balance: payOrder.price }
           });
 
-          // 增加邀请者的团队收益
-          // if (inviter) {
-          //   const amount = (payOrder.price * inviter.promotionRate) / 100;
-          //   createOnePromotion({
-          //     userId: inviter._id,
-          //     objUId: userId,
-          //     type: 'pay',
-          //     amount
-          //   });
-          // }
+          // 增加邀请者的默认的团队收益
+          if (inviter) {
+            const amount = (payOrder.price * inviter.promotionRate) / 100;
+            createOnePromotion({
+              userId: inviter._id,
+              objUId: userId,
+              type: 'pay',
+              amount
+            });
+          }
 
           return jsonRes(res, {
             data: '支付成功'
