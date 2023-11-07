@@ -3,9 +3,14 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { MongoBill } from '@fastgpt/service/support/wallet/bill/schema';
-import { authCert } from '@fastgpt/service/support/permission/auth/common';
-import { adaptBill } from '@fastgpt/global/support/wallet/bill/tools';
+import { adaptBill, formatPrice } from '@fastgpt/global/support/wallet/bill/tools';
 import { addDays } from 'date-fns';
+import { authUserRole } from '@fastgpt/service/support/permission/auth/user';
+import { Types } from '@fastgpt/service/common/mongo';
+import { TeamMemberCollectionName } from '@fastgpt/global/support/user/team/constant';
+import { userCollectionName } from '@fastgpt/service/support/user/schema';
+import { PagingData } from '@/types';
+import { BillItemType } from '@fastgpt/global/support/wallet/bill/type';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -22,30 +27,69 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       dateEnd: Date;
     };
 
-    const { tmbId } = await authCert({ req, authToken: true });
+    const { teamId, tmbId, isOwner } = await authUserRole({ req, authToken: true });
 
     const where = {
-      tmbId,
+      ...(isOwner ? { teamId: new Types.ObjectId(teamId) } : { tmbId: new Types.ObjectId(tmbId) }),
       time: {
-        $gte: dateStart,
-        $lte: dateEnd
+        $gte: new Date(dateStart),
+        $lte: new Date(dateEnd)
       }
     };
 
     // get bill record and total by record
     const [bills, total] = await Promise.all([
-      MongoBill.find(where)
-        .sort({ time: -1 }) // 按照创建时间倒序排列
-        .skip((pageNum - 1) * pageSize)
-        .limit(pageSize),
+      MongoBill.aggregate([
+        { $match: where },
+        {
+          $lookup: {
+            from: TeamMemberCollectionName,
+            localField: 'tmbId',
+            foreignField: '_id',
+            as: 'teamMemberDetails'
+          }
+        },
+        { $unwind: '$teamMemberDetails' },
+        {
+          $lookup: {
+            from: userCollectionName,
+            localField: 'teamMemberDetails.userId',
+            foreignField: '_id',
+            as: 'userDetails'
+          }
+        },
+        { $unwind: '$userDetails' },
+        {
+          $project: {
+            username: '$userDetails.username',
+            _id: 1,
+            source: 1,
+            time: 1,
+            total: 1,
+            appName: 1,
+            list: 1
+          }
+        },
+        { $sort: { time: -1 } },
+        { $skip: (pageNum - 1) * pageSize },
+        { $limit: pageSize }
+      ]),
       MongoBill.countDocuments(where)
     ]);
 
-    jsonRes(res, {
+    jsonRes<PagingData<BillItemType>>(res, {
       data: {
         pageNum,
         pageSize,
-        data: bills.map(adaptBill),
+        data: bills.map((bill) => ({
+          id: bill._id,
+          username: bill.username,
+          source: bill.source,
+          time: bill.time,
+          total: formatPrice(bill.total),
+          appName: bill.appName,
+          list: bill.list
+        })),
         total
       }
     });
