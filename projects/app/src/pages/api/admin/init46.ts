@@ -33,15 +33,6 @@ async function initMongoTeamId(limit: number) {
       schema: MongoPay
     }
   ];
-  /* init user default Team */
-  const users = await MongoUser.find({}, '_id');
-  console.log('user total', users.length);
-  // limit 组一次
-  const userArr: UserModelSchema[][] = [];
-  for (let i = 0; i < users.length; i += limit) {
-    userArr.push(users.slice(i, i + limit));
-  }
-
   for await (const item of mongoSchema) {
     console.log('start init', item.label);
     await initTeamTmbId(item.schema);
@@ -49,21 +40,50 @@ async function initMongoTeamId(limit: number) {
   }
 
   async function initTeamTmbId(schema: any) {
+    const emptyWhere = {
+      $or: [{ teamId: { $exists: false } }, { teamId: null }]
+    };
+    const uniqueUsersWithNoTeamId = await schema.aggregate([
+      {
+        $match: emptyWhere
+      },
+      {
+        $group: {
+          _id: '$userId', // 按 userId 分组以去重
+          userId: { $first: '$userId' } // 保留第一个出现的 userId
+        }
+      },
+      {
+        $project: {
+          _id: 0, // 不显示 _id 字段
+          userId: 1 // 只显示 userId 字段
+        }
+      }
+    ]);
+    const users = uniqueUsersWithNoTeamId;
+
+    console.log('un init total', users.length);
+    // limit 组一次
+    const userArr: any[][] = [];
+    for (let i = 0; i < users.length; i += limit) {
+      userArr.push(users.slice(i, i + limit));
+    }
+
     let success = 0;
     for await (const users of userArr) {
-      await Promise.all(users.map(init));
+      await Promise.all(users.map((item) => init(item.userId)));
       success += limit;
       console.log(success);
     }
 
-    async function init(user: UserModelSchema): Promise<any> {
-      const userId = user._id;
+    async function init(userId: string): Promise<any> {
       try {
         const tmb = await getTeamInfoByTmbId({ userId });
 
         await schema.updateMany(
           {
-            userId
+            userId,
+            ...emptyWhere
           },
           {
             teamId: tmb.teamId,
@@ -71,12 +91,12 @@ async function initMongoTeamId(limit: number) {
           }
         );
       } catch (error) {
-        if (error === 'default team not exist') {
+        if (error === 'team not exist' || error === 'tmbId or userId is required') {
           return;
         }
         console.log(error);
         await delay(1000);
-        return init(user);
+        return init(userId);
       }
     }
   }
