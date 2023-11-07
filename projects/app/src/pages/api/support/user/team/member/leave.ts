@@ -15,7 +15,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await MongoTeamMember.findOneAndDelete({
       teamId,
       userId,
-      defaultTeam: false,
       role: { $ne: TeamMemberRoleEnum.owner }
     });
 
