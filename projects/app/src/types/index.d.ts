@@ -69,4 +69,7 @@ declare global {
   var systemConfig: SystemConfigType;
   var store: Record<string, any>;
   var licenseData: LicenseDataType;
+
+  var sendInformQueue: (() => Promise<void>)[];
+  var sendInformQueueLen: number;
 }

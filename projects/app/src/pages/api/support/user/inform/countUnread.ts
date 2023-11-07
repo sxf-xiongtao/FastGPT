@@ -1,0 +1,32 @@
+// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { jsonRes } from '@fastgpt/service/common/response';
+import { connectToDatabase } from '@/service/mongo';
+import { MongoUserInform } from '@/service/support/user/inform/schema';
+import { authCert } from '@fastgpt/service/support/permission/auth/common';
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    await connectToDatabase();
+    if (!req.headers.cookie) {
+      return jsonRes(res, {
+        data: 0
+      });
+    }
+    const { userId } = await authCert({ req, authToken: true });
+
+    const data = await MongoUserInform.countDocuments({
+      userId,
+      read: false,
+      active: true
+    });
+
+    jsonRes(res, {
+      data
+    });
+  } catch (err) {
+    jsonRes(res, {
+      data: 0
+    });
+  }
+}

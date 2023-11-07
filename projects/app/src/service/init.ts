@@ -13,3 +13,8 @@ export const initService = () => {
     console.log('init config error', error);
   }
 };
+
+export function initGlobal() {
+  global.sendInformQueue = [];
+  global.sendInformQueueLen = 0;
+}
