@@ -56,7 +56,7 @@ async function initMongoTeamId(limit: number) {
       console.log(success);
     }
 
-    async function init(user: UserModelSchema) {
+    async function init(user: UserModelSchema): Promise<any> {
       const userId = user._id;
       try {
         const tmb = await getTeamInfoByTmbId({ userId });
