@@ -63,6 +63,9 @@ importers:
       mongoose:
         specifier: ^7.0.2
         version: registry.npmmirror.com/mongoose@7.2.2
+      nanoid:
+        specifier: ^4.0.1
+        version: registry.npmmirror.com/nanoid@4.0.1
       next:
         specifier: 13.5.2
         version: registry.npmmirror.com/next@13.5.2(@babel/core@7.23.2)(react-dom@18.2.0)(react@18.2.0)(sass@1.58.3)
@@ -72,6 +75,9 @@ importers:
       openai:
         specifier: ^4.12.4
         version: registry.npmmirror.com/openai@4.14.2(encoding@0.1.13)
+      pg:
+        specifier: ^8.10.0
+        version: registry.npmmirror.com/pg@8.10.0
       tunnel:
         specifier: ^0.0.6
         version: registry.npmmirror.com/tunnel@0.0.6
@@ -91,6 +97,9 @@ importers:
       '@types/node':
         specifier: ^20.8.5
         version: registry.npmmirror.com/@types/node@20.8.5
+      '@types/pg':
+        specifier: ^8.6.6
+        version: registry.npmmirror.com/@types/pg@8.6.6
       '@types/tunnel':
         specifier: ^0.0.4
         version: registry.npmmirror.com/@types/tunnel@0.0.4
