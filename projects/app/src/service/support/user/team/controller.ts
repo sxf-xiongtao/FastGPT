@@ -32,7 +32,8 @@ export function teamMemberSchema2TeamItemType(data: TeamMemberSchemaWithTeamAndU
     role: data.role,
     status: data.status,
     defaultTeam: data.defaultTeam,
-    canWrite: data.role !== TeamMemberRoleEnum.visitor
+    canWrite: data.role !== TeamMemberRoleEnum.visitor,
+    maxSize: data.teamId.maxSize
   };
 }
 /* ----------------- auth ----------------- */
