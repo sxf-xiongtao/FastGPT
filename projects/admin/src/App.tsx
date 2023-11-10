@@ -104,7 +104,7 @@ function App() {
         }
       />
       <Resource
-        name="kbs"
+        name="datasets"
         label="知识库"
         icon={<IconBook />}
         list={

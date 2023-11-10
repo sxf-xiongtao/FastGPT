@@ -3,7 +3,7 @@ import cors from 'cors';
 import { authLicense } from './service/auth.js';
 import { useUserRoute } from './service/route/user.js';
 import { useAppRoute } from './service/route/app.js';
-import { useKbRoute } from './service/route/kb.js';
+import { useDatasetRoute } from './service/route/dataset.js';
 import { useSystemRoute } from './service/route/system.js';
 
 authLicense();
@@ -15,7 +15,7 @@ app.use(express.static('dist'));
 
 useUserRoute(app);
 useAppRoute(app);
-useKbRoute(app);
+useDatasetRoute(app);
 useSystemRoute(app);
 
 app.get('/*', (req, res) => {

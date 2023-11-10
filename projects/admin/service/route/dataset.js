@@ -1,9 +1,8 @@
-import { Kb } from '../schema.js';
 import { auth } from './system.js';
-
-export const useKbRoute = (app) => {
+import { Dataset } from '../schema.js';
+export const useDatasetRoute = (app) => {
   // 获取用户知识库列表
-  app.get('/kbs', auth(), async (req, res) => {
+  app.get('/datasets', auth(), async (req, res) => {
     try {
       const start = parseInt(req.query._start) || 0;
       const end = parseInt(req.query._end) || 20;
@@ -25,12 +24,12 @@ export const useKbRoute = (app) => {
           : {})
       };
 
-      const kbsRaw = await Kb.find(where)
+      const kbsRaw = await Dataset.find(where)
         .skip(start)
         .limit(end - start)
         .sort({ [sort]: order });
 
-      const kbs = [];
+      const datasets = [];
 
       for (const kbRaw of kbsRaw) {
         const kb = kbRaw.toObject();
@@ -43,15 +42,15 @@ export const useKbRoute = (app) => {
           avatar: kb.avatar
         };
 
-        kbs.push(orderedKb);
+        datasets.push(orderedKb);
       }
-      const totalCount = await Kb.countDocuments(where);
+      const totalCount = await Dataset.countDocuments(where);
       res.header('Access-Control-Expose-Headers', 'X-Total-Count');
       res.header('X-Total-Count', totalCount);
-      res.json(kbs);
+      res.json(datasets);
     } catch (err) {
-      console.log(`Error fetching kbs: ${err}`);
-      res.status(500).json({ error: 'Error fetching kbs', details: err.message });
+      console.log(`Error fetching datasets: ${err}`);
+      res.status(500).json({ error: 'Error fetching datasets', details: err.message });
     }
   });
 };

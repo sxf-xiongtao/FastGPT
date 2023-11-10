@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import dotenv from 'dotenv';
 
 dotenv.config({ path: '.env.local' });
@@ -61,7 +61,7 @@ const paySchema = new mongoose.Schema({
 });
 
 // 新增: 定义 kb 模型
-const kbSchema = new mongoose.Schema({
+const DatasetSchema = new mongoose.Schema({
   userId: mongoose.Schema.Types.ObjectId,
   avatar: String,
   name: String,
@@ -93,7 +93,63 @@ const appSchema = new mongoose.Schema({
   updateTime: Date
 });
 
+const TeamSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  ownerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'users'
+  },
+  avatar: {
+    type: String,
+    default: '/icon/logo.svg'
+  },
+  createTime: {
+    type: Date,
+    default: () => Date.now()
+  },
+  balance: {
+    type: Number,
+    default: 0
+  },
+  maxSize: {
+    type: Number,
+    default: 5
+  }
+});
+const TeamMemberSchema = new Schema({
+  teamId: {
+    type: Schema.Types.ObjectId,
+    ref: 'teams',
+    required: true
+  },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'users',
+    required: true
+  },
+  role: {
+    type: String
+  },
+  status: {
+    type: String
+  },
+  createTime: {
+    type: Date,
+    default: () => new Date()
+  },
+  defaultTeam: {
+    type: Boolean,
+    default: false
+  }
+});
+
 export const App = mongoose.models['app'] || mongoose.model('app', appSchema);
-export const Kb = mongoose.models['kb'] || mongoose.model('kb', kbSchema);
+export const Dataset = mongoose.models['datasets'] || mongoose.model('datasets', DatasetSchema);
 export const User = mongoose.models['user'] || mongoose.model('user', UserSchema);
 export const Pay = mongoose.models['pay'] || mongoose.model('pay', paySchema);
+export const Team = mongoose.models['team'] || mongoose.model('team', TeamSchema);
+export const Tmb =
+  mongoose.models['team.members'] || mongoose.model('team.members', TeamMemberSchema);

@@ -1,4 +1,4 @@
-import { App, Kb } from '../schema.js';
+import { App } from '../schema.js';
 import { auth } from './system.js';
 
 export const useAppRoute = (app) => {

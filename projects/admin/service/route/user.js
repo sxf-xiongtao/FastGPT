@@ -1,4 +1,4 @@
-import { User, Pay } from '../schema.js';
+import { User, Pay, Team, Tmb } from '../schema.js';
 import dayjs from 'dayjs';
 import { auth } from './system.js';
 import crypto from 'crypto';
@@ -77,15 +77,29 @@ export const useUserRoute = (app) => {
         .skip(start)
         .limit(end - start)
         .sort({ [sort]: order });
+      const tmbs = await Tmb.find({
+        userId: { $in: usersRaw.map((user) => user._id) }
+      });
+      // get teams
+      const teams = await Team.find({
+        _id: { $in: tmbs.map((tmb) => tmb.teamId) }
+      });
 
-      const users = usersRaw.map((user) => {
-        const obj = user.toObject();
+      const users = tmbs.map((tmb, i) => {
+        const user = usersRaw
+          .find((user) => user._id.toString() === tmb.userId.toString())
+          .toObject();
+        const team = teams.find((team) => team._id.toString() === tmb.teamId.toString()).toObject();
+
         return {
-          ...obj,
-          id: obj._id,
-          balance: formatPrice(obj.balance),
-          createTime: dayjs(obj.createTime).format('YYYY/MM/DD HH:mm'),
-          password: ''
+          ...user,
+          id: user._id,
+          balance: formatPrice(team.balance),
+          createTime: dayjs(user.createTime).format('YYYY/MM/DD HH:mm'),
+          password: '',
+          teamId: team._id,
+          tmbId: tmb._id,
+          maxSize: team.maxSize
         };
       });
 
@@ -116,6 +130,21 @@ export const useUserRoute = (app) => {
         password: hashPassword(hashPassword(password)),
         balance: balance * PRICE_SCALE
       });
+
+      const { _id } = await MongoTeam.create({
+        ownerId: result._id,
+        name: 'My Team',
+        avatar,
+        maxSize: 5
+      });
+      await MongoTeamMember.create({
+        teamId: _id,
+        ownerId: result._id,
+        role: 'owner',
+        status: 'active',
+        defaultTeam: true
+      });
+
       res.json(result);
     } catch (err) {
       console.log(`Error creating user: ${err}`);
@@ -127,13 +156,19 @@ export const useUserRoute = (app) => {
     try {
       const id = req.params.id;
 
-      let { username, password, balance = 0 } = req.body;
+      let { username, password, balance, maxSize, teamId } = req.body;
 
       const result = await User.findByIdAndUpdate(id, {
         ...(username && { username }),
-        ...(password && { password: hashPassword(hashPassword(password)) }),
-        ...(balance && { balance: balance * PRICE_SCALE })
+        ...(password && { password: hashPassword(hashPassword(password)) })
       });
+
+      if (teamId && (balance !== undefined || maxSize !== undefined)) {
+        await Team.findByIdAndUpdate(teamId, {
+          ...(balance && { balance: balance * PRICE_SCALE }),
+          ...(maxSize && { maxSize })
+        });
+      }
 
       res.json({
         ...result.toObject(),
