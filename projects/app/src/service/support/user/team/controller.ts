@@ -19,6 +19,7 @@ import type {
   TeamMemberSchemaWithUser
 } from '@/global/user/team.d';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 
 /* -------- format --------- */
 export function teamMemberSchema2TeamItemType(data: TeamMemberSchemaWithTeamAndUser): TeamItemType {
@@ -75,7 +76,8 @@ export async function createTeam({
       ownerId,
       name,
       avatar,
-      maxSize: global.systemConfig.system?.teamDefaultMaxMember || 5
+      maxSize: global.systemConfig.system?.teamDefaultMaxMember || 5,
+      balance: (global.systemConfig.system?.userDefaultBalance || 2) * PRICE_SCALE
     });
     id = _id;
     await MongoTeamMember.create({
