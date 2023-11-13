@@ -5,7 +5,7 @@ import Dysmsapi, * as dysmsapi from '@alicloud/dysmsapi20170525';
 import * as OpenApi from '@alicloud/openapi-client';
 import * as Util from '@alicloud/tea-util';
 import { connectToDatabase } from '@/service/mongo';
-import { MongoAuthCode } from '@/service/models/authCode';
+import { MongoAuthCode } from '@/service/support/user/authCode/schema';
 import axios from 'axios';
 import { customAlphabet } from 'nanoid';
 import requestIp from 'request-ip';

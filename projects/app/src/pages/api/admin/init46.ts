@@ -6,9 +6,11 @@ import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getTeamInfoByTmbId } from '@fastgpt/service/support/user/team/controller';
 import { delay } from '@/utils/tools';
+import { authCert } from '@fastgpt/service/support/permission/auth/common';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
+    await authCert({ req, authRoot: true });
     const { limit = 50 } = req.body as { limit: number };
     await connectToDatabase();
 
