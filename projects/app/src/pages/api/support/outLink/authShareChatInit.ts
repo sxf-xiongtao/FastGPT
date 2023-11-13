@@ -4,10 +4,12 @@ import { connectToDatabase } from '@/service/mongo';
 import type { AuthShareChatInitProps } from '@fastgpt/global/support/outLink/api.d';
 import axios from 'axios';
 import { TokenAuthResponseType } from '@/service/support/outLink/auth';
+import { authCert } from '@fastgpt/service/support/permission/auth/common';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
+    await authCert({ req, authRoot: true });
     const { tokenUrl, authToken } = req.body as AuthShareChatInitProps;
 
     if (!tokenUrl) return jsonRes(res);

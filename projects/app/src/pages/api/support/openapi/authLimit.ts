@@ -2,10 +2,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import type { AuthOpenApiLimitProps } from '@fastgpt/service/support/openapi/auth';
+import { authCert } from '@fastgpt/service/support/permission/auth/common';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
+    await authCert({ req, authRoot: true });
     const { openApi } = req.body as AuthOpenApiLimitProps;
 
     // expiredTime already 2 string
