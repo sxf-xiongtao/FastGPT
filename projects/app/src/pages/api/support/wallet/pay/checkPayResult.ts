@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import { WXPay } from '@/service/support/pay/pay';
 import { connectToDatabase } from '@/service/mongo';
 import { createOnePromotion } from '@/service/support/activity/promotion/controller';
-import { MongoTeam } from '@/service/support/user/team/teamSchema';
+import { updateTeamBalance } from '@/service/support/wallet/controller';
 
 /* 校验支付结果 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -50,9 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         );
         if (updateRes.modifiedCount === 1) {
           // Add balance to team
-          await MongoTeam.findByIdAndUpdate(payOrder.teamId, {
-            $inc: { balance: payOrder.price }
-          });
+          updateTeamBalance({ teamId: payOrder.teamId, amount: payOrder.price });
 
           // 增加邀请者的默认的团队收益
           if (inviter) {

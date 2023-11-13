@@ -3,8 +3,8 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { ConcatBillProps } from '@fastgpt/global/support/wallet/bill/api.d';
 import { addLog } from '@fastgpt/service/common/mongo/controller';
-import { MongoTeam } from '@/service/support/user/team/teamSchema';
 import { MongoBill } from '@fastgpt/service/support/wallet/bill/schema';
+import { updateTeamBalance } from '@/service/support/wallet/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -22,9 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           })
         }
       }),
-      MongoTeam.findByIdAndUpdate(teamId, {
-        $inc: { balance: -total }
-      })
+      updateTeamBalance({ teamId, amount: -total })
     ]);
 
     jsonRes(res);

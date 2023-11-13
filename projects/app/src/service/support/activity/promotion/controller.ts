@@ -1,6 +1,6 @@
 import { MongoPromotionRecord } from '@fastgpt/service/support/activity/promotion/schema';
 import { MongoTeamMember } from '@/service/support/user/team/teamMemberSchema';
-import { MongoTeam } from '@/service/support/user/team/teamSchema';
+import { updateTeamBalance } from '../../wallet/controller';
 
 export async function createOnePromotion(data: {
   userId: string; // 加钱的人
@@ -20,9 +20,7 @@ export async function createOnePromotion(data: {
     }
     try {
       // user add balance
-      await MongoTeam.findByIdAndUpdate(tmb.teamId, {
-        $inc: { balance: amount }
-      });
+      updateTeamBalance({ teamId: tmb.teamId, amount });
     } catch (error) {
       return setTimeout(() => {
         createOnePromotion(data);

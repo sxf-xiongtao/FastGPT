@@ -5,6 +5,7 @@ import { CreateBillProps } from '@fastgpt/global/support/wallet/bill/api.d';
 import { addLog } from '@fastgpt/service/common/mongo/controller';
 import { MongoTeam } from '@/service/support/user/team/teamSchema';
 import { MongoBill } from '@fastgpt/service/support/wallet/bill/schema';
+import { updateTeamBalance } from '@/service/support/wallet/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -13,9 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     await Promise.all([
       MongoBill.create(data),
-      MongoTeam.findByIdAndUpdate(data.teamId, {
-        $inc: { balance: -data.total }
-      })
+      updateTeamBalance({ teamId: data.teamId, amount: -data.total })
     ]);
 
     jsonRes(res);

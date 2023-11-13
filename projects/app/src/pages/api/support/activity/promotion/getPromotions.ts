@@ -3,6 +3,7 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoPromotionRecord } from '@fastgpt/service/support/activity/promotion/schema';
+import { formatPrice } from '@fastgpt/global/support/wallet/bill/tools';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -14,24 +15,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { userId } = await authCert({ req, authToken: true });
 
-    const data = await MongoPromotionRecord.find(
-      {
+    const [data, total] = await Promise.all([
+      MongoPromotionRecord.find(
+        {
+          userId
+        },
+        '_id createTime type amount'
+      )
+        .sort({ _id: -1 })
+        .skip((pageNum - 1) * pageSize)
+        .limit(pageSize),
+      MongoPromotionRecord.countDocuments({
         userId
-      },
-      '_id createTime type amount'
-    )
-      .sort({ _id: -1 })
-      .skip((pageNum - 1) * pageSize)
-      .limit(pageSize);
+      })
+    ]);
 
     jsonRes(res, {
       data: {
         pageNum,
         pageSize,
-        data,
-        total: await MongoPromotionRecord.countDocuments({
-          userId
-        })
+        data: data.map((item) => ({
+          ...item.toObject(),
+          amount: formatPrice(item.amount)
+        })),
+        total
       }
     });
   } catch (err) {
