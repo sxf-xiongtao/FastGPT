@@ -20,6 +20,21 @@ import type {
 } from '@/global/user/team.d';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
+import { MongoApp } from '@fastgpt/service/core/app/schema';
+import { MongoBill } from '@fastgpt/service/support/wallet/bill/schema';
+import { MongoChatItem } from '@fastgpt/service/core/chat/chatItemSchema';
+import { MongoChat } from '@fastgpt/service/core/chat/chatSchema';
+import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
+import { MongoDatasetCollection } from '@fastgpt/service/core/dataset/collection/schema';
+import { MongoDatasetData } from '@fastgpt/service/core/dataset/data/schema';
+import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
+import { getGFSCollection } from '@fastgpt/service/common/file/gridfs/controller';
+import { MongoOpenApi } from '@fastgpt/service/support/openapi/schema';
+import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
+import { MongoPay } from '../../wallet/pay/schema';
+import { MongoPlugin } from '@fastgpt/service/core/plugin/schema';
+import { PgClient } from '@fastgpt/service/common/pg';
+import { PgDatasetTableName } from '@fastgpt/global/core/dataset/constant';
 
 /* -------- format --------- */
 export function teamMemberSchema2TeamItemType(data: TeamMemberSchemaWithTeamAndUser): TeamItemType {
@@ -37,31 +52,6 @@ export function teamMemberSchema2TeamItemType(data: TeamMemberSchemaWithTeamAndU
     canWrite: data.role !== TeamMemberRoleEnum.visitor,
     maxSize: data.teamId.maxSize
   };
-}
-/* ----------------- auth ----------------- */
-/* auth teamMember in team role */
-export async function authTeamRole({
-  teamId,
-  tmbId,
-  role
-}: AuthTeamRoleProps): Promise<TeamItemType> {
-  try {
-    if (!teamId || !tmbId) {
-      return Promise.reject(TeamErrEnum.unAuthTeam);
-    }
-
-    const teamMember = (await MongoTeamMember.findOne({
-      _id: tmbId,
-      teamId,
-      ...(role && { role })
-    }).populate('teamId userId')) as TeamMemberSchemaWithTeamAndUser;
-    if (!teamMember) {
-      return Promise.reject(TeamErrEnum.unAuthTeam);
-    }
-    return teamMemberSchema2TeamItemType(teamMember);
-  } catch (error) {
-    return Promise.reject(error);
-  }
 }
 
 /* -------------- team ------------ */
@@ -124,7 +114,7 @@ export async function getUserTeams(data: {
 }
 
 /* ----------- get team ---------- */
-export async function getTmbByIdAndUId(tmbId: string) {
+export async function getTeamByTmbId(tmbId: string) {
   const tmb = (await MongoTeamMember.findById(tmbId).populate(
     'teamId userId'
   )) as TeamMemberSchemaWithTeamAndUser;
@@ -155,7 +145,7 @@ export async function getUserDefaultTeam(userId: string): Promise<TeamItemType> 
 // get team by tmbId, if not exit, get default team
 export async function getUserTeamOrDefaultTeam(tmbId?: string, userId?: string) {
   if (tmbId) {
-    return getTmbByIdAndUId(tmbId);
+    return getTeamByTmbId(tmbId);
   }
   if (userId) {
     return getUserDefaultTeam(userId);
@@ -179,7 +169,87 @@ export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType
     status: item.status
   }));
 }
+// delete one member, update it all source to owner
+export async function deleteOneMember(tmbId: string) {
+  const tmb = await MongoTeamMember.findById(tmbId);
+  if (!tmb) {
+    return Promise.reject('member not exist');
+  }
+  const ownerTmb = await MongoTeamMember.findOne({
+    teamId: tmb.teamId,
+    role: TeamMemberRoleEnum.owner
+  });
+  if (!ownerTmb) {
+    return Promise.reject('owner not exist');
+  }
+  tmbId = String(tmbId);
+  const ownerId = String(ownerTmb._id);
 
+  // transfer all resources:
+  await Promise.all([
+    MongoApp.updateMany({ tmbId }, { tmbId: ownerId }),
+    MongoOpenApi.updateMany({ tmbId }, { tmbId: ownerId }),
+    MongoOutLink.updateMany({ tmbId }, { tmbId: ownerId }),
+    MongoPay.updateMany({ tmbId }, { tmbId: ownerId }),
+    MongoPlugin.updateMany({ tmbId }, { tmbId: ownerId })
+  ]);
+
+  await Promise.all([
+    MongoBill.updateMany({ tmbId }, { tmbId: ownerId }),
+    MongoChatItem.updateMany({ tmbId }, { tmbId: ownerId }),
+    MongoChat.updateMany({ tmbId }, { tmbId: ownerId })
+  ]);
+
+  await Promise.all([
+    MongoDataset.updateMany({ tmbId }, { tmbId: ownerId }),
+    MongoDatasetCollection.updateMany({ tmbId }, { tmbId: ownerId }),
+    MongoDatasetData.updateMany({ tmbId }, { tmbId: ownerId }),
+    MongoDatasetTraining.updateMany({ tmbId }, { tmbId: ownerId }),
+    getGFSCollection('dataset').updateMany(
+      { 'metadata.tmbId': tmbId },
+      {
+        $set: {
+          'metadata.tmbId': ownerId
+        }
+      }
+    )
+  ]);
+  // pg
+  try {
+    pgClient?.query(
+      `UPDATE ${PgDatasetTableName} SET "tmbId"='${ownerId}' WHERE "tmbId"='${tmbId}'`
+    );
+  } catch (error) {}
+
+  await MongoTeamMember.findByIdAndDelete(tmbId);
+}
+
+/* ----------------- auth ----------------- */
+/* auth teamMember in team role */
+export async function authTeamRole({
+  teamId,
+  tmbId,
+  role
+}: AuthTeamRoleProps): Promise<TeamItemType> {
+  try {
+    if (!teamId || !tmbId) {
+      return Promise.reject(TeamErrEnum.unAuthTeam);
+    }
+
+    const teamMember = (await MongoTeamMember.findOne({
+      _id: tmbId,
+      teamId,
+      ...(role && { role })
+    }).populate('teamId userId')) as TeamMemberSchemaWithTeamAndUser;
+    if (!teamMember) {
+      return Promise.reject(TeamErrEnum.unAuthTeam);
+    }
+    return teamMemberSchema2TeamItemType(teamMember);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+}
+// auth max member, if  over, reject
 export async function authTeamMaxMember(teamId: string) {
   const [team, members] = await Promise.all([
     MongoTeam.findById(teamId, 'maxSize'),
@@ -196,7 +266,6 @@ export async function authTeamMaxMember(teamId: string) {
     memberAmount: members
   };
 }
-
 // tmbId exist or userId and teamId has tmb data
 export async function authMemberExistTeam({
   tmbId,
