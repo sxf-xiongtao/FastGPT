@@ -1,4 +1,5 @@
 import { readFileSync } from 'fs';
+import { exit } from 'process';
 
 export const initService = () => {
   global.store = {};
@@ -11,6 +12,7 @@ export const initService = () => {
     global.systemConfig = res;
   } catch (error) {
     console.log('init config error', error);
+    exit(1);
   }
 };
 

@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     await MongoTeamMember.findByIdAndUpdate(tmbId, {
-      name
+      name: name.slice(0, 20)
     });
 
     jsonRes(res, {});
