@@ -36,16 +36,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     for await (const username of usernames) {
       const user = await authUserExist({ username });
       if (!user || username === 'root') {
-        userMap.inValid.push(username);
+        userMap.inValid.push({
+          username,
+          userId: ''
+        });
         continue;
       }
 
       const exit = await authMemberExistTeam({ userId: user._id, teamId });
       if (exit) {
-        userMap.inTeam.push(username);
+        userMap.inTeam.push({
+          username,
+          userId: user._id
+        });
         continue;
       }
-      userMap.invite.push(user._id);
+      userMap.invite.push({
+        username,
+        userId: user._id
+      });
     }
 
     // insert teamMember and send inform
@@ -56,10 +65,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       await MongoTeamMember.insertMany(
-        userMap.invite.map((userId) => {
+        userMap.invite.map((user) => {
           return {
-            userId,
+            userId: user.userId,
             teamId,
+            name: user.username.slice(0, 5),
             role: role,
             status: TeamMemberStatusEnum.waiting
           };

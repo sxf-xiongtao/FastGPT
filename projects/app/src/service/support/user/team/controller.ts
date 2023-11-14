@@ -27,6 +27,7 @@ export function teamMemberSchema2TeamItemType(data: TeamMemberSchemaWithTeamAndU
     userId: String(data.userId._id),
     teamId: String(data.teamId._id),
     teamName: data.teamId.name,
+    memberName: data.name,
     avatar: data.teamId.avatar,
     balance: data.teamId.balance,
     tmbId: String(data._id),
@@ -83,6 +84,7 @@ export async function createTeam({
     await MongoTeamMember.create({
       teamId: _id,
       userId: ownerId,
+      name: 'Owner',
       role: TeamMemberRoleEnum.owner,
       status: TeamMemberStatusEnum.active,
       defaultTeam
@@ -171,7 +173,7 @@ export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType
     userId: item.userId._id,
     tmbId: item._id,
     teamId: item.teamId,
-    memberUsername: item.userId.username,
+    memberName: item.name,
     avatar: item.userId.avatar,
     role: item.role,
     status: item.status

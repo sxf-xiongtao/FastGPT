@@ -20,6 +20,10 @@ const TeamMemberSchema = new Schema({
     ref: userCollectionName,
     required: true
   },
+  name: {
+    type: String,
+    default: 'Member'
+  },
   role: {
     type: String,
     enum: Object.keys(TeamMemberRoleMap)
