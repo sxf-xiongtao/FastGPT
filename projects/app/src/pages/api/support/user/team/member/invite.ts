@@ -31,6 +31,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       inTeam: []
     };
 
+    const leaveMembers: {
+      username: string;
+      userId: string;
+    }[] = [];
+
     // auth username valid
     for await (const username of usernames) {
       const user = await authUserExist({ username });
@@ -60,6 +65,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         leaveTmb.status = TeamMemberStatusEnum.waiting;
         leaveTmb.role = role;
         await leaveTmb.save();
+        leaveMembers.push({
+          username,
+          userId: user._id
+        });
         continue;
       }
 
@@ -85,6 +94,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
       );
     }
+
+    userMap.invite = userMap.invite.concat(leaveMembers);
 
     jsonRes(res, {
       data: userMap
