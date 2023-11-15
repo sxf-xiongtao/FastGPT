@@ -21,6 +21,8 @@ import type {
 } from '@/global/user/team.d';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
+import { MongoOpenApi } from '@fastgpt/service/support/openapi/schema';
+import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
 
 /* -------- format --------- */
 export function teamMemberSchema2TeamItemType(data: TeamMemberSchemaWithTeamAndUser): TeamItemType {
@@ -153,6 +155,54 @@ export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType
     status: item.status
   }));
 }
+export async function removeUser(memberId: string) {
+  const tmb = await MongoTeamMember.findById(memberId);
+  if (!tmb) {
+    return Promise.reject('member not exist');
+  }
+  const ownerTmb = await MongoTeamMember.findOne({
+    teamId: tmb.teamId,
+    role: TeamMemberRoleEnum.owner
+  });
+  if (!ownerTmb) {
+    return Promise.reject('owner not exist');
+  }
+  const memberTmbId = String(memberId);
+  const teamOwnerTmbId = String(ownerTmb._id);
+
+  // update shareLink and openapi tmbId
+  await Promise.all([
+    MongoOpenApi.updateMany(
+      {
+        tmbId: memberTmbId
+      },
+      {
+        tmbId: teamOwnerTmbId
+      }
+    ),
+    MongoOutLink.updateMany(
+      {
+        tmbId: memberTmbId
+      },
+      {
+        tmbId: teamOwnerTmbId
+      }
+    )
+  ]);
+
+  // update status is leave
+  await MongoTeamMember.findOneAndUpdate(
+    {
+      _id: memberTmbId,
+      teamId: tmb.teamId,
+      role: { $ne: TeamMemberRoleEnum.owner }
+    },
+    {
+      status: TeamMemberStatusEnum.leave
+    }
+  );
+}
+
 /* ----------------- auth ----------------- */
 /* auth teamMember in team role */
 export async function authTeamRole({
