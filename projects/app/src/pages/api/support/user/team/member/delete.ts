@@ -2,9 +2,13 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
-import { authTeamRole, deleteOneMember } from '@/service/support/user/team/controller';
-import { TeamMemberRoleEnum } from '@fastgpt/global/support/user/team/constant';
+import { authTeamRole } from '@/service/support/user/team/controller';
+import {
+  TeamMemberRoleEnum,
+  TeamMemberStatusEnum
+} from '@fastgpt/global/support/user/team/constant';
 import { DelMemberProps } from '@fastgpt/global/support/user/team/controller';
+import { MongoTeamMember } from '@/service/support/user/team/teamMemberSchema';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -14,8 +18,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     await authTeamRole({ teamId, tmbId, role: TeamMemberRoleEnum.owner });
 
-    // Transfer all resources
-    await deleteOneMember(memberId);
+    // update status is leave
+    await MongoTeamMember.findOneAndUpdate(
+      {
+        _id: memberId,
+        teamId
+      },
+      {
+        status: TeamMemberStatusEnum.leave
+      }
+    );
 
     jsonRes(res, {});
   } catch (err) {

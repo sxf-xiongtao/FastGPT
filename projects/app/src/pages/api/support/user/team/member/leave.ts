@@ -3,7 +3,10 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoTeamMember } from '@/service/support/user/team/teamMemberSchema';
-import { TeamMemberRoleEnum } from '@fastgpt/global/support/user/team/constant';
+import {
+  TeamMemberRoleEnum,
+  TeamMemberStatusEnum
+} from '@fastgpt/global/support/user/team/constant';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -12,11 +15,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { userId } = await authCert({ req, authToken: true });
 
     // Can not leave default team or owner team
-    await MongoTeamMember.findOneAndDelete({
-      teamId,
-      userId,
-      role: { $ne: TeamMemberRoleEnum.owner }
-    });
+    await MongoTeamMember.findOneAndUpdate(
+      {
+        teamId,
+        userId,
+        role: { $ne: TeamMemberRoleEnum.owner }
+      },
+      {
+        status: TeamMemberStatusEnum.leave
+      }
+    );
 
     jsonRes(res, {});
   } catch (err) {

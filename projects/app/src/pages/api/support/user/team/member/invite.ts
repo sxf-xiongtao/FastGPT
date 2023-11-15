@@ -3,7 +3,7 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import {
-  authMemberExistTeam,
+  authUserExistTeam,
   authTeamMaxMember,
   authTeamRole
 } from '@/service/support/user/team/controller';
@@ -17,7 +17,6 @@ import {
 } from '@fastgpt/global/support/user/team/constant';
 import { authUserExist } from '@fastgpt/service/support/user/controller';
 import { MongoTeamMember } from '@/service/support/user/team/teamMemberSchema';
-import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -43,14 +42,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         continue;
       }
 
-      const exit = await authMemberExistTeam({ userId: user._id, teamId });
-      if (exit) {
+      const tmb = await authUserExistTeam({ userId: user._id, teamId });
+      if (tmb) {
         userMap.inTeam.push({
           username,
           userId: user._id
         });
         continue;
       }
+
+      // auth user leave
+      const leaveTmb = await MongoTeamMember.findOne({
+        userId: user._id,
+        status: TeamMemberStatusEnum.leave
+      });
+      if (leaveTmb) {
+        leaveTmb.status = TeamMemberStatusEnum.waiting;
+        await leaveTmb.save();
+        continue;
+      }
+
       userMap.invite.push({
         username,
         userId: user._id
@@ -59,10 +70,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // insert teamMember and send inform
     if (userMap.invite.length > 0) {
-      const { maxSize, memberAmount } = await authTeamMaxMember(teamId);
-      if (memberAmount + userMap.invite.length > maxSize) {
-        throw new Error(TeamErrEnum.teamOverSize);
-      }
+      await authTeamMaxMember(teamId, userMap.invite.length);
 
       await MongoTeamMember.insertMany(
         userMap.invite.map((user) => {
