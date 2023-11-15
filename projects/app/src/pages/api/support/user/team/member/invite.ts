@@ -58,6 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
       if (leaveTmb) {
         leaveTmb.status = TeamMemberStatusEnum.waiting;
+        leaveTmb.role = role;
         await leaveTmb.save();
         continue;
       }
