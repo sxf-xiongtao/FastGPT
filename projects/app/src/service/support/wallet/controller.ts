@@ -9,7 +9,10 @@ export async function updateTeamBalance({ teamId, amount }: { teamId: string; am
     addLog.info('updateTeamBalance amount too small, maybe have error', { teamId, amount });
   }
 
-  console.log('update balance', amount);
+  addLog.info(`create bill`, {
+    teamId,
+    amount
+  });
 
   await MongoTeam.findByIdAndUpdate(teamId, {
     $inc: { balance: amount }
