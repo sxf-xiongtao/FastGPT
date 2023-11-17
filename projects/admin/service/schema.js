@@ -52,7 +52,16 @@ const UserSchema = new mongoose.Schema({
 
 // 新增: 定义 pays 模型
 const paySchema = new mongoose.Schema({
-  userId: mongoose.Schema.Types.ObjectId,
+  teamId: {
+    type: Schema.Types.ObjectId,
+    ref: 'teams',
+    required: true
+  },
+  tmbId: {
+    type: Schema.Types.ObjectId,
+    ref: 'team.members',
+    required: true
+  },
   price: Number,
   orderId: String,
   status: String,
@@ -150,6 +159,6 @@ export const App = mongoose.models['app'] || mongoose.model('app', appSchema);
 export const Dataset = mongoose.models['datasets'] || mongoose.model('datasets', DatasetSchema);
 export const User = mongoose.models['user'] || mongoose.model('user', UserSchema);
 export const Pay = mongoose.models['pay'] || mongoose.model('pay', paySchema);
-export const Team = mongoose.models['team'] || mongoose.model('team', TeamSchema);
-export const Tmb =
+export const MongoTeam = mongoose.models['team'] || mongoose.model('team', TeamSchema);
+export const MongoTmb =
   mongoose.models['team.members'] || mongoose.model('team.members', TeamMemberSchema);

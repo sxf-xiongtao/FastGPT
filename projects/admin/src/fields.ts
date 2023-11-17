@@ -1,22 +1,22 @@
 import { createTextField, createNumberField } from 'tushan';
 
 export const userFields = [
-  createTextField('id', { label: 'ID' }),
+  createTextField('id', { label: 'TmbId' }),
   createTextField('username', { label: '用户名' }),
   createNumberField('balance', { label: '余额（元）', list: { sort: true } }),
-  createNumberField('maxSize', { label: '团队最大数量' }),
+  createTextField('teamName', { label: '团队名' }),
+  createNumberField('maxSize', { label: '团队最大数量', list: { hidden: true } }),
   createTextField('createTime', {
     label: '创建时间',
     list: { sort: true },
     edit: { hidden: true }
   }),
-  createTextField('teamId', { label: '团队id', list: { hidden: true } }),
   createTextField('password', { label: '密码', list: { hidden: true } })
 ];
 
 export const payFields = [
   createTextField('id', { label: '订单号' }),
-  createTextField('userId', { label: '用户Id' }),
+  createTextField('username', { label: '用户名' }),
   createNumberField('price', { label: '支付金额(元)' }),
   createTextField('orderId', { label: 'orderId' }),
   createTextField('status', { label: '状态' }),
