@@ -3,28 +3,20 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoTeamMember } from '@/service/support/user/team/teamMemberSchema';
-import {
-  TeamMemberRoleEnum,
-  TeamMemberStatusEnum
-} from '@fastgpt/global/support/user/team/constant';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { teamId } = req.query as { teamId: string };
+    const { name } = req.body as { name: string };
     await connectToDatabase();
-    const { userId } = await authCert({ req, authToken: true });
+    const { tmbId } = await authCert({ req, authToken: true });
 
-    // Can not leave default team or owner team
-    await MongoTeamMember.findOneAndUpdate(
-      {
-        teamId,
-        userId,
-        role: { $ne: TeamMemberRoleEnum.owner }
-      },
-      {
-        status: TeamMemberStatusEnum.leave
-      }
-    );
+    if (!name) {
+      throw new Error('name is required');
+    }
+
+    await MongoTeamMember.findByIdAndUpdate(tmbId, {
+      name: name.slice(0, 20)
+    });
 
     jsonRes(res, {});
   } catch (err) {

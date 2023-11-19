@@ -94,8 +94,8 @@ function App() {
         list={
           <ListTable
             filter={[
-              createTextField('userId', {
-                label: 'userId'
+              createTextField('tmbId', {
+                label: 'tmbId'
               })
             ]}
             fields={payFields}

@@ -26,6 +26,8 @@ export async function createUserByUsername({
     balance: (global.systemConfig.system?.userDefaultBalance || 2) * PRICE_SCALE
   });
 
+  const team = await getUserDefaultTeam(user._id);
+
   return {
     _id: user._id,
     username: user.username,
@@ -34,7 +36,7 @@ export async function createUserByUsername({
     timezone: user.timezone,
     promotionRate: user.promotionRate,
     openaiAccount: user.openaiAccount,
-    team: await getUserDefaultTeam(user._id)
+    team: team
   };
 }
 

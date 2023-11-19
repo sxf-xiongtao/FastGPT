@@ -30,7 +30,7 @@ function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>FastGPT</title>
+        <title>Admin</title>
         <meta name="description" content="Embedding + LLM, Build AI knowledge base" />
         <meta
           name="viewport"

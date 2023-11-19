@@ -51,23 +51,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
         { $unwind: '$teamMemberDetails' },
         {
-          $lookup: {
-            from: userCollectionName,
-            localField: 'teamMemberDetails.userId',
-            foreignField: '_id',
-            as: 'userDetails'
-          }
-        },
-        { $unwind: '$userDetails' },
-        {
           $project: {
-            username: '$userDetails.username',
             _id: 1,
             source: 1,
             time: 1,
             total: 1,
             appName: 1,
-            list: 1
+            list: 1,
+            memberName: '$teamMemberDetails.name'
           }
         },
         { $sort: { time: -1 } },
@@ -83,7 +74,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         pageSize,
         data: bills.map((bill) => ({
           id: bill._id,
-          username: bill.username,
+          memberName: bill.memberName,
           source: bill.source,
           time: bill.time,
           total: formatPrice(bill.total),

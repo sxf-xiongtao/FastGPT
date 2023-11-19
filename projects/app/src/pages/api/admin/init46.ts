@@ -1,10 +1,8 @@
 import { connectToDatabase } from '@/service/mongo';
 import { MongoPay } from '@/service/support/wallet/pay/schema';
-import { UserModelSchema } from '@fastgpt/global/support/user/type';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getTeamInfoByTmbId } from '@fastgpt/service/support/user/team/controller';
+import { getUserDefaultTeam } from '@fastgpt/service/support/user/team/controller';
 import { delay } from '@/utils/tools';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 
@@ -80,7 +78,7 @@ async function initMongoTeamId(limit: number) {
 
     async function init(userId: string): Promise<any> {
       try {
-        const tmb = await getTeamInfoByTmbId({ userId });
+        const tmb = await getUserDefaultTeam({ userId });
 
         await schema.updateMany(
           {
