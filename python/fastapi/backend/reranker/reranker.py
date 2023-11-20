@@ -6,6 +6,7 @@
 @File: reranker.py
 @Desc: 
 """
+import os
 from typing import List
 
 import numpy as np
@@ -13,7 +14,7 @@ from FlagEmbedding import FlagReranker
 
 from backend.schemas.model import QADocs
 
-RERANK_MODEL_PATH = '/root/autodl-tmp/eval-data/bge-reranker-base'
+RERANK_MODEL_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "bge-reranker-base")
 
 
 class Singleton(type):
