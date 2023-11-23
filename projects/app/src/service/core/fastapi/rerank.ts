@@ -6,7 +6,12 @@ export function rerank({ query, inputs }: PostReRankProps) {
   return POST<PostReRankResponse>('/v1/rerank', {
     query,
     inputs
-  }).finally(() => {
-    console.log('rerank time:', Date.now() - start);
-  });
+  })
+    .catch((err) => {
+      console.log('rerank error', err);
+      return Promise.reject(err);
+    })
+    .finally(() => {
+      console.log('rerank time:', Date.now() - start);
+    });
 }
