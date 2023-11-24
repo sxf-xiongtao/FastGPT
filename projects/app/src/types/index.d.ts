@@ -55,6 +55,12 @@ export type SystemConfigType = {
       WX_PRIVATE_KEY: string;
     };
   };
+  fastLogin?: Record<
+    string,
+    {
+      authUrl: string;
+    }
+  >;
 };
 
 export type LicenseDataType = {
