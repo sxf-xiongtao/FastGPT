@@ -4,6 +4,11 @@ import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 import { ERROR_ENUM } from '@fastgpt/global/common/error/errorCode';
 import { UserType } from '@fastgpt/global/support/user/type';
 import { getUserDefaultTeam, getUserTeamOrDefaultTeam } from './team/controller';
+import { customAlphabet } from 'nanoid';
+import { createHashPassword } from '@/utils/tools';
+import { sendInform2OneUser } from './inform/controller';
+import { createJWT } from '@fastgpt/service/support/permission/controller';
+const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 8);
 
 /* create user and team */
 export async function createUserByUsername({
@@ -57,5 +62,54 @@ export async function getUserDetail(tmbId?: string, userId?: string): Promise<Us
     promotionRate: user.promotionRate,
     openaiAccount: user.openaiAccount,
     team
+  };
+}
+
+export async function usernameLogin({
+  username,
+  avatar,
+  inviterId,
+  tmbId
+}: {
+  username: string;
+  avatar?: string;
+  inviterId?: string;
+  tmbId?: string;
+}) {
+  // try to login
+  const user = await MongoUser.findOne({ username }, '_id');
+
+  // register
+  if (!user) {
+    const password = nanoid();
+    const user = await createUserByUsername({
+      username,
+      password: createHashPassword(password),
+      avatar,
+      inviterId
+    });
+    // send default password inform
+    sendInform2OneUser({
+      tmbId: user.team.tmbId,
+      type: 'system',
+      title: '新用户注册',
+      content: `您的初始密码为: ${password}`
+    });
+    const token = createJWT(user);
+
+    return {
+      user,
+      token
+    };
+  }
+
+  // login
+  const userInfo = await getUserDetail(tmbId, user._id);
+
+  const token = createJWT(userInfo);
+
+  return {
+    user: userInfo,
+    token
   };
 }

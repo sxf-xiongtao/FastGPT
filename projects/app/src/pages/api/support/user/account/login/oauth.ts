@@ -4,16 +4,10 @@ import axios from 'axios';
 import { parseQueryString } from '@/utils/tools';
 import { connectToDatabase } from '@/service/mongo';
 import jwt from 'jsonwebtoken';
-import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
-import { sendInform2OneUser } from '@/service/support/user/inform/controller';
-import { createUserByUsername } from '@/service/support/user/controller';
-import { customAlphabet } from 'nanoid';
-const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 8);
-import { createHashPassword } from '@/utils/tools';
+import { setCookie } from '@fastgpt/service/support/permission/controller';
+import { usernameLogin } from '@/service/support/user/controller';
 import { OAuthEnum } from '@fastgpt/global/support/user/constant';
 import type { OauthLoginProps } from '@fastgpt/global/support/user/api';
-import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { getUserDetail } from '@/service/support/user/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -26,39 +20,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       return Promise.reject('type error');
     })();
 
-    // try to login
-    const user = await MongoUser.findOne({ username }, '_id');
+    const { user, token } = await usernameLogin({
+      username,
+      avatar: avatarUrl,
+      inviterId,
+      tmbId
+    });
 
-    // register
-    if (!user) {
-      const password = nanoid();
-      const user = await createUserByUsername({
-        username,
-        password: createHashPassword(password),
-        avatar: avatarUrl,
-        inviterId
-      });
-      // send default password inform
-      sendInform2OneUser({
-        tmbId: user.team.tmbId,
-        type: 'system',
-        title: '新用户注册',
-        content: `您的初始密码为: ${password}`
-      });
-      const token = createJWT(user);
-      setCookie(res, token);
-      return jsonRes(res, {
-        data: { user, token }
-      });
-    }
-
-    // login
-    const userInfo = await getUserDetail(tmbId, user._id);
-
-    const token = createJWT(userInfo);
     setCookie(res, token);
     jsonRes(res, {
-      data: { user: userInfo, token }
+      data: { user, token }
     });
   } catch (err) {
     console.log(err);

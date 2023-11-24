@@ -41,5 +41,10 @@
       "WX_SERIAL_NO": "",
       "WX_PRIVATE_KEY": ""
     }
+  },
+  "fastLogin": {
+    "test": {
+      "authUrl": "https://d8dns0.laf.dev/baoxiao"
+    }
   }
 }
