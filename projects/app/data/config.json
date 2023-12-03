@@ -3,8 +3,7 @@
   "system": {
     "title": "",
     "userDefaultBalance": 2,
-    "teamDefaultMaxMember": 100,
-    "fastAPIBaseUrl": ""
+    "teamDefaultMaxMember": 100
   },
   "censor": {
     "BAIDU_TEXT_CENSOR_CLIENTID": "",

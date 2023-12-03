@@ -17,7 +17,6 @@ export type SystemConfigType = {
     title: string;
     userDefaultBalance?: number;
     teamDefaultMaxMember?: number;
-    fastAPIBaseUrl?: string;
   };
   censor?: {
     BAIDU_TEXT_CENSOR_CLIENTID?: string;

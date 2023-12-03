@@ -14,18 +14,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { teamId, billId, total, listIndex, tokens = 0 } = req.body as ConcatBillProps;
 
     if (!billId) return;
-    await Promise.all([
-      MongoBill.findByIdAndUpdate(billId, {
-        $inc: {
-          total,
-          ...(listIndex !== undefined && {
-            [`list.${listIndex}.amount`]: total,
-            [`list.${listIndex}.tokenLen`]: tokens
-          })
-        }
-      }),
-      updateTeamBalance({ teamId, amount: -total })
-    ]);
+    await MongoBill.findByIdAndUpdate(billId, {
+      $inc: {
+        total,
+        ...(listIndex !== undefined && {
+          [`list.${listIndex}.amount`]: total,
+          [`list.${listIndex}.tokenLen`]: tokens
+        })
+      }
+    }),
+      await updateTeamBalance({ teamId, amount: -total });
 
     jsonRes(res);
   } catch (err) {
