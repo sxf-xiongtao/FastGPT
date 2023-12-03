@@ -126,7 +126,7 @@ async function createCollectionAndPushData(props: {
   }
 }
 
-async function updateStatusToActive(datasetId: string) {
+async function updateStatusToActive(datasetId: string): Promise<void> {
   try {
     await MongoDataset.findByIdAndUpdate(datasetId, {
       status: DatasetStatusEnum.active
