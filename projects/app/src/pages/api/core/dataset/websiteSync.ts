@@ -16,6 +16,7 @@ import { delay } from '@/utils/tools';
 import { DatasetSchemaType } from '@fastgpt/global/core/dataset/type';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { PostWebsiteSyncParams } from '@fastgpt/global/core/dataset/api.d';
+import { delDatasetRelevantData } from '@fastgpt/service/core/dataset/data/controller';
 
 // config
 const maxCrawlPage = 200;
@@ -35,10 +36,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       throw new Error('Dataset is not website dataset');
     }
 
-    // 1. delete parentId = collection._id collections
-    await MongoDatasetCollection.deleteMany({ datasetId: dataset._id });
+    // 1. clear dataset all data
+    await delDatasetRelevantData({ datasetIds: [dataset._id] });
 
-    // 3. crawl all website
+    // 2. crawl all website
     await crawlWebsite({
       url: dataset.websiteConfig.url.trim(),
       maxPage: maxCrawlPage,
