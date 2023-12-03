@@ -12,18 +12,17 @@ import {
   DatasetStatusEnum,
   TrainingModeEnum
 } from '@fastgpt/global/core/dataset/constant';
-import { MongoBill } from '@fastgpt/service/support/wallet/bill/schema';
-import { BillSourceEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { delay } from '@/utils/tools';
 import { DatasetSchemaType } from '@fastgpt/global/core/dataset/type';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
+import { PostWebsiteSyncParams } from '@fastgpt/global/core/dataset/api.d';
 
 // config
 const maxCrawlPage = 200;
 const chunkSize = 768;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { datasetId } = req.body as { datasetId: string };
+  const { datasetId, billId } = req.body as PostWebsiteSyncParams;
   try {
     await connectToDatabase();
     const { dataset } = await authDataset({
@@ -38,29 +37,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // 1. delete parentId = collection._id collections
     await MongoDatasetCollection.deleteMany({ datasetId: dataset._id });
-
-    // 2. create bill
-    const { _id: billId } = await MongoBill.create({
-      teamId: dataset.teamId,
-      tmbId: dataset.tmbId,
-      appName: 'core.dataset.training.Website Sync',
-      source: BillSourceEnum.training,
-      list: [
-        {
-          moduleName: '索引生成',
-          model: dataset.vectorModel,
-          amount: 0,
-          tokenLen: 0
-        },
-        {
-          moduleName: 'QA 拆分',
-          model: dataset.agentModel,
-          amount: 0,
-          tokenLen: 0
-        }
-      ],
-      total: 0
-    });
 
     // 3. crawl all website
     await crawlWebsite({
@@ -97,7 +73,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 async function createCollectionAndPushData(props: {
   dataset: DatasetSchemaType;
   item: CrawlDataItemType;
-  billId: string;
+  billId?: string;
   retry: number;
 }): Promise<any> {
   const { dataset, item, billId, retry } = props;
