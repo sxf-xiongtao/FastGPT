@@ -4,6 +4,7 @@ import { connectToDatabase } from '@/service/mongo';
 import { addLog } from '@fastgpt/service/common/mongo/controller';
 import { MongoTeam } from '@/service/support/user/team/teamSchema';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
+import { UserErrEnum } from '@fastgpt/global/common/error/code/user';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -16,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!team || team.balance < 0) {
       return jsonRes(res, {
         code: 500,
-        message: '团队余额不足'
+        error: UserErrEnum.balanceNotEnough
       });
     }
 
