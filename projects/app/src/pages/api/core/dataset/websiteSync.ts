@@ -41,16 +41,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // 2. crawl all website
     await crawlWebsite({
+      uid: datasetId,
       url: dataset.websiteConfig.url.trim(),
       maxPage: maxCrawlPage,
       selector: dataset.websiteConfig?.selector?.trim() || 'body',
-      crawlOnePageCallback: (item) =>
-        createCollectionAndPushData({
-          dataset,
-          item,
-          billId,
-          retry: 3
-        })
+      crawlOnePageCallback: async (item, stopCrawler) => {
+        try {
+          if (await checkDatasetExist(datasetId)) {
+            createCollectionAndPushData({
+              dataset,
+              item,
+              billId,
+              retry: 3
+            });
+          } else {
+            stopCrawler();
+          }
+        } catch (error) {}
+      }
     });
 
     jsonRes(res, {
@@ -69,6 +77,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   setTimeout(async () => {
     await updateStatusToActive(datasetId);
   }, 20000);
+}
+
+async function checkDatasetExist(datasetId: string) {
+  const dataset = await MongoDataset.findById(datasetId);
+  return !!dataset;
 }
 
 async function createCollectionAndPushData(props: {
