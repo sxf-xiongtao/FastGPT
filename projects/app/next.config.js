@@ -25,7 +25,8 @@ const nextConfig = {
       'mongodb-client-encryption': false,
       kerberos: false,
       'supports-color': false,
-      'bson-ext': false
+      'bson-ext': false,
+      'pg-native': false
     });
     config.module = {
       ...config.module,
