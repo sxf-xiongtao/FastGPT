@@ -1,3 +1,6 @@
+import { delay } from '@/utils/tools';
+import { DatasetStatusEnum } from '@fastgpt/global/core/dataset/constant';
+import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { readFileSync } from 'fs';
 import { exit } from 'process';
 
@@ -19,4 +22,16 @@ export const initService = () => {
 export function initGlobal() {
   global.sendInformQueue = [];
   global.sendInformQueueLen = 0;
+}
+
+export async function initDatasetStatus() {
+  try {
+    await MongoDataset.updateMany(
+      { status: { $ne: DatasetStatusEnum.active } },
+      { status: DatasetStatusEnum.active }
+    );
+  } catch (error) {
+    await delay(1000);
+    initDatasetStatus();
+  }
 }
