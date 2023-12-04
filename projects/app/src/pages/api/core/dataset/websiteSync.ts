@@ -4,19 +4,17 @@ import { connectToDatabase } from '@/service/mongo';
 import { authDataset } from '@fastgpt/service/support/permission/auth/dataset';
 import { crawlWebsite, type CrawlDataItemType } from '@/service/common/crawler';
 import { MongoDatasetCollection } from '@fastgpt/service/core/dataset/collection/schema';
-import { splitText2Chunks } from '@fastgpt/global/common/string/textSplitter';
-import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
 import {
   DatasetCollectionTrainingModeEnum,
   DatasetCollectionTypeEnum,
-  DatasetStatusEnum,
-  TrainingModeEnum
+  DatasetStatusEnum
 } from '@fastgpt/global/core/dataset/constant';
 import { delay } from '@/utils/tools';
 import { DatasetSchemaType } from '@fastgpt/global/core/dataset/type';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { PostWebsiteSyncParams } from '@fastgpt/global/core/dataset/api.d';
 import { delDatasetRelevantData } from '@fastgpt/service/core/dataset/data/controller';
+import { loadingOneChunkCollection } from '@fastgpt/service/core/dataset/collection/utils';
 
 // config
 const maxCrawlPage = 200;
@@ -93,13 +91,7 @@ async function createCollectionAndPushData(props: {
   const { dataset, item, billId, retry } = props;
 
   try {
-    // 1. split text to chunks
-    const { chunks } = splitText2Chunks({
-      text: item.content,
-      chunkLen: chunkSize
-    });
-
-    // 2. create collection
+    // create collection
     const { _id: collectionId } = await MongoDatasetCollection.create({
       parentId: null,
       teamId: dataset.teamId,
@@ -112,22 +104,12 @@ async function createCollectionAndPushData(props: {
       rawLink: item.url
     });
 
-    // 3. push data to training queue
-    await MongoDatasetTraining.insertMany(
-      chunks.map((item, i) => ({
-        teamId: dataset.teamId,
-        tmbId: dataset.tmbId,
-        datasetId: dataset._id,
-        collectionId,
-        billId,
-        mode: TrainingModeEnum.chunk,
-        prompt: '',
-        model: dataset.vectorModel,
-        q: item,
-        a: '',
-        chunkIndex: i
-      }))
-    );
+    await loadingOneChunkCollection({
+      collectionId,
+      tmbId: dataset.tmbId,
+      billId,
+      rawText: item.content
+    });
   } catch (err) {
     await delay(1000);
     if (retry > 0) {
