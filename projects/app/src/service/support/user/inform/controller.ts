@@ -2,7 +2,7 @@ import { MongoUserInform } from './schema';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import type { SendInformProps } from '@fastgpt/global/support/user/inform/type';
 import { delay } from '@/utils/tools';
-import { MongoTeamMember } from '../team/teamMemberSchema';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 
 export async function sendInform2AllUser({ type, title, content }: SendInformProps) {
   const users = await MongoUser.find({}, '_id');

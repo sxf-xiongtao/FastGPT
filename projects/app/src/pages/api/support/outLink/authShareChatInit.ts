@@ -5,6 +5,7 @@ import type { AuthShareChatInitProps } from '@fastgpt/global/support/outLink/api
 import axios from 'axios';
 import { TokenAuthResponseType } from '@/service/support/outLink/auth';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
+import { OutLinkErrEnum } from '@fastgpt/global/common/error/code/outLink';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -24,10 +25,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       });
       if (data?.success !== true) {
-        throw new Error(data?.message || data?.msg || '身份校验失败');
+        throw new Error(data?.message || data?.msg || OutLinkErrEnum.unAuthUser);
       }
     } catch (error) {
-      throw new Error('身份校验失败');
+      throw new Error(OutLinkErrEnum.unAuthUser);
     }
 
     jsonRes(res);

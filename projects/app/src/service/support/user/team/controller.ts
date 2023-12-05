@@ -1,5 +1,5 @@
-import { MongoTeam } from './teamSchema';
-import { MongoTeamMember } from './teamMemberSchema';
+import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import type {
   AuthTeamRoleProps,
   CreateTeamProps,

@@ -1,4 +1,4 @@
-import { MongoTeam } from '../user/team/teamSchema';
+import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { addLog } from '@fastgpt/service/common/mongo/controller';
 
 /* 

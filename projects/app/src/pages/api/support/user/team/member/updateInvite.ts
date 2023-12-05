@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
-import { MongoTeamMember } from '@/service/support/user/team/teamMemberSchema';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { UpdateInviteProps } from '@fastgpt/global/support/user/team/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
