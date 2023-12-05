@@ -120,10 +120,3 @@ export const getErrText = (err: any, def = '') => {
   msg && console.log('error =>', msg);
   return msg;
 };
-
-export const delay = (ms: number) =>
-  new Promise((resolve) => {
-    setTimeout(() => {
-      resolve('');
-    }, ms);
-  });

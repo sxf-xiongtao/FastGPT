@@ -9,7 +9,7 @@ import {
   DatasetCollectionTypeEnum,
   DatasetStatusEnum
 } from '@fastgpt/global/core/dataset/constant';
-import { delay } from '@/utils/tools';
+import { delay } from '@fastgpt/global/common/system/utils';
 import { DatasetSchemaType } from '@fastgpt/global/core/dataset/type';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { PostWebsiteSyncParams } from '@fastgpt/global/core/dataset/api.d';

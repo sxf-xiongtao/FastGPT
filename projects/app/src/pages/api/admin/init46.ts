@@ -3,7 +3,7 @@ import { MongoPay } from '@/service/support/wallet/pay/schema';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getUserDefaultTeam } from '@fastgpt/service/support/user/team/controller';
-import { delay } from '@/utils/tools';
+import { delay } from '@fastgpt/global/common/system/utils';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

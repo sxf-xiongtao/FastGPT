@@ -1,4 +1,4 @@
-import { delay } from '@/utils/tools';
+import { delay } from '@fastgpt/global/common/system/utils';
 import { simpleText } from '@fastgpt/global/common/string/tools';
 import { CheerioCrawler, LogLevel, EnqueueStrategy, Configuration } from 'crawlee';
 import { htmlToMarkdown } from '@fastgpt/global/common/string/markdown';
