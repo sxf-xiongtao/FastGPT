@@ -16,16 +16,16 @@ import {
   TeamMemberSchema
 } from '@fastgpt/global/support/user/team/type';
 import type {
-  TeamMemberSchemaWithTeamAndUser,
-  TeamMemberSchemaWithUser
-} from '@/global/user/team.d';
+  TeamMemberWithTeamAndUserSchema,
+  TeamMemberWithUserSchema
+} from '@fastgpt/global/support/user/team/type.d';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 import { MongoOpenApi } from '@fastgpt/service/support/openapi/schema';
 import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
 
 /* -------- format --------- */
-export function teamMemberSchema2TeamItemType(data: TeamMemberSchemaWithTeamAndUser): TeamItemType {
+export function teamMemberSchema2TeamItemType(data: TeamMemberWithTeamAndUserSchema): TeamItemType {
   return {
     userId: String(data.userId._id),
     teamId: String(data.teamId._id),
@@ -92,7 +92,7 @@ export async function getUserTeams(data: {
   }
   const members = (await MongoTeamMember.find(data)
     .sort({ defaultTeam: -1 })
-    .populate('teamId userId')) as TeamMemberSchemaWithTeamAndUser[];
+    .populate('teamId userId')) as TeamMemberWithTeamAndUserSchema[];
 
   return members.map(teamMemberSchema2TeamItemType);
 }
@@ -102,7 +102,7 @@ export async function getTeamByTmbId(tmbId: string) {
   const tmb = (await MongoTeamMember.findById({
     _id: tmbId,
     status: leaveStatus
-  }).populate('teamId userId')) as TeamMemberSchemaWithTeamAndUser;
+  }).populate('teamId userId')) as TeamMemberWithTeamAndUserSchema;
 
   if (!tmb) {
     return Promise.reject(TeamErrEnum.unAuthTeam);
@@ -115,7 +115,7 @@ export async function getUserDefaultTeam(userId: string): Promise<TeamItemType> 
   const tmb = (await MongoTeamMember.findOne({
     userId,
     defaultTeam: true
-  }).populate('teamId userId')) as TeamMemberSchemaWithTeamAndUser;
+  }).populate('teamId userId')) as TeamMemberWithTeamAndUserSchema;
   if (!tmb) {
     await createTeam({
       ownerId: userId,
@@ -144,7 +144,7 @@ export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType
   const members = (await MongoTeamMember.find({
     teamId,
     status: leaveStatus
-  }).populate('userId')) as TeamMemberSchemaWithUser[];
+  }).populate('userId')) as TeamMemberWithUserSchema[];
   return members.map((item) => ({
     userId: item.userId._id,
     tmbId: item._id,
@@ -219,7 +219,7 @@ export async function authTeamRole({
       _id: tmbId,
       teamId,
       ...(role && { role })
-    }).populate('teamId userId')) as TeamMemberSchemaWithTeamAndUser;
+    }).populate('teamId userId')) as TeamMemberWithTeamAndUserSchema;
     if (!teamMember) {
       return Promise.reject(TeamErrEnum.unAuthTeam);
     }
