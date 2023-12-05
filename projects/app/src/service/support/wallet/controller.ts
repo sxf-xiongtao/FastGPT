@@ -7,10 +7,12 @@ import { delay } from '@fastgpt/global/common/system/utils';
 */
 export async function updateTeamBalance({
   teamId,
-  amount
+  amount,
+  retry = 3
 }: {
   teamId: string;
   amount: number;
+  retry?: number;
 }): Promise<any> {
   if (Math.abs(amount) < 10) {
     addLog.info('updateTeamBalance amount too small, maybe have error', { teamId, amount });
@@ -26,7 +28,9 @@ export async function updateTeamBalance({
       $inc: { balance: amount }
     });
   } catch (error) {
-    await delay(1000);
-    return updateTeamBalance({ teamId, amount });
+    if (retry >= 0) {
+      await delay(1000);
+      return updateTeamBalance({ teamId, amount, retry: retry - 1 });
+    }
   }
 }

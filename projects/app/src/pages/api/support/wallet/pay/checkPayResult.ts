@@ -11,6 +11,7 @@ import { createOnePromotion } from '@/service/support/activity/promotion/control
 import { updateTeamBalance } from '@/service/support/wallet/controller';
 import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
 import { delay } from '@fastgpt/global/common/system/utils';
+import { addLog } from '@fastgpt/service/common/mongo/controller';
 
 /* 校验支付结果 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -107,7 +108,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-async function unLockTrainingData(teamId: string): Promise<any> {
+async function unLockTrainingData(teamId: string, retry = 3): Promise<any> {
   try {
     await MongoDatasetTraining.updateMany(
       {
@@ -118,7 +119,10 @@ async function unLockTrainingData(teamId: string): Promise<any> {
       }
     );
   } catch (error) {
-    await delay(1000);
-    return unLockTrainingData(teamId);
+    addLog.error('unLockTrainingData error', error);
+    if (retry >= 0) {
+      await delay(1000);
+      return unLockTrainingData(teamId, retry - 1);
+    }
   }
 }

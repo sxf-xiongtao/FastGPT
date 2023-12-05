@@ -22,7 +22,7 @@ export async function authOutLinkLimit({
   question
 }: AuthOutLinkLimitProps): Promise<AuthOutLinkResponse> {
   if (!ip || !outLink.limit) {
-    return {};
+    return { uid: authToken };
   }
 
   //   expiredTime already to string
@@ -46,11 +46,11 @@ async function authStartChat({
   authToken,
   question
 }: {
-  authToken?: string;
+  authToken: string;
   question: string;
   tokenUrl?: string;
 }): Promise<AuthOutLinkResponse> {
-  if (!tokenUrl) return {};
+  if (!tokenUrl) return { uid: authToken };
   try {
     const { data } = await axios<TokenAuthResponseType>({
       baseURL: tokenUrl,
@@ -66,7 +66,7 @@ async function authStartChat({
       return Promise.reject(data?.message || data?.msg || '身份校验失败');
     }
 
-    return data.data || {};
+    return { uid: data?.data?.uid || authToken };
   } catch (error) {
     return Promise.reject('身份校验失败');
   }
@@ -76,7 +76,7 @@ export async function authOutLinkInit({
   tokenUrl,
   authToken
 }: AuthOutLinkInitProps): Promise<AuthOutLinkResponse> {
-  if (!tokenUrl) return {};
+  if (!tokenUrl) return { uid: authToken };
 
   const { data } = await axios<TokenAuthResponseType>({
     baseURL: tokenUrl,
@@ -89,5 +89,7 @@ export async function authOutLinkInit({
   if (data?.success !== true) {
     return Promise.reject(data?.message || data?.msg || OutLinkErrEnum.unAuthUser);
   }
-  return data.data || {};
+  return {
+    uid: data?.data?.uid || authToken
+  };
 }

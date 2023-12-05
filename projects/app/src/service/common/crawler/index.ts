@@ -36,7 +36,7 @@ export const crawlWebsite = async ({
     persistStorage: false,
     logLevel: LogLevel.INFO
   });
-  const crawler = new CheerioCrawler(
+  let crawler = new CheerioCrawler(
     {
       maxRequestsPerCrawl: maxPage,
       keepAlive: false,
@@ -91,6 +91,8 @@ export const crawlWebsite = async ({
     crawler.requestQueue?.drop();
     crawler.requestList = undefined;
     crawler.teardown();
+    // @ts-ignore
+    crawler = undefined;
   }
 
   await crawler.run([url]);
