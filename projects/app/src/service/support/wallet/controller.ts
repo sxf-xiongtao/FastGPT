@@ -5,7 +5,13 @@ import { delay } from '@fastgpt/global/common/system/utils';
 /* 
     amount: min unit
 */
-export async function updateTeamBalance({ teamId, amount }: { teamId: string; amount: number }) {
+export async function updateTeamBalance({
+  teamId,
+  amount
+}: {
+  teamId: string;
+  amount: number;
+}): Promise<any> {
   if (Math.abs(amount) < 10) {
     addLog.info('updateTeamBalance amount too small, maybe have error', { teamId, amount });
   }

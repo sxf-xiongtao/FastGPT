@@ -1,16 +1,28 @@
 import { authIpLimit } from '@/service/common/ipLimit/tools';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
-import type { AuthLinkLimitProps } from '@fastgpt/global/support/outLink/api.d';
+import type {
+  AuthOutLinkInitProps,
+  AuthOutLinkLimitProps,
+  AuthOutLinkResponse
+} from '@fastgpt/global/support/outLink/api.d';
 import axios from 'axios';
+import { OutLinkErrEnum } from '@fastgpt/global/common/error/code/outLink';
+
 export type TokenAuthResponseType = {
   success: boolean;
   msg?: string;
   message?: string;
+  data?: AuthOutLinkResponse;
 };
 
-export async function authOutLinkLimit({ outLink, ip, authToken, question }: AuthLinkLimitProps) {
+export async function authOutLinkLimit({
+  outLink,
+  ip,
+  authToken,
+  question
+}: AuthOutLinkLimitProps): Promise<AuthOutLinkResponse> {
   if (!ip || !outLink.limit) {
-    return;
+    return {};
   }
 
   //   expiredTime already to string
@@ -26,10 +38,10 @@ export async function authOutLinkLimit({ outLink, ip, authToken, question }: Aut
   await authIpLimit({ ip, outLink });
 
   // url auth. send request
-  await authShareStart({ authToken, tokenUrl: outLink.limit.hookUrl, question });
+  return authStartChat({ authToken, tokenUrl: outLink.limit.hookUrl, question });
 }
 
-export async function authShareStart({
+async function authStartChat({
   tokenUrl,
   authToken,
   question
@@ -37,8 +49,8 @@ export async function authShareStart({
   authToken?: string;
   question: string;
   tokenUrl?: string;
-}) {
-  if (!tokenUrl) return;
+}): Promise<AuthOutLinkResponse> {
+  if (!tokenUrl) return {};
   try {
     const { data } = await axios<TokenAuthResponseType>({
       baseURL: tokenUrl,
@@ -53,7 +65,29 @@ export async function authShareStart({
     if (data?.success !== true) {
       return Promise.reject(data?.message || data?.msg || '身份校验失败');
     }
+
+    return data.data || {};
   } catch (error) {
     return Promise.reject('身份校验失败');
   }
+}
+
+export async function authOutLinkInit({
+  tokenUrl,
+  authToken
+}: AuthOutLinkInitProps): Promise<AuthOutLinkResponse> {
+  if (!tokenUrl) return {};
+
+  const { data } = await axios<TokenAuthResponseType>({
+    baseURL: tokenUrl,
+    url: '/shareAuth/init',
+    method: 'POST',
+    data: {
+      token: authToken
+    }
+  });
+  if (data?.success !== true) {
+    return Promise.reject(data?.message || data?.msg || OutLinkErrEnum.unAuthUser);
+  }
+  return data.data || {};
 }

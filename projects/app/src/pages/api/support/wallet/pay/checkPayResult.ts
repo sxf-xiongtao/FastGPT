@@ -65,7 +65,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             });
           }
 
-          startTraining(payOrder.teamId);
+          unLockTrainingData(payOrder.teamId);
 
           return jsonRes(res, {
             data: '支付成功'
@@ -107,7 +107,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-async function startTraining(teamId: string) {
+async function unLockTrainingData(teamId: string): Promise<any> {
   try {
     await MongoDatasetTraining.updateMany(
       {
@@ -119,6 +119,6 @@ async function startTraining(teamId: string) {
     );
   } catch (error) {
     await delay(1000);
-    return startTraining(teamId);
+    return unLockTrainingData(teamId);
   }
 }
