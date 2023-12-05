@@ -18,11 +18,11 @@ export type TokenAuthResponseType = {
 export async function authOutLinkLimit({
   outLink,
   ip,
-  authToken,
+  outLinkUid,
   question
 }: AuthOutLinkLimitProps): Promise<AuthOutLinkResponse> {
   if (!ip || !outLink.limit) {
-    return { uid: authToken };
+    return { uid: outLinkUid };
   }
 
   //   expiredTime already to string
@@ -38,26 +38,16 @@ export async function authOutLinkLimit({
   await authIpLimit({ ip, outLink });
 
   // url auth. send request
-  return authStartChat({ authToken, tokenUrl: outLink.limit.hookUrl, question });
-}
-
-async function authStartChat({
-  tokenUrl,
-  authToken,
-  question
-}: {
-  authToken: string;
-  question: string;
-  tokenUrl?: string;
-}): Promise<AuthOutLinkResponse> {
-  if (!tokenUrl) return { uid: authToken };
+  if (!outLink.limit.hookUrl) {
+    return { uid: outLinkUid };
+  }
   try {
     const { data } = await axios<TokenAuthResponseType>({
-      baseURL: tokenUrl,
+      baseURL: outLink.limit.hookUrl,
       url: '/shareAuth/start',
       method: 'POST',
       data: {
-        token: authToken,
+        token: outLinkUid,
         question
       }
     });
@@ -66,7 +56,7 @@ async function authStartChat({
       return Promise.reject(data?.message || data?.msg || '身份校验失败');
     }
 
-    return { uid: data?.data?.uid || authToken };
+    return { uid: data?.data?.uid || outLinkUid };
   } catch (error) {
     return Promise.reject('身份校验失败');
   }
@@ -74,22 +64,22 @@ async function authStartChat({
 
 export async function authOutLinkInit({
   tokenUrl,
-  authToken
+  outLinkUid
 }: AuthOutLinkInitProps): Promise<AuthOutLinkResponse> {
-  if (!tokenUrl) return { uid: authToken };
+  if (!tokenUrl) return { uid: outLinkUid };
 
   const { data } = await axios<TokenAuthResponseType>({
     baseURL: tokenUrl,
     url: '/shareAuth/init',
     method: 'POST',
     data: {
-      token: authToken
+      token: outLinkUid
     }
   });
   if (data?.success !== true) {
     return Promise.reject(data?.message || data?.msg || OutLinkErrEnum.unAuthUser);
   }
   return {
-    uid: data?.data?.uid || authToken
+    uid: data?.data?.uid || outLinkUid
   };
 }
