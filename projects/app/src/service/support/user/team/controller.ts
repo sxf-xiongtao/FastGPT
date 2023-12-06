@@ -8,7 +8,7 @@ import type {
 import {
   TeamMemberRoleEnum,
   TeamMemberStatusEnum,
-  leaveStatus
+  notLeaveStatus
 } from '@fastgpt/global/support/user/team/constant';
 import {
   TeamItemType,
@@ -101,7 +101,7 @@ export async function getUserTeams(data: {
 export async function getTeamByTmbId(tmbId: string) {
   const tmb = (await MongoTeamMember.findById({
     _id: tmbId,
-    status: leaveStatus
+    status: notLeaveStatus
   }).populate('teamId userId')) as TeamMemberWithTeamAndUserSchema;
 
   if (!tmb) {
@@ -143,7 +143,7 @@ export async function getUserTeamOrDefaultTeam(tmbId?: string, userId?: string) 
 export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType[]> {
   const members = (await MongoTeamMember.find({
     teamId,
-    status: leaveStatus
+    status: notLeaveStatus
   }).populate('userId')) as TeamMemberWithUserSchema[];
   return members.map((item) => ({
     userId: item.userId._id,
@@ -232,7 +232,7 @@ export async function authTeamRole({
 export async function authTeamMaxMember(teamId: string, addAmount: number) {
   const [team, members] = await Promise.all([
     MongoTeam.findById(teamId, 'maxSize'),
-    MongoTeamMember.countDocuments({ teamId, status: leaveStatus })
+    MongoTeamMember.countDocuments({ teamId, status: notLeaveStatus })
   ]);
   if (!team) {
     return Promise.reject('Team not exit');
