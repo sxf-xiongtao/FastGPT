@@ -24,6 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { datasetId, billId } = req.body as PostWebsiteSyncParams;
   try {
     await connectToDatabase();
+
     const { dataset } = await authDataset({
       datasetId,
       req,

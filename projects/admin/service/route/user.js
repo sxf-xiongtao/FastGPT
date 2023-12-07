@@ -2,6 +2,7 @@ import { User, Pay, MongoTeam, MongoTmb } from '../schema.js';
 import dayjs from 'dayjs';
 import { auth } from './system.js';
 import crypto from 'crypto';
+import { Types } from 'mongoose';
 export const PRICE_SCALE = 100000;
 
 export const formatPrice = (val = 0, multiple = 1) => {
@@ -58,7 +59,7 @@ export const useUserRoute = (app) => {
       res.json(countResult);
     } catch (err) {
       console.log(`Error fetching users: ${err}`);
-      res.status(500).json({ error: 'Error fetching users' });
+      res.status(500).json({ message: 'Error fetching users' });
     }
   });
   // 获取用户列表
@@ -113,7 +114,7 @@ export const useUserRoute = (app) => {
       res.json(users);
     } catch (err) {
       console.log(`Error fetching users: ${err}`);
-      res.status(500).json({ error: 'Error fetching users' });
+      res.status(500).json({ message: 'Error fetching users' });
     }
   });
   // 创建用户
@@ -121,26 +122,48 @@ export const useUserRoute = (app) => {
     try {
       const { username, password, balance, teamName, maxSize } = req.body;
       if (!username || !password || !balance) {
-        return res.status(400).json({ error: 'Invalid user information' });
-      }
-      const existingUser = await User.findOne({ username });
-      if (existingUser) {
-        return res.status(400).json({ error: 'Username already exists' });
+        return res.status(400).json({ message: '缺少字段' });
       }
 
-      const { _id: userId } = await User.create({
-        username,
-        password: hashPassword(hashPassword(password))
-      });
-      const { _id } = await MongoTeam.create({
-        ownerId: userId,
-        name: teamName || 'My Team',
-        maxSize,
-        balance: balance * PRICE_SCALE
-      });
+      const existingUser = await User.findOne({ username });
+
+      if (existingUser) {
+        // check team
+        const tmb = await MongoTmb.findOne({ userId: existingUser._id });
+        if (tmb) {
+          return res.status(400).json({ message: '用户已注册' });
+        }
+      }
+
+      const userId = await (async () => {
+        if (existingUser) {
+          return existingUser._id;
+        }
+        const { _id } = await User.create({
+          username,
+          password: hashPassword(hashPassword(password))
+        });
+        return _id;
+      })();
+
+      const ownerTeam = await MongoTeam.findOne({ ownerId: userId });
+
+      const teamId = await (async () => {
+        if (ownerTeam) {
+          return ownerTeam._id;
+        }
+        const { _id } = await MongoTeam.create({
+          ownerId: userId,
+          name: teamName || 'My Team',
+          maxSize,
+          balance: balance * PRICE_SCALE
+        });
+        return _id;
+      })();
+
       await MongoTmb.create({
-        teamId: _id,
-        userId: userId,
+        teamId,
+        userId,
         role: 'owner',
         status: 'active',
         defaultTeam: true
@@ -149,7 +172,7 @@ export const useUserRoute = (app) => {
       res.json();
     } catch (err) {
       console.log(`Error creating user: ${err}`);
-      res.status(500).json({ error: 'Error creating user' });
+      res.status(500).json({ message: `创建用户失败, ${err?.message}` });
     }
   });
   // 修改用户信息
@@ -178,7 +201,7 @@ export const useUserRoute = (app) => {
       });
     } catch (err) {
       console.log(`Error updating user: ${err}`);
-      res.status(500).json({ error: 'Error updating user' });
+      res.status(500).json({ message: `更新用户失败,${err?.message}` });
     }
   });
 
@@ -224,7 +247,7 @@ export const useUserRoute = (app) => {
       return res.json(pays);
     } catch (err) {
       console.log(`Error fetching pays: ${err}`);
-      res.status(500).json({ error: 'Error fetching pays', details: err.message });
+      res.status(500).json({ message: 'Error fetching pays', details: err.message });
     }
   });
   // 获取本月账单
@@ -278,7 +301,7 @@ export const useUserRoute = (app) => {
       res.json(countResult);
     } catch (err) {
       console.log(`Error fetching users: ${err}`);
-      res.status(500).json({ error: 'Error fetching users' });
+      res.status(500).json({ message: 'Error fetching users' });
     }
   });
 };
