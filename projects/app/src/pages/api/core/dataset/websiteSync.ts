@@ -27,7 +27,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { dataset } = await authDataset({
       datasetId,
       req,
-      authToken: true
+      authToken: true,
+      per: 'w'
     });
 
     if (!dataset?.websiteConfig?.url) {
