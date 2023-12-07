@@ -81,9 +81,10 @@ export const useUserRoute = (app) => {
         .skip(start)
         .limit(end - start)
         .sort({ [sort]: order });
+
       const tmbs = await MongoTmb.find({
         userId: { $in: usersRaw.map((user) => user._id) }
-      });
+      }).sort({ [sort]: order });
 
       // get teams
       const teams = await MongoTeam.find({
@@ -120,20 +121,24 @@ export const useUserRoute = (app) => {
   // 创建用户
   app.post('/users', auth(), async (req, res) => {
     try {
-      const { username, password, balance, teamName, maxSize } = req.body;
-      if (!username || !password || !balance) {
+      const { username, password, balance = 0, teamName, maxSize } = req.body;
+      if (!username || !password) {
+        console.log('缺少字段', req.body);
         return res.status(400).json({ message: '缺少字段' });
       }
 
       const existingUser = await User.findOne({ username });
 
       if (existingUser) {
-        // check team
+        // check tmb
         const tmb = await MongoTmb.findOne({ userId: existingUser._id });
+
         if (tmb) {
           return res.status(400).json({ message: '用户已注册' });
         }
       }
+
+      console.log('create user', { existingUser });
 
       const userId = await (async () => {
         if (existingUser) {
@@ -141,17 +146,21 @@ export const useUserRoute = (app) => {
         }
         const { _id } = await User.create({
           username,
-          password: hashPassword(hashPassword(password))
+          password: hashPassword(hashPassword(password)),
+          createTime: new Date()
         });
         return _id;
       })();
 
       const ownerTeam = await MongoTeam.findOne({ ownerId: userId });
 
+      console.log('create team, userId: ', { userId, ownerTeam });
+
       const teamId = await (async () => {
         if (ownerTeam) {
           return ownerTeam._id;
         }
+
         const { _id } = await MongoTeam.create({
           ownerId: userId,
           name: teamName || 'My Team',
@@ -161,6 +170,8 @@ export const useUserRoute = (app) => {
         return _id;
       })();
 
+      console.log('create team member, userId: ', { teamId, userId });
+
       await MongoTmb.create({
         teamId,
         userId,
@@ -169,9 +180,9 @@ export const useUserRoute = (app) => {
         defaultTeam: true
       });
 
-      res.json();
+      res.json({ message: '创建成功' });
     } catch (err) {
-      console.log(`Error creating user: ${err}`);
+      console.log(`Error creating user`, err);
       res.status(500).json({ message: `创建用户失败, ${err?.message}` });
     }
   });
