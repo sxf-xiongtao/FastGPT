@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { connectToDatabase } from '@/service/mongo';
-import { MongoConfigs } from '@fastgpt/service/common/system/configSchema';
+import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { jsonRes } from '@fastgpt/service/common/response';
 
@@ -8,7 +8,7 @@ export default async function getConfig(req: NextApiRequest, res: NextApiRespons
   try {
     await connectToDatabase();
     await adminCert({ req, authToken: true });
-    const config = await MongoConfigs.findOne({}).sort({ createTime: -1 });
+    const config = await MongoSystemConfigs.findOne({}).sort({ createTime: -1 });
     jsonRes(res, {
       data: {
         config
