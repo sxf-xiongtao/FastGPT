@@ -1,0 +1,27 @@
+.icon {
+  color: #c5cae9;
+  cursor: pointer;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 600;
+
+  svg {
+    fill: #c5cae9;
+  }
+}
+
+.icon:hover,
+.icon.current {
+  background-color: #4e83fd;
+  color: #ffffff;
+
+  svg {
+    fill: #ffffff;
+  }
+}
+
+.collapsed {
+  width: 60px;
+}

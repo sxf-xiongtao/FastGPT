@@ -1,13 +1,17 @@
-import React, { useEffect } from 'react';
-import { Box } from '@chakra-ui/react';
+import { useEffect } from 'react';
 import { serviceSideProps } from '@/utils/web/i18n';
-import { strIsLink } from '@fastgpt/global/common/string/tools';
+import { useRouter } from 'next/router';
 
 const Home = () => {
-  console.log(strIsLink('sdsds'), '===');
+  const router = useRouter();
 
-  return <Box>这是FastGPT Pro</Box>;
+  useEffect(() => {
+    router.push('/login');
+  }, [router]);
+
+  return null;
 };
+
 export async function getServerSideProps(content: any) {
   return {
     props: {
