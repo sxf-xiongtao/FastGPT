@@ -8,10 +8,24 @@ export default async function getConfig(req: NextApiRequest, res: NextApiRespons
   try {
     await connectToDatabase();
     await adminCert({ req, authToken: true });
-    const config = await MongoSystemConfigs.findOne({}).sort({ createTime: -1 });
+    const latestConfigs = await MongoSystemConfigs.aggregate([
+      {
+        $sort: { createTime: -1 }
+      },
+      {
+        $group: {
+          _id: '$type',
+          latestConfig: { $first: '$$ROOT' }
+        }
+      },
+      {
+        $replaceRoot: { newRoot: '$latestConfig' }
+      }
+    ]);
+
     jsonRes(res, {
       data: {
-        config
+        latestConfigs
       }
     });
   } catch (err) {

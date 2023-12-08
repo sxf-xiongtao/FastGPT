@@ -21,9 +21,16 @@ export const Settings = () => {
 
   const fetchConfig = async () => {
     try {
-      const response: any = await GET('/admin/settings/getConfig');
+      const response: Record<string, any> = await GET('/admin/settings/getConfig');
+      const aggregatedConfigs = response.latestConfigs.reduce(
+        (result: Record<string, any>, config: Record<string, any>) => {
+          result[config.type] = config.value;
+          return result;
+        },
+        {}
+      );
       if (!response.error) {
-        setFormData(response.config.adminSystemConfig);
+        setFormData(aggregatedConfigs);
       } else {
         toast({
           title: '获取配置失败',

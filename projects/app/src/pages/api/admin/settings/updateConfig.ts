@@ -8,11 +8,21 @@ export default async function updateConfig(req: NextApiRequest, res: NextApiResp
   try {
     await connectToDatabase();
     await adminCert({ req, authToken: true });
-    const newConfig = await MongoSystemConfigs.create({ adminSystemConfig: req.body });
+
+    if (req.body.fastgpt) {
+      await MongoSystemConfigs.create({
+        type: 'fastgpt',
+        value: req.body.fastgpt
+      });
+    }
+    if (req.body.fastgptPro) {
+      await MongoSystemConfigs.create({
+        type: 'fastgptPro',
+        value: req.body.fastgptPro
+      });
+    }
     jsonRes(res, {
-      data: {
-        newConfig
-      }
+      data: 'success'
     });
   } catch (err) {
     console.error(`Error in updateConfig: ${err}`);
