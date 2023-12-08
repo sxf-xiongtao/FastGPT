@@ -25,6 +25,8 @@ git push
 # 根目录
 pnpm i
 cd projects/app
+cp data/config.json data/config.local.json
+cp data/formConfig.json data/formConfig.local.json
 pnpm dev
 ```
 

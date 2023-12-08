@@ -1,7 +1,13 @@
-import { ComponentStyleConfig, defineStyleConfig, extendTheme } from '@chakra-ui/react';
+import {
+  ComponentStyleConfig,
+  defineStyle,
+  defineStyleConfig,
+  extendTheme
+} from '@chakra-ui/react';
 
 const Button = defineStyleConfig({
   baseStyle: {},
+  // Two sizes: sm and md
   sizes: {},
 
   variants: {
@@ -190,20 +196,6 @@ const Input: ComponentStyleConfig = {
 
 const theme = extendTheme({
   useSystemColorMode: false,
-  styles: {
-    global: {
-      'html, body': {
-        color: 'myGray.900',
-        fontSize: 'md',
-        fontWeight: 400,
-        height: '100%',
-        overflow: 'hidden'
-      },
-      a: {
-        color: 'myBlue.700'
-      }
-    }
-  },
   fontSizes: {
     xs: '10px',
     sm: '12px',

@@ -1,11 +1,14 @@
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
-import { theme } from '@/constants/theme';
+import { ChakraProvider } from '@chakra-ui/react';
+import theme from '@/constants/theme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import NProgress from 'nprogress';
 import Router from 'next/router';
 import { appWithTranslation } from 'next-i18next';
+
+import '../styles/globals.scss';
+import 'tailwindcss/tailwind.css';
 
 import 'nprogress/nprogress.css';
 import '@/styles/reset.scss';
@@ -30,7 +33,7 @@ function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>Admin</title>
+        <title>FastGPT Admin</title>
         <meta name="description" content="Embedding + LLM, Build AI knowledge base" />
         <meta
           name="viewport"
@@ -41,7 +44,7 @@ function App({ Component, pageProps }: AppProps) {
 
       <QueryClientProvider client={queryClient}>
         <ChakraProvider theme={theme}>
-          <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+          {/* <ColorModeScript initialColorMode={theme.config.initialColorMode} /> */}
           <Component {...pageProps} />
         </ChakraProvider>
       </QueryClientProvider>
