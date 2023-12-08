@@ -7,7 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     await adminCert({ req, authToken: true });
     const filename =
-      process.env.NODE_ENV === 'development' ? 'data/formConfig.local.json' : '/formConfig.json';
+      process.env.NODE_ENV === 'development' ? 'data/formConfig.json' : '/formConfig.json';
     const filePath = path.join(process.cwd(), filename);
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     const config = JSON.parse(fileContent);
