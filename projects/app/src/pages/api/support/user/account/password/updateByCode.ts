@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { connectToDatabase } from '@/service/mongo';
-import { UserAuthTypeEnum } from '@/constants/common';
+import { UserAuthTypeEnum } from '@fastgpt/global/support/user/constant';
 import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
 import { authCode } from '../../inform/sendAuthCode';
 import { getUserDetail } from '@/service/support/user/controller';

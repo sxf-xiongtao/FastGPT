@@ -43,7 +43,7 @@ const Login = () => {
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
-      const response: any = await POST(`admin/auth/login`, {
+      const response: any = await POST(`/admin/support/user/login`, {
         username: data.account,
         password: hashStr(data.password)
       });
