@@ -1,5 +1,5 @@
 import { MongoPromotionRecord } from '@fastgpt/service/support/activity/promotion/schema';
-import { MongoTeamMember } from '@/service/support/user/team/teamMemberSchema';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { updateTeamBalance } from '../../wallet/controller';
 
 export async function createOnePromotion(data: {

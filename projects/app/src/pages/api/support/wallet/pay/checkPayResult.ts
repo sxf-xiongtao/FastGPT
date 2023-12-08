@@ -9,6 +9,9 @@ import { WXPay } from '@/service/support/pay/pay';
 import { connectToDatabase } from '@/service/mongo';
 import { createOnePromotion } from '@/service/support/activity/promotion/controller';
 import { updateTeamBalance } from '@/service/support/wallet/controller';
+import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
+import { delay } from '@fastgpt/global/common/system/utils';
+import { addLog } from '@fastgpt/service/common/mongo/controller';
 
 /* 校验支付结果 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -50,7 +53,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         );
         if (updateRes.modifiedCount === 1) {
           // Add balance to team
-          updateTeamBalance({ teamId: payOrder.teamId, amount: payOrder.price });
+          await updateTeamBalance({ teamId: payOrder.teamId, amount: payOrder.price });
 
           // 增加邀请者的默认的团队收益
           if (inviter) {
@@ -62,6 +65,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               amount
             });
           }
+
+          unLockTrainingData(payOrder.teamId);
 
           return jsonRes(res, {
             data: '支付成功'
@@ -100,5 +105,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       code: 500,
       error: err
     });
+  }
+}
+
+async function unLockTrainingData(teamId: string, retry = 3): Promise<any> {
+  try {
+    await MongoDatasetTraining.updateMany(
+      {
+        teamId
+      },
+      {
+        lockTime: new Date('2000/1/1')
+      }
+    );
+  } catch (error) {
+    addLog.error('unLockTrainingData error', error);
+    if (retry >= 0) {
+      await delay(1000);
+      return unLockTrainingData(teamId, retry - 1);
+    }
   }
 }

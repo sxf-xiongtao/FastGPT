@@ -1,4 +1,4 @@
-import { delay } from '@/utils/tools';
+import { delay } from '@fastgpt/global/common/system/utils';
 import { simpleText } from '@fastgpt/global/common/string/tools';
 import { CheerioCrawler, LogLevel, EnqueueStrategy, Configuration } from 'crawlee';
 import { htmlToMarkdown } from '@fastgpt/global/common/string/markdown';
@@ -36,7 +36,7 @@ export const crawlWebsite = async ({
     persistStorage: false,
     logLevel: LogLevel.INFO
   });
-  const crawler = new CheerioCrawler(
+  let crawler = new CheerioCrawler(
     {
       maxRequestsPerCrawl: maxPage,
       keepAlive: false,
@@ -91,6 +91,8 @@ export const crawlWebsite = async ({
     crawler.requestQueue?.drop();
     crawler.requestList = undefined;
     crawler.teardown();
+    // @ts-ignore
+    crawler = undefined;
   }
 
   await crawler.run([url]);

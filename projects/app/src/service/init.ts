@@ -1,4 +1,4 @@
-import { delay } from '@/utils/tools';
+import { delay } from '@fastgpt/global/common/system/utils';
 import { DatasetStatusEnum } from '@fastgpt/global/core/dataset/constant';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { readFileSync } from 'fs';
