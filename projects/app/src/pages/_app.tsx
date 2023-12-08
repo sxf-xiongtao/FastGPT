@@ -1,7 +1,7 @@
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { ChakraProvider } from '@chakra-ui/react';
-import theme from '@/constants/theme';
+import theme from '@/styles/theme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import NProgress from 'nprogress';
 import Router from 'next/router';
@@ -33,18 +33,12 @@ function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>FastGPT Admin</title>
-        <meta name="description" content="Embedding + LLM, Build AI knowledge base" />
-        <meta
-          name="viewport"
-          content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no, viewport-fit=cover"
-        />
+        <title>Admin</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <QueryClientProvider client={queryClient}>
         <ChakraProvider theme={theme}>
-          {/* <ColorModeScript initialColorMode={theme.config.initialColorMode} /> */}
           <Component {...pageProps} />
         </ChakraProvider>
       </QueryClientProvider>
