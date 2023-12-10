@@ -64,8 +64,16 @@
                   "title": "Email 服务",
                   "description": "发送邮件相关参数\n发送邮箱验证码的 code (QQ邮箱最简单）\nhttps://wx.mail.qq.com/account/index?sid=zZ1Cd4yyR2sugk5jACBGMwAA#/?tab=safety\n在上面的链接中生成对应授权码，并提供邮箱地址"
                 },
-                "user": { "type": "string", "title": "Email User", "description": "qq 邮箱为例，对应 qq 号" },
-                "pass": { "type": "string", "title": "Email Password", "description": "对应 SMTP 授权码" }
+                "user": {
+                  "type": "string",
+                  "title": "Email User",
+                  "description": "qq 邮箱为例，对应 qq 号"
+                },
+                "pass": {
+                  "type": "string",
+                  "title": "Email Password",
+                  "description": "对应 SMTP 授权码"
+                }
               }
             },
             "phone": {
@@ -107,7 +115,11 @@
                   "title": "V3 Code",
                   "description": "![](https://oss.laf.dev/lk63dw-fastgpt/ws_v3_code.png)"
                 },
-                "WX_NOTIFY_URL": { "type": "string", "title": "Notify URL", "description": "没用到，随便填个" },
+                "WX_NOTIFY_URL": {
+                  "type": "string",
+                  "title": "Notify URL",
+                  "description": "没用到，随便填个"
+                },
                 "WX_SERIAL_NO": {
                   "type": "string",
                   "title": "Serial Number",
@@ -126,7 +138,7 @@
     },
     "fastgpt": {
       "title": "",
-      "properties":{
+      "properties": {
         "FeConfig": {
           "type": "object",
           "title": "前端配置",
@@ -135,7 +147,10 @@
             "show_register": { "type": "boolean", "title": "展示注册" },
             "show_git": { "type": "boolean", "title": "展示 github 图标" },
             "show_pay": { "type": "boolean", "title": "展示支付按键" },
-            "show_openai_account": { "type": "boolean", "title": "展示用户可填自己的 openapi 账号" },
+            "show_openai_account": {
+              "type": "boolean",
+              "title": "展示用户可填自己的 openapi 账号"
+            },
             "show_promotion": { "type": "boolean", "title": "展示邀请好友活动" },
             "openAPIUrl": { "type": "string", "title": "api 文档地址" },
             "systemTitle": { "type": "string", "title": "系统名" },
