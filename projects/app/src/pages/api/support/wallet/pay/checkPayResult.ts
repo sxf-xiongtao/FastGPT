@@ -11,7 +11,7 @@ import { createOnePromotion } from '@/service/support/activity/promotion/control
 import { updateTeamBalance } from '@/service/support/wallet/controller';
 import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
 import { delay } from '@fastgpt/global/common/system/utils';
-import { addLog } from '@fastgpt/service/common/mongo/controller';
+import { addLog } from '@fastgpt/service/common/system/log';
 
 /* 校验支付结果 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

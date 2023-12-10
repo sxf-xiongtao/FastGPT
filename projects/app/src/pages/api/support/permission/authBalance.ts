@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
-import { addLog } from '@fastgpt/service/common/mongo/controller';
+import { addLog } from '@fastgpt/service/common/system/log';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { UserErrEnum } from '@fastgpt/global/common/error/code/user';

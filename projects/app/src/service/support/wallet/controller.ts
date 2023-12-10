@@ -1,5 +1,5 @@
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
-import { addLog } from '@fastgpt/service/common/mongo/controller';
+import { addLog } from '@fastgpt/service/common/system/log';
 import { delay } from '@fastgpt/global/common/system/utils';
 
 /* 

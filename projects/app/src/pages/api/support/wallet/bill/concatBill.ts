@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { ConcatBillProps } from '@fastgpt/global/support/wallet/bill/api.d';
-import { addLog } from '@fastgpt/service/common/mongo/controller';
+import { addLog } from '@fastgpt/service/common/system/log';
 import { MongoBill } from '@fastgpt/service/support/wallet/bill/schema';
 import { updateTeamBalance } from '@/service/support/wallet/controller';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
