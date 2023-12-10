@@ -71,7 +71,7 @@ export async function checkInvalidPg(start: Date, end: Date, limit = 50) {
   async function check(index: number, retry = 3): Promise<any> {
     const item = rows[index];
     if (!item) {
-      console.log(`检测完成，共删除 ${deletedPgAmount} 个无效文件`);
+      console.log(`检测完成，共删除 ${deletedPgAmount} 个无效 pg 数据`);
 
       return;
     }
