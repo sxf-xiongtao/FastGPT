@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import validator from '@rjsf/validator-ajv8';
 import Form from '@rjsf/core';
 import styles from './index.module.scss';
@@ -7,6 +7,7 @@ import CustomCheckbox from './Customization/CustomCheckbox';
 import DescriptionFieldTemplate from './Customization/DescriptionFieldTemplate';
 import { GET, POST } from '@/service/common/request';
 import { uiSchema } from '@/service/admin/formUISchema';
+import TitleFieldTemplate from './Customization/TitleFieldTemplate';
 
 const widgets = {
   CheckboxWidget: CustomCheckbox
@@ -18,6 +19,7 @@ export const Settings = () => {
   const [schemaConfig, setSchemaConfig] = useState({});
   const [isSchemaLoading, setIsSchemaLoading] = useState(true);
   const toast = useToast();
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   const fetchConfig = async () => {
     try {
@@ -104,10 +106,16 @@ export const Settings = () => {
     }
   };
 
+  const handleClick = () => {
+    if (submitButtonRef.current) {
+      submitButtonRef.current.click();
+    }
+  };
+
   return (
-    <div className="w-[90%] m-auto">
+    <div className="w-[90%] m-auto flex space-x-4 h-full pb-4">
       <Box
-        className="bg-white mt-8 w-full px-6 py-4"
+        className="bg-white mt-8 px-6 py-4 w-3/4 overflow-y-auto"
         style={{ boxShadow: '0px 2px 10px rgba(76, 141, 235, 0.1)' }}
       >
         {isSchemaLoading ? (
@@ -123,13 +131,31 @@ export const Settings = () => {
             formData={formData}
             validator={validator}
             widgets={widgets}
-            templates={{ DescriptionFieldTemplate }}
+            templates={{ DescriptionFieldTemplate, TitleFieldTemplate }}
           >
-            <Button type="submit" className="w-60" isLoading={isLoading}>
-              确认
-            </Button>
+            <Button ref={submitButtonRef} type="submit" className="!hidden"></Button>
           </Form>
         )}
+      </Box>
+      <Box className="w-1/4 flex flex-col mt-8 justify-between">
+        <Box
+          className="bg-white w-full px-6 py-4 flex-1 min-h-[200px] max-h-[360px]"
+          style={{ boxShadow: '0px 2px 10px rgba(76, 141, 235, 0.1)' }}
+        >
+          aaa
+        </Box>
+        <Box
+          className="bg-white w-full px-6 py-4"
+          style={{ boxShadow: '0px 2px 10px rgba(76, 141, 235, 0.1)' }}
+        >
+          <Button
+            onClick={handleClick}
+            isLoading={isLoading}
+            className="w-full !bg-blue-500 !text-white hover:!bg-blue-600 "
+          >
+            保存
+          </Button>
+        </Box>
       </Box>
     </div>
   );
