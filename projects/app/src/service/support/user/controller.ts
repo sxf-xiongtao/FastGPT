@@ -3,7 +3,7 @@ import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 import { ERROR_ENUM } from '@fastgpt/global/common/error/errorCode';
 import { UserType } from '@fastgpt/global/support/user/type';
-import { getUserDefaultTeam, getUserTeamOrDefaultTeam } from './team/controller';
+import { getAndCreateUserDefaultTeam, getUserTeamOrDefaultTeam } from './team/controller';
 import { customAlphabet } from 'nanoid';
 import { createHashPassword } from '@/utils/tools';
 import { sendInform2OneUser } from './inform/controller';
@@ -31,7 +31,7 @@ export async function createUserByUsername({
     balance: (global.systemConfig.system?.userDefaultBalance || 2) * PRICE_SCALE
   });
 
-  const team = await getUserDefaultTeam(user._id);
+  const team = await getAndCreateUserDefaultTeam(user._id);
 
   return {
     _id: user._id,

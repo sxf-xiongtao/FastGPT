@@ -49,29 +49,32 @@ export async function createTeam({
   avatar,
   defaultTeam = false
 }: CreateTeamProps & { ownerId: string }) {
-  let id = '';
   try {
-    const { _id } = await MongoTeam.create({
-      ownerId,
-      name,
-      avatar,
-      maxSize: global.systemConfig.system?.teamDefaultMaxMember || 5,
-      balance: (global.systemConfig.system?.userDefaultBalance || 2) * PRICE_SCALE
-    });
-    id = _id;
+    // find team, if not exist, create
+    const teamId = await (async () => {
+      const team = await MongoTeam.findOne({ ownerId }, '_id');
+      if (team) {
+        return team._id;
+      }
+      const { _id } = await MongoTeam.create({
+        ownerId,
+        name,
+        avatar,
+        maxSize: global.systemConfig.system?.teamDefaultMaxMember || 5,
+        balance: (global.systemConfig.system?.userDefaultBalance || 2) * PRICE_SCALE
+      });
+      return _id;
+    })();
     await MongoTeamMember.create({
-      teamId: _id,
+      teamId,
       userId: ownerId,
       name: 'Owner',
       role: TeamMemberRoleEnum.owner,
       status: TeamMemberStatusEnum.active,
       defaultTeam
     });
-    return _id;
+    return teamId;
   } catch (error) {
-    if (id) {
-      await MongoTeam.findByIdAndDelete(id);
-    }
     return Promise.reject(error);
   }
 }
@@ -111,7 +114,7 @@ export async function getTeamByTmbId(tmbId: string) {
   return teamMemberSchema2TeamItemType(tmb);
 }
 // get default team, if not exit, create one
-export async function getUserDefaultTeam(userId: string): Promise<TeamItemType> {
+export async function getAndCreateUserDefaultTeam(userId: string): Promise<TeamItemType> {
   const tmb = (await MongoTeamMember.findOne({
     userId,
     defaultTeam: true
@@ -123,7 +126,7 @@ export async function getUserDefaultTeam(userId: string): Promise<TeamItemType> 
       avatar: '/icon/logo.svg',
       defaultTeam: true
     });
-    return getUserDefaultTeam(userId);
+    return getAndCreateUserDefaultTeam(userId);
   }
   return teamMemberSchema2TeamItemType(tmb);
 }
@@ -133,7 +136,7 @@ export async function getUserTeamOrDefaultTeam(tmbId?: string, userId?: string) 
     return getTeamByTmbId(tmbId);
   }
   if (userId) {
-    return getUserDefaultTeam(userId);
+    return getAndCreateUserDefaultTeam(userId);
   }
 
   return Promise.reject('tmbId or userId is required');
