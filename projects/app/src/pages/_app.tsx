@@ -41,7 +41,7 @@ function App({ Component, pageProps }: AppProps) {
       setLngStore(targetLng);
       router.replace(router.asPath, undefined, { locale: targetLng });
     }
-  }, []);
+  }, [i18n.language, router]);
 
   return (
     <>

@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { base64Img, expiredTime } = req.body as Props;
 
     const data = await uploadMongoImg({
-      teamId: new mongoose.Types.ObjectId(),
+      teamId: String(new mongoose.Types.ObjectId()),
       base64Img,
       expiredTime
     });

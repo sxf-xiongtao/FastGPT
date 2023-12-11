@@ -3,9 +3,8 @@ import { Divider } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 
 const TitleFieldTemplate: React.FC<any> = (props) => {
-  const { title, id, required } = props;
+  const { title } = props;
   const [titles, setTitles] = useState<string[]>([]);
-  console.log(titles);
 
   const fetchInitConfig = async () => {
     try {

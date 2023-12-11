@@ -189,7 +189,7 @@ export const Settings = () => {
         >
           <Button
             onClick={handleClick}
-            isLoading={isLoading}
+            isLoading={isLoading || isSchemaLoading}
             className="w-full !bg-blue-500 !text-white hover:!bg-blue-600 "
           >
             保存
@@ -199,3 +199,5 @@ export const Settings = () => {
     </div>
   );
 };
+
+export default Settings;
