@@ -120,3 +120,15 @@ export const getErrText = (err: any, def = '') => {
   msg && console.log('error =>', msg);
   return msg;
 };
+
+export const throttle = <T extends (...args: any[]) => void>(func: T, delay: number) => {
+  let timeoutId: NodeJS.Timeout;
+  return (...args: Parameters<T>) => {
+    if (!timeoutId) {
+      timeoutId = setTimeout(() => {
+        func(...args);
+        timeoutId = undefined!;
+      }, delay);
+    }
+  };
+};

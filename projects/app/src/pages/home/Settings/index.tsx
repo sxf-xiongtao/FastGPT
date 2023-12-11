@@ -8,6 +8,8 @@ import DescriptionFieldTemplate from './Customization/DescriptionFieldTemplate';
 import { GET, POST } from '@/service/common/request';
 import { uiSchema } from '@/service/admin/formUISchema';
 import TitleFieldTemplate from './Customization/TitleFieldTemplate';
+import { extractThirdLevelTitles } from '@/utils/web/extractTitles';
+import { throttle } from '@/utils/tools';
 
 const widgets = {
   CheckboxWidget: CustomCheckbox
@@ -17,6 +19,8 @@ export const Settings = () => {
   const [formData, setFormData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [schemaConfig, setSchemaConfig] = useState({});
+  const [titles, setTitles] = useState<string[]>([]);
+  const [activeTitle, setActiveTitle] = useState('');
   const [isSchemaLoading, setIsSchemaLoading] = useState(true);
   const toast = useToast();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
@@ -53,31 +57,34 @@ export const Settings = () => {
     }
   };
 
+  const fetchInitConfig = async () => {
+    try {
+      const response = await fetch('/api/system/getInitData');
+      const config = await response.json();
+      setSchemaConfig(config);
+      setTitles(extractThirdLevelTitles(config));
+    } catch (error) {
+      toast({
+        title: '获取初始化配置失败',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top'
+      });
+    } finally {
+      setIsSchemaLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchConfig();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    const fetchInitConfig = async () => {
-      try {
-        const response = await fetch('/api/system/getInitData');
-        const config = await response.json();
-        setSchemaConfig(config);
-      } catch (error) {
-        toast({
-          title: '获取初始化配置失败',
-          status: 'error',
-          duration: 3000,
-          isClosable: true,
-          position: 'top'
-        });
-      } finally {
-        setIsSchemaLoading(false);
-      }
-    };
-
     fetchInitConfig();
-  }, [toast]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onSubmit = async ({ formData }: any) => {
     setIsLoading(true);
@@ -112,13 +119,26 @@ export const Settings = () => {
     }
   };
 
+  const handleScroll = throttle(() => {
+    titles.forEach((title) => {
+      const element = document.getElementById(title);
+      if (!element) return;
+      const rect = element.getBoundingClientRect();
+      if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
+        setActiveTitle(title);
+        return;
+      }
+    });
+  }, 100);
+
   return (
     <div className="w-[90%] m-auto flex space-x-4 h-full pb-4">
       <Box
         className="bg-white mt-8 px-6 py-4 w-3/4 overflow-y-auto"
         style={{ boxShadow: '0px 2px 10px rgba(76, 141, 235, 0.1)' }}
+        onScroll={handleScroll}
       >
-        {isSchemaLoading ? (
+        {isSchemaLoading || isLoading ? (
           <Center className="h-full text-gray-500">
             <Spinner size={'lg'} />
           </Center>
@@ -139,10 +159,29 @@ export const Settings = () => {
       </Box>
       <Box className="w-1/4 flex flex-col mt-8 justify-between">
         <Box
-          className="bg-white w-full px-6 py-4 flex-1 min-h-[200px] max-h-[360px]"
+          className="bg-white w-full pr-6 pt-8 pb-12 max-h-[360px]"
           style={{ boxShadow: '0px 2px 10px rgba(76, 141, 235, 0.1)' }}
         >
-          aaa
+          <ul className="flex flex-col space-y-4 text-lg">
+            {titles.map((title) => (
+              <li
+                key={title}
+                className={
+                  activeTitle === title
+                    ? 'pl-4 text-blue-500 cursor-pointer border-l-4 border-blue-500'
+                    : 'pl-4 border-l-4 border-transparent text-gray-500 hover:text-blue-500 cursor-pointer'
+                }
+                onClick={() => {
+                  const anchor = document.getElementById(title);
+                  if (anchor) {
+                    anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                }}
+              >
+                {title}
+              </li>
+            ))}
+          </ul>
         </Box>
         <Box
           className="bg-white w-full px-6 py-4"
@@ -160,5 +199,3 @@ export const Settings = () => {
     </div>
   );
 };
-
-export default Settings;
