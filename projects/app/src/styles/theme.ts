@@ -10,7 +10,10 @@ const Button = defineStyleConfig({
       color: 'white',
       width: '100%',
       height: '40px',
-      borderRadius: '5px'
+      borderRadius: '5px',
+      _hover: {
+        bg: '#3182ce'
+      }
     },
     text: {
       bg: 'transparent',

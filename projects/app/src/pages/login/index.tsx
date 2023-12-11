@@ -14,6 +14,8 @@ import { useForm } from 'react-hook-form';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { POST } from '@/service/common/request';
 import { hashStr } from '@fastgpt/global/common/string/tools';
+import { serviceSideProps } from '@/utils/web/i18n';
+import { useTranslation } from 'next-i18next';
 
 type FormData = {
   account: string;
@@ -22,8 +24,10 @@ type FormData = {
 
 const Login = () => {
   const [isShowPassword, setIsShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const toast = useToast();
+  const { t } = useTranslation();
 
   const {
     register,
@@ -37,6 +41,7 @@ const Login = () => {
   });
 
   const onSubmit = async (data: FormData) => {
+    setIsLoading(true);
     try {
       const response: any = await POST(`/admin/support/user/login`, {
         username: data.account,
@@ -63,6 +68,8 @@ const Login = () => {
         position: 'top'
       });
       console.error('Error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -73,11 +80,11 @@ const Login = () => {
         style={{ boxShadow: '0px 14px 53px  rgba(84, 85, 144, 0.16)' }}
       >
         <div className="mb-12 text-[24px] text-center font-medium text-[#245373]">
-          FastGPT 管理员登录
+          FastGPT {t('AdminLogin')}
         </div>
         <FormControl className="mb-10 flex flex-col">
           <FormLabel className="text-[#245373] font-medium" htmlFor="account">
-            用户名
+            {t('Username')}
           </FormLabel>
           <Input
             {...register('account', { required: true })}
@@ -88,7 +95,7 @@ const Login = () => {
         </FormControl>
         <FormControl isInvalid={!!errors.password} className="mb-16 flex flex-col">
           <FormLabel className="text-[#245373] font-medium" htmlFor="password">
-            密码
+            {t('Password')}
           </FormLabel>
           <InputGroup>
             <Input
@@ -112,12 +119,23 @@ const Login = () => {
             </InputRightElement>
           </InputGroup>
         </FormControl>
-        <Button type="submit" variant="login" onClick={handleSubmit(onSubmit)}>
-          登录
+        <Button
+          type="submit"
+          variant="login"
+          onClick={handleSubmit(onSubmit)}
+          isLoading={isLoading}
+        >
+          {t('Login')}
         </Button>
       </div>
     </div>
   );
 };
+
+export async function getServerSideProps(context: any) {
+  return {
+    props: { ...(await serviceSideProps(context)) }
+  };
+}
 
 export default Login;
