@@ -9,7 +9,7 @@ import {
   DatasetCollectionTypeEnum,
   DatasetStatusEnum
 } from '@fastgpt/global/core/dataset/constant';
-import { delay } from '@/utils/tools';
+import { delay } from '@fastgpt/global/common/system/utils';
 import { DatasetSchemaType } from '@fastgpt/global/core/dataset/type';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { PostWebsiteSyncParams } from '@fastgpt/global/core/dataset/api.d';
@@ -24,10 +24,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { datasetId, billId } = req.body as PostWebsiteSyncParams;
   try {
     await connectToDatabase();
+
     const { dataset } = await authDataset({
       datasetId,
       req,
-      authToken: true
+      authToken: true,
+      per: 'w'
     });
 
     if (!dataset?.websiteConfig?.url) {

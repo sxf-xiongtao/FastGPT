@@ -121,9 +121,14 @@ export const getErrText = (err: any, def = '') => {
   return msg;
 };
 
-export const delay = (ms: number) =>
-  new Promise((resolve) => {
-    setTimeout(() => {
-      resolve('');
-    }, ms);
-  });
+export const throttle = <T extends (...args: any[]) => void>(func: T, delay: number) => {
+  let timeoutId: NodeJS.Timeout;
+  return (...args: Parameters<T>) => {
+    if (!timeoutId) {
+      timeoutId = setTimeout(() => {
+        func(...args);
+        timeoutId = undefined!;
+      }, delay);
+    }
+  };
+};

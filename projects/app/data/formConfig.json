@@ -1,0 +1,167 @@
+{
+  "title": "",
+  "type": "object",
+  "properties": {
+    "fastgpt": {
+      "title": "",
+      "properties": {
+        "FeConfig": {
+          "type": "object",
+          "title": "站点展示配置",
+          "properties": {
+            "show_register": { "type": "boolean", "title": "展示注册" },
+            "show_git": { "type": "boolean", "title": "展示 github 图标" },
+            "show_openai_account": {
+              "type": "boolean",
+              "title": "展示用户可填自己的 openapi 账号"
+            },
+            "show_promotion": { "type": "boolean", "title": "展示邀请好友活动" },
+            "systemTitle": { "type": "string", "title": "系统名" },
+            "favicon": { "type": "string", "title": "LOGO" },
+            "avatar": { "type": "string", "title": "用户默认头像" },
+            "api_doc_url": { "type": "string", "title": "api 文档地址" },
+            "other_doc_url": {
+              "type": "string",
+              "title": "其他文档地址",
+              "description": "文档地址以 / 为结尾"
+            },
+            "exportLimitMinutes": { "type": "number", "title": "导出间隔时长" }
+          }
+        }
+      }
+    },
+    "fastgptPro": {
+      "title": "License",
+      "properties": {
+        "license": { "type": "string", "title": "License", "description": "请填写您的 License" },
+        "system": {
+          "type": "object",
+          "title": "关键系统配置",
+          "properties": {
+            "userDefaultBalance": { "type": "number", "title": "默认用户余额" },
+            "teamDefaultMaxMember": { "type": "number", "title": "默认团队成员上限" }
+          }
+        },
+        "auth": {
+          "type": "object",
+          "title": "登录配置",
+          "properties": {
+            "email": {
+              "type": "object",
+              "title": "邮箱配置",
+              "properties": {
+                "service": {
+                  "type": "string",
+                  "title": "邮箱服务",
+                  "description": "发送邮件相关参数\n发送邮箱验证码的 code (QQ邮箱最简单）\nhttps://wx.mail.qq.com/account/index?sid=zZ1Cd4yyR2sugk5jACBGMwAA#/?tab=safety\n在上面的链接中生成对应授权码，并提供邮箱地址"
+                },
+                "user": {
+                  "type": "string",
+                  "title": "邮箱 User",
+                  "description": "qq 邮箱为例，对应 qq 号"
+                },
+                "pass": {
+                  "type": "string",
+                  "title": "邮箱 Password",
+                  "description": "对应 SMTP 授权码"
+                }
+              }
+            },
+            "phone": {
+              "type": "object",
+              "title": "手机配置",
+              "properties": {
+                "SNED_PHONE_ACCESSKEYID": {
+                  "type": "string",
+                  "title": "ACCESSKEYID",
+                  "description": "阿里云短信参数\nhttps://dysms.console.aliyun.com/overview\n申请对应的签名和短信模板，提供：\nACCESSKEYID\nACCESSSECRET\n签名名称\n模板CODE，SM开头的"
+                },
+                "SNED_PHONE_ACCESSSECRET": { "type": "string", "title": "ACCESSSECRET" },
+                "SNED_PHONE_SIGNNAME": { "type": "string", "title": "签名名称" },
+                "SNED_PHONE_TEMPLATE": { "type": "string", "title": "模板CODE" }
+              }
+            },
+            "github": {
+              "type": "object",
+              "title": "GitHub 配置",
+              "properties": {
+                "clientId": {
+                  "type": "string",
+                  "title": "GitHub Client ID",
+                  "description": "https://github.com/settings/developers，注册一个 oauth，\nHomepage: 域名\nCallbackurl: 域名/login/provider\n提供：\nclientId: \nclientSecret:"
+                },
+                "secret": { "type": "string", "title": "GitHub Secret" }
+              }
+            },
+            "google": {
+              "type": "object",
+              "title": "Google 配置",
+              "properties": {
+                "clientId": {
+                  "type": "string",
+                  "title": "Google Client ID",
+                  "description": "![](https://oss.laf.dev/lk63dw-fastgpt/google_service_ver_key_1.png)\n![](https://oss.laf.dev/lk63dw-fastgpt/google_service_ver_key_2.png)\nhttps://www.google.com/recaptcha/about/\nclientId: \nserviceId:\n每月有免费额度，基本够用"
+                },
+                "secret": { "type": "string", "title": "Google Secret" }
+              }
+            }
+          }
+        },
+        "pay": {
+          "type": "object",
+          "title": "支付配置",
+          "properties": {
+            "wx": {
+              "type": "object",
+              "title": "微信支付配置",
+              "properties": {
+                "WX_APPID": {
+                  "type": "string",
+                  "title": "appid",
+                  "description": "微信支付相关材料\nhttps://pay.weixin.qq.com/index.php/core/home/login?return_url=https%3A%2F%2Fpay.weixin.qq.com%2Findex.php%2Fextend%2Femployee\n自行注册微信支付，目前需要wx扫码支付\nappid: ![](https://oss.laf.dev/lk63dw-fastgpt/appid.png)"
+                },
+                "WX_MCHID": {
+                  "type": "string",
+                  "title": "Merchant ID",
+                  "description": "![](https://oss.laf.dev/lk63dw-fastgpt/wx_mchid.png)"
+                },
+                "WX_V3_CODE": {
+                  "type": "string",
+                  "title": "V3 Code",
+                  "description": "![](https://oss.laf.dev/lk63dw-fastgpt/ws_v3_code.png)"
+                },
+                "WX_NOTIFY_URL": {
+                  "type": "string",
+                  "title": "Notify URL",
+                  "description": "没用到，随便填个"
+                },
+                "WX_SERIAL_NO": {
+                  "type": "string",
+                  "title": "Serial Number",
+                  "description": "点管理证书进去看到\n![](https://oss.laf.dev/lk63dw-fastgpt/wx_serial_no.png)"
+                },
+                "WX_PRIVATE_KEY": {
+                  "type": "string",
+                  "title": "Private Key",
+                  "description": "按微信教程拿到这几个文件，txt打开key\n![](https://oss.laf.dev/lk63dw-fastgpt/wx_private_key.png)"
+                }
+              }
+            }
+          }
+        },
+        "censor": {
+          "type": "object",
+          "title": "内容审查",
+          "properties": {
+            "BAIDU_TEXT_CENSOR_CLIENTID": {
+              "type": "string",
+              "title": "百度安全 id",
+              "description": "![](https://oss.laf.dev/lk63dw-fastgpt/baidu_censor.png)\nhttps://console.bce.baidu.com/ai/?_=1693133074333#/ai/antiporn/overview/index 注册百度安全校验账号，并创建对应应用。提供应用的 id 和 secret"
+            },
+            "BAIDU_TEXT_CENSOR_CLIENTSECRET": { "type": "string", "title": "百度安全 secret" }
+          }
+        }
+      }
+    }
+  }
+}

@@ -8,6 +8,9 @@
 # git submodule add https://github.com/labring/FastGPT
 # cd FastGPT
 git submodule update --init --recursive
+
+# 查看 submodule 状态，检查 hash 是否指向正确的 commit
+git submodule status
 ```
 
 首次拉取和更新都用上面的命令。

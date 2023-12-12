@@ -3,7 +3,7 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { connectToDatabase } from '@/service/mongo';
 import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
-import { UserAuthTypeEnum } from '@/constants/common';
+import { UserAuthTypeEnum } from '@fastgpt/global/support/user/constant';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 import { authCode } from '../../inform/sendAuthCode';
 import { authMaxUsers } from '@/service/support/user/auth';

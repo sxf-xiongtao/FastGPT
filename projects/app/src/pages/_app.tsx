@@ -1,14 +1,19 @@
+import { useEffect } from 'react';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
-import { theme } from '@/constants/theme';
+import { ChakraProvider } from '@chakra-ui/react';
+import theme from '@/styles/theme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import NProgress from 'nprogress';
-import Router from 'next/router';
-import { appWithTranslation } from 'next-i18next';
+import Router, { useRouter } from 'next/router';
+import { appWithTranslation, useTranslation } from 'next-i18next';
+
+import '../styles/globals.scss';
+import 'tailwindcss/tailwind.css';
 
 import 'nprogress/nprogress.css';
 import '@/styles/reset.scss';
+import { change2DefaultLng, setLngStore } from '@/utils/web/i18n';
 
 //Binding events.
 Router.events.on('routeChangeStart', () => NProgress.start());
@@ -27,21 +32,26 @@ const queryClient = new QueryClient({
 });
 
 function App({ Component, pageProps }: AppProps) {
+  const router = useRouter();
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const targetLng = change2DefaultLng(i18n.language);
+    if (targetLng) {
+      setLngStore(targetLng);
+      router.replace(router.asPath, undefined, { locale: targetLng });
+    }
+  }, [i18n.language, router]);
+
   return (
     <>
       <Head>
         <title>Admin</title>
-        <meta name="description" content="Embedding + LLM, Build AI knowledge base" />
-        <meta
-          name="viewport"
-          content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no, viewport-fit=cover"
-        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <QueryClientProvider client={queryClient}>
         <ChakraProvider theme={theme}>
-          <ColorModeScript initialColorMode={theme.config.initialColorMode} />
           <Component {...pageProps} />
         </ChakraProvider>
       </QueryClientProvider>

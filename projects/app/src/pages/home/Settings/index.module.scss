@@ -1,0 +1,40 @@
+.myForm {
+  font-family: 'Arial', sans-serif;
+  margin: 20px;
+  margin-top: 10px;
+
+  legend {
+    font-size: 18px;
+    color: #5283ff;
+    padding-top: 10px;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  label {
+    font-size: 14px;
+    color: rgba(15, 12, 43, 1);
+  }
+
+  input {
+    padding: 8px;
+    margin-bottom: 20px;
+    height: 48px;
+    font-size: 16px;
+    border: 1px solid rgba(206, 213, 228, 1);
+    color: rgba(15, 12, 43, 1);
+    outline: none;
+    padding-left: 30px;
+    width: 100%;
+  }
+
+  button {
+    background-color: #007bff;
+    color: #fff;
+    width: 100%;
+  }
+
+  button:hover {
+    background-color: #0069d9;
+  }
+}

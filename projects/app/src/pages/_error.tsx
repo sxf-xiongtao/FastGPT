@@ -4,9 +4,9 @@ function Error() {
   const router = useRouter();
   useEffect(() => {
     setTimeout(() => {
-      router.replace('/app/list');
+      router.replace('/');
     }, 2000);
-  }, []);
+  }, [router]);
 
   return (
     <p>

@@ -16,7 +16,7 @@ import {
   TeamMemberStatusEnum
 } from '@fastgpt/global/support/user/team/constant';
 import { authUserExist } from '@fastgpt/service/support/user/controller';
-import { MongoTeamMember } from '@/service/support/user/team/teamMemberSchema';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

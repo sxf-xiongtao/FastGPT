@@ -4,7 +4,7 @@ import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { authTeamRole } from '@/service/support/user/team/controller';
 import { TeamMemberRoleEnum } from '@fastgpt/global/support/user/team/constant';
-import { MongoTeamMember } from '@/service/support/user/team/teamMemberSchema';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { UpdateTeamMemberProps } from '@fastgpt/global/support/user/team/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
