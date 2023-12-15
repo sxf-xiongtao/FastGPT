@@ -113,7 +113,9 @@ async function createCollectionAndPushData(props: {
       rawText: item.content
     });
   } catch (err) {
-    await delay(1000);
+    console.log(err, retry);
+
+    await delay(100);
     if (retry > 0) {
       return createCollectionAndPushData({
         ...props,

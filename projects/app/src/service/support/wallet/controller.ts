@@ -28,8 +28,10 @@ export async function updateTeamBalance({
       $inc: { balance: amount }
     });
   } catch (error) {
-    if (retry >= 0) {
-      await delay(1000);
+    console.log(error, retry);
+
+    if (retry > 0) {
+      await delay(100);
       return updateTeamBalance({ teamId, amount, retry: retry - 1 });
     }
   }

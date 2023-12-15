@@ -121,7 +121,7 @@ async function unLockTrainingData(teamId: string, retry = 3): Promise<any> {
   } catch (error) {
     addLog.error('unLockTrainingData error', error);
     if (retry >= 0) {
-      await delay(1000);
+      await delay(100);
       return unLockTrainingData(teamId, retry - 1);
     }
   }
