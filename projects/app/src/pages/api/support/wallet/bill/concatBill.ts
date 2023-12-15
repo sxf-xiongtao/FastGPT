@@ -22,8 +22,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           [`list.${listIndex}.tokenLen`]: tokens
         })
       }
-    }),
-      await updateTeamBalance({ teamId, amount: -total });
+    });
+    await updateTeamBalance({ teamId, amount: -total });
 
     jsonRes(res);
   } catch (err) {

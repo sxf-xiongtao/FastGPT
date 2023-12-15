@@ -31,7 +31,7 @@ export async function initDatasetStatus() {
       { status: DatasetStatusEnum.active }
     );
   } catch (error) {
-    await delay(1000);
+    await delay(100);
     initDatasetStatus();
   }
 }
