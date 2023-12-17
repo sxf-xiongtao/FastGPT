@@ -70,6 +70,7 @@ export const Settings = () => {
       setSchemaConfig(config);
       setTitles(extractThirdLevelTitles(config));
     } catch (error) {
+      console.log(error);
       toast({
         title: '获取初始化配置失败',
         status: 'error',

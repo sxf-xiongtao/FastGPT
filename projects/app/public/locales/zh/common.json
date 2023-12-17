@@ -2,5 +2,12 @@
   "AdminLogin": "管理员登录",
   "Login": "登录",
   "Password": "密码",
-  "Username": "用户名"
+  "Username": "用户名",
+  "Sidebar":{
+    "Dashboard": "仪表盘",
+    "UserInfo": "用户信息",
+    "Apps": "应用信息",
+    "Billing": "账单管理",
+    "KnowledgeBase": "知识库管理"
+  }
 }

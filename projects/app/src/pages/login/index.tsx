@@ -79,7 +79,7 @@ const Login = () => {
         style={{ boxShadow: '0px 14px 53px  rgba(84, 85, 144, 0.16)' }}
       >
         <div className="mb-12 text-[24px] text-center font-medium text-[#245373]">
-          FastGPT {t('AdminLogin')}
+          {t('AdminLogin')}
         </div>
         <FormControl className="mb-10 flex flex-col">
           <FormLabel className="text-[#245373] font-medium" htmlFor="account">
@@ -109,7 +109,7 @@ const Login = () => {
                 }
               }}
             />
-            <InputRightElement className="!h-full">
+            <InputRightElement className="mt-2">
               {isShowPassword ? (
                 <ViewOffIcon className="cursor-pointer" onClick={() => setIsShowPassword(false)} />
               ) : (
