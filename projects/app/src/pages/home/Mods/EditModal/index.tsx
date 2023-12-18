@@ -92,7 +92,7 @@ export default function EditModal(props: { data: any; isCreate?: boolean }) {
             <FormControl>
               <FormLabel htmlFor="username" className="!mb-0 !font-bold text-grayModern-700">
                 用户名
-                {!!errors.username && <span className="ml-2 text-[12px] text-red-500">*必填</span>}
+                {!!errors?.username && <span className="ml-2 text-[12px] text-red-500">*必填</span>}
               </FormLabel>
               <Input
                 {...register('username', {
@@ -101,13 +101,13 @@ export default function EditModal(props: { data: any; isCreate?: boolean }) {
                 className="!text-xl"
                 id="username"
                 variant="outline"
-                placeholder={data.username}
+                placeholder={data?.username}
               />
             </FormControl>
             <FormControl className="mt-4">
               <FormLabel htmlFor="password" className="!mb-0 !font-bold text-grayModern-700">
                 密码
-                {!!errors.password && isCreate && (
+                {!!errors?.password && isCreate && (
                   <span className="ml-2 text-[12px] text-red-500">*必填</span>
                 )}
               </FormLabel>
@@ -124,7 +124,7 @@ export default function EditModal(props: { data: any; isCreate?: boolean }) {
             <FormControl className="mt-4">
               <FormLabel htmlFor="balance" className="!mb-0 !font-bold text-grayModern-700">
                 余额
-                {!!errors.balance && <span className="ml-2 text-[12px] text-red-500">*必填</span>}
+                {!!errors?.balance && <span className="ml-2 text-[12px] text-red-500">*必填</span>}
               </FormLabel>
               <Input
                 {...register('balance', {
@@ -133,7 +133,7 @@ export default function EditModal(props: { data: any; isCreate?: boolean }) {
                 className="!text-xl"
                 id="balance"
                 variant="outline"
-                placeholder={data.balance}
+                placeholder={data?.balance}
               />
             </FormControl>
             <FormControl className="mt-4">
@@ -145,7 +145,7 @@ export default function EditModal(props: { data: any; isCreate?: boolean }) {
                 className="!text-xl"
                 id="teamName"
                 variant="outline"
-                placeholder={data.teamName}
+                placeholder={data?.teamName}
               />
             </FormControl>
             <FormControl className="mt-4">
@@ -157,7 +157,7 @@ export default function EditModal(props: { data: any; isCreate?: boolean }) {
                 className="!text-xl"
                 id="maxSize"
                 variant="outline"
-                placeholder={data.maxSize}
+                placeholder={data?.maxSize}
               />
             </FormControl>
           </ModalBody>

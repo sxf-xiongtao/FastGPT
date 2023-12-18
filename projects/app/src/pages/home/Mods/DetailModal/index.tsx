@@ -14,7 +14,7 @@ import React from 'react';
 
 export default function DetailModal(props: { data: any }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data } = props;
+  const { data = {} } = props;
   return (
     <>
       <span
