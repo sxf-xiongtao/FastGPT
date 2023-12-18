@@ -35,32 +35,49 @@ export default function EditModal(props: { data: any; isCreate?: boolean }) {
 
   const onSubmit = async (formData: any) => {
     if (!isCreate) {
-      const res: any = await POST(`/admin/routes/users/updateUser`, formData);
-      if (!res.error) {
-        queryClient.invalidateQueries(['getUsers']);
-        onClose();
-      }
+      POST(`/admin/routes/users/updateUser`, formData)
+        .then((res) => {
+          toast({
+            title: '添加成功',
+            status: 'success',
+            duration: 2000,
+            isClosable: false,
+            position: 'top'
+          });
+          queryClient.invalidateQueries(['getUsers']);
+          onClose();
+        })
+        .catch((err) => {
+          toast({
+            title: err.message,
+            status: 'error',
+            duration: 2000,
+            isClosable: false,
+            position: 'top'
+          });
+        });
     } else {
-      const res: any = await POST(`/admin/routes/users/addUser`, formData);
-      if (!res?.error) {
-        toast({
-          title: '添加成功',
-          status: 'success',
-          duration: 2000,
-          isClosable: false,
-          position: 'top'
+      POST(`/admin/routes/users/addUser`, formData)
+        .then((res) => {
+          toast({
+            title: '添加成功',
+            status: 'success',
+            duration: 2000,
+            isClosable: false,
+            position: 'top'
+          });
+          queryClient.invalidateQueries(['getUsers']);
+          onClose();
+        })
+        .catch((err) => {
+          toast({
+            title: err.message,
+            status: 'error',
+            duration: 2000,
+            isClosable: false,
+            position: 'top'
+          });
         });
-        queryClient.invalidateQueries(['getUsers']);
-        onClose();
-      } else {
-        toast({
-          title: '添加失败',
-          status: 'error',
-          duration: 2000,
-          isClosable: false,
-          position: 'top'
-        });
-      }
     }
   };
 
