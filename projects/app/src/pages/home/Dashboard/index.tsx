@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { Box, Divider, GridItem, HStack, VStack } from '@chakra-ui/react';
 

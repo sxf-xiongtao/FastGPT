@@ -60,8 +60,6 @@ export default async function addUser(req: NextApiRequest, res: NextApiResponse)
       return _id;
     })();
 
-    console.log('create team member, userId: ', { teamId, userId });
-
     await MongoTeamMember.create({
       teamId,
       userId,

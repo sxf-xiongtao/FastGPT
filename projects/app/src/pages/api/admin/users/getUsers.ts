@@ -30,13 +30,13 @@ export default async function getUsers(req: NextApiRequest, res: NextApiResponse
         }
       : {};
 
-    const usersRaw = await MongoUser.find(where)
+    const usersRaw: any = await MongoUser.find(where)
       .skip(start)
       .limit(end - start);
     // .sort({ [sort]: order });
 
     const tmbs = await MongoTeamMember.find({
-      userId: { $in: usersRaw.map((user) => user._id) }
+      userId: { $in: usersRaw.map((user: any) => user._id) }
     });
 
     const teams = await MongoTeam.find({
@@ -45,9 +45,11 @@ export default async function getUsers(req: NextApiRequest, res: NextApiResponse
 
     const users = tmbs.map((tmb, i) => {
       const user = usersRaw
-        .find((user) => user?._id.toString() === tmb.userId.toString())
+        .find((user: any) => user?._id.toString() === tmb.userId.toString())
         .toObject();
-      const team = teams.find((team) => team._id.toString() === tmb.teamId.toString()).toObject();
+      const team: any = teams
+        .find((team) => team._id.toString() === tmb.teamId.toString())
+        ?.toObject();
 
       return {
         id: tmb._id,

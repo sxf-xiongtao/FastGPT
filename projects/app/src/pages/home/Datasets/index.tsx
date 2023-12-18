@@ -16,69 +16,63 @@ import {
 } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
 import { GET } from '@/service/common/request';
-import { useQuery } from '@tanstack/react-query';
-import DetailModal from '../Mods/DetailModal';
 import Pagination from '@/components/Pagination';
+import { useQuery } from '@tanstack/react-query';
 
-type APP = {
+type User = {
   id: string;
+  userId: number;
   name: string;
-  intro: string;
-  'share.collection': string;
+  tags: Array<string>;
+  createTime: string;
   operation?: any;
 };
 
-const columnHelper = createColumnHelper<APP>();
-
-const defaultData: APP[] = [
-  {
-    id: 'string',
-    name: 'string',
-    intro: 'string',
-    'share.collection': 'string'
-  }
-];
+const columnHelper = createColumnHelper<User>();
 
 const columns = [
   columnHelper.accessor('id', {
     header: () => 'id',
     cell: (info) => info.getValue()
   }),
+  columnHelper.accessor('userId', {
+    header: () => 'userId',
+    cell: (info) => info.renderValue()
+  }),
   columnHelper.accessor('name', {
-    header: () => '应用名',
+    header: () => '知识库名',
     cell: (info) => info.renderValue()
   }),
-  columnHelper.accessor('share.collection', {
-    header: () => '收藏数',
-    cell: (info) => (
-      <div className="w-[60px] text-center">{info.row.original['share.collection']}</div>
-    )
-  }),
-  columnHelper.accessor('intro', {
-    header: () => '介绍',
+  columnHelper.accessor('tags', {
+    header: () => '标签',
     cell: (info) => info.renderValue()
-  }),
-  columnHelper.accessor('operation', {
-    header: () => '操作',
-    cell: (info) => (
-      <div className="flex w-[80px] pl-2">
-        <DetailModal data={info.row.original} />
-      </div>
-    )
   })
+  // columnHelper.accessor('operation', {
+  //   header: () => '操作',
+  //   cell: (info) => (
+  //     <div className="flex">
+  //       <DetailModal data={info.row.original}>
+  //         <span className="p-1 flex items-center justify-center rounded hover:bg-slate-100 cursor-pointer mr-1">
+  //           <Icons type="detail" />
+  //         </span>
+  //       </DetailModal>
+  //     </div>
+  //   )
+  // })
 ];
 
 const defaultQueryParams = {
   _start: 0,
   _end: 20,
+  _sort: 'balance',
+  _order: '',
   name: ''
 };
 
-export default function Apps() {
+export default function Datasets() {
   const [queryParams, setQueryParams] = useState(defaultQueryParams);
+  const [data, setData] = useState([]);
   const [total, setTotal] = useState(0);
-
-  const [data, setData] = useState(() => [...defaultData]);
 
   const table = useReactTable({
     data,
@@ -89,11 +83,12 @@ export default function Apps() {
   const { isLoading } = useQuery(
     ['getUsers', queryParams],
     () => {
-      return GET('/admin/routes/apps/getApps', queryParams);
+      return GET('/admin/routes/datasets/getDatasets', queryParams);
     },
     {
       onSuccess: (res: any) => {
-        setData(res.models);
+        console.log(res);
+        setData(res.datasets);
         setTotal(res.total);
       }
     }
@@ -106,8 +101,8 @@ export default function Apps() {
         style={{ boxShadow: '0px 2px 10px  rgba(76, 141, 235, 0.1)' }}
       >
         <HStack className="justify-between">
-          <Box className="flex">
-            <Box className="text-[20px] font-bold text-[#405169] mb-2">应用列表</Box>
+          <Box className="flex flex-1">
+            <Box className="text-[20px] font-bold text-[#405169]">知识库列表</Box>
             <Box className="mt-[2px]">
               <InputGroup className="ml-4">
                 <InputLeftElement className="!h-8 text-[#E5E5E5]">
@@ -123,34 +118,36 @@ export default function Apps() {
                       });
                     }
                   }}
-                  placeholder="输入应用名，回车搜索"
+                  placeholder="输入知识库名，回车搜索"
                 ></Input>
               </InputGroup>
             </Box>
           </Box>
-          <Pagination
-            values={{
-              page: queryParams._start / 20 + 1,
-              pageSize: 20,
-              total: total
-            }}
-            onChange={(values) => {
-              setQueryParams({
-                ...queryParams,
-                _start: (values.page - 1) * 20,
-                _end: values.page * 20
-              });
-            }}
-            notShowSelect
-          />
+          <Box className="!h-8 -mt-2">
+            <Pagination
+              values={{
+                page: queryParams._start / 20 + 1,
+                pageSize: 20,
+                total: total
+              }}
+              onChange={(values) => {
+                setQueryParams({
+                  ...queryParams,
+                  _start: (values.page - 1) * 20,
+                  _end: values.page * 20
+                });
+              }}
+              notShowSelect
+            />
+          </Box>
         </HStack>
         {isLoading ? (
           <Center className="h-full">
             <Spinner />
           </Center>
         ) : (
-          <table className="w-full rounded-lg mt-2">
-            <thead className="text-xl h-10">
+          <table className="w-full rounded-lg">
+            <thead className="text-lg h-10">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
@@ -163,7 +160,7 @@ export default function Apps() {
                 </tr>
               ))}
             </thead>
-            <tbody className="text-lg">
+            <tbody className="text-md">
               {table.getRowModel().rows.map((row) => (
                 <tr key={row.id} className="hover:drop-shadow-lg">
                   {row.getVisibleCells().map((cell) => (

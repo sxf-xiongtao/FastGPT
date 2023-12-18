@@ -1,9 +1,9 @@
+import Icons from '@/components/Icons';
 import {
   Button,
   HStack,
   Modal,
   ModalBody,
-  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
@@ -12,17 +12,17 @@ import {
 } from '@chakra-ui/react';
 import React from 'react';
 
-export default function DetailModal(props: { children: React.ReactElement; data: any }) {
+export default function DetailModal(props: { data: any }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { children, data } = props;
+  const { data } = props;
   return (
     <>
-      {React.cloneElement(children, {
-        onClick: (e: any) => {
-          e.stopPropagation();
-          onOpen();
-        }
-      })}
+      <span
+        className="p-1 flex items-center justify-center rounded hover:bg-slate-100 cursor-pointer mr-1"
+        onClick={onOpen}
+      >
+        <Icons type="detail" />
+      </span>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />

@@ -47,9 +47,9 @@ export default function Pagination(props: {
         </Text>
         <Tooltip label={'第一页'}>
           <Button
-            variant="link"
+            variant="pagination"
             className={clsx(
-              '!h-6 !w-6 !rounded-full bg-lafWhite-600 !p-0',
+              '!h-6 !w-6 !rounded-full !p-0 hover:bg-gray-100',
               darkMode ? '' : '!text-[#262A32]'
             )}
             style={{ minWidth: '24px' }}
@@ -66,9 +66,9 @@ export default function Pagination(props: {
         </Tooltip>
         <Tooltip label={'上一页'}>
           <Button
-            variant="link"
+            variant="pagination"
             className={clsx(
-              '!h-6 !w-6 !rounded-full bg-lafWhite-600 !p-0',
+              '!h-6 !w-6 !rounded-full !p-0 hover:bg-gray-100',
               darkMode ? '' : '!text-[#262A32]'
             )}
             style={{ minWidth: '24px' }}
@@ -88,10 +88,10 @@ export default function Pagination(props: {
         <Text className="min-w-[10px] text-center font-medium">{maxPage < 0 ? '-' : maxPage}</Text>
         <Tooltip label="下一页">
           <Button
-            variant="link"
+            variant="pagination"
             isDisabled={maxPage === page || maxPage === -1}
             className={clsx(
-              '!h-6 !w-6 !rounded-full bg-lafWhite-600 !p-0',
+              '!h-6 !w-6 !rounded-full !p-0 hover:bg-gray-100',
               darkMode ? '' : '!text-[#262A32]'
             )}
             style={{ minWidth: '24px' }}
@@ -107,9 +107,9 @@ export default function Pagination(props: {
         </Tooltip>
         <Tooltip label="最后一页">
           <Button
-            variant="link"
+            variant="pagination"
             className={clsx(
-              '!h-6 !w-6 !rounded-full bg-lafWhite-600 !p-0',
+              '!h-6 !w-6 !rounded-full !p-0 hover:bg-gray-100',
               darkMode ? '' : '!text-[#262A32]'
             )}
             style={{ minWidth: '24px' }}

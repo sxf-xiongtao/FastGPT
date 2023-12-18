@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   createColumnHelper,
   flexRender,
@@ -7,7 +7,6 @@ import {
 } from '@tanstack/react-table';
 import {
   Box,
-  Button,
   Center,
   HStack,
   Input,
@@ -15,8 +14,7 @@ import {
   InputLeftElement,
   Spinner
 } from '@chakra-ui/react';
-import { AddIcon, EditIcon, SearchIcon } from '@chakra-ui/icons';
-import Icons from '@/components/Icons';
+import { SearchIcon } from '@chakra-ui/icons';
 import { GET } from '@/service/common/request';
 import EditModal from '../Mods/EditModal';
 import Pagination from '@/components/Pagination';
@@ -59,16 +57,8 @@ const columns = [
     header: () => '操作',
     cell: (info) => (
       <div className="flex">
-        <DetailModal data={info.row.original}>
-          <span className="p-1 flex items-center justify-center rounded hover:bg-slate-100 cursor-pointer mr-1">
-            <Icons type="detail" />
-          </span>
-        </DetailModal>
-        <EditModal data={info.row.original}>
-          <span className="p-1 flex items-center justify-center rounded hover:bg-slate-100 cursor-pointer">
-            <EditIcon className="text-[14px]" />
-          </span>
-        </EditModal>
+        <DetailModal data={info.row.original} />
+        <EditModal data={info.row.original} />
       </div>
     )
   })
@@ -76,13 +66,13 @@ const columns = [
 
 const defaultQueryParams = {
   _start: 0,
-  _end: 10,
+  _end: 20,
   _sort: 'balance',
   _order: '',
   username: ''
 };
 
-export const Users = () => {
+export default function Users() {
   const [queryParams, setQueryParams] = useState(defaultQueryParams);
   const [data, setData] = useState([]);
   const [total, setTotal] = useState(0);
@@ -115,7 +105,7 @@ export const Users = () => {
         <HStack className="justify-between">
           <Box className="flex flex-1">
             <Box className="text-[20px] font-bold text-[#405169] mb-2">用户列表</Box>
-            <Box>
+            <Box className="mt-[2px]">
               <InputGroup className="ml-4">
                 <InputLeftElement className="!h-8 text-[#E5E5E5]">
                   <SearchIcon />
@@ -134,28 +124,20 @@ export const Users = () => {
                 ></Input>
               </InputGroup>
             </Box>
-            <EditModal data={{}} isCreate>
-              <Button
-                className="ml-8 w-20 !h-8"
-                variant="outline"
-                leftIcon={<AddIcon boxSize={2} />}
-              >
-                添加用户
-              </Button>
-            </EditModal>
+            <EditModal data={{}} isCreate />
           </Box>
           <Box className="!h-8 -mt-2">
             <Pagination
               values={{
-                page: queryParams._start / 10 + 1,
-                pageSize: 10,
+                page: queryParams._start / 20 + 1,
+                pageSize: 20,
                 total: total
               }}
               onChange={(values) => {
                 setQueryParams({
                   ...queryParams,
-                  _start: (values.page - 1) * 10,
-                  _end: values.page * 10
+                  _start: (values.page - 1) * 20,
+                  _end: values.page * 20
                 });
               }}
               notShowSelect
@@ -197,4 +179,4 @@ export const Users = () => {
       </Box>
     </div>
   );
-};
+}

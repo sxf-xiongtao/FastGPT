@@ -131,6 +131,22 @@ const Input: ComponentStyleConfig = {
         }
       }
     },
+    pagination: {
+      field: {
+        borderRadius: 'sm',
+        fontSize: 'sm',
+        height: 8,
+        paddingX: 3,
+        border: '1px solid rgba(229, 229, 229, 1)',
+        backgrond: '#000000',
+        _hover: {
+          borderColor: 'grayModern.300'
+        },
+        _focus: {
+          boxShadow: 'none'
+        }
+      }
+    },
     outline: {
       field: {
         borderBottom: '1px solid rgba(229, 229, 229, 1)',

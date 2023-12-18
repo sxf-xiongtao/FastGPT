@@ -1,7 +1,6 @@
 import {
   Button,
   FormControl,
-  FormErrorMessage,
   FormLabel,
   Input,
   Modal,
@@ -10,21 +9,20 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  useDisclosure
+  useDisclosure,
+  useToast
 } from '@chakra-ui/react';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { POST } from '@/service/common/request';
 import { useQueryClient } from '@tanstack/react-query';
+import { AddIcon, EditIcon } from '@chakra-ui/icons';
 
-export default function EditModal(props: {
-  children: React.ReactElement;
-  data: any;
-  isCreate?: boolean;
-}) {
+export default function EditModal(props: { data: any; isCreate?: boolean }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { children, data, isCreate } = props;
+  const { data, isCreate } = props;
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   const {
     register,
@@ -44,21 +42,47 @@ export default function EditModal(props: {
       }
     } else {
       const res: any = await POST(`/admin/routes/users/addUser`, formData);
-      if (!res.error) {
+      if (!res?.error) {
+        toast({
+          title: '添加成功',
+          status: 'success',
+          duration: 2000,
+          isClosable: false,
+          position: 'top'
+        });
+        queryClient.invalidateQueries(['getUsers']);
         onClose();
+      } else {
+        toast({
+          title: '添加失败',
+          status: 'error',
+          duration: 2000,
+          isClosable: false,
+          position: 'top'
+        });
       }
     }
   };
 
   return (
     <>
-      {React.cloneElement(children, {
-        onClick: (e: any) => {
-          e.stopPropagation();
-          reset(data);
-          onOpen();
-        }
-      })}
+      {isCreate ? (
+        <Button
+          className="ml-8 w-20 !h-8 mt-[2px]"
+          variant="outline"
+          leftIcon={<AddIcon boxSize={2} />}
+          onClick={onOpen}
+        >
+          添加用户
+        </Button>
+      ) : (
+        <span
+          className="p-1 flex items-center justify-center rounded hover:bg-slate-100 cursor-pointer"
+          onClick={onOpen}
+        >
+          <EditIcon className="text-[14px]" />
+        </span>
+      )}
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
@@ -83,7 +107,7 @@ export default function EditModal(props: {
             <FormControl className="mt-4">
               <FormLabel htmlFor="password" className="!mb-0 !font-bold text-grayModern-700">
                 密码
-                {!!errors.username && isCreate && (
+                {!!errors.password && isCreate && (
                   <span className="ml-2 text-[12px] text-red-500">*必填</span>
                 )}
               </FormLabel>
@@ -100,7 +124,7 @@ export default function EditModal(props: {
             <FormControl className="mt-4">
               <FormLabel htmlFor="balance" className="!mb-0 !font-bold text-grayModern-700">
                 余额
-                {!!errors.username && <span className="ml-2 text-[12px] text-red-500">*必填</span>}
+                {!!errors.balance && <span className="ml-2 text-[12px] text-red-500">*必填</span>}
               </FormLabel>
               <Input
                 {...register('balance', {

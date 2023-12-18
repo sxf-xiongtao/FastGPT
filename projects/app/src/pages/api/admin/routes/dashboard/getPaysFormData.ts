@@ -55,7 +55,6 @@ export default async function getPaysFormData(req: NextApiRequest, res: NextApiR
         count: item.count
       };
     });
-    console.log(countResult);
 
     jsonRes(res, {
       data: {
