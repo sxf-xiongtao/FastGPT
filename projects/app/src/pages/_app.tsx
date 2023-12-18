@@ -13,6 +13,7 @@ import 'tailwindcss/tailwind.css';
 
 import 'nprogress/nprogress.css';
 import '@/styles/reset.scss';
+import './home/Settings/index.css';
 import { change2DefaultLng, setLngStore } from '@/utils/web/i18n';
 
 //Binding events.

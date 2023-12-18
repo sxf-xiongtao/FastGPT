@@ -3,15 +3,47 @@ import styles from './index.module.scss';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Icons from '@/components/Icons';
+import { useTranslation } from 'next-i18next';
 
 export default function SideBar() {
   const router = useRouter();
   const pageId = router.asPath.split('/').pop();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { t } = useTranslation();
   useEffect(() => {
     const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
     setSidebarCollapsed(sidebarCollapsed);
   }, []);
+
+  const LIST = [
+    {
+      pageId: 'dashboard',
+      // name: String(t('Sidebar.Dashboard')),
+      name: '仪表盘',
+      icon: <Icons type="dashboard" />
+    },
+    {
+      pageId: 'users',
+      // name: String(t('Sidebar.UserInfo')),
+      name: '用户信息',
+      icon: <Icons type="user" />
+    },
+    {
+      pageId: 'apps',
+      name: '应用信息',
+      icon: <Icons type="app" />
+    },
+    {
+      pageId: 'pays',
+      name: '账单管理',
+      icon: <Icons type="pay" />
+    },
+    {
+      pageId: 'datasets',
+      name: '知识库管理',
+      icon: <Icons type="dataset" />
+    }
+  ];
 
   const BOTTOM_LIST = [
     {
@@ -33,7 +65,7 @@ export default function SideBar() {
       })}
       style={{ boxShadow: '0px 2px 10px  rgba(76, 141, 235, 0.1)' }}
     >
-      {[BOTTOM_LIST].map((items, index) => {
+      {[LIST, BOTTOM_LIST].map((items, index) => {
         return (
           <div key={index}>
             {items.map((item) => {

@@ -9,16 +9,28 @@
           "type": "object",
           "title": "站点展示配置",
           "properties": {
-            "show_register": { "type": "boolean", "title": "展示注册" },
-            "show_git": { "type": "boolean", "title": "展示 github 图标" },
-            "show_openai_account": {
-              "type": "boolean",
-              "title": "展示用户可填自己的 openapi 账号"
+            "switches": {
+              "type": "object",
+              "title": "",
+              "properties": {
+                "show_register": { "type": "boolean", "title": "展示注册" },
+                "show_git": { "type": "boolean", "title": "展示 github 图标" },
+                "show_openai_account": {
+                  "type": "boolean",
+                  "title": "展示用户可填自己的 openapi 账号"
+                },
+                "show_promotion": { "type": "boolean", "title": "展示邀请好友活动" }
+              }
             },
-            "show_promotion": { "type": "boolean", "title": "展示邀请好友活动" },
             "systemTitle": { "type": "string", "title": "系统名" },
-            "favicon": { "type": "string", "title": "LOGO" },
-            "avatar": { "type": "string", "title": "用户默认头像" },
+            "images": {
+              "type": "object",
+              "title": "",
+              "properties": {
+                "favicon": { "type": "string", "title": "LOGO" },
+                "avatar": { "type": "string", "title": "用户默认头像" }
+              }
+            },
             "api_doc_url": { "type": "string", "title": "api 文档地址" },
             "other_doc_url": {
               "type": "string",

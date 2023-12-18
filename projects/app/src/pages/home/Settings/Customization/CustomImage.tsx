@@ -36,13 +36,13 @@ const CustomImage: React.FC<WidgetProps> = (props) => {
         <Image
           src={props.value}
           alt="image"
-          className="w-40 h-40 cursor-pointer border border-solid border-[#CED5E4]"
+          className="w-28 h-28 cursor-pointer border border-solid border-[#CED5E4]"
           onClick={() => inputRef.current?.click()}
           objectFit={'contain'}
         />
       ) : (
         <div
-          className="w-40 h-40 cursor-pointer border border-solid flex justify-center items-center text-2xl"
+          className="w-28 h-28 cursor-pointer border border-solid flex justify-center items-center text-2xl"
           onClick={() => inputRef.current?.click()}
         >
           <AddIcon />

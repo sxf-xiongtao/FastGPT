@@ -1,15 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react';
 import validator from '@rjsf/validator-ajv8';
 import Form from '@rjsf/core';
-import styles from './index.module.scss';
+// import styles from './index.module.scss';
 import { Box, Button, Center, Spinner, useToast } from '@chakra-ui/react';
 import CustomCheckbox from './Customization/CustomCheckbox';
 import DescriptionFieldTemplate from './Customization/DescriptionFieldTemplate';
 import { GET, POST } from '@/service/common/request';
-import { uiSchema } from '@/service/admin/formUISchema';
+import { uiSchema, defaultConfig } from '@/service/admin/formData';
 import TitleFieldTemplate from './Customization/TitleFieldTemplate';
 import { extractThirdLevelTitles } from '@/utils/web/extractTitles';
 import { throttle } from '@/utils/tools';
+import { deepMerge, mapFeConfig, stripFeConfig } from '@/utils/web/merge';
 
 const widgets = {
   CheckboxWidget: CustomCheckbox
@@ -30,13 +31,18 @@ export const Settings = () => {
       const response: Record<string, any> = await GET('/admin/settings/getConfig');
       const aggregatedConfigs = response.latestConfigs.reduce(
         (result: Record<string, any>, config: Record<string, any>) => {
-          result[config.type] = config.value;
+          if (config.type === 'fastgpt') {
+            result[config.type] = { FeConfig: mapFeConfig(config.value.FeConfig) };
+          } else if (config.type === 'fastgptPro') {
+            result[config.type] = { ...config.value };
+          }
+
           return result;
         },
         {}
       );
       if (!response.error) {
-        setFormData(aggregatedConfigs);
+        setFormData(deepMerge(defaultConfig, aggregatedConfigs));
       } else {
         toast({
           title: '获取配置失败',
@@ -64,6 +70,7 @@ export const Settings = () => {
       setSchemaConfig(config);
       setTitles(extractThirdLevelTitles(config));
     } catch (error) {
+      console.log(error);
       toast({
         title: '获取初始化配置失败',
         status: 'error',
@@ -89,7 +96,10 @@ export const Settings = () => {
   const onSubmit = async ({ formData }: any) => {
     setIsLoading(true);
     try {
-      const response: any = await POST('/admin/settings/updateConfig', formData);
+      const response: any = await POST('/admin/settings/updateConfig', {
+        fastgpt: stripFeConfig(formData.fastgpt),
+        fastgptPro: formData.fastgptPro
+      });
       if (!response.error) {
         toast({
           title: '配置保存成功',
@@ -98,7 +108,7 @@ export const Settings = () => {
           isClosable: true,
           position: 'top'
         });
-        fetchConfig();
+        await fetchConfig();
       }
     } catch (error) {
       toast({
@@ -147,7 +157,6 @@ export const Settings = () => {
             schema={schemaConfig}
             onSubmit={onSubmit}
             uiSchema={uiSchema}
-            className={styles.myForm}
             formData={formData}
             validator={validator}
             widgets={widgets}
