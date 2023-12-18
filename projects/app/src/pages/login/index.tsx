@@ -49,7 +49,7 @@ const Login = () => {
 
       if (response.token) {
         localStorage.setItem('token', response.token);
-        router.push('/home/settings');
+        router.push('/home/dashboard');
         toast({
           title: '登录成功',
           status: 'success',

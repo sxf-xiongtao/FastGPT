@@ -71,14 +71,20 @@ export default function EditModal(props: { data: any; isCreate?: boolean }) {
           className="ml-8 w-20 !h-8 mt-[2px]"
           variant="outline"
           leftIcon={<AddIcon boxSize={2} />}
-          onClick={onOpen}
+          onClick={() => {
+            onOpen();
+            reset(data);
+          }}
         >
           添加用户
         </Button>
       ) : (
         <span
           className="p-1 flex items-center justify-center rounded hover:bg-slate-100 cursor-pointer"
-          onClick={onOpen}
+          onClick={() => {
+            onOpen();
+            reset(data);
+          }}
         >
           <EditIcon className="text-[14px]" />
         </span>
@@ -92,7 +98,9 @@ export default function EditModal(props: { data: any; isCreate?: boolean }) {
             <FormControl>
               <FormLabel htmlFor="username" className="!mb-0 !font-bold text-grayModern-700">
                 用户名
-                {!!errors.username && <span className="ml-2 text-[12px] text-red-500">*必填</span>}
+                {errors && !!errors?.username && (
+                  <span className="ml-2 text-[12px] text-red-500">*必填</span>
+                )}
               </FormLabel>
               <Input
                 {...register('username', {
@@ -101,13 +109,13 @@ export default function EditModal(props: { data: any; isCreate?: boolean }) {
                 className="!text-xl"
                 id="username"
                 variant="outline"
-                placeholder={data.username}
+                placeholder="用户名"
               />
             </FormControl>
             <FormControl className="mt-4">
               <FormLabel htmlFor="password" className="!mb-0 !font-bold text-grayModern-700">
                 密码
-                {!!errors.password && isCreate && (
+                {errors && !!errors?.password && isCreate && (
                   <span className="ml-2 text-[12px] text-red-500">*必填</span>
                 )}
               </FormLabel>
@@ -118,13 +126,15 @@ export default function EditModal(props: { data: any; isCreate?: boolean }) {
                 className="!text-xl"
                 id="password"
                 variant="outline"
-                placeholder={isCreate ? '' : '∗∗∗∗∗∗∗∗'}
+                placeholder={isCreate ? '密码' : '∗∗∗∗∗∗∗∗'}
               />
             </FormControl>
             <FormControl className="mt-4">
               <FormLabel htmlFor="balance" className="!mb-0 !font-bold text-grayModern-700">
                 余额
-                {!!errors.balance && <span className="ml-2 text-[12px] text-red-500">*必填</span>}
+                {errors && !!errors?.balance && (
+                  <span className="ml-2 text-[12px] text-red-500">*必填</span>
+                )}
               </FormLabel>
               <Input
                 {...register('balance', {
@@ -133,7 +143,7 @@ export default function EditModal(props: { data: any; isCreate?: boolean }) {
                 className="!text-xl"
                 id="balance"
                 variant="outline"
-                placeholder={data.balance}
+                placeholder="余额"
               />
             </FormControl>
             <FormControl className="mt-4">
@@ -145,7 +155,7 @@ export default function EditModal(props: { data: any; isCreate?: boolean }) {
                 className="!text-xl"
                 id="teamName"
                 variant="outline"
-                placeholder={data.teamName}
+                placeholder="团队名"
               />
             </FormControl>
             <FormControl className="mt-4">
@@ -157,7 +167,7 @@ export default function EditModal(props: { data: any; isCreate?: boolean }) {
                 className="!text-xl"
                 id="maxSize"
                 variant="outline"
-                placeholder={data.maxSize}
+                placeholder="团队最大成员数"
               />
             </FormControl>
           </ModalBody>
