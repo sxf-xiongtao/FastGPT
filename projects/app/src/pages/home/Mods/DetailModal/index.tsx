@@ -29,14 +29,15 @@ export default function DetailModal(props: { data: any }) {
         <ModalContent>
           <ModalHeader>详情</ModalHeader>
           <ModalBody>
-            {Object.keys(data).map((key: string) => {
-              return (
-                <HStack key={key}>
-                  <span className="text-md font-bold w-1/3">{key}</span>
-                  <span className="text-lg w-2/3 text-end">{data[key]}</span>
-                </HStack>
-              );
-            })}
+            {data &&
+              Object.keys(data).map((key: string) => {
+                return (
+                  <HStack key={key}>
+                    <span className="text-md font-bold w-1/3">{key}</span>
+                    <span className="text-lg w-2/3 text-end">{data[key]}</span>
+                  </HStack>
+                );
+              })}
           </ModalBody>
           <ModalFooter>
             <Button variant="text" onClick={onClose}>
