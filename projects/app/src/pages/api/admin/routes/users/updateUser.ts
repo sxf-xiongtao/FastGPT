@@ -17,7 +17,7 @@ export default async function updateUser(req: NextApiRequest, res: NextApiRespon
 
     const tmb = await MongoTeamMember.findById(tmbId);
 
-    const result: any = await MongoUser.findByIdAndUpdate(tmb?.userId, {
+    await MongoUser.findByIdAndUpdate(tmb?.userId, {
       ...(username && { username }),
       ...(password && { password: createHashPassword(password) })
     });
@@ -30,7 +30,6 @@ export default async function updateUser(req: NextApiRequest, res: NextApiRespon
 
     jsonRes(res, {
       data: {
-        ...result.toObject(),
         ...(balance && { balance: formatPrice(balance * PRICE_SCALE) })
       }
     });

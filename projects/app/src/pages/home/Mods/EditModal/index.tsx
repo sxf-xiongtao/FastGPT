@@ -38,7 +38,7 @@ export default function EditModal(props: { data: any; isCreate?: boolean }) {
       POST(`/admin/routes/users/updateUser`, formData)
         .then((res) => {
           toast({
-            title: '添加成功',
+            title: '更新成功',
             status: 'success',
             duration: 2000,
             isClosable: false,
