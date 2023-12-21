@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import validator from '@rjsf/validator-ajv8';
 import Form from '@rjsf/core';
-// import styles from './index.module.scss';
 import { Box, Button, Center, Spinner, useToast } from '@chakra-ui/react';
 import CustomCheckbox from './Customization/CustomCheckbox';
 import DescriptionFieldTemplate from './Customization/DescriptionFieldTemplate';
@@ -10,7 +9,7 @@ import { uiSchema, defaultConfig } from '@/service/admin/formData';
 import TitleFieldTemplate from './Customization/TitleFieldTemplate';
 import { extractThirdLevelTitles } from '@/utils/web/extractTitles';
 import { throttle } from '@/utils/tools';
-import { deepMerge, mapFeConfig, stripFeConfig } from '@/utils/web/merge';
+import { deepMerge, mapFeConfig, stripFeConfig, stripModels } from '@/utils/web/merge';
 
 const widgets = {
   CheckboxWidget: CustomCheckbox
@@ -32,7 +31,10 @@ export const Settings = () => {
       const aggregatedConfigs = response.latestConfigs.reduce(
         (result: Record<string, any>, config: Record<string, any>) => {
           if (config.type === 'fastgpt') {
-            result[config.type] = { FeConfig: mapFeConfig(config.value.FeConfig) };
+            result[config.type] = {
+              FeConfig: mapFeConfig(config.value.FeConfig),
+              ...stripModels(config.value)
+            };
           } else if (config.type === 'fastgptPro') {
             result[config.type] = { ...config.value };
           }
@@ -97,7 +99,7 @@ export const Settings = () => {
     setIsLoading(true);
     try {
       const response: any = await POST('/admin/settings/updateConfig', {
-        fastgpt: stripFeConfig(formData.fastgpt),
+        fastgpt: { ...formData.fastgpt.models, ...stripFeConfig(formData.fastgpt) },
         fastgptPro: formData.fastgptPro
       });
       if (!response.error) {
@@ -160,7 +162,10 @@ export const Settings = () => {
             formData={formData}
             validator={validator}
             widgets={widgets}
-            templates={{ DescriptionFieldTemplate, TitleFieldTemplate }}
+            templates={{
+              DescriptionFieldTemplate,
+              TitleFieldTemplate
+            }}
           >
             <Button ref={submitButtonRef} type="submit" className="!hidden"></Button>
           </Form>

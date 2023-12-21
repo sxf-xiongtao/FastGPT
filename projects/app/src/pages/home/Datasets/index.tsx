@@ -21,9 +21,9 @@ import { useQuery } from '@tanstack/react-query';
 
 type User = {
   id: string;
-  userId: number;
+  username: number;
   name: string;
-  tags: Array<string>;
+  intro: string;
   createTime: string;
   operation?: any;
 };
@@ -35,30 +35,18 @@ const columns = [
     header: () => 'id',
     cell: (info) => info.getValue()
   }),
-  columnHelper.accessor('userId', {
-    header: () => 'userId',
-    cell: (info) => info.renderValue()
-  }),
   columnHelper.accessor('name', {
     header: () => '知识库名',
     cell: (info) => info.renderValue()
   }),
-  columnHelper.accessor('tags', {
-    header: () => '标签',
+  columnHelper.accessor('username', {
+    header: () => '创建者',
+    cell: (info) => info.renderValue()
+  }),
+  columnHelper.accessor('intro', {
+    header: () => '介绍',
     cell: (info) => info.renderValue()
   })
-  // columnHelper.accessor('operation', {
-  //   header: () => '操作',
-  //   cell: (info) => (
-  //     <div className="flex">
-  //       <DetailModal data={info.row.original}>
-  //         <span className="p-1 flex items-center justify-center rounded hover:bg-slate-100 cursor-pointer mr-1">
-  //           <Icons type="detail" />
-  //         </span>
-  //       </DetailModal>
-  //     </div>
-  //   )
-  // })
 ];
 
 const defaultQueryParams = {
@@ -87,7 +75,6 @@ export default function Datasets() {
     },
     {
       onSuccess: (res: any) => {
-        console.log(res);
         setData(res.datasets);
         setTotal(res.total);
       }

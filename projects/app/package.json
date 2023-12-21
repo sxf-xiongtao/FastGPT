@@ -13,14 +13,15 @@
     "@alicloud/tea-util": "^1.4.7",
     "@chakra-ui/anatomy": "^2.2.1",
     "@chakra-ui/icons": "^2.1.1",
+    "@chakra-ui/next-js": "^2.1.5",
     "@chakra-ui/react": "^2.8.1",
     "@chakra-ui/styled-system": "^2.9.1",
-    "@chakra-ui/next-js": "^2.1.5",
     "@chakra-ui/system": "^2.6.1",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@fastgpt/global": "workspace:*",
     "@fastgpt/service": "workspace:*",
+    "@monaco-editor/react": "^4.6.0",
     "@mozilla/readability": "^0.4.4",
     "@peculiar/x509": "^1.9.5",
     "@rjsf/core": "^5.14.3",
@@ -62,7 +63,7 @@
     "request-ip": "^3.3.0",
     "sass": "^1.58.3",
     "urllib": "^3.18.0",
-    "zustand": "^4.3.5"
+    "zustand": "^4.3.8"
   },
   "devDependencies": {
     "@svgr/webpack": "^6.5.1",
@@ -82,12 +83,12 @@
     "autoprefixer": "^10.4.16",
     "eslint": "8.34.0",
     "eslint-config-next": "13.1.6",
-    "postcss": "^8.4.31",
-    "tailwindcss": "^3.3.5",
-    "typescript": "4.9.5",
     "i18next": "^22.5.1",
     "next-i18next": "^13.3.0",
-    "react-i18next": "^12.3.1"
+    "postcss": "^8.4.31",
+    "react-i18next": "^12.3.1",
+    "tailwindcss": "^3.3.5",
+    "typescript": "4.9.5"
   },
   "engines": {
     "node": ">=18.0.0"

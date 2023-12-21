@@ -3,6 +3,8 @@ import { adminCert } from '@/service/support/permission/adminCert';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
+import { MongoUser } from '@fastgpt/service/support/user/schema';
 
 export default async function getApps(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -39,12 +41,19 @@ export default async function getApps(req: NextApiRequest, res: NextApiResponse)
     for (const kbRaw of kbsRaw) {
       const kb: any = kbRaw.toObject();
 
+      const tmb = await MongoTeamMember.findOne({
+        _id: kb.tmbId
+      });
+
+      const user = await MongoUser.findOne({
+        _id: tmb?.userId
+      });
+
       const orderedKb = {
         id: kb._id.toString(),
-        userId: kb.userId,
+        username: user?.username,
         name: kb.name,
-        tags: kb.tags,
-        avatar: kb.avatar
+        intro: kb.intro
       };
 
       datasets.push(orderedKb);

@@ -40,6 +40,34 @@ export function mapFeConfig(feConfig: Record<string, any>): Record<string, any> 
   };
 }
 
+export function stripModels(config: Record<string, any>): Record<string, any> {
+  const {
+    ChatModels,
+    QAModels,
+    CQModels,
+    ExtractModels,
+    QGModels,
+    VectorModels,
+    ReRankModels,
+    AudioSpeechModels,
+    WhisperModel
+  } = config;
+
+  return {
+    models: {
+      ChatModels,
+      QAModels,
+      CQModels,
+      ExtractModels,
+      QGModels,
+      VectorModels,
+      ReRankModels,
+      AudioSpeechModels,
+      WhisperModel
+    }
+  };
+}
+
 export function stripFeConfig(config: Record<string, any>): Record<string, any> {
   const { switches, images, ...rest } = config.FeConfig;
   return { FeConfig: { ...switches, ...images, ...rest } };

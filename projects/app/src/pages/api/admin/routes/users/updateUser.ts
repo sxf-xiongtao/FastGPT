@@ -19,7 +19,7 @@ export default async function updateUser(req: NextApiRequest, res: NextApiRespon
 
     const result: any = await MongoUser.findByIdAndUpdate(tmb?.userId, {
       ...(username && { username }),
-      ...(password && { password: createHashPassword(createHashPassword(password)) })
+      ...(password && { password: createHashPassword(password) })
     });
 
     await MongoTeam.findByIdAndUpdate(tmb?.teamId, {

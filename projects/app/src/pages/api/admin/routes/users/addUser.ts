@@ -36,7 +36,7 @@ export default async function addUser(req: NextApiRequest, res: NextApiResponse)
       }
       const { _id } = await MongoUser.create({
         username,
-        password: createHashPassword(createHashPassword(password)),
+        password: createHashPassword(password),
         createTime: new Date()
       });
       return _id;

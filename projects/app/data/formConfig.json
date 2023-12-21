@@ -39,6 +39,20 @@
             },
             "exportLimitMinutes": { "type": "number", "title": "导出间隔时长" }
           }
+        },
+        "models": {
+          "title": "模型配置",
+          "properties": {
+            "ChatModels": {"type": "string"},
+            "QAModels": {"type": "string"},
+            "CQModels": {"type": "string"},
+            "ExtractModels": {"type": "string"},
+            "QGModels": {"type": "string"},
+            "VectorModels": {"type": "string"},
+            "ReRankModels": {"type": "string"},
+            "AudioSpeechModels": {"type": "string"},
+            "WhisperModel": {"type": "string"}
+          }
         }
       }
     },

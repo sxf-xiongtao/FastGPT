@@ -35,32 +35,24 @@ export default async function getUsers(req: NextApiRequest, res: NextApiResponse
       .limit(end - start);
     // .sort({ [sort]: order });
 
-    const tmbs = await MongoTeamMember.find({
-      userId: { $in: usersRaw.map((user: any) => user._id) }
-    });
+    // const tmbs = await MongoTeamMember.find({
+    //   userId: { $in: usersRaw.map((user: any) => user._id) }
+    // });
 
-    const teams: any = await MongoTeam.find({
-      _id: { $in: tmbs.map((tmb) => tmb.teamId) }
-    });
+    // const teams: any = await MongoTeam.find({
+    //   _id: { $in: tmbs.map((tmb) => tmb.teamId) }
+    // });
 
-    const users = tmbs.map((tmb, i) => {
-      const user = usersRaw
-        .find((user: any) => user?._id.toString() === tmb.userId.toString())
-        .toObject();
-      const team = teams
-        .find((team: any) => team._id.toString() === tmb.teamId.toString())
-        .toObject();
-
-      return {
-        id: tmb._id,
-        username: user.username,
-        balance: formatPrice(team.balance),
-        teamName: team.name,
-        maxSize: team.maxSize,
-        createTime: dayjs(user.createTime).format('YYYY/MM/DD HH:mm'),
-        password: ''
-      };
-    });
+    const users = await Promise.all(
+      usersRaw.map(async (user: any) => {
+        return {
+          id: user._id,
+          username: user.username,
+          balance: formatPrice(user.balance),
+          createTime: dayjs(user.createTime).format('YYYY/MM/DD HH:mm')
+        };
+      })
+    );
 
     const totalCount = await MongoUser.countDocuments(where);
 

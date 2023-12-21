@@ -1,0 +1,29 @@
+{
+  "menuList": [
+    {
+      "pageId": "dashboard"
+    },
+    {
+      "pageId": "users"
+    },
+    {
+      "pageId": "teams"
+    },
+    {
+      "pageId": "apps"
+    },
+    {
+      "pageId": "pays"
+    },
+    {
+      "pageId": "datasets"
+    },
+    {
+      "pageId": "oneAPI",
+      "oneAPIUrl": "https://nuwijiuq.cloud.sealos.io"
+    },
+    {
+      "pageId": "settings"
+    }
+  ]
+}

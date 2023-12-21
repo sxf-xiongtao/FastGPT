@@ -18,8 +18,8 @@ importers:
         specifier: ^13.2.1
         version: registry.npmmirror.com/lint-staged@13.2.1
       prettier:
-        specifier: ^3.0.3
-        version: registry.npmmirror.com/prettier@3.0.3
+        specifier: 2.7.1
+        version: registry.npmmirror.com/prettier@2.7.1
 
   FastGPT/packages/global:
     dependencies:
@@ -238,6 +238,9 @@ importers:
       '@fastgpt/service':
         specifier: workspace:*
         version: link:../../FastGPT/packages/service
+      '@monaco-editor/react':
+        specifier: ^4.6.0
+        version: registry.npmmirror.com/@monaco-editor/react@4.6.0(monaco-editor@0.45.0)(react-dom@18.2.0)(react@18.2.0)
       '@mozilla/readability':
         specifier: ^0.4.4
         version: registry.npmmirror.com/@mozilla/readability@0.4.4
@@ -258,7 +261,7 @@ importers:
         version: registry.npmmirror.com/@tanstack/react-query@4.24.10(react-dom@18.2.0)(react@18.2.0)
       '@tanstack/react-table':
         specifier: ^8.10.7
-        version: registry.npmmirror.com/@tanstack/react-table@8.10.7(react-dom@18.2.0)(react@18.2.0)
+        version: registry.npmmirror.com/@tanstack/react-table@8.11.0(react-dom@18.2.0)(react@18.2.0)
       '@types/nprogress':
         specifier: ^0.2.0
         version: registry.npmmirror.com/@types/nprogress@0.2.0
@@ -362,8 +365,8 @@ importers:
         specifier: ^3.18.0
         version: registry.npmmirror.com/urllib@3.18.0
       zustand:
-        specifier: ^4.3.5
-        version: registry.npmmirror.com/zustand@4.3.5(immer@9.0.19)(react@18.2.0)
+        specifier: ^4.3.8
+        version: registry.npmmirror.com/zustand@4.4.7(@types/react@18.2.0)(immer@9.0.19)(react@18.2.0)
     devDependencies:
       '@svgr/webpack':
         specifier: ^6.5.1
@@ -10440,6 +10443,34 @@ packages:
       '@jridgewell/resolve-uri': registry.npmmirror.com/@jridgewell/resolve-uri@3.1.1
       '@jridgewell/sourcemap-codec': registry.npmmirror.com/@jridgewell/sourcemap-codec@1.4.15
 
+  registry.npmmirror.com/@monaco-editor/loader@1.4.0(monaco-editor@0.45.0):
+    resolution: {integrity: sha512-00ioBig0x642hytVspPl7DbQyaSWRaolYie/UFNjoTdvoKPzo6xrXLhTk9ixgIKcLH5b5vDOjVNiGyY+uDCUlg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@monaco-editor/loader/-/loader-1.4.0.tgz}
+    id: registry.npmmirror.com/@monaco-editor/loader/1.4.0
+    name: '@monaco-editor/loader'
+    version: 1.4.0
+    peerDependencies:
+      monaco-editor: '>= 0.21.0 < 1'
+    dependencies:
+      monaco-editor: registry.npmmirror.com/monaco-editor@0.45.0
+      state-local: registry.npmmirror.com/state-local@1.0.7
+    dev: false
+
+  registry.npmmirror.com/@monaco-editor/react@4.6.0(monaco-editor@0.45.0)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-RFkU9/i7cN2bsq/iTkurMWOEErmYcY6JiQI3Jn+WeR/FGISH8JbHERjpS9oRuSOPvDMJI0Z8nJeKkbOs9sBYQw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@monaco-editor/react/-/react-4.6.0.tgz}
+    id: registry.npmmirror.com/@monaco-editor/react/4.6.0
+    name: '@monaco-editor/react'
+    version: 4.6.0
+    peerDependencies:
+      monaco-editor: '>= 0.25.0 < 1'
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@monaco-editor/loader': registry.npmmirror.com/@monaco-editor/loader@1.4.0(monaco-editor@0.45.0)
+      monaco-editor: registry.npmmirror.com/monaco-editor@0.45.0
+      react: registry.npmmirror.com/react@18.2.0
+      react-dom: registry.npmmirror.com/react-dom@18.2.0(react@18.2.0)
+    dev: false
+
   registry.npmmirror.com/@mozilla/readability@0.4.4:
     resolution: {integrity: sha512-MCgZyANpJ6msfvVMi6+A0UAsvZj//4OHREYUB9f2087uXHVoU+H+SWhuihvb1beKpM323bReQPRio0WNk2+V6g==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@mozilla/readability/-/readability-0.4.4.tgz}
     name: '@mozilla/readability'
@@ -14259,6 +14290,12 @@ packages:
       minimist: registry.npmmirror.com/minimist@1.2.8
     dev: false
 
+  registry.npmmirror.com/monaco-editor@0.45.0:
+    resolution: {integrity: sha512-mjv1G1ZzfEE3k9HZN0dQ2olMdwIfaeAAjFiwNprLfYNRSz7ctv9XuCT7gPtBGrMUeV1/iZzYKj17Khu1hxoHOA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/monaco-editor/-/monaco-editor-0.45.0.tgz}
+    name: monaco-editor
+    version: 0.45.0
+    dev: false
+
   registry.npmmirror.com/mongodb-connection-string-url@2.6.0:
     resolution: {integrity: sha512-WvTZlI9ab0QYtTYnuMLgobULWhokRjtC7db9LtcVfJ+Hsnyr5eo6ZtNAt3Ly24XZScGMelOcGtm7lSn0332tPQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/mongodb-connection-string-url/-/mongodb-connection-string-url-2.6.0.tgz}
     name: mongodb-connection-string-url
@@ -14924,11 +14961,11 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
-  registry.npmmirror.com/prettier@3.0.3:
-    resolution: {integrity: sha512-L/4pUDMxcNa8R/EthV08Zt42WBO4h1rarVtK0K+QJG0X187OLo7l699jWw0GKuwzkPQ//jMFA/8Xm6Fh3J/DAg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/prettier/-/prettier-3.0.3.tgz}
+  registry.npmmirror.com/prettier@2.7.1:
+    resolution: {integrity: sha512-ujppO+MkdPqoVINuDFDRLClm7D78qbDt0/NR+wp5FqEZOoTNAjPHWj17QRhu7geIHJfcNhRk1XVQmF8Bp3ye+g==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/prettier/-/prettier-2.7.1.tgz}
     name: prettier
-    version: 3.0.3
-    engines: {node: '>=14'}
+    version: 2.7.1
+    engines: {node: '>=10.13.0'}
     hasBin: true
     dev: true
 
@@ -15637,6 +15674,12 @@ packages:
     version: 0.1.8
     deprecated: 'Modern JS already guarantees Array#sort() is a stable sort, so this library is deprecated. See the compatibility table on MDN: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#browser_compatibility'
     dev: true
+
+  registry.npmmirror.com/state-local@1.0.7:
+    resolution: {integrity: sha512-HTEHMNieakEnoe33shBYcZ7NX83ACUjCu8c40iOGEZsngj9zRnkqS9j1pqQPXwobB0ZcVTk27REb7COQ0UR59w==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/state-local/-/state-local-1.0.7.tgz}
+    name: state-local
+    version: 1.0.7
+    dev: false
 
   registry.npmmirror.com/streamsearch@1.1.0:
     resolution: {integrity: sha512-Mcc5wHehp9aXz1ax6bZUyY5afg9u2rv5cqQI3mRrYkGC8rW2hM02jWuwjtL++LS5qinSyhj2QfLyNsuc+VsExg==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/streamsearch/-/streamsearch-1.1.0.tgz}
@@ -16472,21 +16515,25 @@ packages:
     name: zod
     version: 3.21.4
 
-  registry.npmmirror.com/zustand@4.3.5(immer@9.0.19)(react@18.2.0):
-    resolution: {integrity: sha512-2iPUzfwx+g3f0PagOMz2vDO9mZzEp2puFpNe7vrAymVPOEIEUjCPkC4/zy84eAscxIWmTU4j9g6upXYkJdzEFQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/zustand/-/zustand-4.3.5.tgz}
-    id: registry.npmmirror.com/zustand/4.3.5
+  registry.npmmirror.com/zustand@4.4.7(@types/react@18.2.0)(immer@9.0.19)(react@18.2.0):
+    resolution: {integrity: sha512-QFJWJMdlETcI69paJwhSMJz7PPWjVP8Sjhclxmxmxv/RYI7ZOvR5BHX+ktH0we9gTWQMxcne8q1OY8xxz604gw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/zustand/-/zustand-4.4.7.tgz}
+    id: registry.npmmirror.com/zustand/4.4.7
     name: zustand
-    version: 4.3.5
+    version: 4.4.7
     engines: {node: '>=12.7.0'}
     peerDependencies:
+      '@types/react': '>=16.8'
       immer: '>=9.0'
       react: '>=16.8'
     peerDependenciesMeta:
+      '@types/react':
+        optional: true
       immer:
         optional: true
       react:
         optional: true
     dependencies:
+      '@types/react': registry.npmmirror.com/@types/react@18.2.0
       immer: registry.npmmirror.com/immer@9.0.19
       react: registry.npmmirror.com/react@18.2.0
       use-sync-external-store: registry.npmmirror.com/use-sync-external-store@1.2.0(react@18.2.0)
