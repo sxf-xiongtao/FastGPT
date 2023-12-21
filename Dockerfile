@@ -79,6 +79,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/projects/$name/.next/static ./pro
 COPY --from=builder /app/projects/$name/package.json ./package.json 
 # copy woker
 COPY --from=workerDeps /app/worker /app/worker
+# copy config
+COPY ./projects/$name/data/formConfig.json /app/data/formConfig.json
+COPY ./projects/$name/data/menuconfig.json /app/data/menuconfig.json
+
 
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
