@@ -45,10 +45,20 @@ export default async function getUsers(req: NextApiRequest, res: NextApiResponse
 
     const users = await Promise.all(
       usersRaw.map(async (user: any) => {
+        const tmb = await MongoTeamMember.find({ userId: user._id });
+        const owner = tmb.find((tmb) => tmb.role === 'owner');
+        const teams = await Promise.all(
+          tmb.map(async (tmb) => await MongoTeam.findOne({ _id: tmb.teamId }))
+        );
+
+        const ownerTeam = teams.find((team) => team?._id.toString() === owner?.teamId.toString());
+
         return {
-          id: user._id,
+          id: owner?._id,
+          avatar: user.avatar,
+          teams: teams.map((team) => team?.name),
           username: user.username,
-          balance: formatPrice(user.balance),
+          balance: formatPrice(ownerTeam?.balance),
           createTime: dayjs(user.createTime).format('YYYY/MM/DD HH:mm')
         };
       })

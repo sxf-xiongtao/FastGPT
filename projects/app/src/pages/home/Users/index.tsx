@@ -20,6 +20,7 @@ import EditModal from '../Mods/EditModal';
 import Pagination from '@/components/Pagination';
 import { useQuery } from '@tanstack/react-query';
 import DetailModal from '../Mods/DetailModal';
+import UserDetailModal from './mods/UserDetailModal';
 
 type User = {
   id: string;
@@ -52,7 +53,7 @@ const columns = [
     header: () => '操作',
     cell: (info) => (
       <div className="flex">
-        <DetailModal data={info.row.original} />
+        <UserDetailModal data={info.row.original} />
         <EditModal data={info.row.original} />
       </div>
     )
