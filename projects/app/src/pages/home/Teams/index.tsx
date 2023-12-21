@@ -18,11 +18,13 @@ import { SearchIcon } from '@chakra-ui/icons';
 import { GET } from '@/service/common/request';
 import { useQuery } from '@tanstack/react-query';
 import Pagination from '@/components/Pagination';
-import DetailTeamModal from '../Mods/DetailTeamModal';
-import EditTeamModal from '../Mods/EditTeamModal';
+import DetailTeamModal from './mods/DetailTeamModal';
+import EditTeamModal from './mods/EditTeamModal';
+import Icons from '@/components/Icons';
 
 type APP = {
   id: string;
+  ownerId: string;
   name: string;
   balance: number;
   maxSize: number;
@@ -35,6 +37,10 @@ const columnHelper = createColumnHelper<APP>();
 const columns = [
   columnHelper.accessor('id', {
     header: () => 'id',
+    cell: (info) => info.getValue()
+  }),
+  columnHelper.accessor('ownerId', {
+    header: () => 'ownerId',
     cell: (info) => info.getValue()
   }),
   columnHelper.accessor('name', {
@@ -67,7 +73,7 @@ const columns = [
 const defaultQueryParams = {
   _start: 0,
   _end: 20,
-  name: ''
+  id: ''
 };
 
 export default function Teams() {
@@ -91,6 +97,11 @@ export default function Teams() {
       onSuccess: (res: any) => {
         setData(res.teams);
         setTotal(res.total);
+      },
+      onError: (err) => {
+        console.log(err);
+        setData([]);
+        setTotal(0);
       }
     }
   );
@@ -115,11 +126,12 @@ export default function Teams() {
                     if (e.key === 'Enter') {
                       setQueryParams({
                         ...queryParams,
-                        name: e.currentTarget.value
+                        id: e.currentTarget.value
                       });
                     }
                   }}
-                  placeholder="输入团队名，回车搜索"
+                  className="!w-60"
+                  placeholder="输入 id 或 ownerId，回车搜索"
                 ></Input>
               </InputGroup>
             </Box>
@@ -143,6 +155,13 @@ export default function Teams() {
         {isLoading ? (
           <Center className="h-full">
             <Spinner />
+          </Center>
+        ) : data.length === 0 ? (
+          <Center className="h-[400px]">
+            <Box className="flex flex-col">
+              <Icons type="empty" />
+              <span className="w-full text-center mt-4 text-[#c5cae9]">暂无数据</span>
+            </Box>
           </Center>
         ) : (
           <table className="w-full rounded-lg mt-2">

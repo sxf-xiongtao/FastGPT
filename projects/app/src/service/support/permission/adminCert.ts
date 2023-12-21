@@ -9,7 +9,6 @@ export const adminCert = async ({ req }: any) => {
     });
 
     if (user && user.username !== 'root') {
-      window.location.replace(`/login`);
       throw new Error('权限不足');
     }
   } catch (error) {

@@ -19,6 +19,7 @@ import { GET } from '@/service/common/request';
 import { useQuery } from '@tanstack/react-query';
 import DetailModal from '../Mods/DetailModal';
 import Pagination from '@/components/Pagination';
+import Icons from '@/components/Icons';
 
 type APP = {
   id: string;
@@ -108,25 +109,6 @@ export default function Apps() {
         <HStack className="justify-between">
           <Box className="flex">
             <Box className="text-[20px] font-bold text-[#405169] mb-2">应用列表</Box>
-            <Box className="mt-[2px]">
-              <InputGroup className="ml-4">
-                <InputLeftElement className="!h-8 text-[#E5E5E5]">
-                  <SearchIcon />
-                </InputLeftElement>
-                <Input
-                  variant={'search'}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      setQueryParams({
-                        ...queryParams,
-                        name: e.currentTarget.value
-                      });
-                    }
-                  }}
-                  placeholder="输入应用名，回车搜索"
-                ></Input>
-              </InputGroup>
-            </Box>
           </Box>
           <Pagination
             values={{
@@ -147,6 +129,13 @@ export default function Apps() {
         {isLoading ? (
           <Center className="h-full">
             <Spinner />
+          </Center>
+        ) : data.length === 0 ? (
+          <Center className="h-[400px]">
+            <Box className="flex flex-col">
+              <Icons type="empty" />
+              <span className="w-full text-center mt-4 text-[#c5cae9]">暂无数据</span>
+            </Box>
           </Center>
         ) : (
           <table className="w-full rounded-lg mt-2">

@@ -2,10 +2,10 @@ import Icons from '@/components/Icons';
 import {
   Avatar,
   Box,
-  Button,
   HStack,
   Modal,
   ModalBody,
+  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
@@ -17,11 +17,11 @@ import React from 'react';
 export default function UserDetailModal(props: { data: any }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data = {} } = props;
-  const { id, username, balance, createTime } = data;
+  const { userId, username, balance, createTime } = data;
   const showedData = [
     {
       name: 'id',
-      value: id
+      value: userId
     },
     {
       name: '用户名',
@@ -48,7 +48,8 @@ export default function UserDetailModal(props: { data: any }) {
 
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent m={'auto'}>
+          <ModalCloseButton className="text-black hover:bg-slate-100" />
           <ModalHeader>详情</ModalHeader>
           <ModalBody>
             <Box className="flex space-x-4 w-full px-6">
@@ -61,7 +62,9 @@ export default function UserDetailModal(props: { data: any }) {
                     return (
                       <HStack key={item.name}>
                         <span className="text-md font-bold w-1/3">{item.name}</span>
-                        <span className="text-lg w-2/3 text-end">{item.value}</span>
+                        <span className="text-lg w-2/3 text-end whitespace-nowrap">
+                          {item.value}
+                        </span>
                       </HStack>
                     );
                   })}
@@ -77,11 +80,7 @@ export default function UserDetailModal(props: { data: any }) {
               </Box>
             </Box>
           </ModalBody>
-          <ModalFooter>
-            <Button variant="text" onClick={onClose}>
-              关闭
-            </Button>
-          </ModalFooter>
+          <ModalFooter></ModalFooter>
         </ModalContent>
       </Modal>
     </>

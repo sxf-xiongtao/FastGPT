@@ -6,6 +6,7 @@ import {
   Center,
   Modal,
   ModalBody,
+  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
@@ -80,7 +81,8 @@ export default function DetailTeamModal(props: { teamId: string }) {
 
       <Modal isOpen={isOpen} onClose={onClose} size={'xl'}>
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent m={'auto'}>
+          <ModalCloseButton className="text-black hover:bg-slate-100" />
           <ModalHeader>详情</ModalHeader>
           <ModalBody>
             {isLoading ? (
@@ -116,11 +118,7 @@ export default function DetailTeamModal(props: { teamId: string }) {
               </table>
             )}
           </ModalBody>
-          <ModalFooter>
-            <Button variant="text" onClick={onClose}>
-              关闭
-            </Button>
-          </ModalFooter>
+          <ModalFooter></ModalFooter>
         </ModalContent>
       </Modal>
     </>

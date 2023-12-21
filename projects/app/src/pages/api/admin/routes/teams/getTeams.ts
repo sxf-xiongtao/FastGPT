@@ -2,6 +2,7 @@ import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import dayjs from 'dayjs';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -19,13 +20,18 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
 
     const start = parseInt(req.query._start as string) || 0;
     const end = parseInt(req.query._end as string) || 20;
-    const teamName = (req.query.name as string) || '';
+    const teamId = (req.query.id as string) || '';
 
-    const where = teamName
-      ? {
-          name: new RegExp(teamName, 'i')
-        }
-      : {};
+    const where = {
+      $or: [
+        teamId
+          ? {
+              _id: Object(teamId)
+            }
+          : {},
+        teamId ? { ownerId: teamId } : {}
+      ]
+    };
 
     const teamsRaw: any = await MongoTeam.find(where)
       .skip(start)
@@ -39,6 +45,7 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
 
         return {
           id: team._id,
+          ownerId: team.ownerId,
           name: team.name,
           balance: formatPrice(team.balance),
           maxSize: team.maxSize,
