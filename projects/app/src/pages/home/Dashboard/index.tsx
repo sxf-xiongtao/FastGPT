@@ -89,7 +89,6 @@ export default function DashBoard() {
                 count={numbers?.usersCount || 0}
               />
             </GridItem>
-
             <GridItem flex={1} className="border-r">
               <DataItem
                 icon={<Icons type="dataset" />}
@@ -97,7 +96,6 @@ export default function DashBoard() {
                 count={numbers?.datasetsCount || 0}
               />
             </GridItem>
-
             <GridItem flex={1}>
               <DataItem
                 icon={<Icons type="app" />}

@@ -16,8 +16,8 @@ export default async function getPays(req: NextApiRequest, res: NextApiResponse)
     const end = parseInt(req.query._end as string) || 20;
     const order = req.query._order === 'ASC' ? 1 : -1;
     const sort = req.query._sort === 'id' ? '_id' : req.query._sort || '_id';
-    const tmbId = req.query.tmbId || '';
-    const where = tmbId ? { tmbId } : {};
+    const userId = req.query.userId || '';
+    const where = userId ? { userId: Object(userId) } : {};
 
     const paysRaw = await MongoPay.find(where)
       .skip(start)

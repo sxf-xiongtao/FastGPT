@@ -5,19 +5,11 @@ import {
   getCoreRowModel,
   useReactTable
 } from '@tanstack/react-table';
-import {
-  Box,
-  Center,
-  HStack,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  Spinner
-} from '@chakra-ui/react';
-import { SearchIcon } from '@chakra-ui/icons';
+import { Box, Center, HStack, Spinner } from '@chakra-ui/react';
 import { GET } from '@/service/common/request';
 import Pagination from '@/components/Pagination';
 import { useQuery } from '@tanstack/react-query';
+import Icons from '@/components/Icons';
 
 type User = {
   id: string;
@@ -89,26 +81,7 @@ export default function Datasets() {
       >
         <HStack className="justify-between">
           <Box className="flex flex-1">
-            <Box className="text-[20px] font-bold text-[#405169]">知识库列表</Box>
-            <Box className="mt-[2px]">
-              <InputGroup className="ml-4">
-                <InputLeftElement className="!h-8 text-[#E5E5E5]">
-                  <SearchIcon />
-                </InputLeftElement>
-                <Input
-                  variant={'search'}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      setQueryParams({
-                        ...queryParams,
-                        name: e.currentTarget.value
-                      });
-                    }
-                  }}
-                  placeholder="输入知识库名，回车搜索"
-                ></Input>
-              </InputGroup>
-            </Box>
+            <Box className="text-[20px] font-bold text-[#405169] mb-3">知识库列表</Box>
           </Box>
           <Box className="!h-8 -mt-2">
             <Pagination
@@ -131,6 +104,13 @@ export default function Datasets() {
         {isLoading ? (
           <Center className="h-full">
             <Spinner />
+          </Center>
+        ) : data.length === 0 ? (
+          <Center className="h-[400px]">
+            <Box className="flex flex-col">
+              <Icons type="empty" />
+              <span className="w-full text-center mt-4 text-[#c5cae9]">暂无数据</span>
+            </Box>
           </Center>
         ) : (
           <table className="w-full rounded-lg">

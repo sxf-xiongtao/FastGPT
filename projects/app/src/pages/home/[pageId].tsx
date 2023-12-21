@@ -40,8 +40,6 @@ const Home = ({ pageData }: any) => {
       setMenuListData(config.menuList.map((item: any) => item.pageId));
     } catch (error) {
       console.log(error);
-    } finally {
-      // setIsSchemaLoading(false);
     }
   };
 
@@ -69,12 +67,12 @@ const Home = ({ pageData }: any) => {
             component: Teams
           },
           {
-            pageId: 'apps',
-            component: Apps
-          },
-          {
             pageId: 'pays',
             component: Pays
+          },
+          {
+            pageId: 'apps',
+            component: Apps
           },
           {
             pageId: 'datasets',

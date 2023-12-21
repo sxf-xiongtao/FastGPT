@@ -31,14 +31,14 @@ export default function SideBar({ menuListData }: any) {
       icon: <Icons type="team" />
     },
     {
-      pageId: 'apps',
-      name: '应用信息',
-      icon: <Icons type="app" />
-    },
-    {
       pageId: 'pays',
       name: '账单管理',
       icon: <Icons type="pay" />
+    },
+    {
+      pageId: 'apps',
+      name: '应用信息',
+      icon: <Icons type="app" />
     },
     {
       pageId: 'datasets',

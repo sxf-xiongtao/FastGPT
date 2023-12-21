@@ -16,16 +16,16 @@ import {
 } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
 import { GET } from '@/service/common/request';
-import EditModal from '../Mods/EditModal';
+import UserEditModal from './mods/UserEditModal';
 import Pagination from '@/components/Pagination';
 import { useQuery } from '@tanstack/react-query';
-import DetailModal from '../Mods/DetailModal';
 import UserDetailModal from './mods/UserDetailModal';
+import UserAddModal from './mods/UserAddModal';
+import Icons from '@/components/Icons';
 
 type User = {
-  id: string;
+  userId: string;
   username: string;
-  balance: number;
   createTime: string;
   operation?: any;
 };
@@ -33,16 +33,12 @@ type User = {
 const columnHelper = createColumnHelper<User>();
 
 const columns = [
-  columnHelper.accessor('id', {
+  columnHelper.accessor('userId', {
     header: () => 'id',
     cell: (info) => info.getValue()
   }),
   columnHelper.accessor('username', {
     header: () => '用户名',
-    cell: (info) => info.renderValue()
-  }),
-  columnHelper.accessor('balance', {
-    header: () => '余额',
     cell: (info) => info.renderValue()
   }),
   columnHelper.accessor('createTime', {
@@ -54,7 +50,7 @@ const columns = [
     cell: (info) => (
       <div className="flex">
         <UserDetailModal data={info.row.original} />
-        <EditModal data={info.row.original} />
+        <UserEditModal data={info.row.original} />
       </div>
     )
   })
@@ -65,7 +61,7 @@ const defaultQueryParams = {
   _end: 20,
   _sort: 'balance',
   _order: '',
-  username: ''
+  id: ''
 };
 
 export default function Users() {
@@ -88,6 +84,10 @@ export default function Users() {
       onSuccess: (res: any) => {
         setData(res.users);
         setTotal(res.total);
+      },
+      onError: () => {
+        setData([]);
+        setTotal(0);
       }
     }
   );
@@ -112,15 +112,15 @@ export default function Users() {
                     if (e.key === 'Enter') {
                       setQueryParams({
                         ...queryParams,
-                        username: e.currentTarget.value
+                        id: e.currentTarget.value
                       });
                     }
                   }}
-                  placeholder="输入用户名，回车搜索"
+                  placeholder="输入用户 id，回车搜索"
                 ></Input>
               </InputGroup>
             </Box>
-            <EditModal data={{}} isCreate />
+            <UserAddModal data={{}} />
           </Box>
           <Box className="!h-8 -mt-2">
             <Pagination
@@ -143,6 +143,13 @@ export default function Users() {
         {isLoading ? (
           <Center className="h-full">
             <Spinner />
+          </Center>
+        ) : data.length === 0 ? (
+          <Center className="h-[400px]">
+            <Box className="flex flex-col">
+              <Icons type="empty" />
+              <span className="w-full text-center mt-4 text-[#c5cae9]">暂无数据</span>
+            </Box>
           </Center>
         ) : (
           <table className="w-full rounded-lg">

@@ -27,7 +27,7 @@ export const Settings = () => {
 
   const fetchConfig = async () => {
     try {
-      const response: Record<string, any> = await GET('/admin/settings/getConfig');
+      const response: Record<string, any> = await GET('/admin/routes/settings/getConfig');
       const aggregatedConfigs = response.latestConfigs.reduce(
         (result: Record<string, any>, config: Record<string, any>) => {
           if (config.type === 'fastgpt') {

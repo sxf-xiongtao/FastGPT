@@ -20,28 +20,17 @@ export default async function getUsers(req: NextApiRequest, res: NextApiResponse
 
     const start = parseInt(req.query._start as string) || 0;
     const end = parseInt(req.query._end as string) || 20;
-    // const order = req.query._order === 'DESC' ? -1 : 1;
-    // const sort = req.query._sort === 'id' ? '_id' : req.query._sort || '_id';
-    const username = (req.query.username as string) || '';
+    const userId = (req.query.id as string) || '';
 
-    const where = username
+    const where = userId
       ? {
-          username: new RegExp(username, 'i')
+          _id: Object(userId)
         }
       : {};
 
     const usersRaw: any = await MongoUser.find(where)
       .skip(start)
       .limit(end - start);
-    // .sort({ [sort]: order });
-
-    // const tmbs = await MongoTeamMember.find({
-    //   userId: { $in: usersRaw.map((user: any) => user._id) }
-    // });
-
-    // const teams: any = await MongoTeam.find({
-    //   _id: { $in: tmbs.map((tmb) => tmb.teamId) }
-    // });
 
     const users = await Promise.all(
       usersRaw.map(async (user: any) => {
@@ -54,6 +43,7 @@ export default async function getUsers(req: NextApiRequest, res: NextApiResponse
         const ownerTeam = teams.find((team) => team?._id.toString() === owner?.teamId.toString());
 
         return {
+          userId: user._id,
           id: owner?._id,
           avatar: user.avatar,
           teams: teams.map((team) => team?.name),

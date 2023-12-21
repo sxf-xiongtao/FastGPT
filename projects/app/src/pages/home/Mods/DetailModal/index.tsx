@@ -26,7 +26,7 @@ export default function DetailModal(props: { data: any }) {
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent m={'auto'}>
           <ModalHeader>详情</ModalHeader>
           <ModalBody>
             {data &&
