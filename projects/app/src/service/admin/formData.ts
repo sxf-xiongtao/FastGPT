@@ -1,7 +1,7 @@
 import CustomImage from '../../pages/home/Settings/Customization/CustomImage';
+import CustomJSONEditor from '../../pages/home/Settings/Customization/CustomJSONEditor';
 
 export const uiSchema = {
-  'ui:widget': CustomImage,
   fastgpt: {
     FeConfig: {
       images: {
@@ -11,6 +11,35 @@ export const uiSchema = {
         avatar: {
           'ui:widget': CustomImage
         }
+      }
+    },
+    models: {
+      ChatModels: {
+        'ui:widget': CustomJSONEditor
+      },
+      QAModels: {
+        'ui:widget': CustomJSONEditor
+      },
+      CQModels: {
+        'ui:widget': CustomJSONEditor
+      },
+      ExtractModels: {
+        'ui:widget': CustomJSONEditor
+      },
+      QGModels: {
+        'ui:widget': CustomJSONEditor
+      },
+      VectorModels: {
+        'ui:widget': CustomJSONEditor
+      },
+      ReRankModels: {
+        'ui:widget': CustomJSONEditor
+      },
+      AudioSpeechModels: {
+        'ui:widget': CustomJSONEditor
+      },
+      WhisperModel: {
+        'ui:widget': CustomJSONEditor
       }
     }
   }
@@ -33,6 +62,17 @@ export const defaultConfig = {
       api_doc_url: '',
       other_doc_url: '',
       exportLimitMinutes: 10
+    },
+    models: {
+      ChatModels: `[\n\n]`,
+      QAModels: `[\n\n]`,
+      CQModels: `[\n\n]`,
+      ExtractModels: `[\n\n]`,
+      QGModels: `[\n\n]`,
+      VectorModels: `[\n\n]`,
+      ReRankModels: `[\n\n]`,
+      AudioSpeechModels: `[\n\n]`,
+      WhisperModel: `[\n\n]`
     }
   },
   fastgptPro: {

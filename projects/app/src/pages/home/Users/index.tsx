@@ -25,7 +25,6 @@ type User = {
   id: string;
   username: string;
   balance: number;
-  teamName: string;
   createTime: string;
   operation?: any;
 };
@@ -43,10 +42,6 @@ const columns = [
   }),
   columnHelper.accessor('balance', {
     header: () => '余额',
-    cell: (info) => info.renderValue()
-  }),
-  columnHelper.accessor('teamName', {
-    header: () => '团队名',
     cell: (info) => info.renderValue()
   }),
   columnHelper.accessor('createTime', {
