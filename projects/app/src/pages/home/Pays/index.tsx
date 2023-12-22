@@ -20,6 +20,7 @@ import Pagination from '@/components/Pagination';
 import { useQuery } from '@tanstack/react-query';
 import DetailModal from '../Mods/DetailModal';
 import { SearchIcon } from '@chakra-ui/icons';
+import { formatDate } from '@/utils/tools';
 
 type User = {
   id: string;
@@ -51,7 +52,7 @@ const columns = [
   }),
   columnHelper.accessor('createTime', {
     header: () => '创建时间',
-    cell: (info) => info.renderValue()
+    cell: (info) => <span>{formatDate(info.cell.getValue())}</span>
   }),
   columnHelper.accessor('operation', {
     header: () => '操作',

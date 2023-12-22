@@ -38,7 +38,7 @@ export default async function getPays(req: NextApiRequest, res: NextApiResponse)
             price: item.price / PRICE_SCALE,
             orderId: item.orderId,
             status: item.status,
-            createTime: dayjs(item.createTime).format('YYYY/MM/DD HH:mm')
+            createTime: item.createTime
           };
         })
     );

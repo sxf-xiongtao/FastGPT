@@ -21,6 +21,7 @@ import Pagination from '@/components/Pagination';
 import DetailTeamModal from './mods/DetailTeamModal';
 import EditTeamModal from './mods/EditTeamModal';
 import Icons from '@/components/Icons';
+import { formatDate } from '@/utils/tools';
 
 type APP = {
   id: string;
@@ -57,7 +58,7 @@ const columns = [
   }),
   columnHelper.accessor('createTime', {
     header: () => '创建时间',
-    cell: (info) => info.renderValue()
+    cell: (info) => <span>{formatDate(info.cell.getValue())}</span>
   }),
   columnHelper.accessor('operation', {
     header: () => '操作',

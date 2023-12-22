@@ -50,7 +50,7 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
           name: team.name,
           balance: formatPrice(team.balance),
           maxSize: team.maxSize,
-          createTime: dayjs(team.createTime).format('YYYY/MM/DD HH:mm'),
+          createTime: team.createTime,
           owner: owner
         };
       })
