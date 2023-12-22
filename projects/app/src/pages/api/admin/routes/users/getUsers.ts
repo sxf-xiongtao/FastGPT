@@ -1,10 +1,10 @@
 import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
+import { UserModelSchema as UserType } from '@fastgpt/global/support/user/type';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
-import dayjs from 'dayjs';
 
 export const PRICE_SCALE = 100000;
 
@@ -37,12 +37,12 @@ export default async function getUsers(req: NextApiRequest, res: NextApiResponse
       };
     }
 
-    const usersRaw: any = await MongoUser.find(where)
+    const usersRaw: UserType[] = await MongoUser.find(where)
       .skip(start)
       .limit(end - start);
 
     const users = await Promise.all(
-      usersRaw.map(async (user: any) => {
+      usersRaw.map(async (user) => {
         const tmb = await MongoTeamMember.find({ userId: user._id });
         const owner = tmb.find((tmb) => tmb.role === 'owner');
 
@@ -52,7 +52,7 @@ export default async function getUsers(req: NextApiRequest, res: NextApiResponse
           status: user.status,
           avatar: user.avatar,
           username: user.username,
-          createTime: dayjs(user.createTime).format('YYYY/MM/DD HH:mm')
+          createTime: user.createTime
         };
       })
     );

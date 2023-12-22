@@ -16,7 +16,12 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { POST } from '@/service/common/request';
 import { useQueryClient } from '@tanstack/react-query';
-import { AddIcon, EditIcon } from '@chakra-ui/icons';
+import { AddIcon } from '@chakra-ui/icons';
+
+type TFormData = {
+  username: string;
+  password: string;
+};
 
 export default function UserAddModal(props: { data: any }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -33,34 +38,33 @@ export default function UserAddModal(props: { data: any }) {
     defaultValues: data
   });
 
-  const onSubmit = async (formData: any) => {
-    POST(`/admin/routes/users/addUser`, formData)
-      .then((res) => {
-        toast({
-          title: '添加成功',
-          status: 'success',
-          duration: 2000,
-          isClosable: false,
-          position: 'top'
-        });
-        queryClient.invalidateQueries(['getUsers']);
-        onClose();
-      })
-      .catch((err) => {
-        toast({
-          title: err.message,
-          status: 'error',
-          duration: 2000,
-          isClosable: false,
-          position: 'top'
-        });
+  const onSubmit = async (formData: TFormData) => {
+    try {
+      await POST(`/admin/routes/users/addUser`, formData);
+      toast({
+        title: '添加成功',
+        status: 'success',
+        duration: 2000,
+        isClosable: false,
+        position: 'top'
       });
+      queryClient.invalidateQueries(['getUsers']);
+      onClose();
+    } catch (error: any) {
+      toast({
+        title: error.message,
+        status: 'error',
+        duration: 2000,
+        isClosable: false,
+        position: 'top'
+      });
+    }
   };
 
   return (
     <>
       <Button
-        className="ml-8 w-20 !h-8 mt-[2px]"
+        className="ml-8 w-24 !h-8 mt-[2px]"
         variant="outline"
         leftIcon={<AddIcon boxSize={2} />}
         onClick={() => {

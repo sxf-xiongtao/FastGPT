@@ -58,15 +58,14 @@ const Login = () => {
           position: 'top'
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       toast({
-        title: '登录失败',
+        title: error.message,
         status: 'error',
         duration: 2000,
         isClosable: true,
         position: 'top'
       });
-      console.error('Error:', error);
     } finally {
       setIsLoading(false);
     }

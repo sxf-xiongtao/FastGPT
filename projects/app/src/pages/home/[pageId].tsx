@@ -29,24 +29,29 @@ export async function getStaticProps({ params }: any) {
   };
 }
 
+export type TMenu = {
+  pageId: string;
+  oneAPIUrl?: string;
+};
+
 const Home = ({ pageData }: any) => {
-  const [menuList, setMenuList] = useState<any>([]);
-  const [menuListData, setMenuListData] = useState<any>([]);
+  const [menuList, setMenuList] = useState<Array<TMenu>>([]);
+  const [menuListData, setMenuListData] = useState<Array<string>>([]);
   const router = useRouter();
 
-  const fetchInitConfig = async () => {
+  const fetchInitMenuConfig = async () => {
     const response = await fetch('/api/system/getInitMenu');
     if (response.status === 403) {
       router.push('/login');
       return;
     }
-    const config = await response.json();
-    setMenuList(config.menuList);
-    setMenuListData(config.menuList.map((item: any) => item.pageId));
+    const menuConfig = await response.json();
+    setMenuList(menuConfig.menuList);
+    setMenuListData(menuConfig.menuList.map((item: TMenu) => item.pageId));
   };
 
   useEffect(() => {
-    fetchInitConfig();
+    fetchInitMenuConfig();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -11,8 +11,6 @@ export default async function getApps(req: NextApiRequest, res: NextApiResponse)
 
     const start = parseInt(req.query._start as string) || 0;
     const end = parseInt(req.query._end as string) || 20;
-    const order = req.query._order === 'DESC' ? -1 : 1;
-    const sort = req.query._sort === 'id' ? '_id' : req.query._sort || '_id';
     const name = req.query.name || '';
     const id = req.query.id || '';
 

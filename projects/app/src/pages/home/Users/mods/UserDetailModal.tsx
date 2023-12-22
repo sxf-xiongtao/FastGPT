@@ -1,4 +1,5 @@
 import Icons from '@/components/Icons';
+import { formatDate } from '@/utils/tools';
 import {
   Avatar,
   Box,
@@ -16,8 +17,9 @@ import React from 'react';
 
 export default function UserDetailModal(props: { data: any }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data = {} } = props;
+  const { data } = props;
   const { userId, username, createTime, status } = data;
+
   const showedData = [
     {
       name: 'id',
@@ -29,7 +31,7 @@ export default function UserDetailModal(props: { data: any }) {
     },
     {
       name: '创建时间',
-      value: createTime
+      value: formatDate(createTime)
     },
     {
       name: '状态',

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Icons from '@/components/Icons';
 
-export default function SideBar({ menuListData }: any) {
+export default function SideBar({ menuListData }: { menuListData: string[] }) {
   const router = useRouter();
   const pageId = router.asPath.split('/').pop();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);

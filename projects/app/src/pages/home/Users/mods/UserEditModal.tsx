@@ -12,15 +12,19 @@ import {
   ModalOverlay,
   Radio,
   RadioGroup,
-  Switch,
   useDisclosure,
   useToast
 } from '@chakra-ui/react';
 import React from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { POST } from '@/service/common/request';
 import { useQueryClient } from '@tanstack/react-query';
 import { EditIcon } from '@chakra-ui/icons';
+
+type TFormData = {
+  password: string;
+  status: string;
+};
 
 export default function UserEditModal(props: { data: any }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -32,28 +36,28 @@ export default function UserEditModal(props: { data: any }) {
     defaultValues: data
   });
 
-  const onSubmit = async (formData: any) => {
-    POST(`/admin/routes/users/updateUser`, formData)
-      .then((res) => {
-        toast({
-          title: '更新成功',
-          status: 'success',
-          duration: 2000,
-          isClosable: false,
-          position: 'top'
-        });
-        queryClient.invalidateQueries(['getUsers']);
-        onClose();
-      })
-      .catch((err) => {
-        toast({
-          title: err.message,
-          status: 'error',
-          duration: 2000,
-          isClosable: false,
-          position: 'top'
-        });
+  const onSubmit = async (formData: TFormData) => {
+    try {
+      const res = await POST(`/admin/routes/users/updateUser`, formData);
+      console.log(res);
+      toast({
+        title: '更新成功',
+        status: 'success',
+        duration: 2000,
+        isClosable: false,
+        position: 'top'
       });
+      queryClient.invalidateQueries(['getUsers']);
+      onClose();
+    } catch (err: any) {
+      toast({
+        title: err.message,
+        status: 'error',
+        duration: 2000,
+        isClosable: false,
+        position: 'top'
+      });
+    }
   };
 
   return (

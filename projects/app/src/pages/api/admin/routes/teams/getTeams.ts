@@ -2,11 +2,11 @@ import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import dayjs from 'dayjs';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { isValidObjectIdString } from '../users/getUsers';
+import { TeamSchema as TeamType } from '@fastgpt/global/support/user/team/type';
 
 export const PRICE_SCALE = 100000;
 
@@ -23,20 +23,6 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
     const end = parseInt(req.query._end as string) || 20;
     const search = (req.query.search as string) || '';
 
-    // const where = {
-    //   $or: [
-    //     teamId
-    //       ? {
-    //           _id: Object(teamId)
-    //         }
-    //       : {},
-    //     teamId
-    //       ? {
-    //           ownerId: teamId
-    //         }
-    //       : {}
-    //   ]
-    // };
     let where = {};
     if (search && isValidObjectIdString(search)) {
       where = {
@@ -48,12 +34,12 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
       };
     }
 
-    const teamsRaw: any = await MongoTeam.find(where)
+    const teamsRaw: TeamType[] = await MongoTeam.find(where)
       .skip(start)
       .limit(end - start);
 
     const teams = await Promise.all(
-      teamsRaw.map(async (team: any) => {
+      teamsRaw.map(async (team) => {
         const owner = await MongoUser.find({
           _id: team.ownerId
         });

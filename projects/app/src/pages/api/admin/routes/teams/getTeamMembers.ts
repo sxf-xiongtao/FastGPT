@@ -1,5 +1,6 @@
 import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
+import { TeamMemberItemType } from '@fastgpt/global/support/user/team/type';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
@@ -19,21 +20,18 @@ export default async function getTeamMembers(req: NextApiRequest, res: NextApiRe
 
     const teamId = (req.query.teamId as string) || '';
 
-    const membersRow: any = await MongoTeamMember.find({ teamId: Object(teamId) });
+    const membersRow: TeamMemberItemType[] = await MongoTeamMember.find({ teamId: Object(teamId) });
     const team = await MongoTeam.findById(teamId, 'name');
 
     const members = await Promise.all(
-      membersRow.map(async (member: any) => {
+      membersRow.map(async (member) => {
         const user = await MongoUser.findById(member.userId, 'username');
 
         return {
-          id: member._id,
           userName: user?.username,
           teamId: member.teamId,
-          createTime: member.createTime,
           role: member.role,
-          status: member.status,
-          default: member.default
+          status: member.status
         };
       })
     );

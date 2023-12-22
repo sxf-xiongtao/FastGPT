@@ -30,11 +30,11 @@ export default async function getPays(req: NextApiRequest, res: NextApiResponse)
       paysRaw
         .filter((item) => item.tmbId)
         .map(async (item: any) => {
-          const user: any = await MongoUser.findById(item.tmbId.userId, 'username');
+          const user = await MongoUser.findById(item.tmbId.userId, 'username');
 
           return {
             id: item._id.toString(),
-            username: user.username,
+            username: user?.username,
             price: item.price / PRICE_SCALE,
             orderId: item.orderId,
             status: item.status,

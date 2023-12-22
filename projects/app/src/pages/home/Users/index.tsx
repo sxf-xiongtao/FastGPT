@@ -22,8 +22,9 @@ import { useQuery } from '@tanstack/react-query';
 import UserDetailModal from './mods/UserDetailModal';
 import UserAddModal from './mods/UserAddModal';
 import Icons from '@/components/Icons';
+import { formatDate } from '@/utils/tools';
 
-type User = {
+export type User = {
   userId: string;
   username: string;
   createTime: string;
@@ -44,7 +45,7 @@ const columns = [
   }),
   columnHelper.accessor('createTime', {
     header: () => '创建时间',
-    cell: (info) => info.renderValue()
+    cell: (info) => <span>{formatDate(info.cell.getValue())}</span>
   }),
   columnHelper.accessor('status', {
     header: () => '状态',

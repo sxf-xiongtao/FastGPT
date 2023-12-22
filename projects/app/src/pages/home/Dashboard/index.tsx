@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
-import { Box, Divider, GridItem, HStack, VStack } from '@chakra-ui/react';
+import { Box, Center, Divider, GridItem, HStack, Spinner, VStack } from '@chakra-ui/react';
 
 import {
   Area,
@@ -64,7 +64,7 @@ export default function DashBoard() {
     };
 
     const fetchNumbers = async () => {
-      const res: any = await GET(`/admin/routes/dashboard/getNumbers`);
+      const res: TNumbers = await GET(`/admin/routes/dashboard/getNumbers`);
       setNumbers(res);
     };
 

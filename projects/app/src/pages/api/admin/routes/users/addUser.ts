@@ -15,8 +15,10 @@ export default async function addUser(req: NextApiRequest, res: NextApiResponse)
 
     const { username, password } = req.body;
     if (!username || !password) {
-      console.log('缺少字段', req.body);
-      return res.status(400).json({ message: '缺少字段' });
+      jsonRes(res, {
+        code: 400,
+        error: '缺少字段'
+      });
     }
 
     const existingUser = await MongoUser.findOne({ username });
@@ -26,7 +28,10 @@ export default async function addUser(req: NextApiRequest, res: NextApiResponse)
       const tmb = await MongoTeamMember.findOne({ userId: existingUser._id });
 
       if (tmb) {
-        return res.status(400).json({ message: '用户已注册' });
+        jsonRes(res, {
+          code: 400,
+          error: '用户已存在'
+        });
       }
     }
 
@@ -66,7 +71,13 @@ export default async function addUser(req: NextApiRequest, res: NextApiResponse)
       defaultTeam: true
     });
 
-    res.json({ message: '创建成功' });
+    jsonRes(res, {
+      data: {
+        userId,
+        teamId,
+        err: null
+      }
+    });
   } catch (err) {
     jsonRes(res, {
       code: 500,

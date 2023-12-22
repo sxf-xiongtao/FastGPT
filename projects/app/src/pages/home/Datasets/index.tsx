@@ -76,7 +76,7 @@ export default function Datasets() {
   return (
     <div className="w-[90%] m-auto h-[95%] pb-8">
       <Box
-        className="bg-white mt-8 w-full pl-12 pr-4 pb-4 pt-6 h-full flex flex-col"
+        className="bg-white mt-8 w-full pl-12 pb-4 pt-6 h-full flex flex-col"
         style={{ boxShadow: '0px 2px 10px  rgba(76, 141, 235, 0.1)' }}
       >
         <HStack className="justify-between h-12 pr-4">
