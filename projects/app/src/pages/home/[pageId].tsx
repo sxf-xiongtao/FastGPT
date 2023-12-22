@@ -10,6 +10,7 @@ import Datasets from './Datasets';
 import Teams from './Teams';
 import OneAPI from './OneAPI';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 
 export async function getStaticPaths() {
   const paths = getAllPageIds();
@@ -31,16 +32,17 @@ export async function getStaticProps({ params }: any) {
 const Home = ({ pageData }: any) => {
   const [menuList, setMenuList] = useState<any>([]);
   const [menuListData, setMenuListData] = useState<any>([]);
+  const router = useRouter();
 
   const fetchInitConfig = async () => {
-    try {
-      const response = await fetch('/api/system/getInitMenu');
-      const config = await response.json();
-      setMenuList(config.menuList);
-      setMenuListData(config.menuList.map((item: any) => item.pageId));
-    } catch (error) {
-      console.log(error);
+    const response = await fetch('/api/system/getInitMenu');
+    if (response.status === 403) {
+      router.push('/login');
+      return;
     }
+    const config = await response.json();
+    setMenuList(config.menuList);
+    setMenuListData(config.menuList.map((item: any) => item.pageId));
   };
 
   useEffect(() => {

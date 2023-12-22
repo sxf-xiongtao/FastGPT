@@ -6,6 +6,7 @@ import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSc
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import dayjs from 'dayjs';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { isValidObjectIdString } from '../users/getUsers';
 
 export const PRICE_SCALE = 100000;
 
@@ -20,18 +21,32 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
 
     const start = parseInt(req.query._start as string) || 0;
     const end = parseInt(req.query._end as string) || 20;
-    const teamId = (req.query.id as string) || '';
+    const search = (req.query.search as string) || '';
 
-    const where = {
-      $or: [
-        teamId
-          ? {
-              _id: Object(teamId)
-            }
-          : {},
-        teamId ? { ownerId: teamId } : {}
-      ]
-    };
+    // const where = {
+    //   $or: [
+    //     teamId
+    //       ? {
+    //           _id: Object(teamId)
+    //         }
+    //       : {},
+    //     teamId
+    //       ? {
+    //           ownerId: teamId
+    //         }
+    //       : {}
+    //   ]
+    // };
+    let where = {};
+    if (search && isValidObjectIdString(search)) {
+      where = {
+        $or: [{ ownerId: Object(search) }, { name: new RegExp(search, 'i') }]
+      };
+    } else if (search) {
+      where = {
+        name: new RegExp(search, 'i')
+      };
+    }
 
     const teamsRaw: any = await MongoTeam.find(where)
       .skip(start)

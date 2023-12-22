@@ -61,7 +61,7 @@ export const defaultConfig = {
       },
       api_doc_url: '',
       other_doc_url: '',
-      exportLimitMinutes: ''
+      exportLimitMinutes: 0
     },
     models: {
       ChatModels: `[\n\n]`,

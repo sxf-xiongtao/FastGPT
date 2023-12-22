@@ -2,6 +2,7 @@ import Icons from '@/components/Icons';
 import { useState } from 'react';
 import { GET } from '@/service/common/request';
 import {
+  Box,
   Button,
   Center,
   Modal,
@@ -50,6 +51,7 @@ export default function DetailTeamModal(props: { teamId: string }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { teamId } = props;
   const [data, setData] = useState([]);
+  const [team, setTeam] = useState<any>();
 
   const table = useReactTable({
     data,
@@ -65,6 +67,7 @@ export default function DetailTeamModal(props: { teamId: string }) {
     {
       onSuccess: (res: any) => {
         setData(res.members);
+        setTeam(res.team);
       },
       enabled: isOpen
     }
@@ -83,39 +86,47 @@ export default function DetailTeamModal(props: { teamId: string }) {
         <ModalOverlay />
         <ModalContent m={'auto'}>
           <ModalCloseButton className="text-black hover:bg-slate-100" />
-          <ModalHeader>详情</ModalHeader>
+          <ModalHeader>
+            <Box className="text-lg font-bold">详情 - {team?.name}</Box>
+          </ModalHeader>
           <ModalBody>
             {isLoading ? (
               <Center className="h-full">
                 <Spinner />
               </Center>
             ) : (
-              <table className="w-full rounded-lg mt-2">
-                <thead className="text-md h-10">
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <tr key={headerGroup.id}>
-                      {headerGroup.headers.map((header) => (
-                        <th key={header.id} align="left" className="pl-2 text-[#132047] font-bold">
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(header.column.columnDef.header, header.getContext())}
-                        </th>
-                      ))}
-                    </tr>
-                  ))}
-                </thead>
-                <tbody className="text-md">
-                  {table.getRowModel().rows.map((row) => (
-                    <tr key={row.id} className="hover:drop-shadow-lg">
-                      {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id} className="pl-2 h-12 font-medium">
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <>
+                <table className="w-full rounded-lg mt-2">
+                  <thead className="text-md h-10">
+                    {table.getHeaderGroups().map((headerGroup) => (
+                      <tr key={headerGroup.id}>
+                        {headerGroup.headers.map((header) => (
+                          <th
+                            key={header.id}
+                            align="left"
+                            className="pl-2 text-[#132047] font-bold"
+                          >
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(header.column.columnDef.header, header.getContext())}
+                          </th>
+                        ))}
+                      </tr>
+                    ))}
+                  </thead>
+                  <tbody className="text-md">
+                    {table.getRowModel().rows.map((row) => (
+                      <tr key={row.id} className="hover:drop-shadow-lg">
+                        {row.getVisibleCells().map((cell) => (
+                          <td key={cell.id} className="pl-2 h-12 font-medium">
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
             )}
           </ModalBody>
           <ModalFooter></ModalFooter>

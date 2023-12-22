@@ -2,6 +2,7 @@ import {
   Button,
   FormControl,
   FormLabel,
+  HStack,
   Input,
   Modal,
   ModalBody,
@@ -9,11 +10,14 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Radio,
+  RadioGroup,
+  Switch,
   useDisclosure,
   useToast
 } from '@chakra-ui/react';
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { POST } from '@/service/common/request';
 import { useQueryClient } from '@tanstack/react-query';
 import { EditIcon } from '@chakra-ui/icons';
@@ -67,21 +71,34 @@ export default function UserEditModal(props: { data: any }) {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent m={'auto'}>
-          <ModalHeader>更改密码</ModalHeader>
+          <ModalHeader>更改</ModalHeader>
           <ModalBody>
             <FormControl className="mt-4">
               <FormLabel htmlFor="password" className="!mb-0 !font-bold text-grayModern-700">
                 密码
               </FormLabel>
               <Input
-                {...register('password', {
-                  required: 'This is required'
-                })}
+                {...register('password')}
                 className="!text-xl"
                 id="password"
                 variant="outline"
                 placeholder="∗∗∗∗∗∗∗∗"
               />
+            </FormControl>
+            <FormControl className="mt-4">
+              <FormLabel htmlFor="password" className="!mb-0 !font-bold text-grayModern-700">
+                用户状态
+              </FormLabel>
+              <RadioGroup defaultValue={data?.status}>
+                <HStack spacing={6} mt={2}>
+                  <Radio {...register('status')} value="active" size="lg">
+                    active
+                  </Radio>
+                  <Radio {...register('status')} value="forbidden" size="lg">
+                    forbidden
+                  </Radio>
+                </HStack>
+              </RadioGroup>
             </FormControl>
           </ModalBody>
           <ModalFooter>

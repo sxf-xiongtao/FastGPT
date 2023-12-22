@@ -3,6 +3,7 @@ import { adminCert } from '@/service/support/permission/adminCert';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
+import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export const PRICE_SCALE = 100000;
@@ -19,14 +20,15 @@ export default async function getTeamMembers(req: NextApiRequest, res: NextApiRe
     const teamId = (req.query.teamId as string) || '';
 
     const membersRow: any = await MongoTeamMember.find({ teamId: Object(teamId) });
+    const team = await MongoTeam.findById(teamId, 'name');
 
     const members = await Promise.all(
       membersRow.map(async (member: any) => {
-        const userName = await MongoUser.findById(member.userId, 'username');
+        const user = await MongoUser.findById(member.userId, 'username');
 
         return {
           id: member._id,
-          userName: userName?.username,
+          userName: user?.username,
           teamId: member.teamId,
           createTime: member.createTime,
           role: member.role,
@@ -38,7 +40,8 @@ export default async function getTeamMembers(req: NextApiRequest, res: NextApiRe
 
     jsonRes(res, {
       data: {
-        members
+        members,
+        team
       }
     });
   } catch (err) {

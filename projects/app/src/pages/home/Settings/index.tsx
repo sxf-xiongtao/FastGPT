@@ -98,7 +98,7 @@ export const Settings = () => {
   const onSubmit = async ({ formData }: any) => {
     setIsLoading(true);
     try {
-      const response: any = await POST('/admin/settings/updateConfig', {
+      const response: any = await POST('/admin/routes/settings/updateConfig', {
         fastgpt: { ...formData.fastgpt.models, ...stripFeConfig(formData.fastgpt) },
         fastgptPro: formData.fastgptPro
       });

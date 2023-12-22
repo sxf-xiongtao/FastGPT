@@ -40,7 +40,7 @@ const columns = [
     cell: (info) => info.getValue()
   }),
   columnHelper.accessor('ownerId', {
-    header: () => 'ownerId',
+    header: () => '用户 id',
     cell: (info) => info.getValue()
   }),
   columnHelper.accessor('name', {
@@ -73,7 +73,7 @@ const columns = [
 const defaultQueryParams = {
   _start: 0,
   _end: 20,
-  id: ''
+  search: ''
 };
 
 export default function Teams() {
@@ -109,10 +109,10 @@ export default function Teams() {
   return (
     <div className="w-[90%] m-auto h-[95%] pb-8">
       <Box
-        className="bg-white mt-8 w-full pl-12 pr-4 pb-4 pt-6 h-full overflow-auto"
+        className="bg-white mt-8 w-full pl-12 pb-4 pt-6 h-full flex flex-col"
         style={{ boxShadow: '0px 2px 10px  rgba(76, 141, 235, 0.1)' }}
       >
-        <HStack className="justify-between">
+        <HStack className="justify-between h-16 pr-4">
           <Box className="flex">
             <Box className="text-[20px] font-bold text-[#405169] mb-2">团队列表</Box>
             <Box className="mt-[2px]">
@@ -126,12 +126,12 @@ export default function Teams() {
                     if (e.key === 'Enter') {
                       setQueryParams({
                         ...queryParams,
-                        id: e.currentTarget.value
+                        search: e.currentTarget.value
                       });
                     }
                   }}
-                  className="!w-60"
-                  placeholder="输入 id 或 ownerId，回车搜索"
+                  className="!w-[240px]"
+                  placeholder="输入团队名或 用户 id，回车搜索"
                 ></Input>
               </InputGroup>
             </Box>
@@ -152,45 +152,47 @@ export default function Teams() {
             notShowSelect
           />
         </HStack>
-        {isLoading ? (
-          <Center className="h-full">
-            <Spinner />
-          </Center>
-        ) : data.length === 0 ? (
-          <Center className="h-[400px]">
-            <Box className="flex flex-col">
-              <Icons type="empty" />
-              <span className="w-full text-center mt-4 text-[#c5cae9]">暂无数据</span>
-            </Box>
-          </Center>
-        ) : (
-          <table className="w-full rounded-lg mt-2">
-            <thead className="text-xl h-10">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <th key={header.id} align="left" className="pl-2 text-[#132047] font-bold">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody className="text-lg">
-              {table.getRowModel().rows.map((row) => (
-                <tr key={row.id} className="hover:drop-shadow-lg">
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="pl-2 h-12 font-medium">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+        <Box className="overflow-auto h-full flex-1 pr-4">
+          {isLoading ? (
+            <Center className="h-full">
+              <Spinner />
+            </Center>
+          ) : data.length === 0 ? (
+            <Center className="h-[400px]">
+              <Box className="flex flex-col">
+                <Icons type="empty" />
+                <span className="w-full text-center mt-4 text-[#c5cae9]">暂无数据</span>
+              </Box>
+            </Center>
+          ) : (
+            <table className="w-full rounded-lg mt-2">
+              <thead className="text-xl h-10">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th key={header.id} align="left" className="pl-2 text-[#132047] font-bold">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody className="text-lg">
+                {table.getRowModel().rows.map((row) => (
+                  <tr key={row.id} className="hover:drop-shadow-lg">
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id} className="pl-2 h-12 font-medium">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </Box>
       </Box>
     </div>
   );
