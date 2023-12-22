@@ -17,7 +17,7 @@ import React from 'react';
 
 export default function UserDetailModal(props: { data: any }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data } = props;
+  const { data = {} } = props;
   const { userId, username, createTime, status } = data;
 
   const showedData = [
