@@ -1,16 +1,19 @@
 import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
+import { UserModelSchema as UserType } from '@fastgpt/global/support/user/type';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
-import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
-import dayjs from 'dayjs';
-
-export const PRICE_SCALE = 100000;
 
 export const formatPrice = (val = 0, multiple = 1) => {
   return Number(((val / PRICE_SCALE) * multiple).toFixed(10));
+};
+
+export const isValidObjectIdString = (str: string) => {
+  const mongoose = require('mongoose');
+  return mongoose.Types.ObjectId.isValid(str);
 };
 
 export default async function getUsers(req: NextApiRequest, res: NextApiResponse) {
@@ -20,36 +23,35 @@ export default async function getUsers(req: NextApiRequest, res: NextApiResponse
 
     const start = parseInt(req.query._start as string) || 0;
     const end = parseInt(req.query._end as string) || 20;
-    const userId = (req.query.id as string) || '';
+    const search = (req.query.search as string) || '';
 
-    const where = userId
-      ? {
-          _id: Object(userId)
-        }
-      : {};
+    let where = {};
+    if (search && isValidObjectIdString(search)) {
+      where = {
+        $or: [{ _id: Object(search) }, { username: new RegExp(search, 'i') }]
+      };
+    } else if (search) {
+      where = {
+        username: new RegExp(search, 'i')
+      };
+    }
 
-    const usersRaw: any = await MongoUser.find(where)
+    const usersRaw: UserType[] = await MongoUser.find(where)
       .skip(start)
       .limit(end - start);
 
     const users = await Promise.all(
-      usersRaw.map(async (user: any) => {
+      usersRaw.map(async (user) => {
         const tmb = await MongoTeamMember.find({ userId: user._id });
         const owner = tmb.find((tmb) => tmb.role === 'owner');
-        const teams = await Promise.all(
-          tmb.map(async (tmb) => await MongoTeam.findOne({ _id: tmb.teamId }))
-        );
-
-        const ownerTeam = teams.find((team) => team?._id.toString() === owner?.teamId.toString());
 
         return {
           userId: user._id,
           id: owner?._id,
+          status: user.status,
           avatar: user.avatar,
-          teams: teams.map((team) => team?.name),
           username: user.username,
-          balance: formatPrice(ownerTeam?.balance),
-          createTime: dayjs(user.createTime).format('YYYY/MM/DD HH:mm')
+          createTime: user.createTime
         };
       })
     );

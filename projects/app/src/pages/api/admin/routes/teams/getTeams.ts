@@ -2,12 +2,11 @@ import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
-import dayjs from 'dayjs';
 import { NextApiRequest, NextApiResponse } from 'next';
-
-export const PRICE_SCALE = 100000;
+import { isValidObjectIdString } from '../users/getUsers';
+import { TeamSchema as TeamType } from '@fastgpt/global/support/user/team/type';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 
 export const formatPrice = (val = 0, multiple = 1) => {
   return Number(((val / PRICE_SCALE) * multiple).toFixed(10));
@@ -20,25 +19,25 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
 
     const start = parseInt(req.query._start as string) || 0;
     const end = parseInt(req.query._end as string) || 20;
-    const teamId = (req.query.id as string) || '';
+    const search = (req.query.search as string) || '';
 
-    const where = {
-      $or: [
-        teamId
-          ? {
-              _id: Object(teamId)
-            }
-          : {},
-        teamId ? { ownerId: teamId } : {}
-      ]
-    };
+    let where = {};
+    if (search && isValidObjectIdString(search)) {
+      where = {
+        $or: [{ ownerId: Object(search) }, { name: new RegExp(search, 'i') }]
+      };
+    } else if (search) {
+      where = {
+        name: new RegExp(search, 'i')
+      };
+    }
 
-    const teamsRaw: any = await MongoTeam.find(where)
+    const teamsRaw: TeamType[] = await MongoTeam.find(where)
       .skip(start)
       .limit(end - start);
 
     const teams = await Promise.all(
-      teamsRaw.map(async (team: any) => {
+      teamsRaw.map(async (team) => {
         const owner = await MongoUser.find({
           _id: team.ownerId
         });
@@ -49,7 +48,7 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
           name: team.name,
           balance: formatPrice(team.balance),
           maxSize: team.maxSize,
-          createTime: dayjs(team.createTime).format('YYYY/MM/DD HH:mm'),
+          createTime: team.createTime,
           owner: owner
         };
       })

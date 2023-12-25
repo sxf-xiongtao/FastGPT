@@ -5,16 +5,7 @@ import {
   getCoreRowModel,
   useReactTable
 } from '@tanstack/react-table';
-import {
-  Box,
-  Center,
-  HStack,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  Spinner
-} from '@chakra-ui/react';
-import { SearchIcon } from '@chakra-ui/icons';
+import { Box, Center, HStack, Spinner } from '@chakra-ui/react';
 import { GET } from '@/service/common/request';
 import { useQuery } from '@tanstack/react-query';
 import DetailModal from '../Mods/DetailModal';
@@ -103,68 +94,72 @@ export default function Apps() {
   return (
     <div className="w-[90%] m-auto h-[95%] pb-8">
       <Box
-        className="bg-white mt-8 w-full pl-12 pr-4 pb-4 pt-6 h-full overflow-auto"
+        className="bg-white mt-8 w-full pl-12 pb-4 pt-6 h-full flex flex-col"
         style={{ boxShadow: '0px 2px 10px  rgba(76, 141, 235, 0.1)' }}
       >
-        <HStack className="justify-between">
+        <HStack className="justify-between h-12 pr-4">
           <Box className="flex">
             <Box className="text-[20px] font-bold text-[#405169] mb-2">应用列表</Box>
           </Box>
-          <Pagination
-            values={{
-              page: queryParams._start / 20 + 1,
-              pageSize: 20,
-              total: total
-            }}
-            onChange={(values) => {
-              setQueryParams({
-                ...queryParams,
-                _start: (values.page - 1) * 20,
-                _end: values.page * 20
-              });
-            }}
-            notShowSelect
-          />
+          <Box className="!h-8 -mt-2">
+            <Pagination
+              values={{
+                page: queryParams._start / 20 + 1,
+                pageSize: 20,
+                total: total
+              }}
+              onChange={(values) => {
+                setQueryParams({
+                  ...queryParams,
+                  _start: (values.page - 1) * 20,
+                  _end: values.page * 20
+                });
+              }}
+              notShowSelect
+            />
+          </Box>
         </HStack>
-        {isLoading ? (
-          <Center className="h-full">
-            <Spinner />
-          </Center>
-        ) : data.length === 0 ? (
-          <Center className="h-[400px]">
-            <Box className="flex flex-col">
-              <Icons type="empty" />
-              <span className="w-full text-center mt-4 text-[#c5cae9]">暂无数据</span>
-            </Box>
-          </Center>
-        ) : (
-          <table className="w-full rounded-lg mt-2">
-            <thead className="text-xl h-10">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <th key={header.id} align="left" className="pl-2 text-[#132047] font-bold">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody className="text-lg">
-              {table.getRowModel().rows.map((row) => (
-                <tr key={row.id} className="hover:drop-shadow-lg">
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="pl-2 h-12 font-medium">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+        <Box className="overflow-auto h-full flex-1 pr-4">
+          {isLoading ? (
+            <Center className="h-full">
+              <Spinner />
+            </Center>
+          ) : data.length === 0 ? (
+            <Center className="h-[400px]">
+              <Box className="flex flex-col">
+                <Icons type="empty" />
+                <span className="w-full text-center mt-4 text-[#c5cae9]">暂无数据</span>
+              </Box>
+            </Center>
+          ) : (
+            <table className="w-full rounded-lg mt-2">
+              <thead className="text-xl h-10">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th key={header.id} align="left" className="pl-2 text-[#132047] font-bold">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody className="text-lg">
+                {table.getRowModel().rows.map((row) => (
+                  <tr key={row.id} className="hover:drop-shadow-lg">
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id} className="pl-2 h-12 font-medium">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </Box>
       </Box>
     </div>
   );

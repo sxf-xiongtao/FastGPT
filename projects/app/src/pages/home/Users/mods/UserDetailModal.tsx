@@ -1,4 +1,5 @@
 import Icons from '@/components/Icons';
+import { formatDate } from '@/utils/tools';
 import {
   Avatar,
   Box,
@@ -17,7 +18,8 @@ import React from 'react';
 export default function UserDetailModal(props: { data: any }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data = {} } = props;
-  const { userId, username, balance, createTime } = data;
+  const { userId, username, createTime, status } = data;
+
   const showedData = [
     {
       name: 'id',
@@ -28,12 +30,12 @@ export default function UserDetailModal(props: { data: any }) {
       value: username
     },
     {
-      name: '余额',
-      value: balance
+      name: '创建时间',
+      value: formatDate(createTime)
     },
     {
-      name: '创建时间',
-      value: createTime
+      name: '状态',
+      value: status
     }
   ];
 
@@ -68,15 +70,6 @@ export default function UserDetailModal(props: { data: any }) {
                       </HStack>
                     );
                   })}
-                <HStack>
-                  <span className="text-md font-bold w-1/3">所属团队</span>
-                  <span className="text-lg w-2/3 text-end">
-                    {data.teams &&
-                      data.teams.map((team: string) => (
-                        <span key={team} className="ml-1">{`[ ${team} ]`}</span>
-                      ))}
-                  </span>
-                </HStack>
               </Box>
             </Box>
           </ModalBody>

@@ -3,9 +3,8 @@ import { adminCert } from '@/service/support/permission/adminCert';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { MongoPay } from '@/service/support/wallet/pay/schema';
-import { PRICE_SCALE } from '../users/getUsers';
-import dayjs from 'dayjs';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 
 export default async function getPays(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -30,15 +29,15 @@ export default async function getPays(req: NextApiRequest, res: NextApiResponse)
       paysRaw
         .filter((item) => item.tmbId)
         .map(async (item: any) => {
-          const user: any = await MongoUser.findById(item.tmbId.userId, 'username');
+          const user = await MongoUser.findById(item.tmbId.userId, 'username');
 
           return {
             id: item._id.toString(),
-            username: user.username,
+            username: user?.username,
             price: item.price / PRICE_SCALE,
             orderId: item.orderId,
             status: item.status,
-            createTime: dayjs(item.createTime).format('YYYY/MM/DD HH:mm')
+            createTime: item.createTime
           };
         })
     );

@@ -10,6 +10,7 @@ import Datasets from './Datasets';
 import Teams from './Teams';
 import OneAPI from './OneAPI';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 
 export async function getStaticPaths() {
   const paths = getAllPageIds();
@@ -28,23 +29,29 @@ export async function getStaticProps({ params }: any) {
   };
 }
 
-const Home = ({ pageData }: any) => {
-  const [menuList, setMenuList] = useState<any>([]);
-  const [menuListData, setMenuListData] = useState<any>([]);
+export type TMenu = {
+  pageId: string;
+  oneAPIUrl?: string;
+};
 
-  const fetchInitConfig = async () => {
-    try {
-      const response = await fetch('/api/system/getInitMenu');
-      const config = await response.json();
-      setMenuList(config.menuList);
-      setMenuListData(config.menuList.map((item: any) => item.pageId));
-    } catch (error) {
-      console.log(error);
+const Home = ({ pageData }: any) => {
+  const [menuList, setMenuList] = useState<Array<TMenu>>([]);
+  const [menuListData, setMenuListData] = useState<Array<string>>([]);
+  const router = useRouter();
+
+  const fetchInitMenuConfig = async () => {
+    const response = await fetch('/api/system/getInitMenu');
+    if (response.status === 403) {
+      router.push('/login');
+      return;
     }
+    const menuConfig = await response.json();
+    setMenuList(menuConfig.menuList);
+    setMenuListData(menuConfig.menuList.map((item: TMenu) => item.pageId));
   };
 
   useEffect(() => {
-    fetchInitConfig();
+    fetchInitMenuConfig();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

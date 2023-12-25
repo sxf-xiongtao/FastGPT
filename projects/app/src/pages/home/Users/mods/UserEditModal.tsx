@@ -2,6 +2,7 @@ import {
   Button,
   FormControl,
   FormLabel,
+  HStack,
   Input,
   Modal,
   ModalBody,
@@ -9,6 +10,8 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Radio,
+  RadioGroup,
   useDisclosure,
   useToast
 } from '@chakra-ui/react';
@@ -17,6 +20,11 @@ import { useForm } from 'react-hook-form';
 import { POST } from '@/service/common/request';
 import { useQueryClient } from '@tanstack/react-query';
 import { EditIcon } from '@chakra-ui/icons';
+
+type TFormData = {
+  password: string;
+  status: string;
+};
 
 export default function UserEditModal(props: { data: any }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -28,28 +36,28 @@ export default function UserEditModal(props: { data: any }) {
     defaultValues: data
   });
 
-  const onSubmit = async (formData: any) => {
-    POST(`/admin/routes/users/updateUser`, formData)
-      .then((res) => {
-        toast({
-          title: '更新成功',
-          status: 'success',
-          duration: 2000,
-          isClosable: false,
-          position: 'top'
-        });
-        queryClient.invalidateQueries(['getUsers']);
-        onClose();
-      })
-      .catch((err) => {
-        toast({
-          title: err.message,
-          status: 'error',
-          duration: 2000,
-          isClosable: false,
-          position: 'top'
-        });
+  const onSubmit = async (formData: TFormData) => {
+    try {
+      const res = await POST(`/admin/routes/users/updateUser`, formData);
+      console.log(res);
+      toast({
+        title: '更新成功',
+        status: 'success',
+        duration: 2000,
+        isClosable: false,
+        position: 'top'
       });
+      queryClient.invalidateQueries(['getUsers']);
+      onClose();
+    } catch (err: any) {
+      toast({
+        title: err.message,
+        status: 'error',
+        duration: 2000,
+        isClosable: false,
+        position: 'top'
+      });
+    }
   };
 
   return (
@@ -67,21 +75,34 @@ export default function UserEditModal(props: { data: any }) {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent m={'auto'}>
-          <ModalHeader>更改密码</ModalHeader>
+          <ModalHeader>更改</ModalHeader>
           <ModalBody>
             <FormControl className="mt-4">
               <FormLabel htmlFor="password" className="!mb-0 !font-bold text-grayModern-700">
                 密码
               </FormLabel>
               <Input
-                {...register('password', {
-                  required: 'This is required'
-                })}
+                {...register('password')}
                 className="!text-xl"
                 id="password"
                 variant="outline"
                 placeholder="∗∗∗∗∗∗∗∗"
               />
+            </FormControl>
+            <FormControl className="mt-4">
+              <FormLabel htmlFor="password" className="!mb-0 !font-bold text-grayModern-700">
+                用户状态
+              </FormLabel>
+              <RadioGroup defaultValue={data?.status}>
+                <HStack spacing={6} mt={2}>
+                  <Radio {...register('status')} value="active" size="lg">
+                    active
+                  </Radio>
+                  <Radio {...register('status')} value="forbidden" size="lg">
+                    forbidden
+                  </Radio>
+                </HStack>
+              </RadioGroup>
             </FormControl>
           </ModalBody>
           <ModalFooter>

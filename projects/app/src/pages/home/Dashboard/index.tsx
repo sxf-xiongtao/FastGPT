@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
-import { Box, Divider, GridItem, HStack, VStack } from '@chakra-ui/react';
+import { Box, Center, Divider, GridItem, HStack, Spinner, VStack } from '@chakra-ui/react';
 
 import {
   Area,
@@ -13,6 +13,7 @@ import {
 } from 'recharts';
 import Icons from '@/components/Icons';
 import { GET } from '@/service/common/request';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 
 type fetchChatData = {
   count: number;
@@ -36,8 +37,6 @@ type TNumbers = {
   datasetsCount: number;
   usersCount: number;
 };
-
-const PRICE_SCALE = 100000;
 
 export default function DashBoard() {
   const [chartData, setChartData] = useState<chatDataType[]>([]);
@@ -64,7 +63,7 @@ export default function DashBoard() {
     };
 
     const fetchNumbers = async () => {
-      const res: any = await GET(`/admin/routes/dashboard/getNumbers`);
+      const res: TNumbers = await GET(`/admin/routes/dashboard/getNumbers`);
       setNumbers(res);
     };
 

@@ -11,12 +11,13 @@ export default async function updateUser(req: NextApiRequest, res: NextApiRespon
     await connectToDatabase();
     await adminCert({ req, authToken: true });
 
-    let { id: tmbId, password } = req.body;
+    let { id: tmbId, password, status } = req.body;
 
     const tmb = await MongoTeamMember.findById(tmbId);
 
     const result = await MongoUser.findByIdAndUpdate(tmb?.userId, {
-      ...(password && { password: createHashPassword(password) })
+      ...(password && { password: createHashPassword(password) }),
+      ...(status && { status })
     });
 
     jsonRes(res, {

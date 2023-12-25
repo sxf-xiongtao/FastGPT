@@ -76,10 +76,10 @@ export default function Datasets() {
   return (
     <div className="w-[90%] m-auto h-[95%] pb-8">
       <Box
-        className="bg-white mt-8 w-full pl-12 pr-4 pb-4 pt-6 h-full overflow-auto"
+        className="bg-white mt-8 w-full pl-12 pb-4 pt-6 h-full flex flex-col"
         style={{ boxShadow: '0px 2px 10px  rgba(76, 141, 235, 0.1)' }}
       >
-        <HStack className="justify-between">
+        <HStack className="justify-between h-12 pr-4">
           <Box className="flex flex-1">
             <Box className="text-[20px] font-bold text-[#405169] mb-3">知识库列表</Box>
           </Box>
@@ -101,45 +101,47 @@ export default function Datasets() {
             />
           </Box>
         </HStack>
-        {isLoading ? (
-          <Center className="h-full">
-            <Spinner />
-          </Center>
-        ) : data.length === 0 ? (
-          <Center className="h-[400px]">
-            <Box className="flex flex-col">
-              <Icons type="empty" />
-              <span className="w-full text-center mt-4 text-[#c5cae9]">暂无数据</span>
-            </Box>
-          </Center>
-        ) : (
-          <table className="w-full rounded-lg">
-            <thead className="text-lg h-10">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <th key={header.id} align="left" className="pl-2 text-[#132047] font-bold">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody className="text-md">
-              {table.getRowModel().rows.map((row) => (
-                <tr key={row.id} className="hover:drop-shadow-lg">
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="pl-2 h-12 font-medium">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+        <Box className="overflow-auto h-full flex-1 pr-4">
+          {isLoading ? (
+            <Center className="h-full">
+              <Spinner />
+            </Center>
+          ) : data.length === 0 ? (
+            <Center className="h-[400px]">
+              <Box className="flex flex-col">
+                <Icons type="empty" />
+                <span className="w-full text-center mt-4 text-[#c5cae9]">暂无数据</span>
+              </Box>
+            </Center>
+          ) : (
+            <table className="w-full rounded-lg">
+              <thead className="text-lg h-10">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th key={header.id} align="left" className="pl-2 text-[#132047] font-bold">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody className="text-md">
+                {table.getRowModel().rows.map((row) => (
+                  <tr key={row.id} className="hover:drop-shadow-lg">
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id} className="pl-2 h-12 font-medium">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </Box>
       </Box>
     </div>
   );

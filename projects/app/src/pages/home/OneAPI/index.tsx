@@ -1,11 +1,12 @@
 import { Box } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
+import { TMenu } from '../[pageId]';
 
-export default function OneAPI({ menuList }: any) {
+export default function OneAPI({ menuList }: { menuList: TMenu[] }) {
   const [oneAPIUrl, setOneAPIUrl] = useState('');
 
   useEffect(() => {
-    const oneAPIItem = menuList.find((item: any) => item.pageId === 'oneAPI');
+    const oneAPIItem = menuList.find((item: TMenu) => item.pageId === 'oneAPI');
     if (oneAPIItem && oneAPIItem.oneAPIUrl) {
       const processedUrl = new URL(oneAPIItem.oneAPIUrl);
       const baseUrl = `${processedUrl.protocol}//${processedUrl.hostname}`;

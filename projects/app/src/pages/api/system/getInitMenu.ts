@@ -10,8 +10,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     const config = JSON.parse(fileContent);
     res.status(200).json(config);
-  } catch (error) {
-    console.error('Failed to read menuConfig file:', error);
-    res.status(500).json({ error: 'Failed to get init config' });
+  } catch (err) {
+    console.error('Failed to read menuConfig file:', err);
+    if (err === 'unAuthorization') {
+      res.status(403).json({ error: 'unAuthorization' });
+    } else {
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
   }
 }

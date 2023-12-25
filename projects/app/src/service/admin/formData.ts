@@ -4,6 +4,15 @@ import CustomJSONEditor from '../../pages/home/Settings/Customization/CustomJSON
 export const uiSchema = {
   fastgpt: {
     FeConfig: {
+      systemTitle: {
+        'ui:emptyValue': ''
+      },
+      api_doc_url: {
+        'ui:emptyValue': ''
+      },
+      other_doc_url: {
+        'ui:emptyValue': ''
+      },
       images: {
         favicon: {
           'ui:widget': CustomImage
@@ -15,31 +24,118 @@ export const uiSchema = {
     },
     models: {
       ChatModels: {
-        'ui:widget': CustomJSONEditor
+        'ui:widget': CustomJSONEditor,
+        'ui:emptyValue': `[\n\n]`
       },
       QAModels: {
-        'ui:widget': CustomJSONEditor
+        'ui:widget': CustomJSONEditor,
+        'ui:emptyValue': `[\n\n]`
       },
       CQModels: {
-        'ui:widget': CustomJSONEditor
+        'ui:widget': CustomJSONEditor,
+        'ui:emptyValue': `[\n\n]`
       },
       ExtractModels: {
-        'ui:widget': CustomJSONEditor
+        'ui:widget': CustomJSONEditor,
+        'ui:emptyValue': `[\n\n]`
       },
       QGModels: {
-        'ui:widget': CustomJSONEditor
+        'ui:widget': CustomJSONEditor,
+        'ui:emptyValue': `[\n\n]`
       },
       VectorModels: {
-        'ui:widget': CustomJSONEditor
+        'ui:widget': CustomJSONEditor,
+        'ui:emptyValue': `[\n\n]`
       },
       ReRankModels: {
-        'ui:widget': CustomJSONEditor
+        'ui:widget': CustomJSONEditor,
+        'ui:emptyValue': `[\n\n]`
       },
       AudioSpeechModels: {
-        'ui:widget': CustomJSONEditor
+        'ui:widget': CustomJSONEditor,
+        'ui:emptyValue': `[\n\n]`
       },
       WhisperModel: {
-        'ui:widget': CustomJSONEditor
+        'ui:widget': CustomJSONEditor,
+        'ui:emptyValue': `[\n\n]`
+      }
+    }
+  },
+  fastgptPro: {
+    license: {
+      'ui:emptyValue': ''
+    },
+    auth: {
+      email: {
+        service: {
+          'ui:emptyValue': ''
+        },
+        user: {
+          'ui:emptyValue': ''
+        },
+        pass: {
+          'ui:emptyValue': ''
+        }
+      },
+      phone: {
+        SNED_PHONE_ACCESSKEYID: {
+          'ui:emptyValue': ''
+        },
+        SNED_PHONE_ACCESSSECRET: {
+          'ui:emptyValue': ''
+        },
+        SNED_PHONE_SIGNNAME: {
+          'ui:emptyValue': ''
+        },
+        SNED_PHONE_TEMPLATE: {
+          'ui:emptyValue': ''
+        }
+      },
+      github: {
+        clientId: {
+          'ui:emptyValue': ''
+        },
+        secret: {
+          'ui:emptyValue': ''
+        }
+      },
+      google: {
+        clientId: {
+          'ui:emptyValue': ''
+        },
+        secret: {
+          'ui:emptyValue': ''
+        }
+      }
+    },
+    pay: {
+      wx: {
+        WX_APPID: {
+          'ui:emptyValue': ''
+        },
+        WX_MCHID: {
+          'ui:emptyValue': ''
+        },
+        WX_V3_CODE: {
+          'ui:emptyValue': ''
+        },
+        WX_NOTIFY_URL: {
+          'ui:emptyValue': ''
+        },
+        WX_SERIAL_NO: {
+          'ui:emptyValue': ''
+        },
+        WX_PRIVATE_KEY: {
+          'ui:emptyValue': ''
+        }
+      }
+    },
+    censor: {
+      BAIDU_TEXT_CENSOR_CLIENTID: {
+        'ui:emptyValue': ''
+      },
+      BAIDU_TEXT_CENSOR_CLIENTSECRET: {
+        'ui:emptyValue': ''
       }
     }
   }
@@ -61,7 +157,7 @@ export const defaultConfig = {
       },
       api_doc_url: '',
       other_doc_url: '',
-      exportLimitMinutes: ''
+      exportLimitMinutes: 0
     },
     models: {
       ChatModels: `[\n\n]`,
