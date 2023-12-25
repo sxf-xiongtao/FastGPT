@@ -40,7 +40,13 @@
               "description": "文档地址以 / 为结尾"
             },
             "chatbotUrl": {"type": "string", "title": "聊天机器人地址"},
-            "exportLimitMinutes": { "type": "number", "title": "导出间隔时长" }
+            "limit": {
+              "type":"object",
+              "title": " ",
+              "properties":{
+                "exportLimitMinutes": { "type": "number", "title": "导出间隔时长" }
+              }
+            }
           }
         },
         "models": {

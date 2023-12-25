@@ -4,7 +4,6 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { isValidObjectIdString } from '../users/getUsers';
 import { TeamSchema as TeamType } from '@fastgpt/global/support/user/team/type';
 import { formatPrice } from '@fastgpt/global/support/wallet/bill/tools';
 
@@ -17,9 +16,24 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
     const end = parseInt(req.query._end as string) || 20;
     const search = (req.query.search as string) || '';
 
-    const where = {
+    let where: any = {
       name: new RegExp(search, 'i')
     };
+
+    if (search !== '') {
+      const usersRaw = await MongoUser.find(
+        {
+          username: new RegExp(search, 'i')
+        },
+        '_id'
+      );
+
+      const userIds = usersRaw.map((user) => user._id);
+
+      where = {
+        $or: [{ name: new RegExp(search, 'i') }, { ownerId: { $in: userIds } }]
+      };
+    }
 
     const teamsRaw: TeamType[] = await MongoTeam.find(where)
       .skip(start)
@@ -47,7 +61,7 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
 
     jsonRes(res, {
       data: {
-        teams,
+        teams: teams,
         total: totalCount
       }
     });
