@@ -25,7 +25,7 @@ import { formatDate } from '@/utils/tools';
 
 type APP = {
   id: string;
-  ownerId: string;
+  ownerName: string;
   name: string;
   balance: number;
   maxSize: number;
@@ -40,13 +40,13 @@ const columns = [
     header: () => 'id',
     cell: (info) => info.getValue()
   }),
-  columnHelper.accessor('ownerId', {
-    header: () => '用户 id',
-    cell: (info) => info.getValue()
-  }),
   columnHelper.accessor('name', {
     header: () => '团队名',
     cell: (info) => info.renderValue()
+  }),
+  columnHelper.accessor('ownerName', {
+    header: () => '用户名',
+    cell: (info) => info.getValue()
   }),
   columnHelper.accessor('balance', {
     header: () => '余额',
@@ -131,7 +131,7 @@ export default function Teams() {
                     }
                   }}
                   className="!w-[240px]"
-                  placeholder="输入团队名或用户 id，回车搜索"
+                  placeholder="输入团队名，回车搜索"
                 ></Input>
               </InputGroup>
             </Box>

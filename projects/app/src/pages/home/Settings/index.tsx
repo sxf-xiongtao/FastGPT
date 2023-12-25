@@ -131,24 +131,24 @@ export const Settings = () => {
     }
   };
 
-  const handleScroll = throttle(() => {
-    titles.forEach((title) => {
-      const element = document.getElementById(title);
-      if (!element) return;
-      const rect = element.getBoundingClientRect();
-      if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
-        setActiveTitle(title);
-        return;
-      }
-    });
-  }, 100);
+  // const handleScroll = throttle(() => {
+  //   titles.forEach((title) => {
+  //     const element = document.getElementById(title);
+  //     if (!element) return;
+  //     const rect = element.getBoundingClientRect();
+  //     if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
+  //       setActiveTitle(title);
+  //       return;
+  //     }
+  //   });
+  // }, 100);
 
   return (
     <div className="w-[90%] m-auto flex space-x-4 h-full pb-4">
       <Box
         className="bg-white mt-8 px-6 py-4 w-3/4 overflow-y-auto"
         style={{ boxShadow: '0px 2px 10px rgba(76, 141, 235, 0.1)' }}
-        onScroll={handleScroll}
+        // onScroll={handleScroll}
       >
         {isSchemaLoading || isLoading ? (
           <Center className="h-full text-gray-500">

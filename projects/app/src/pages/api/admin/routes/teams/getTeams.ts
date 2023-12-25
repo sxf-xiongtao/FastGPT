@@ -17,16 +17,9 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
     const end = parseInt(req.query._end as string) || 20;
     const search = (req.query.search as string) || '';
 
-    let where = {};
-    if (search && isValidObjectIdString(search)) {
-      where = {
-        $or: [{ ownerId: Object(search) }, { name: new RegExp(search, 'i') }]
-      };
-    } else if (search) {
-      where = {
-        name: new RegExp(search, 'i')
-      };
-    }
+    const where = {
+      name: new RegExp(search, 'i')
+    };
 
     const teamsRaw: TeamType[] = await MongoTeam.find(where)
       .skip(start)
@@ -40,12 +33,12 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
 
         return {
           id: team._id,
-          ownerId: team.ownerId,
           name: team.name,
           balance: formatPrice(team.balance),
           maxSize: team.maxSize,
           createTime: team.createTime,
-          owner: owner
+          owner: owner,
+          ownerName: owner[0].username
         };
       })
     );

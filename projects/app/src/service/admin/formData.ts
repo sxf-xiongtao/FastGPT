@@ -174,12 +174,12 @@ export const defaultConfig = {
   fastgptPro: {
     license: '',
     system: {
-      userDefaultBalance: 0,
-      teamDefaultMaxMember: 0
+      userDefaultBalance: 2,
+      teamDefaultMaxMember: 100
     },
     auth: {
       email: {
-        service: '',
+        service: 'qq',
         user: '',
         pass: ''
       },
