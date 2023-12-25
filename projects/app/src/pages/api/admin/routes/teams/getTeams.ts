@@ -6,11 +6,7 @@ import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { isValidObjectIdString } from '../users/getUsers';
 import { TeamSchema as TeamType } from '@fastgpt/global/support/user/team/type';
-import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
-
-export const formatPrice = (val = 0, multiple = 1) => {
-  return Number(((val / PRICE_SCALE) * multiple).toFixed(10));
-};
+import { formatPrice } from '@fastgpt/global/support/wallet/bill/tools';
 
 export default async function getTeams(req: NextApiRequest, res: NextApiResponse) {
   try {
