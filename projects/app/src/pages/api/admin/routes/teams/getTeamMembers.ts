@@ -1,13 +1,12 @@
 import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { TeamMemberItemType } from '@fastgpt/global/support/user/team/type';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
-
-export const PRICE_SCALE = 100000;
 
 export const formatPrice = (val = 0, multiple = 1) => {
   return Number(((val / PRICE_SCALE) * multiple).toFixed(10));

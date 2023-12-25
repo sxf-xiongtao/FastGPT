@@ -1,12 +1,12 @@
 import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { createHashPassword } from '@/utils/tools';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { PRICE_SCALE } from './getUsers';
 
 export default async function addUser(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -15,10 +15,7 @@ export default async function addUser(req: NextApiRequest, res: NextApiResponse)
 
     const { username, password } = req.body;
     if (!username || !password) {
-      jsonRes(res, {
-        code: 400,
-        error: '缺少字段'
-      });
+      throw new Error('缺少字段');
     }
 
     const existingUser = await MongoUser.findOne({ username });
@@ -28,10 +25,7 @@ export default async function addUser(req: NextApiRequest, res: NextApiResponse)
       const tmb = await MongoTeamMember.findOne({ userId: existingUser._id });
 
       if (tmb) {
-        jsonRes(res, {
-          code: 400,
-          error: '用户已存在'
-        });
+        throw new Error('用户已存在');
       }
     }
 

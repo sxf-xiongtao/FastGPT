@@ -3,9 +3,8 @@ import { adminCert } from '@/service/support/permission/adminCert';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { MongoPay } from '@/service/support/wallet/pay/schema';
-import { PRICE_SCALE } from '../users/getUsers';
-import dayjs from 'dayjs';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 
 export default async function getPays(req: NextApiRequest, res: NextApiResponse) {
   try {

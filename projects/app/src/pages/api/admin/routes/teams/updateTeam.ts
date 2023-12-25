@@ -3,7 +3,8 @@ import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
-import { PRICE_SCALE, formatPrice } from './getTeams';
+import { formatPrice } from './getTeams';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 
 export default async function updateTeam(req: NextApiRequest, res: NextApiResponse) {
   try {

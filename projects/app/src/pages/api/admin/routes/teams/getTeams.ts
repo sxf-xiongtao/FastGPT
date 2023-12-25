@@ -3,12 +3,10 @@ import { adminCert } from '@/service/support/permission/adminCert';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
-import dayjs from 'dayjs';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { isValidObjectIdString } from '../users/getUsers';
 import { TeamSchema as TeamType } from '@fastgpt/global/support/user/team/type';
-
-export const PRICE_SCALE = 100000;
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 
 export const formatPrice = (val = 0, multiple = 1) => {
   return Number(((val / PRICE_SCALE) * multiple).toFixed(10));

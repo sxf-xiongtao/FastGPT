@@ -13,6 +13,7 @@ import {
 } from 'recharts';
 import Icons from '@/components/Icons';
 import { GET } from '@/service/common/request';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 
 type fetchChatData = {
   count: number;
@@ -36,8 +37,6 @@ type TNumbers = {
   datasetsCount: number;
   usersCount: number;
 };
-
-const PRICE_SCALE = 100000;
 
 export default function DashBoard() {
   const [chartData, setChartData] = useState<chatDataType[]>([]);
