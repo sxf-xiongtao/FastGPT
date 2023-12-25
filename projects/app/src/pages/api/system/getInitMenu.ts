@@ -1,11 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
 import path from 'path';
-import { adminCert } from '@/service/support/permission/adminCert';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    await adminCert({ req, authToken: true });
     const filename =
       process.env.NODE_ENV === 'development' ? 'data/menuConfig.json' : '/menuConfig.json';
     const filePath = path.join(process.cwd(), filename);
