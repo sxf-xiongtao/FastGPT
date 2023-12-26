@@ -3,69 +3,93 @@ import CustomJSONEditor from '../../pages/home/Settings/Customization/CustomJSON
 
 export const uiSchema = {
   fastgpt: {
-    FeConfig: {
+    feConfigs: {
       systemTitle: {
         'ui:emptyValue': ''
       },
-      api_doc_url: {
+      openAPIDocUrl: {
         'ui:emptyValue': ''
       },
-      other_doc_url: {
+      docUrl: {
+        'ui:emptyValue': ''
+      },
+      chatbotUrl: {
+        'ui:emptyValue': ''
+      },
+      concatMd: {
         'ui:emptyValue': ''
       },
       images: {
         favicon: {
           'ui:widget': CustomImage
-        },
-        avatar: {
-          'ui:widget': CustomImage
+        }
+      },
+      limit: {
+        exportLimitMinutes: {
+          'ui:emptyValue': 0
         }
       }
     },
     models: {
-      ChatModels: {
+      chatModels: {
         'ui:widget': CustomJSONEditor,
-        'ui:emptyValue': `[\n\n]`
+        'ui:emptyValue': ``
       },
-      QAModels: {
+      qaModels: {
         'ui:widget': CustomJSONEditor,
-        'ui:emptyValue': `[\n\n]`
+        'ui:emptyValue': ``
       },
-      CQModels: {
+      cqModels: {
         'ui:widget': CustomJSONEditor,
-        'ui:emptyValue': `[\n\n]`
+        'ui:emptyValue': ``
       },
-      ExtractModels: {
+      extractModels: {
         'ui:widget': CustomJSONEditor,
-        'ui:emptyValue': `[\n\n]`
+        'ui:emptyValue': ``
       },
-      QGModels: {
+      qgModels: {
         'ui:widget': CustomJSONEditor,
-        'ui:emptyValue': `[\n\n]`
+        'ui:emptyValue': ``
       },
-      VectorModels: {
+      vectorModels: {
         'ui:widget': CustomJSONEditor,
-        'ui:emptyValue': `[\n\n]`
+        'ui:emptyValue': ``
       },
-      ReRankModels: {
+      reRankModels: {
         'ui:widget': CustomJSONEditor,
-        'ui:emptyValue': `[\n\n]`
+        'ui:emptyValue': ``
       },
-      AudioSpeechModels: {
+      audioSpeechModels: {
         'ui:widget': CustomJSONEditor,
-        'ui:emptyValue': `[\n\n]`
+        'ui:emptyValue': ``
       },
-      WhisperModel: {
+      whisperModel: {
         'ui:widget': CustomJSONEditor,
-        'ui:emptyValue': `[\n\n]`
+        'ui:emptyValue': ``
       }
     }
   },
   fastgptPro: {
-    license: {
-      'ui:emptyValue': ''
+    system: {
+      fastgpt_domain: {
+        'ui:emptyValue': ''
+      },
+      userDefaultBalance: {
+        'ui:emptyValue': 0
+      },
+      teamDefaultMaxMember: {
+        'ui:emptyValue': 1
+      }
     },
     auth: {
+      googleV3Ver: {
+        clientKey: {
+          'ui:emptyValue': ''
+        },
+        serviceKey: {
+          'ui:emptyValue': ''
+        }
+      },
       email: {
         service: {
           'ui:emptyValue': ''
@@ -137,82 +161,6 @@ export const uiSchema = {
       BAIDU_TEXT_CENSOR_CLIENTSECRET: {
         'ui:emptyValue': ''
       }
-    }
-  }
-};
-
-export const defaultConfig = {
-  fastgpt: {
-    FeConfig: {
-      switches: {
-        show_register: true,
-        show_git: false,
-        show_openai_account: false,
-        show_promotion: false
-      },
-      systemTitle: '',
-      images: {
-        favicon: '',
-        avatar: ''
-      },
-      api_doc_url: '',
-      other_doc_url: '',
-      limit: {
-        exportLimitMinutes: 0
-      }
-    },
-    models: {
-      ChatModels: `[\n\n]`,
-      QAModels: `[\n\n]`,
-      CQModels: `[\n\n]`,
-      ExtractModels: `[\n\n]`,
-      QGModels: `[\n\n]`,
-      VectorModels: `[\n\n]`,
-      ReRankModels: `[\n\n]`,
-      AudioSpeechModels: `[\n\n]`,
-      WhisperModel: `[\n\n]`
-    }
-  },
-  fastgptPro: {
-    license: '',
-    system: {
-      userDefaultBalance: 2,
-      teamDefaultMaxMember: 100
-    },
-    auth: {
-      email: {
-        service: 'qq',
-        user: '',
-        pass: ''
-      },
-      phone: {
-        SNED_PHONE_ACCESSKEYID: '',
-        SNED_PHONE_ACCESSSECRET: '',
-        SNED_PHONE_SIGNNAME: '',
-        SNED_PHONE_TEMPLATE: ''
-      },
-      github: {
-        clientId: '',
-        secret: ''
-      },
-      google: {
-        clientId: '',
-        secret: ''
-      }
-    },
-    pay: {
-      wx: {
-        WX_APPID: '',
-        WX_MCHID: '',
-        WX_V3_CODE: '',
-        WX_NOTIFY_URL: '',
-        WX_SERIAL_NO: '',
-        WX_PRIVATE_KEY: ''
-      }
-    },
-    censor: {
-      BAIDU_TEXT_CENSOR_CLIENTID: '',
-      BAIDU_TEXT_CENSOR_CLIENTSECRET: ''
     }
   }
 };

@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { LicenseDataType } from '@/types';
+import { readFileSync } from 'fs';
 
 export const LICENSE_PUBLIC_KEY = `-----BEGIN PRIVATE KEY-----
 MIIJRAIBADANBgkqhkiG9w0BAQEFAASCCS4wggkqAgEAAoICAQCr52U/PTCo1vrn
@@ -57,7 +58,11 @@ SN2dSdtwlojkOB6cVqpn8vvziPL0ERVD
 
 export async function authLicense() {
   try {
-    const license = global.systemConfig.license;
+    const filename =
+      process.env.NODE_ENV === 'development' ? 'data/config.local.json' : '/app/data/config.json';
+    const res = JSON.parse(readFileSync(filename, 'utf-8'));
+
+    const license = res.license || '';
     const buffer = Buffer.from(license, 'base64');
     const decrypted = crypto.privateDecrypt(
       {

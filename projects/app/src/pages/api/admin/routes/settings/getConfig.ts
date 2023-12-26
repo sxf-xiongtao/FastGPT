@@ -3,29 +3,38 @@ import { connectToDatabase } from '@/service/mongo';
 import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { jsonRes } from '@fastgpt/service/common/response';
+import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
 
 export default async function getConfig(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
     await adminCert({ req, authToken: true });
-    const latestConfigs = await MongoSystemConfigs.aggregate([
-      {
-        $sort: { createTime: -1 }
-      },
-      {
-        $group: {
-          _id: '$type',
-          latestConfig: { $first: '$$ROOT' }
-        }
-      },
-      {
-        $replaceRoot: { newRoot: '$latestConfig' }
-      }
+    let [fastgptConfig, fastgptProConfig] = await Promise.all([
+      MongoSystemConfigs.findOne({
+        type: SystemConfigsTypeEnum.fastgpt
+      })
+        .sort({
+          createTime: -1
+        })
+        .lean(),
+      MongoSystemConfigs.findOne({
+        type: SystemConfigsTypeEnum.fastgptPro
+      })
+        .sort({
+          createTime: -1
+        })
+        .lean()
     ]);
+
+    const formatFastgptProConfig = fastgptProConfig?.value || global.systemConfig;
 
     jsonRes(res, {
       data: {
-        latestConfigs
+        [SystemConfigsTypeEnum.fastgpt]: fastgptConfig?.value,
+        [SystemConfigsTypeEnum.fastgptPro]: {
+          ...formatFastgptProConfig,
+          license: undefined
+        }
       }
     });
   } catch (err) {

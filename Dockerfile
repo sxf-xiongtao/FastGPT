@@ -82,6 +82,7 @@ COPY --from=workerDeps /app/worker /app/worker
 # copy config
 COPY ./projects/$name/data/formConfig.json /app/data/formConfig.json
 COPY ./projects/$name/data/menuconfig.json /app/data/menuconfig.json
+COPY ./projects/$name/data/config.json /app/data/config.json
 
 
 ENV NODE_ENV production
