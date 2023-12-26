@@ -10,10 +10,10 @@ export async function connectToDatabase(): Promise<void> {
   await connectMongo({
     beforeHook: () => {
       initGlobal();
-      initService();
     },
     afterHook: async () => {
       try {
+        await initService();
         await authLicense();
         initDatasetStatus();
       } catch (error) {

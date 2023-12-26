@@ -3,7 +3,7 @@
   "system": {
     "title": "",
     "userDefaultBalance": 2,
-    "teamDefaultMaxMember": 100
+    "teamDefaultMaxMember": 10
   },
   "censor": {
     "BAIDU_TEXT_CENSOR_CLIENTID": "",
@@ -41,9 +41,5 @@
       "WX_PRIVATE_KEY": ""
     }
   },
-  "fastLogin": {
-    "test": {
-      "authUrl": "https://d8dns0.laf.dev/baoxiao"
-    }
-  }
+  "fastLogin": {}
 }
