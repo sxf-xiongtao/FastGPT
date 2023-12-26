@@ -166,6 +166,7 @@ export const Settings = () => {
               DescriptionFieldTemplate,
               TitleFieldTemplate
             }}
+            onChange={({ formData }) => setFormData(formData)}
           >
             <Button ref={submitButtonRef} type="submit" className="!hidden"></Button>
           </Form>

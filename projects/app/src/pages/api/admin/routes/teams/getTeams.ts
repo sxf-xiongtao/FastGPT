@@ -4,13 +4,8 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { isValidObjectIdString } from '../users/getUsers';
 import { TeamSchema as TeamType } from '@fastgpt/global/support/user/team/type';
-import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
-
-export const formatPrice = (val = 0, multiple = 1) => {
-  return Number(((val / PRICE_SCALE) * multiple).toFixed(10));
-};
+import { formatPrice } from '@fastgpt/global/support/wallet/bill/tools';
 
 export default async function getTeams(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -21,14 +16,22 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
     const end = parseInt(req.query._end as string) || 20;
     const search = (req.query.search as string) || '';
 
-    let where = {};
-    if (search && isValidObjectIdString(search)) {
+    let where: any = {
+      name: new RegExp(search, 'i')
+    };
+
+    if (search !== '') {
+      const usersRaw = await MongoUser.find(
+        {
+          username: new RegExp(search, 'i')
+        },
+        '_id'
+      );
+
+      const userIds = usersRaw.map((user) => user._id);
+
       where = {
-        $or: [{ ownerId: Object(search) }, { name: new RegExp(search, 'i') }]
-      };
-    } else if (search) {
-      where = {
-        name: new RegExp(search, 'i')
+        $or: [{ name: new RegExp(search, 'i') }, { ownerId: { $in: userIds } }]
       };
     }
 
@@ -44,12 +47,12 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
 
         return {
           id: team._id,
-          ownerId: team.ownerId,
           name: team.name,
           balance: formatPrice(team.balance),
           maxSize: team.maxSize,
           createTime: team.createTime,
-          owner: owner
+          owner: owner,
+          ownerName: owner[0].username
         };
       })
     );
@@ -58,7 +61,7 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
 
     jsonRes(res, {
       data: {
-        teams,
+        teams: teams,
         total: totalCount
       }
     });

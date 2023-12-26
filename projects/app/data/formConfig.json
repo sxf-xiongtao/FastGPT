@@ -13,8 +13,10 @@
               "type": "object",
               "title": "",
               "properties": {
+                "show_emptyChat": { "type": "boolean", "title": "展示聊天空白页"},
                 "show_register": { "type": "boolean", "title": "展示注册" },
                 "show_git": { "type": "boolean", "title": "展示 github 图标" },
+                "show_pay": { "type": "boolean", "title": "展示支付"},
                 "show_openai_account": {
                   "type": "boolean",
                   "title": "展示用户可填自己的 openapi 账号"
@@ -31,13 +33,20 @@
                 "avatar": { "type": "string", "title": "用户默认头像" }
               }
             },
-            "api_doc_url": { "type": "string", "title": "api 文档地址" },
-            "other_doc_url": {
+            "openAPIDocUrl": { "type": "string", "title": "api 文档地址", "description": "文档地址以 / 为结尾" },
+            "docUrl": {
               "type": "string",
-              "title": "其他文档地址",
+              "title": "文档地址",
               "description": "文档地址以 / 为结尾"
             },
-            "exportLimitMinutes": { "type": "number", "title": "导出间隔时长" }
+            "chatbotUrl": {"type": "string", "title": "聊天机器人地址"},
+            "limit": {
+              "type":"object",
+              "title": " ",
+              "properties":{
+                "exportLimitMinutes": { "type": "number", "title": "导出间隔时长" }
+              }
+            }
           }
         },
         "models": {
@@ -57,9 +66,8 @@
       }
     },
     "fastgptPro": {
-      "title": "License",
+      "title": "",
       "properties": {
-        "license": { "type": "string", "title": "License", "description": "请填写您的 License" },
         "system": {
           "type": "object",
           "title": "关键系统配置",
@@ -185,6 +193,13 @@
               "description": "![](https://oss.laf.dev/lk63dw-fastgpt/baidu_censor.png)\nhttps://console.bce.baidu.com/ai/?_=1693133074333#/ai/antiporn/overview/index 注册百度安全校验账号，并创建对应应用。提供应用的 id 和 secret"
             },
             "BAIDU_TEXT_CENSOR_CLIENTSECRET": { "type": "string", "title": "百度安全 secret" }
+          }
+        },
+        "fastgpt_domain": {
+          "type": "object",
+          "title": "主站域名",
+          "properties": {
+            "fastgpt_domain": {"type":"string", "title":" "}
           }
         }
       }
