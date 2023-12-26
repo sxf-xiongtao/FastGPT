@@ -1,7 +1,7 @@
 import { WidgetProps } from '@rjsf/utils';
 import Editor from '@monaco-editor/react';
 
-const CustomImage: React.FC<WidgetProps> = (props) => {
+const CustomJSONEditor: React.FC<WidgetProps> = (props) => {
   const options = {
     lineNumbers: 'off',
     guides: {
@@ -54,4 +54,4 @@ const CustomImage: React.FC<WidgetProps> = (props) => {
   );
 };
 
-export default CustomImage;
+export default CustomJSONEditor;

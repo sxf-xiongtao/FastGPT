@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
 import path from 'path';
 import { adminCert } from '@/service/support/permission/adminCert';
+import { jsonRes } from '@fastgpt/service/common/response';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -11,9 +12,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const filePath = path.join(process.cwd(), filename);
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     const config = JSON.parse(fileContent);
-    res.status(200).json(config);
+    jsonRes(res, { data: config });
   } catch (error) {
     console.error('Failed to read config file:', error);
-    res.status(500).json({ error: 'Failed to get init config' });
+    jsonRes(res, { code: 500, message: 'Failed to read config file' });
   }
 }

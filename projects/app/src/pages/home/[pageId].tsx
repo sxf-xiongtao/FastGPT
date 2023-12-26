@@ -9,8 +9,9 @@ import Pays from './Pays';
 import Datasets from './Datasets';
 import Teams from './Teams';
 import OneAPI from './OneAPI';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { getInitMenuConfig } from './api';
+import { useQuery } from '@tanstack/react-query';
 
 export async function getStaticPaths() {
   const paths = getAllPageIds();
@@ -37,23 +38,13 @@ export type TMenu = {
 const Home = ({ pageData }: any) => {
   const [menuList, setMenuList] = useState<Array<TMenu>>([]);
   const [menuListData, setMenuListData] = useState<Array<string>>([]);
-  const router = useRouter();
 
-  const fetchInitMenuConfig = async () => {
-    const response = await fetch('/api/admin/common/system/getInitMenu');
-    if (response.status === 403) {
-      router.push('/login');
-      return;
+  useQuery(['getInitMenuConfig'], () => getInitMenuConfig(), {
+    onSuccess: (data: { menuList: [] }) => {
+      setMenuList(data?.menuList);
+      setMenuListData(data?.menuList.map((item: TMenu) => item.pageId));
     }
-    const menuConfig = await response.json();
-    setMenuList(menuConfig.menuList);
-    setMenuListData(menuConfig.menuList.map((item: TMenu) => item.pageId));
-  };
-
-  useEffect(() => {
-    fetchInitMenuConfig();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   return (
     <div className="bg-white h-screen flex">

@@ -131,7 +131,7 @@ export default function Teams() {
                     }
                   }}
                   className="!w-[240px]"
-                  placeholder="输入团队名，回车搜索"
+                  placeholder="输入团队名或用户名，回车搜索"
                 ></Input>
               </InputGroup>
             </Box>

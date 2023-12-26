@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import validator from '@rjsf/validator-ajv8';
 import Form from '@rjsf/core';
 import { Box, Button, Center, Spinner, useToast } from '@chakra-ui/react';
@@ -11,6 +11,8 @@ import { extractThirdLevelTitles } from '@/utils/web/extractTitles';
 import { throttle } from '@/utils/tools';
 import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';
 import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
+import { useQuery } from '@tanstack/react-query';
+import { getInitFormConfig, getInitFormData } from './api';
 
 const widgets = {
   CheckboxWidget: CustomCheckbox
@@ -26,17 +28,12 @@ export const Settings = () => {
   const toast = useToast();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
-  const fetchConfig = async () => {
-    try {
-      const data = await GET<ConfigStoreType>('/admin/routes/settings/getConfig');
-
+  useQuery(['getInitFormData'], () => getInitFormData(), {
+    onSuccess: (data: ConfigStoreType) => {
       const aggregatedConfigs: ConfigFormType = formatConfigStore2FormSchema(data);
-      console.log(aggregatedConfigs);
-
       setFormData(aggregatedConfigs);
-    } catch (error) {
-      console.log(error);
-
+    },
+    onError: () => {
       toast({
         title: '获取配置出错',
         status: 'error',
@@ -45,16 +42,15 @@ export const Settings = () => {
         position: 'top'
       });
     }
-  };
+  });
 
-  const fetchInitFormConfig = async () => {
-    try {
-      const response = await fetch('/api/admin/common/system/getInitForm');
-      const config = await response.json();
-      setSchemaConfig(config);
-      setTitles(extractThirdLevelTitles(config));
-    } catch (error) {
-      console.log(error);
+  useQuery(['getInitFormConfig'], () => getInitFormConfig(), {
+    onSuccess: (data: ConfigFormType) => {
+      setSchemaConfig(data);
+      setTitles(extractThirdLevelTitles(data));
+      setIsSchemaLoading(false);
+    },
+    onError: () => {
       toast({
         title: '获取初始化配置失败',
         status: 'error',
@@ -62,16 +58,13 @@ export const Settings = () => {
         isClosable: true,
         position: 'top'
       });
-    } finally {
-      setIsSchemaLoading(false);
     }
-  };
+  });
 
   const onSubmit = async ({ formData }: any) => {
     setIsLoading(true);
     try {
       const data = formatFormData2ConfigStore(formData);
-      console.log(data);
 
       await POST('/admin/routes/settings/updateConfig', data);
 
@@ -112,11 +105,6 @@ export const Settings = () => {
       }
     });
   }, 100);
-
-  useEffect(() => {
-    fetchConfig();
-    fetchInitFormConfig();
-  }, []);
 
   return (
     <div className="w-[90%] m-auto flex space-x-4 h-full pb-4">

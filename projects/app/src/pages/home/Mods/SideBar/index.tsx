@@ -18,32 +18,32 @@ export default function SideBar({ menuListData }: { menuListData: string[] }) {
     {
       pageId: 'dashboard',
       name: '仪表盘',
-      icon: <Icons type="dashboard" />
+      icon: <Icons type="homeLine" />
     },
     {
       pageId: 'users',
       name: '用户信息',
-      icon: <Icons type="user" />
+      icon: <Icons type="userLine" />
     },
     {
       pageId: 'teams',
       name: '团队信息',
-      icon: <Icons type="team" />
+      icon: <Icons type="teamLine" />
     },
     {
       pageId: 'pays',
       name: '账单管理',
-      icon: <Icons type="pay" />
+      icon: <Icons type="billLine" />
     },
     {
       pageId: 'apps',
       name: '应用信息',
-      icon: <Icons type="app" />
+      icon: <Icons type="appLine" />
     },
     {
       pageId: 'datasets',
       name: '知识库管理',
-      icon: <Icons type="dataset" />
+      icon: <Icons type="dataLine" />
     },
     {
       pageId: 'oneAPI',

@@ -1,5 +1,6 @@
 import CustomImage from '../../pages/home/Settings/Customization/CustomImage';
 import CustomJSONEditor from '../../pages/home/Settings/Customization/CustomJSONEditor';
+import CustomTextarea from '@/pages/home/Settings/Customization/CustomTextArea';
 
 export const uiSchema = {
   fastgpt: {
@@ -17,7 +18,8 @@ export const uiSchema = {
         'ui:emptyValue': ''
       },
       concatMd: {
-        'ui:emptyValue': ''
+        'ui:emptyValue': '',
+        'ui:widget': CustomTextarea
       },
       images: {
         favicon: {
@@ -150,6 +152,7 @@ export const uiSchema = {
           'ui:emptyValue': ''
         },
         WX_PRIVATE_KEY: {
+          'ui:widget': CustomTextarea,
           'ui:emptyValue': ''
         }
       }

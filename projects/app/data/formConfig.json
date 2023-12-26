@@ -27,7 +27,7 @@
               "type": "object",
               "title": "",
               "properties": {
-                "favicon": { "type": "string", "title": "LOGO" }
+                "favicon": { "type": "string", "title": "favicon" }
               }
             },
             "openAPIDocUrl": {
