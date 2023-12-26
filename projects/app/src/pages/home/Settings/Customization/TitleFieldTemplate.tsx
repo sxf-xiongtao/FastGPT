@@ -2,7 +2,7 @@ import { extractThirdLevelTitles } from '@/utils/web/extractTitles';
 import { Divider } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { getInitFormConfig } from '../api';
+import { getInitFormConfig } from '@/web/core/config/api';
 
 const TitleFieldTemplate: React.FC<any> = (props) => {
   const { title } = props;

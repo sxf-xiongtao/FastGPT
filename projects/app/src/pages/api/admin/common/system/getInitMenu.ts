@@ -6,9 +6,8 @@ import { jsonRes } from '@fastgpt/service/common/response';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const filename =
-      process.env.NODE_ENV === 'development' ? 'data/menuConfig.json' : '/menuConfig.json';
-    const filePath = path.join(process.cwd(), filename);
-    const fileContent = fs.readFileSync(filePath, 'utf-8');
+      process.env.NODE_ENV === 'development' ? 'data/menuConfig.json' : '/app/data/menuConfig.json';
+    const fileContent = fs.readFileSync(filename, 'utf-8');
     const config = JSON.parse(fileContent);
     jsonRes(res, {
       data: config

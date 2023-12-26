@@ -81,7 +81,7 @@ COPY --from=builder /app/projects/$name/package.json ./package.json
 COPY --from=workerDeps /app/worker /app/worker
 # copy config
 COPY ./projects/$name/data/formConfig.json /app/data/formConfig.json
-COPY ./projects/$name/data/menuconfig.json /app/data/menuconfig.json
+COPY ./projects/$name/data/menuConfig.json /app/data/menuConfig.json
 COPY ./projects/$name/data/config.json /app/data/config.json
 
 
