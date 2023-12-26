@@ -23,6 +23,7 @@ export const initProServiceData = async () => {
         };
 
     global.systemConfig = config;
+    console.log(config);
   } catch (error) {
     console.log('init config error', error);
   }

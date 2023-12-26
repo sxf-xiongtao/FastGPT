@@ -13,12 +13,20 @@ export const uiSchema = {
       docUrl: {
         'ui:emptyValue': ''
       },
+      chatbotUrl: {
+        'ui:emptyValue': ''
+      },
+      concatMd: {
+        'ui:emptyValue': ''
+      },
       images: {
         favicon: {
           'ui:widget': CustomImage
-        },
-        avatar: {
-          'ui:widget': CustomImage
+        }
+      },
+      limit: {
+        exportLimitMinutes: {
+          'ui:emptyValue': 0
         }
       }
     },
@@ -62,10 +70,26 @@ export const uiSchema = {
     }
   },
   fastgptPro: {
-    license: {
-      'ui:emptyValue': ''
+    system: {
+      fastgpt_domain: {
+        'ui:emptyValue': ''
+      },
+      userDefaultBalance: {
+        'ui:emptyValue': 0
+      },
+      teamDefaultMaxMember: {
+        'ui:emptyValue': 1
+      }
     },
     auth: {
+      googleV3Ver: {
+        clientKey: {
+          'ui:emptyValue': ''
+        },
+        serviceKey: {
+          'ui:emptyValue': ''
+        }
+      },
       email: {
         service: {
           'ui:emptyValue': ''
