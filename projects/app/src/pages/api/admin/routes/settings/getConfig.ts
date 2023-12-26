@@ -31,10 +31,12 @@ export default async function getConfig(req: NextApiRequest, res: NextApiRespons
     jsonRes(res, {
       data: {
         [SystemConfigsTypeEnum.fastgpt]: fastgptConfig?.value,
-        [SystemConfigsTypeEnum.fastgptPro]: {
-          ...formatFastgptProConfig,
-          license: undefined
-        }
+        [SystemConfigsTypeEnum.fastgptPro]: formatFastgptProConfig
+          ? {
+              ...formatFastgptProConfig,
+              license: undefined
+            }
+          : undefined
       }
     });
   } catch (err) {

@@ -12,7 +12,7 @@ import { throttle } from '@/utils/tools';
 import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';
 import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
 import { useQuery } from '@tanstack/react-query';
-import { getInitFormConfig, getInitFormData } from './api';
+import { getInitFormConfig, getInitFormData } from '@/web/core/config/api';
 
 const widgets = {
   CheckboxWidget: CustomCheckbox
@@ -76,6 +76,8 @@ export const Settings = () => {
         position: 'top'
       });
     } catch (error) {
+      console.log(error);
+
       toast({
         title: '保存配置出错',
         status: 'error',

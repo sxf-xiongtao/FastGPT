@@ -10,7 +10,7 @@ import Datasets from './Datasets';
 import Teams from './Teams';
 import OneAPI from './OneAPI';
 import { useState } from 'react';
-import { getInitMenuConfig } from './api';
+import { getInitMenuConfig } from '@/web/common/system/api';
 import { useQuery } from '@tanstack/react-query';
 
 export async function getStaticPaths() {
