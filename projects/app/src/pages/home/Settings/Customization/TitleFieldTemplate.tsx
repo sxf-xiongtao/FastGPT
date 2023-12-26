@@ -1,24 +1,18 @@
 import { extractThirdLevelTitles } from '@/utils/web/extractTitles';
 import { Divider } from '@chakra-ui/react';
-import { useCallback, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { getInitFormConfig } from '../api';
 
 const TitleFieldTemplate: React.FC<any> = (props) => {
   const { title } = props;
   const [titles, setTitles] = useState<string[]>([]);
 
-  const fetchInitConfig = useCallback(async () => {
-    try {
-      const response = await fetch('/api/admin/common/system/getInitForm');
-      const config = await response.json();
-      setTitles(extractThirdLevelTitles(config));
-    } catch (error) {
-      console.error(error);
+  useQuery(['getInitFormConfig'], () => getInitFormConfig(), {
+    onSuccess: (data) => {
+      setTitles(extractThirdLevelTitles(data));
     }
-  }, []);
-
-  useEffect(() => {
-    fetchInitConfig();
-  }, [fetchInitConfig]);
+  });
 
   return (
     <div id={title}>

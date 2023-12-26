@@ -55,6 +55,9 @@ export default async function updateConfig(req: NextApiRequest, res: NextApiResp
     });
   } catch (err) {
     console.error(`Error in updateConfig: ${err}`);
-    res.status(500).json({ error: 'Internal Server Error' });
+    jsonRes(res, {
+      code: 500,
+      error: err
+    });
   }
 }

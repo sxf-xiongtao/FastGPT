@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
 import path from 'path';
+import { jsonRes } from '@fastgpt/service/common/response';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -9,13 +10,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const filePath = path.join(process.cwd(), filename);
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     const config = JSON.parse(fileContent);
-    res.status(200).json(config);
+    jsonRes(res, {
+      data: config
+    });
   } catch (err) {
     console.error('Failed to read menuConfig file:', err);
-    if (err === 'unAuthorization') {
-      res.status(403).json({ error: 'unAuthorization' });
-    } else {
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
+    jsonRes(res, {
+      code: 500,
+      message: 'Failed to read menuConfig file'
+    });
   }
 }
