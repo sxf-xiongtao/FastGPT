@@ -1,37 +1,37 @@
+import { SystemConfigType } from '@/types';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
 import { delay } from '@fastgpt/global/common/system/utils';
 import { DatasetStatusEnum } from '@fastgpt/global/core/dataset/constant';
 import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
-import { readFileSync } from 'fs';
-import { exit } from 'process';
 
-export const initService = async () => {
-  global.store = {};
+export const initProServiceData = async () => {
   try {
-    const filename =
-      process.env.NODE_ENV === 'development' ? 'data/config.local.json' : '/app/data/config.json';
-    const res = JSON.parse(readFileSync(filename, 'utf-8'));
+    const dbConfig = await MongoSystemConfigs.findOne({
+      type: SystemConfigsTypeEnum.fastgptPro
+    }).sort({
+      createTime: -1
+    });
 
-    const [dbConfig] = await Promise.all([
-      MongoSystemConfigs.findOne({
-        type: SystemConfigsTypeEnum.fastgptPro
-      }).sort({
-        createTime: -1
-      })
-    ]);
-    console.log(res);
+    // concat config
+    const config: SystemConfigType = dbConfig?.value
+      ? (dbConfig?.value as SystemConfigType)
+      : {
+          system: {
+            title: 'FastGPT'
+          }
+        };
 
-    global.systemConfig = res;
+    global.systemConfig = config;
   } catch (error) {
     console.log('init config error', error);
-    exit(1);
   }
 };
 
 export function initGlobal() {
   global.sendInformQueue = [];
   global.sendInformQueueLen = 0;
+  global.store = {};
 }
 
 export async function initDatasetStatus() {

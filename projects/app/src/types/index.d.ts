@@ -12,9 +12,10 @@ export type PagingData<T> = {
 export type RequestPaging = { pageNum: number; pageSize: number; [key]: any };
 
 export type SystemConfigType = {
-  license: string;
+  // license: string;
   system: {
     title: string;
+    fastgpt_domain?: string;
     userDefaultBalance?: number;
     teamDefaultMaxMember?: number;
   };
@@ -70,8 +71,6 @@ export type LicenseDataType = {
 };
 
 declare global {
-  var pgClient: Pool | null;
-
   var systemConfig: SystemConfigType;
   var store: Record<string, any>;
   var licenseData: LicenseDataType;

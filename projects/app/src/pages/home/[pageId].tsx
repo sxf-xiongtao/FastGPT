@@ -40,7 +40,7 @@ const Home = ({ pageData }: any) => {
   const router = useRouter();
 
   const fetchInitMenuConfig = async () => {
-    const response = await fetch('/api/system/getInitMenu');
+    const response = await fetch('/api/admin/common/system/getInitMenu');
     if (response.status === 403) {
       router.push('/login');
       return;

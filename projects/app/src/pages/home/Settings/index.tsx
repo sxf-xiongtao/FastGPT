@@ -5,18 +5,19 @@ import { Box, Button, Center, Spinner, useToast } from '@chakra-ui/react';
 import CustomCheckbox from './Customization/CustomCheckbox';
 import DescriptionFieldTemplate from './Customization/DescriptionFieldTemplate';
 import { GET, POST } from '@/service/common/request';
-import { uiSchema, defaultConfig } from '@/service/admin/formData';
+import { uiSchema } from '@/service/admin/formData';
 import TitleFieldTemplate from './Customization/TitleFieldTemplate';
 import { extractThirdLevelTitles } from '@/utils/web/extractTitles';
 import { throttle } from '@/utils/tools';
-import { deepMerge, mapFeConfig, stripFeConfig, stripModels } from '@/utils/web/merge';
+import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';
+import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
 
 const widgets = {
   CheckboxWidget: CustomCheckbox
 };
 
 export const Settings = () => {
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState<ConfigFormType>();
   const [isLoading, setIsLoading] = useState(false);
   const [schemaConfig, setSchemaConfig] = useState({});
   const [titles, setTitles] = useState<string[]>([]);
@@ -27,34 +28,15 @@ export const Settings = () => {
 
   const fetchConfig = async () => {
     try {
-      const response: Record<string, any> = await GET('/admin/routes/settings/getConfig');
-      const aggregatedConfigs = response.latestConfigs.reduce(
-        (result: Record<string, any>, config: Record<string, any>) => {
-          if (config.type === 'fastgpt') {
-            result[config.type] = {
-              FeConfig: mapFeConfig(config.value.FeConfig),
-              ...stripModels(config.value)
-            };
-          } else if (config.type === 'fastgptPro') {
-            result[config.type] = { ...config.value };
-          }
+      const data = await GET<ConfigStoreType>('/admin/routes/settings/getConfig');
 
-          return result;
-        },
-        {}
-      );
-      if (!response.error) {
-        setFormData(deepMerge(defaultConfig, aggregatedConfigs));
-      } else {
-        toast({
-          title: '获取配置失败',
-          status: 'error',
-          duration: 3000,
-          isClosable: true,
-          position: 'top'
-        });
-      }
+      const aggregatedConfigs: ConfigFormType = formatConfigStore2FormSchema(data);
+      console.log(aggregatedConfigs);
+
+      setFormData(aggregatedConfigs);
     } catch (error) {
+      console.log(error);
+
       toast({
         title: '获取配置出错',
         status: 'error',
@@ -65,9 +47,9 @@ export const Settings = () => {
     }
   };
 
-  const fetchInitConfig = async () => {
+  const fetchInitFormConfig = async () => {
     try {
-      const response = await fetch('/api/system/getInitData');
+      const response = await fetch('/api/admin/common/system/getInitForm');
       const config = await response.json();
       setSchemaConfig(config);
       setTitles(extractThirdLevelTitles(config));
@@ -85,33 +67,21 @@ export const Settings = () => {
     }
   };
 
-  useEffect(() => {
-    fetchConfig();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    fetchInitConfig();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const onSubmit = async ({ formData }: any) => {
     setIsLoading(true);
     try {
-      const response: any = await POST('/admin/routes/settings/updateConfig', {
-        fastgpt: { ...formData.fastgpt.models, ...stripFeConfig(formData.fastgpt) },
-        fastgptPro: formData.fastgptPro
+      const data = formatFormData2ConfigStore(formData);
+      console.log(data);
+
+      await POST('/admin/routes/settings/updateConfig', data);
+
+      toast({
+        title: '配置保存成功',
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+        position: 'top'
       });
-      if (!response.error) {
-        toast({
-          title: '配置保存成功',
-          status: 'success',
-          duration: 2000,
-          isClosable: true,
-          position: 'top'
-        });
-        await fetchConfig();
-      }
     } catch (error) {
       toast({
         title: '保存配置出错',
@@ -143,6 +113,11 @@ export const Settings = () => {
     });
   }, 100);
 
+  useEffect(() => {
+    fetchConfig();
+    fetchInitFormConfig();
+  }, []);
+
   return (
     <div className="w-[90%] m-auto flex space-x-4 h-full pb-4">
       <Box
@@ -150,11 +125,12 @@ export const Settings = () => {
         style={{ boxShadow: '0px 2px 10px rgba(76, 141, 235, 0.1)' }}
         onScroll={handleScroll}
       >
-        {isSchemaLoading || isLoading ? (
+        {(isSchemaLoading || isLoading) && (
           <Center className="h-full text-gray-500">
             <Spinner size={'lg'} />
           </Center>
-        ) : (
+        )}
+        {!!formData && (
           <Form
             schema={schemaConfig}
             onSubmit={onSubmit}

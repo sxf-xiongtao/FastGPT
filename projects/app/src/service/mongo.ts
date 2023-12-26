@@ -1,4 +1,4 @@
-import { initDatasetStatus, initGlobal, initService } from './init';
+import { initDatasetStatus, initGlobal, initProServiceData } from './init';
 import { authLicense } from '@/utils/service/common/license';
 import { exit } from 'process';
 import { connectMongo } from '@fastgpt/service/common/mongo/init';
@@ -13,7 +13,7 @@ export async function connectToDatabase(): Promise<void> {
     },
     afterHook: async () => {
       try {
-        await initService();
+        await initProServiceData();
         await authLicense();
         initDatasetStatus();
       } catch (error) {

@@ -8,7 +8,7 @@ const TitleFieldTemplate: React.FC<any> = (props) => {
 
   const fetchInitConfig = useCallback(async () => {
     try {
-      const response = await fetch('/api/system/getInitData');
+      const response = await fetch('/api/admin/common/system/getInitForm');
       const config = await response.json();
       setTitles(extractThirdLevelTitles(config));
     } catch (error) {

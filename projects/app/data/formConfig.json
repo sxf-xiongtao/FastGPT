@@ -5,18 +5,16 @@
     "fastgpt": {
       "title": "",
       "properties": {
-        "FeConfig": {
+        "feConfigs": {
           "type": "object",
-          "title": "站点展示配置",
+          "title": "前端展示配置",
           "properties": {
             "switches": {
               "type": "object",
               "title": "",
               "properties": {
-                "show_emptyChat": { "type": "boolean", "title": "展示聊天空白页"},
-                "show_register": { "type": "boolean", "title": "展示注册" },
+                "show_emptyChat": { "type": "boolean", "title": "展示聊天空白页" },
                 "show_git": { "type": "boolean", "title": "展示 github 图标" },
-                "show_pay": { "type": "boolean", "title": "展示支付"},
                 "show_openai_account": {
                   "type": "boolean",
                   "title": "展示用户可填自己的 openapi 账号"
@@ -29,38 +27,42 @@
               "type": "object",
               "title": "",
               "properties": {
-                "favicon": { "type": "string", "title": "LOGO" },
-                "avatar": { "type": "string", "title": "用户默认头像" }
+                "favicon": { "type": "string", "title": "LOGO" }
               }
             },
-            "openAPIDocUrl": { "type": "string", "title": "api 文档地址", "description": "文档地址以 / 为结尾" },
+            "openAPIDocUrl": {
+              "type": "string",
+              "title": "api 文档地址",
+              "description": "文档地址以 / 为结尾"
+            },
             "docUrl": {
               "type": "string",
               "title": "文档地址",
               "description": "文档地址以 / 为结尾"
             },
-            "chatbotUrl": {"type": "string", "title": "聊天机器人地址"},
+            "chatbotUrl": { "type": "string", "title": "聊天机器人地址" },
             "limit": {
-              "type":"object",
+              "type": "object",
               "title": " ",
-              "properties":{
-                "exportLimitMinutes": { "type": "number", "title": "导出间隔时长" }
+              "properties": {
+                "exportLimitMinutes": { "type": "number", "title": "导出间隔时长(分钟)" }
               }
-            }
+            },
+            "concatMd": { "type": "string", "title": "联系弹窗Markdown" }
           }
         },
         "models": {
           "title": "模型配置",
           "properties": {
-            "ChatModels": {"type": "string"},
-            "QAModels": {"type": "string"},
-            "CQModels": {"type": "string"},
-            "ExtractModels": {"type": "string"},
-            "QGModels": {"type": "string"},
-            "VectorModels": {"type": "string"},
-            "ReRankModels": {"type": "string"},
-            "AudioSpeechModels": {"type": "string"},
-            "WhisperModel": {"type": "string"}
+            "chatModels": { "type": "string" },
+            "qaModels": { "type": "string" },
+            "cqModels": { "type": "string" },
+            "extractModels": { "type": "string" },
+            "qgModels": { "type": "string" },
+            "vectorModels": { "type": "string" },
+            "reRankModels": { "type": "string" },
+            "audioSpeechModels": { "type": "string" },
+            "whisperModel": { "type": "string" }
           }
         }
       }
@@ -72,6 +74,7 @@
           "type": "object",
           "title": "关键系统配置",
           "properties": {
+            "fastgpt_domain": { "type": "string", "title": "FastGPT主站域名" },
             "userDefaultBalance": { "type": "number", "title": "默认用户余额" },
             "teamDefaultMaxMember": { "type": "number", "title": "默认团队成员上限" }
           }
@@ -80,6 +83,17 @@
           "type": "object",
           "title": "登录配置",
           "properties": {
+            "googleV3Ver": {
+              "type": "object",
+              "title": "谷歌V3安全校验",
+              "properties": {
+                "clientKey": {
+                  "type": "string",
+                  "title": "客户端Key"
+                },
+                "serviceKey": { "type": "string", "title": "服务端Key" }
+              }
+            },
             "email": {
               "type": "object",
               "title": "邮箱配置",
@@ -193,13 +207,6 @@
               "description": "![](https://oss.laf.dev/lk63dw-fastgpt/baidu_censor.png)\nhttps://console.bce.baidu.com/ai/?_=1693133074333#/ai/antiporn/overview/index 注册百度安全校验账号，并创建对应应用。提供应用的 id 和 secret"
             },
             "BAIDU_TEXT_CENSOR_CLIENTSECRET": { "type": "string", "title": "百度安全 secret" }
-          }
-        },
-        "fastgpt_domain": {
-          "type": "object",
-          "title": "主站域名",
-          "properties": {
-            "fastgpt_domain": {"type":"string", "title":" "}
           }
         }
       }

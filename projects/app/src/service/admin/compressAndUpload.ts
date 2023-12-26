@@ -1,7 +1,7 @@
 export const uploadImage = async (imageBase64: string) => {
   try {
     const token = localStorage.getItem('token') || '';
-    const response = await fetch('/api/admin/file/uploadImage', {
+    const response = await fetch('/api/admin/common/file/uploadImage', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
