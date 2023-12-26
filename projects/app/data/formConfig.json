@@ -74,7 +74,7 @@
           "type": "object",
           "title": "关键系统配置",
           "properties": {
-            "fastgpt_domain": { "type": "string", "title": "FastGPT主站域名" },
+            "fastgpt_domain": { "type": "string", "title": "主站域名" },
             "userDefaultBalance": { "type": "number", "title": "默认用户余额" },
             "teamDefaultMaxMember": { "type": "number", "title": "默认团队成员上限" }
           }
