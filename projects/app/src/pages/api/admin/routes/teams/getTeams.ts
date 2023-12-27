@@ -5,7 +5,7 @@ import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { TeamSchema as TeamType } from '@fastgpt/global/support/user/team/type';
-import { formatPriceStore2Read } from '@fastgpt/global/support/wallet/bill/tools';
+import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/bill/tools';
 
 export default async function getTeams(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -48,7 +48,7 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
         return {
           id: team._id,
           name: team.name,
-          balance: formatPriceStore2Read(team.balance),
+          balance: formatStorePrice2Read(team.balance),
           maxSize: team.maxSize,
           createTime: team.createTime,
           owner: owner,

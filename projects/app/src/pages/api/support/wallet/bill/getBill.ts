@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { MongoBill } from '@fastgpt/service/support/wallet/bill/schema';
-import { formatPriceStore2Read } from '@fastgpt/global/support/wallet/bill/tools';
+import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/bill/tools';
 import { addDays } from 'date-fns';
 import { authUserRole } from '@fastgpt/service/support/permission/auth/user';
 import { Types } from '@fastgpt/service/common/mongo';
@@ -76,7 +76,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           memberName: bill.memberName,
           source: bill.source,
           time: bill.time,
-          total: formatPriceStore2Read(bill.total),
+          total: formatStorePrice2Read(bill.total),
           appName: bill.appName,
           list: bill.list
         })),

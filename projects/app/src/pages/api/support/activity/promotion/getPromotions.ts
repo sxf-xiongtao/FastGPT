@@ -3,7 +3,7 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoPromotionRecord } from '@fastgpt/service/support/activity/promotion/schema';
-import { formatPriceStore2Read } from '@fastgpt/global/support/wallet/bill/tools';
+import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/bill/tools';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -36,7 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         pageSize,
         data: data.map((item) => ({
           ...item.toObject(),
-          amount: formatPriceStore2Read(item.amount)
+          amount: formatStorePrice2Read(item.amount)
         })),
         total
       }
