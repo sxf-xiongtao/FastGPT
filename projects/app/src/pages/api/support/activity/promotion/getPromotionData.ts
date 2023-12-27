@@ -6,7 +6,7 @@ import { MongoPromotionRecord } from '@fastgpt/service/support/activity/promotio
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import mongoose from '@fastgpt/service/common/mongo';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { formatPrice } from '@fastgpt/global/support/wallet/bill/tools';
+import { formatPriceStore2Read } from '@fastgpt/global/support/wallet/bill/tools';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -42,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     jsonRes(res, {
       data: {
         invitedAmount,
-        earningsAmount: formatPrice(countHistory[0]?.totalAmount || 0)
+        earningsAmount: formatPriceStore2Read(countHistory[0]?.totalAmount || 0)
       }
     });
   } catch (err) {
