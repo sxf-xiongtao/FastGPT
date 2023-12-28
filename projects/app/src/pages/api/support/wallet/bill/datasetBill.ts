@@ -77,7 +77,7 @@ const getTeamDatasetStoreBill = async (where: any, limit: number): Promise<any> 
         tmbId: teamOwner._id,
         appName: 'wallet.bill.Dataset store',
         total: amount,
-        source: BillSourceEnum.fastgpt,
+        source: BillSourceEnum.datasetStore,
         list: [
           {
             moduleName: 'wallet.bill.Dataset store',
