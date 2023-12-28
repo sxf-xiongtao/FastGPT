@@ -56,7 +56,10 @@ const getTeamDatasetStoreBill = async (where: any, limit: number): Promise<any> 
         { teamId: team._id, role: 'owner' },
         '_id teamId'
       ).lean();
-      if (!teamOwner) continue;
+      if (!teamOwner) {
+        await MongoTeam.findByIdAndUpdate(team._id, { lastDatasetBillTime: new Date() });
+        continue;
+      }
 
       // 统计该teamId下 dataset.data 里的 indexes 总和(是一个数组)
       const data = await MongoDatasetData.aggregate([
@@ -91,7 +94,9 @@ const getTeamDatasetStoreBill = async (where: any, limit: number): Promise<any> 
 
       successUsers++;
       successUsers % 100 === 0 && console.log(`successUsers: ${successUsers}`);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return getTeamDatasetStoreBill(where, limit);
