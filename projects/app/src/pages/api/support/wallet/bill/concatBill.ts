@@ -11,7 +11,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     await connectToDatabase();
     await authCert({ req, authRoot: true });
-    const { teamId, billId, total, listIndex, tokenLen = 0 } = req.body as ConcatBillProps;
+    const {
+      teamId,
+      billId,
+      total,
+      listIndex,
+      inputTokens = 0,
+      outputTokens = 0
+    } = req.body as ConcatBillProps;
 
     if (!billId) return;
     await MongoBill.findByIdAndUpdate(billId, {
@@ -19,7 +26,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         total,
         ...(listIndex !== undefined && {
           [`list.${listIndex}.amount`]: total,
-          [`list.${listIndex}.tokenLen`]: tokenLen
+          [`list.${listIndex}.inputTokens`]: inputTokens,
+          [`list.${listIndex}.outputTokens`]: outputTokens
         })
       }
     });

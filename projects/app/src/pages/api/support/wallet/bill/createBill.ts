@@ -13,10 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await authCert({ req, authRoot: true });
     const data = req.body as CreateBillProps;
 
-    await Promise.all([
-      MongoBill.create(data),
-      updateTeamBalance({ teamId: data.teamId, amount: -data.total })
-    ]);
+    await createBill(data);
 
     jsonRes(res);
   } catch (err) {
@@ -25,3 +22,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     jsonRes(res);
   }
 }
+
+export const createBill = (data: CreateBillProps) => {
+  return Promise.all([
+    MongoBill.create(data),
+    updateTeamBalance({ teamId: data.teamId, amount: -data.total })
+  ]);
+};
