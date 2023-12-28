@@ -4,11 +4,11 @@ import { connectToDatabase } from '@/service/mongo';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
-import { MongoDatasetData } from '@fastgpt/service/core/dataset/data/schema';
 import { createBill } from './createBill';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { BillSourceEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { delay } from '@fastgpt/global/common/system/utils';
+import { getVectorCountByTeamId } from '@fastgpt/service/common/vectorStore/controller';
 
 let datasetTotal = 0;
 let successUsers = 0;
@@ -61,13 +61,15 @@ const getTeamDatasetStoreBill = async (where: any, limit: number): Promise<any> 
         continue;
       }
 
-      // 统计该teamId下 dataset.data 里的 indexes 总和(是一个数组)
-      const data = await MongoDatasetData.aggregate([
-        { $match: { teamId: team._id } },
-        { $unwind: '$indexes' },
-        { $group: { _id: null, total: { $sum: 1 } } }
-      ]);
-      const totalVector = data[0]?.total || 0;
+      const totalVector = await getVectorCountByTeamId(team._id);
+
+      if (totalVector === 0) {
+        await MongoTeam.findByIdAndUpdate(team._id, { lastDatasetBillTime: new Date() });
+        successUsers++;
+        successUsers % 100 === 0 && console.log(`not team bill: ${successUsers}`);
+
+        continue;
+      }
 
       datasetTotal += totalVector;
       const amount = totalVector * 0;
@@ -93,7 +95,7 @@ const getTeamDatasetStoreBill = async (where: any, limit: number): Promise<any> 
       await createBill(billProps);
 
       successUsers++;
-      successUsers % 100 === 0 && console.log(`successUsers: ${successUsers}`);
+      successUsers % 100 === 0 && console.log(`success team bill: ${successUsers}`);
     } catch (error) {
       console.log(error);
     }

@@ -77,4 +77,6 @@ declare global {
 
   var sendInformQueue: (() => Promise<void>)[];
   var sendInformQueueLen: number;
+
+  var reduceBalanceQueue: { teamId: string; amount: number }[];
 }

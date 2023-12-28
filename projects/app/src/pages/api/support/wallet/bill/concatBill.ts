@@ -4,7 +4,7 @@ import { connectToDatabase } from '@/service/mongo';
 import { ConcatBillProps } from '@fastgpt/global/support/wallet/bill/api.d';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { MongoBill } from '@fastgpt/service/support/wallet/bill/schema';
-import { updateTeamBalance } from '@/service/support/wallet/controller';
+import { pushReduceTeamBalanceTask } from '@/service/support/wallet/controller';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -31,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
       }
     });
-    await updateTeamBalance({ teamId, amount: -total });
+    pushReduceTeamBalanceTask({ teamId, amount: -total });
 
     jsonRes(res);
   } catch (err) {
