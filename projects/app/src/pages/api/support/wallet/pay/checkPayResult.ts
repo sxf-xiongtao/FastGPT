@@ -5,7 +5,7 @@ import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import type { PaySchema } from '@fastgpt/global/support/wallet/pay/type.d';
 import dayjs from 'dayjs';
-import { WXPay } from '@/service/support/pay/pay';
+import { WXPay } from '@/service/support/wallet/pay/pay';
 import { connectToDatabase } from '@/service/mongo';
 import { createOnePromotion } from '@/service/support/activity/promotion/controller';
 import { updateTeamBalance } from '@/service/support/wallet/controller';

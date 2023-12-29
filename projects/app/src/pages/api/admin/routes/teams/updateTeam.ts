@@ -4,7 +4,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
-import { formatPrice } from '@fastgpt/global/support/wallet/bill/tools';
 
 export default async function updateTeam(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -21,7 +20,7 @@ export default async function updateTeam(req: NextApiRequest, res: NextApiRespon
 
     jsonRes(res, {
       data: {
-        ...(balance && { balance: formatPrice(balance * PRICE_SCALE) })
+        ...(balance && { balance })
       }
     });
   } catch (err) {

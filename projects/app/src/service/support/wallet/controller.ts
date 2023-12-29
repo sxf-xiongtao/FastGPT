@@ -3,7 +3,7 @@ import { addLog } from '@fastgpt/service/common/system/log';
 import { delay } from '@fastgpt/global/common/system/utils';
 
 /* 
-    amount: min unit
+  amount: min unit
 */
 export async function updateTeamBalance({
   teamId,
@@ -14,6 +14,7 @@ export async function updateTeamBalance({
   amount: number;
   retry?: number;
 }): Promise<any> {
+  if (amount === 0) return;
   if (Math.abs(amount) < 10) {
     addLog.info('updateTeamBalance amount too small, maybe have error', { teamId, amount });
   }
@@ -36,3 +37,47 @@ export async function updateTeamBalance({
     }
   }
 }
+
+export const pushReduceTeamBalanceTask = ({
+  teamId,
+  amount
+}: {
+  teamId: string;
+  amount: number;
+}) => {
+  global.reduceBalanceQueue.push({
+    teamId: String(teamId),
+    amount
+  });
+};
+
+export const reduceTeamBalanceTimer = async () => {
+  if (global.reduceBalanceQueue.length > 0) {
+    const list = global.reduceBalanceQueue.slice();
+    global.reduceBalanceQueue = [];
+
+    // concat same teamId
+    const map = new Map<string, number>();
+    list.forEach(({ teamId, amount }) => {
+      if (map.has(teamId)) {
+        map.set(teamId, map.get(teamId)! + amount);
+      } else {
+        map.set(teamId, amount);
+      }
+    });
+    const reduceList = Array.from(map).map(([teamId, amount]) => ({ teamId, amount }));
+
+    for await (const item of reduceList) {
+      try {
+        await updateTeamBalance({
+          teamId: item.teamId,
+          amount: item.amount
+        });
+      } catch (error) {}
+    }
+
+    console.log('reduce timer:', reduceList.length);
+  }
+  await delay(Number(process.env.UPDATE_BALANCE_DELAY || 5000));
+  reduceTeamBalanceTimer();
+};

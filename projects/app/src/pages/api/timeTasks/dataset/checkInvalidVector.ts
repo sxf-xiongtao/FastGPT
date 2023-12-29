@@ -3,27 +3,28 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { addLog } from '@fastgpt/service/common/system/log';
-import { PgClient } from '@fastgpt/service/common/pg';
-import { PgDatasetTableName } from '@fastgpt/global/core/dataset/constant';
+import {
+  deleteDatasetDataVector,
+  getVectorDataByTime
+} from '@fastgpt/service/common/vectorStore/controller';
 import { addDays } from 'date-fns';
-import dayjs from 'dayjs';
 import { MongoDatasetData } from '@fastgpt/service/core/dataset/data/schema';
 import { delay } from '@fastgpt/global/common/system/utils';
 
 /* 
-  检测无效的 PG 数据. 创建数据的流程：
-  1. 先插入 pg
+  检测无效的 Vector 数据. 创建数据的流程：
+  1. 先插入 vector
   2. 再插入 mongo
 
   异常情况：
-  1. 插入 pg 成功，但是插入 mongo 失败，导致 pg 里有数据，mongo 里没有数据。需要删除 pg 中存在，但是 mongo 中不存在的数据
+  1. 插入 vector 成功，但是插入 mongo 失败，导致 vector 里有数据，mongo 里没有数据。需要删除 vector 中存在，但是 mongo 中不存在的数据
   2. 删除不干净 （这个新版不会产生）
 
-  1. 拿到 pg 的 collection_id 和 data_id
+  1. 拿到 vector 的 collection_id 和 data_id
   2. 去 Mongo 中找对应集合中是否有该 data_id，没有的话则删除（不需要关心 indexes 里是否有）
 */
 
-let deletedPgAmount = 0;
+let deletedVectorAmount = 0;
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const {
@@ -37,9 +38,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // start: now - maxDay, end: now - 3 day
     const start = addDays(new Date(), -startDay);
     const end = addDays(new Date(), -endDay);
-    deletedPgAmount = 0;
+    deletedVectorAmount = 0;
 
-    await checkInvalidPg(start, end, limit);
+    await checkInvalidVector(start, end, limit);
 
     jsonRes(res, {
       message: 'success'
@@ -54,14 +55,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-export async function checkInvalidPg(start: Date, end: Date, limit = 50) {
-  // 1. get all pg data
-  const { rows } = await PgClient.query<{ id: string; data_id: string }>(`SELECT id, data_id
-  FROM ${PgDatasetTableName}
-  WHERE createTime BETWEEN '${dayjs(start).format('YYYY-MM-DD')}' AND '${dayjs(end).format(
-    'YYYY-MM-DD 23:59:59'
-  )}';
-  `);
+export async function checkInvalidVector(start: Date, end: Date, limit = 50) {
+  // 1. get all vector data
+  const rows = await getVectorDataByTime(start, end);
   console.log('total data', rows.length);
 
   for (let i = 0; i < limit; i++) {
@@ -71,21 +67,21 @@ export async function checkInvalidPg(start: Date, end: Date, limit = 50) {
   async function check(index: number, retry = 3): Promise<any> {
     const item = rows[index];
     if (!item) {
-      console.log(`检测完成，共删除 ${deletedPgAmount} 个无效 pg 数据`);
+      console.log(`检测完成，共删除 ${deletedVectorAmount} 个无效 vector 数据`);
 
       return;
     }
     try {
       // 2. find dataset.data
-      const hasData = await MongoDatasetData.countDocuments({ _id: item.data_id });
+      const hasData = await MongoDatasetData.countDocuments({ _id: item.dataId });
 
-      // 3. if not found, delete pg
+      // 3. if not found, delete vector
       if (hasData === 0) {
-        await PgClient.delete(PgDatasetTableName, {
-          where: [['id', item.id]]
+        await deleteDatasetDataVector({
+          id: item.id
         });
-        console.log('delete pg', item.id);
-        deletedPgAmount++;
+        console.log('delete vector data', item.id);
+        deletedVectorAmount++;
       }
       index % 100 === 0 && console.log(index);
       return check(index + limit);

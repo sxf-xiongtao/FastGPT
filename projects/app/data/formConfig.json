@@ -76,7 +76,11 @@
           "properties": {
             "fastgpt_domain": { "type": "string", "title": "主站域名" },
             "userDefaultBalance": { "type": "number", "title": "默认用户余额" },
-            "teamDefaultMaxMember": { "type": "number", "title": "默认团队成员上限" }
+            "teamDefaultMaxMember": { "type": "number", "title": "默认团队成员上限" },
+            "datasetStorePrice": {
+              "type": "number",
+              "title": "知识库存储费用（xx元/1000组/天）"
+            }
           }
         },
         "auth": {

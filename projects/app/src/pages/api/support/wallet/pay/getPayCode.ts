@@ -4,7 +4,7 @@ import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { connectToDatabase } from '@/service/mongo';
 import { MongoPay } from '@/service/support/wallet/pay/schema';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
-import { WXPay } from '@/service/support/pay/pay';
+import { WXPay } from '@/service/support/wallet/pay/pay';
 
 /* 获取支付二维码 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
