@@ -72,7 +72,9 @@ const getTeamDatasetStoreBill = async (where: any, limit: number): Promise<any> 
       }
 
       datasetTotal += totalVector;
-      const amount = totalVector * 0;
+
+      const storePrice = global.systemConfig?.system?.datasetStorePrice || 0;
+      const amount = totalVector * storePrice;
 
       const billProps = {
         teamId: teamOwner.teamId,

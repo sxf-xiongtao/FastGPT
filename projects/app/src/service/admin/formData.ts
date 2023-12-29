@@ -81,6 +81,9 @@ export const uiSchema = {
       },
       teamDefaultMaxMember: {
         'ui:emptyValue': 1
+      },
+      datasetStorePrice: {
+        'ui:emptyValue': 1
       }
     },
     auth: {
