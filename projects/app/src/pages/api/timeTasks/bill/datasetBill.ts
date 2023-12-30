@@ -4,7 +4,7 @@ import { connectToDatabase } from '@/service/mongo';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
-import { createBill } from './createBill';
+import { createBill } from '../../support/wallet/bill/createBill';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { BillSourceEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { delay } from '@fastgpt/global/common/system/utils';

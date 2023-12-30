@@ -17,6 +17,8 @@ export function formatConfigStore2FormSchema({
       chatbotUrl = '',
       openAPIDocUrl = '',
       systemTitle = 'FastAI',
+      customApiDomain = '',
+      customSharePageDomain = '',
       limit = {
         exportLimitMinutes: 20
       }
@@ -47,7 +49,9 @@ export function formatConfigStore2FormSchema({
         chatbotUrl,
         openAPIDocUrl,
         systemTitle,
-        limit
+        limit,
+        customApiDomain,
+        customSharePageDomain
       },
       models: {
         chatModels: JSON.stringify(chatModels, null, 2),
@@ -120,29 +124,14 @@ export function formatFormData2ConfigStore({
       chatbotUrl,
       openAPIDocUrl,
       systemTitle,
-      limit
+      limit,
+      customApiDomain,
+      customSharePageDomain
     },
     models
   },
   fastgptPro
 }: ConfigFormType): ConfigStoreType {
-  console.log({
-    fastgpt: {
-      feConfigs: {
-        switches,
-        images,
-        concatMd,
-        docUrl,
-        chatbotUrl,
-        openAPIDocUrl,
-        systemTitle,
-        limit
-      },
-      models
-    },
-    fastgptPro
-  });
-
   // format models
   const formatModels: Record<string, any> = {};
   for (const key in models) {
@@ -159,6 +148,8 @@ export function formatFormData2ConfigStore({
     openAPIDocUrl,
     systemTitle,
     limit,
+    customApiDomain,
+    customSharePageDomain,
     // auto set field
     show_pay: !!fastgptPro.pay?.wx?.WX_APPID,
     show_register: !!(

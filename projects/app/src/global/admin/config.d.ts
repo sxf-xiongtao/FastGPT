@@ -24,6 +24,8 @@ export type ConfigFormType = {
       chatbotUrl: string;
       openAPIDocUrl: string;
       systemTitle: string;
+      customApiDomain: string;
+      customSharePageDomain: string;
       limit?: FastGPTConfigFileType['feConfigs']['limit'];
     };
     models: {
