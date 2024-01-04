@@ -15,6 +15,7 @@ import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { PostWebsiteSyncParams } from '@fastgpt/global/core/dataset/api.d';
 import { delDatasetRelevantData } from '@fastgpt/service/core/dataset/data/controller';
 import { reloadCollectionChunks } from '@fastgpt/service/core/dataset/collection/utils';
+import { updateWebSyncLimit } from '@fastgpt/service/support/user/utils';
 
 // config
 const maxCrawlPage = 200;
@@ -25,12 +26,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     await connectToDatabase();
 
-    const { dataset } = await authDataset({
+    const { dataset, teamId } = await authDataset({
       datasetId,
       req,
       authToken: true,
       per: 'w'
     });
+
+    await updateStatusToActive(datasetId);
+    await updateWebSyncLimit(teamId);
+    return jsonRes(res);
 
     if (!dataset?.websiteConfig?.url) {
       throw new Error('Dataset is not website dataset');

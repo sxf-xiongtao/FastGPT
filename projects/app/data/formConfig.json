@@ -42,9 +42,13 @@
             "chatbotUrl": { "type": "string", "title": "聊天机器人地址" },
             "limit": {
               "type": "object",
-              "title": " ",
+              "title": "用户使用限制",
               "properties": {
-                "exportLimitMinutes": { "type": "number", "title": "导出间隔时长(分钟)" }
+                "exportDatasetLimitMinutes": { "type": "number", "title": "导出间隔时长(分钟)" },
+                "websiteSyncLimitMinuted": {
+                  "type": "number",
+                  "title": "站点同步使用间隔时长(分钟)"
+                }
               }
             },
             "concatMd": { "type": "string", "title": "联系弹窗Markdown" }

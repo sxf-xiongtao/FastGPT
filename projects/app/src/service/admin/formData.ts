@@ -1,5 +1,5 @@
-import CustomImage from '../../pages/home/Settings/Customization/CustomImage';
-import CustomJSONEditor from '../../pages/home/Settings/Customization/CustomJSONEditor';
+import CustomImage from '@/pages/home/Settings/Customization/CustomImage';
+import CustomJsonEditor from '@/pages/home/Settings/Customization/CustomJsonEditor';
 import CustomTextarea from '@/pages/home/Settings/Customization/CustomTextArea';
 
 export const uiSchema = {
@@ -27,46 +27,49 @@ export const uiSchema = {
         }
       },
       limit: {
-        exportLimitMinutes: {
+        exportDatasetLimitMinutes: {
+          'ui:emptyValue': 0
+        },
+        websiteSyncLimitMinuted: {
           'ui:emptyValue': 0
         }
       }
     },
     models: {
       chatModels: {
-        'ui:widget': CustomJSONEditor,
+        'ui:widget': CustomJsonEditor,
         'ui:emptyValue': ``
       },
       qaModels: {
-        'ui:widget': CustomJSONEditor,
+        'ui:widget': CustomJsonEditor,
         'ui:emptyValue': ``
       },
       cqModels: {
-        'ui:widget': CustomJSONEditor,
+        'ui:widget': CustomJsonEditor,
         'ui:emptyValue': ``
       },
       extractModels: {
-        'ui:widget': CustomJSONEditor,
+        'ui:widget': CustomJsonEditor,
         'ui:emptyValue': ``
       },
       qgModels: {
-        'ui:widget': CustomJSONEditor,
+        'ui:widget': CustomJsonEditor,
         'ui:emptyValue': ``
       },
       vectorModels: {
-        'ui:widget': CustomJSONEditor,
+        'ui:widget': CustomJsonEditor,
         'ui:emptyValue': ``
       },
       reRankModels: {
-        'ui:widget': CustomJSONEditor,
+        'ui:widget': CustomJsonEditor,
         'ui:emptyValue': ``
       },
       audioSpeechModels: {
-        'ui:widget': CustomJSONEditor,
+        'ui:widget': CustomJsonEditor,
         'ui:emptyValue': ``
       },
       whisperModel: {
-        'ui:widget': CustomJSONEditor,
+        'ui:widget': CustomJsonEditor,
         'ui:emptyValue': ``
       }
     }
