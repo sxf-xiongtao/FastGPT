@@ -33,10 +33,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       per: 'w'
     });
 
-    await updateStatusToActive(datasetId);
-    await updateWebSyncLimit(teamId);
-    return jsonRes(res);
-
     if (!dataset?.websiteConfig?.url) {
       throw new Error('Dataset is not website dataset');
     }
@@ -65,6 +61,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         } catch (error) {}
       }
     });
+
+    await updateWebSyncLimit(teamId);
 
     jsonRes(res, {
       data: []
