@@ -7,7 +7,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const fileContent = readConfigData('menuConfig.json');
     const config = JSON.parse(fileContent);
-    console.log(process.env.ONEAPI_URL);
     jsonRes(res, {
       data: {
         config: config,
