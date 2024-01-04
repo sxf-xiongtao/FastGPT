@@ -19,8 +19,7 @@
       "pageId": "datasets"
     },
     {
-      "pageId": "oneAPI",
-      "oneAPIUrl": ""
+      "pageId": "oneAPI"
     },
     {
       "pageId": "settings"

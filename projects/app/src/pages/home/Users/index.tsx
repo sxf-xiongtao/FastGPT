@@ -123,6 +123,12 @@ export default function Users() {
                       });
                     }
                   }}
+                  onBlur={(e) => {
+                    setQueryParams({
+                      ...queryParams,
+                      search: e.currentTarget.value
+                    });
+                  }}
                   placeholder="输入用户 id 或用户名，回车搜索"
                 ></Input>
               </InputGroup>

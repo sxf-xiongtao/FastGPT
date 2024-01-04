@@ -69,7 +69,7 @@ const defaultQueryParams = {
   _end: 20,
   _sort: '',
   _order: '',
-  userId: ''
+  search: ''
 };
 
 export default function Pays() {
@@ -116,15 +116,22 @@ export default function Pays() {
                 </InputLeftElement>
                 <Input
                   variant={'search'}
+                  className="!w-[240px]"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       setQueryParams({
                         ...queryParams,
-                        userId: e.currentTarget.value
+                        search: e.currentTarget.value
                       });
                     }
                   }}
-                  placeholder="输入用户 id，回车搜索"
+                  onBlur={(e) => {
+                    setQueryParams({
+                      ...queryParams,
+                      search: e.currentTarget.value
+                    });
+                  }}
+                  placeholder="输入用户 id 或用户名，回车搜索"
                 ></Input>
               </InputGroup>
             </Box>

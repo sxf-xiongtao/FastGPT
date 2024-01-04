@@ -9,8 +9,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       process.env.NODE_ENV === 'development' ? 'data/menuConfig.json' : '/app/data/menuConfig.json';
     const fileContent = fs.readFileSync(filename, 'utf-8');
     const config = JSON.parse(fileContent);
+    console.log(process.env.ONEAPI_URL);
     jsonRes(res, {
-      data: config
+      data: {
+        config: config,
+        oneAPIUrl: process.env.ONEAPI_URL
+      }
     });
   } catch (err) {
     console.error('Failed to read menuConfig file:', err);

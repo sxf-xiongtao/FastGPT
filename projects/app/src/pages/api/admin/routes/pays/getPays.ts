@@ -5,6 +5,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { MongoPay } from '@/service/support/wallet/pay/schema';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
+import { isValidObjectIdString } from '../users/getUsers';
 
 export default async function getPays(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -15,8 +16,19 @@ export default async function getPays(req: NextApiRequest, res: NextApiResponse)
     const end = parseInt(req.query._end as string) || 20;
     const order = req.query._order === 'ASC' ? 1 : -1;
     const sort = req.query._sort === 'id' ? '_id' : req.query._sort || '_id';
-    const userId = req.query.userId || '';
-    const where = userId ? { userId: Object(userId) } : {};
+    const search = (req.query.search as string) || '';
+
+    const users = await MongoUser.find({ username: new RegExp(search, 'i') });
+    const userIds = users.map((user) => user._id);
+
+    let where = {};
+    if (search && isValidObjectIdString(search)) {
+      where = {
+        $or: [{ userId: Object(search) }, { userId: { $in: userIds } }]
+      };
+    } else if (search) {
+      where = { userId: { $in: userIds } };
+    }
 
     const paysRaw = await MongoPay.find(where)
       .skip(start)

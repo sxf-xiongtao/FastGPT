@@ -17,7 +17,7 @@ export default function SideBar({ menuListData }: { menuListData: string[] }) {
   const LIST = [
     {
       pageId: 'dashboard',
-      name: '仪表盘',
+      name: '数据总览',
       icon: <Icons type="homeLine" />
     },
     {

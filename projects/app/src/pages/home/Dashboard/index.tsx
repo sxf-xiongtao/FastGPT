@@ -28,8 +28,9 @@ type chatDataType = {
   userCount: number;
   userIncrease?: number;
   userIncreaseRate?: string;
-  payTotal: number;
   payCount: number;
+  chatCount: number;
+  chatIncrease?: number;
 };
 
 type TNumbers = {
@@ -44,19 +45,24 @@ export default function DashBoard() {
 
   useEffect(() => {
     const fetchChartData = async () => {
-      const [userResponse, payResponse]: fetchChatData[][] = await Promise.all([
+      const [userResponse, payResponse, chatResponse]: fetchChatData[][] = await Promise.all([
         GET(`admin/routes/dashboard/getUserFormData`, {}).then((res: any) => res.countResult),
-        GET(`admin/routes/dashboard/getPaysFormData`, {}).then((res: any) => res.countResult)
+        GET(`admin/routes/dashboard/getPaysFormData`, {}).then((res: any) => res.countResult),
+        GET(`admin/routes/dashboard/getChatFormData`, {}).then((res: any) => res.countResult)
       ]);
+
       const data = userResponse.map((item, i) => {
-        const pay = payResponse.find((pay) => item.date === pay.date);
+        const pay = payResponse.find((payItem) => payItem.date === item.date);
+        const chat = chatResponse.find((chatItem) => chatItem.date === item.date);
+
         return {
           date: dayjs(item.date).format('MM/DD'),
           userCount: item.count,
           userIncrease: item.increase,
           userIncreaseRate: item.increaseRate,
           payCount: pay ? pay.count / PRICE_SCALE : 0,
-          payTotal: pay?.total ? pay.total / PRICE_SCALE : 0
+          chatCount: chat ? chat.count : 0,
+          chatIncrease: chat ? chat.increase : 0
         };
       });
       setChartData(data);
@@ -153,13 +159,16 @@ const CustomTooltip = ({ active, payload }: any) => {
           用户总数: <strong>{data.userCount}</strong>
         </p>
         <p className="label">
+          对话总数: <strong>{data.chatCount}</strong>
+        </p>
+        <p className="label">
           用户今日增长数量: <strong>{data.userIncrease}</strong>
         </p>
         <p className="label">
-          今日支付: <strong>{data.payCount}</strong>元
+          对话今日增长数量: <strong>{data.chatIncrease}</strong>
         </p>
         <p className="label">
-          60天累计支付: <strong>{data.payTotal}</strong>元
+          今日支付: <strong>{data.payCount}</strong>元
         </p>
       </div>
     );
@@ -176,16 +185,6 @@ const UserChart = ({ data }: { data: chatDataType[] }) => {
         data={data}
         margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
       >
-        <defs>
-          <linearGradient id="userCount" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
-          </linearGradient>
-          <linearGradient id="payTotal" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-          </linearGradient>
-        </defs>
         <XAxis dataKey="date" />
         <YAxis />
         <CartesianGrid strokeDasharray="3 3" />
@@ -193,16 +192,23 @@ const UserChart = ({ data }: { data: chatDataType[] }) => {
         <Area
           type="monotone"
           dataKey="userCount"
-          stroke="#82ca9d"
-          fillOpacity={1}
-          fill="url(#userCount)"
+          stroke="#40C6FF"
+          strokeWidth={1.5}
+          fill="#F0F4FF"
         />
         <Area
           type="monotone"
-          dataKey="payTotal"
-          stroke="#8884d8"
-          fillOpacity={1}
-          fill="url(#payTotal)"
+          dataKey="payCount"
+          stroke="#E2A5FF"
+          strokeWidth={1.5}
+          fill="#FAF1FF"
+        />
+        <Area
+          type="monotone"
+          dataKey="chatCount"
+          stroke="#72E4D6"
+          strokeWidth={1.5}
+          fill="#EAFEFB"
         />
       </AreaChart>
     </ResponsiveContainer>

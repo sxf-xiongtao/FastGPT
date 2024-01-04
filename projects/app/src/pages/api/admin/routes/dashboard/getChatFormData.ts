@@ -1,27 +1,27 @@
 import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
-import { jsonRes } from '@fastgpt/service/common/response';
-import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { MongoChatItem } from '@fastgpt/service/core/chat/chatItemSchema';
+import { jsonRes } from '@fastgpt/service/common/response';
 
 const day = 60;
 
-export default async function getUserFormData(req: NextApiRequest, res: NextApiResponse) {
+export default async function getChatFormData(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
     await adminCert({ req, authToken: true });
 
-    let startCount = await MongoUser.countDocuments({
-      createTime: { $lt: new Date(Date.now() - day * 24 * 60 * 60 * 1000) }
+    let startCount = await MongoChatItem.countDocuments({
+      time: { $lt: new Date(Date.now() - day * 24 * 60 * 60 * 1000) }
     });
-    const usersRaw = await MongoUser.aggregate([
-      { $match: { createTime: { $gte: new Date(Date.now() - day * 24 * 60 * 60 * 1000) } } },
+    const chatsRaw = await MongoChatItem.aggregate([
+      { $match: { time: { $gte: new Date(Date.now() - day * 24 * 60 * 60 * 1000) } } },
       {
         $group: {
           _id: {
-            year: { $year: '$createTime' },
-            month: { $month: '$createTime' },
-            day: { $dayOfMonth: '$createTime' }
+            year: { $year: '$time' },
+            month: { $month: '$time' },
+            day: { $dayOfMonth: '$time' }
           },
           count: { $sum: 1 }
         }
@@ -36,14 +36,12 @@ export default async function getUserFormData(req: NextApiRequest, res: NextApiR
       { $sort: { date: 1 } }
     ]);
 
-    const userCount = usersRaw.map((item) => {
-      const increaseRate = `${((item.count / startCount) * 100).toFixed(2)}%`;
+    const chatCount = chatsRaw.map((item) => {
       startCount += item.count;
       return {
         date: item.date,
         count: startCount,
-        increase: item.count,
-        increaseRate
+        increase: item.count
       };
     });
 
@@ -61,13 +59,13 @@ export default async function getUserFormData(req: NextApiRequest, res: NextApiR
         const date = new Date(currentDate);
         date.setDate(currentDate.getDate() - i);
         date.setUTCHours(0, 0, 0, 0);
-        if (usersRaw[0].date.getTime() > date.getTime()) break;
+        if (chatsRaw[0].date.getTime() > date.getTime()) break;
         expectedDates.push(date);
       }
     }
 
     const countResult = expectedDates.map((date) => {
-      const existingValue = userCount.find(
+      const existingValue = chatCount.find(
         (item) => new Date(item.date).getTime() === date.getTime()
       );
       if (existingValue) {
@@ -75,12 +73,11 @@ export default async function getUserFormData(req: NextApiRequest, res: NextApiR
       } else {
         const emptyValue = {
           date: date.toISOString(),
-          count: userCount.length > 0 ? userCount[0].count : 0,
-          increase: 0,
-          increaseRate: '0.00%'
+          count: chatCount.length > 0 ? chatCount[0].count : 0,
+          increase: 0
         };
 
-        userCount
+        chatCount
           .filter((item) => new Date(item.date).getTime() < date.getTime())
           .forEach((item) => {
             emptyValue.count = item.count;

@@ -32,17 +32,16 @@ export async function getStaticProps({ params }: any) {
 
 export type TMenu = {
   pageId: string;
-  oneAPIUrl?: string;
 };
 
 const Home = ({ pageData }: any) => {
-  const [menuList, setMenuList] = useState<Array<TMenu>>([]);
   const [menuListData, setMenuListData] = useState<Array<string>>([]);
+  const [oneAPIUrl, setOneAPIUrl] = useState('');
 
   useQuery(['getInitMenuConfig'], () => getInitMenuConfig(), {
-    onSuccess: (data: { menuList: [] }) => {
-      setMenuList(data?.menuList);
-      setMenuListData(data?.menuList.map((item: TMenu) => item.pageId));
+    onSuccess: (data: any) => {
+      setMenuListData(data?.config.menuList.map((item: TMenu) => item.pageId));
+      setOneAPIUrl(data?.oneAPIUrl);
     }
   });
 
@@ -86,7 +85,7 @@ const Home = ({ pageData }: any) => {
           }
         ].map((item) =>
           pageData.pageId === item.pageId && menuListData.includes(item.pageId) ? (
-            <item.component key={item.pageId} menuList={menuList} />
+            <item.component key={item.pageId} oneAPIUrl={oneAPIUrl} />
           ) : null
         )}
       </div>
