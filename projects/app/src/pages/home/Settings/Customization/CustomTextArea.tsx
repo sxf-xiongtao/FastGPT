@@ -1,9 +1,9 @@
-import { Textarea } from '@chakra-ui/react';
+import { Box, Textarea } from '@chakra-ui/react';
 import { WidgetProps } from '@rjsf/utils';
 
 const CustomTextarea: React.FC<WidgetProps> = (props) => {
   return (
-    <div className="w-[88%]">
+    <Box className="w-[88%]" mb={3}>
       <Textarea
         variant="none"
         rows={8}
@@ -16,7 +16,7 @@ const CustomTextarea: React.FC<WidgetProps> = (props) => {
           props.onChange(e.target.value);
         }}
       />
-    </div>
+    </Box>
   );
 };
 

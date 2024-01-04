@@ -13,7 +13,6 @@
               "type": "object",
               "title": "",
               "properties": {
-                "show_emptyChat": { "type": "boolean", "title": "展示聊天空白页" },
                 "show_git": { "type": "boolean", "title": "展示 github 图标" },
                 "show_openai_account": {
                   "type": "boolean",

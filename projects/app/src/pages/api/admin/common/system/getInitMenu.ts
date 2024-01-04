@@ -1,13 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
-import path from 'path';
 import { jsonRes } from '@fastgpt/service/common/response';
+import { readConfigData } from '@/service/common/file/reqd';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const filename =
-      process.env.NODE_ENV === 'development' ? 'data/menuConfig.json' : '/app/data/menuConfig.json';
-    const fileContent = fs.readFileSync(filename, 'utf-8');
+    const fileContent = readConfigData('menuConfig.json');
     const config = JSON.parse(fileContent);
     console.log(process.env.ONEAPI_URL);
     jsonRes(res, {
