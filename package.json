@@ -7,10 +7,11 @@
     "format": "prettier --config \"./.prettierrc.js\" --write \"./projects/**/src/**/*.{ts,tsx,scss}\""
   },
   "devDependencies": {
+    "@types/node": "^20.10.6",
     "husky": "^8.0.3",
+    "i18next": "^23.2.11",
     "lint-staged": "^13.2.1",
-    "prettier": "2.7.1",
-    "i18next": "^23.2.11"
+    "prettier": "2.7.1"
   },
   "lint-staged": {
     "./projects/**/**/*.{ts,tsx,scss}": "npm run format"

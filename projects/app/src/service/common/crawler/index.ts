@@ -50,7 +50,7 @@ export const crawlWebsite = async ({
       async requestHandler({ $, request, enqueueLinks, log }) {
         log.info(request.url);
 
-        const html = cheerioToHtml({
+        const { html } = cheerioToHtml({
           fetchUrl: request.url,
           $,
           selector
@@ -58,7 +58,7 @@ export const crawlWebsite = async ({
 
         const markdown = await htmlToMarkdown(html);
 
-        const item = {
+        const item: CrawlDataItemType = {
           url: request.url,
           content: markdown
         };
