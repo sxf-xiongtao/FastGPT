@@ -36,6 +36,7 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
     }
 
     const teamsRaw: TeamType[] = await MongoTeam.find(where)
+      .sort({ createTime: -1 })
       .skip(start)
       .limit(end - start);
 
