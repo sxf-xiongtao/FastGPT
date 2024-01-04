@@ -27,7 +27,10 @@ export const uiSchema = {
         }
       },
       limit: {
-        exportLimitMinutes: {
+        exportDatasetLimitMinutes: {
+          'ui:emptyValue': 0
+        },
+        websiteSyncLimitMinuted: {
           'ui:emptyValue': 0
         }
       }

@@ -20,7 +20,8 @@ export function formatConfigStore2FormSchema({
       customApiDomain = '',
       customSharePageDomain = '',
       limit = {
-        exportLimitMinutes: 20
+        exportDatasetLimitMinutes: 20,
+        websiteSyncLimitMinuted: 60
       }
     },
     chatModels = [],
