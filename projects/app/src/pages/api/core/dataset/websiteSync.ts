@@ -14,7 +14,7 @@ import { DatasetSchemaType } from '@fastgpt/global/core/dataset/type';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { PostWebsiteSyncParams } from '@fastgpt/global/core/dataset/api.d';
 import { delDatasetRelevantData } from '@fastgpt/service/core/dataset/data/controller';
-import { loadingOneChunkCollection } from '@fastgpt/service/core/dataset/collection/utils';
+import { reloadCollectionChunks } from '@fastgpt/service/core/dataset/collection/utils';
 
 // config
 const maxCrawlPage = 200;
@@ -103,10 +103,11 @@ async function createCollectionAndPushData(props: {
       name: item.url,
       trainingType: DatasetCollectionTrainingModeEnum.chunk,
       chunkSize,
-      rawLink: item.url
+      rawLink: item.url,
+      metadata: {}
     });
 
-    await loadingOneChunkCollection({
+    await reloadCollectionChunks({
       collectionId,
       tmbId: dataset.tmbId,
       billId,
