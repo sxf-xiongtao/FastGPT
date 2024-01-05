@@ -13,7 +13,7 @@ import { useForm } from 'react-hook-form';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { POST } from '@/service/common/request';
 import { hashStr } from '@fastgpt/global/common/string/tools';
-import { serviceSideProps } from '@/utils/web/i18n';
+import { serviceSideProps } from '@/web/common/i18n';
 import { useTranslation } from 'next-i18next';
 
 type FormData = {

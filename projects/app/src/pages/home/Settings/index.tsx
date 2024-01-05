@@ -7,7 +7,7 @@ import DescriptionFieldTemplate from './Customization/DescriptionFieldTemplate';
 import { GET, POST } from '@/service/common/request';
 import { uiSchema } from '@/service/admin/formData';
 import TitleFieldTemplate from './Customization/TitleFieldTemplate';
-import { extractThirdLevelTitles } from '@/utils/web/extractTitles';
+import { extractThirdLevelTitles } from '@/web/core/config/utils';
 import { throttle } from '@/utils/tools';
 import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';
 import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';

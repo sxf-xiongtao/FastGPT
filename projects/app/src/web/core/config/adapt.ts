@@ -6,24 +6,8 @@ export function formatConfigStore2FormSchema({
   fastgptPro
 }: ConfigStoreType): ConfigFormType {
   const {
-    feConfigs: {
-      show_emptyChat = false,
-      show_git = false,
-      show_openai_account = false,
-      show_promotion = false,
-      favicon = '',
-      concatMd = '',
-      docUrl = 'https://doc.fastgpt.in',
-      chatbotUrl = '',
-      openAPIDocUrl = '',
-      systemTitle = 'FastAI',
-      customApiDomain = '',
-      customSharePageDomain = '',
-      limit = {
-        exportDatasetLimitMinutes: 20,
-        websiteSyncLimitMinuted: 60
-      }
-    },
+    feConfigs,
+    systemEnv,
     chatModels = [],
     qaModels = [],
     cqModels = [],
@@ -33,7 +17,34 @@ export function formatConfigStore2FormSchema({
     reRankModels = [],
     audioSpeechModels = [],
     whisperModel
-  } = fastgpt || { feConfigs: {} };
+  } = fastgpt || { feConfigs: {}, systemEnv: {} };
+
+  const {
+    show_emptyChat = false,
+    show_git = false,
+    show_openai_account = false,
+    show_promotion = false,
+    favicon = '',
+    concatMd = '',
+    docUrl = 'https://doc.fastgpt.in',
+    chatbotUrl = '',
+    openAPIDocUrl = '',
+    systemTitle = 'FastAI',
+    customApiDomain = '',
+    customSharePageDomain = '',
+    limit = {
+      exportDatasetLimitMinutes: 20,
+      websiteSyncLimitMinuted: 60
+    },
+    scripts = []
+  } = feConfigs || {};
+
+  const {
+    openapiPrefix = 'openapi',
+    vectorMaxProcess = 10,
+    qaMaxProcess = 10,
+    pgHNSWEfSearch = 100
+  } = systemEnv || {};
 
   return {
     fastgpt: {
@@ -52,19 +63,24 @@ export function formatConfigStore2FormSchema({
         systemTitle,
         limit,
         customApiDomain,
-        customSharePageDomain
+        customSharePageDomain,
+        scripts: JSON.stringify(scripts, null, 2)
       },
-      models: {
-        chatModels: JSON.stringify(chatModels, null, 2),
-        qaModels: JSON.stringify(qaModels, null, 2),
-        cqModels: JSON.stringify(cqModels, null, 2),
-        extractModels: JSON.stringify(extractModels, null, 2),
-        qgModels: JSON.stringify(qgModels, null, 2),
-        vectorModels: JSON.stringify(vectorModels, null, 2),
-        reRankModels: JSON.stringify(reRankModels, null, 2),
-        audioSpeechModels: JSON.stringify(audioSpeechModels, null, 2),
-        whisperModel: JSON.stringify(whisperModel, null, 2)
-      }
+      systemEnv: {
+        openapiPrefix,
+        vectorMaxProcess,
+        qaMaxProcess,
+        pgHNSWEfSearch
+      },
+      chatModels: JSON.stringify(chatModels, null, 2),
+      qaModels: JSON.stringify(qaModels, null, 2),
+      cqModels: JSON.stringify(cqModels, null, 2),
+      extractModels: JSON.stringify(extractModels, null, 2),
+      qgModels: JSON.stringify(qgModels, null, 2),
+      vectorModels: JSON.stringify(vectorModels, null, 2),
+      reRankModels: JSON.stringify(reRankModels, null, 2),
+      audioSpeechModels: JSON.stringify(audioSpeechModels, null, 2),
+      whisperModel: JSON.stringify(whisperModel, null, 2)
     },
     fastgptPro: {
       system: {
@@ -127,9 +143,11 @@ export function formatFormData2ConfigStore({
       systemTitle,
       limit,
       customApiDomain,
-      customSharePageDomain
+      customSharePageDomain,
+      scripts
     },
-    models
+    systemEnv,
+    ...models
   },
   fastgptPro
 }: ConfigFormType): ConfigStoreType {
@@ -160,7 +178,8 @@ export function formatFormData2ConfigStore({
       github: fastgptPro.auth?.github?.clientId,
       google: fastgptPro.auth?.google?.clientId
     },
-    googleClientVerKey: fastgptPro.auth?.googleV3Ver.clientKey
+    googleClientVerKey: fastgptPro.auth?.googleV3Ver.clientKey,
+    scripts: scripts ? JSON.parse(scripts) : []
   };
 
   // format fastgptPro
@@ -184,6 +203,7 @@ export function formatFormData2ConfigStore({
     // @ts-ignore
     [SystemConfigsTypeEnum.fastgpt]: {
       feConfigs: formatFeConfig,
+      systemEnv,
       ...formatModels
     },
     [SystemConfigsTypeEnum.fastgptPro]: fastgptProConfig

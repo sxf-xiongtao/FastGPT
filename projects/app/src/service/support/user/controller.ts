@@ -5,7 +5,7 @@ import { ERROR_ENUM } from '@fastgpt/global/common/error/errorCode';
 import { UserType } from '@fastgpt/global/support/user/type';
 import { getAndCreateUserDefaultTeam, getUserTeamOrDefaultTeam } from './team/controller';
 import { customAlphabet } from 'nanoid';
-import { createHashPassword } from '@/utils/tools';
+import { hashStr } from '@fastgpt/global/common/string/tools';
 import { sendInform2OneUser } from './inform/controller';
 import { createJWT } from '@fastgpt/service/support/permission/controller';
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 8);
@@ -84,7 +84,7 @@ export async function usernameLogin({
     const password = nanoid();
     const user = await createUserByUsername({
       username,
-      password: createHashPassword(password),
+      password: hashStr(password),
       avatar,
       inviterId
     });

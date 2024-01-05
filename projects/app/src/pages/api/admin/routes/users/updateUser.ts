@@ -1,4 +1,4 @@
-import { createHashPassword } from '@/utils/tools';
+import { hashStr } from '@fastgpt/global/common/string/tools';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
@@ -16,7 +16,7 @@ export default async function updateUser(req: NextApiRequest, res: NextApiRespon
     const tmb = await MongoTeamMember.findById(tmbId);
 
     const result = await MongoUser.findByIdAndUpdate(tmb?.userId, {
-      ...(password && { password: createHashPassword(password) }),
+      ...(password && { password: hashStr(password) }),
       ...(status && { status })
     });
 

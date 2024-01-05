@@ -1,4 +1,4 @@
-import { extractThirdLevelTitles } from '@/utils/web/extractTitles';
+import { extractThirdLevelTitles } from '@/web/core/config/utils';
 import { Divider } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
