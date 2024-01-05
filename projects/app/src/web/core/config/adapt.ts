@@ -35,7 +35,8 @@ export function formatConfigStore2FormSchema({
     limit = {
       exportDatasetLimitMinutes: 20,
       websiteSyncLimitMinuted: 60
-    }
+    },
+    scripts = []
   } = feConfigs || {};
 
   const {
@@ -62,7 +63,8 @@ export function formatConfigStore2FormSchema({
         systemTitle,
         limit,
         customApiDomain,
-        customSharePageDomain
+        customSharePageDomain,
+        scripts: JSON.stringify(scripts, null, 2)
       },
       systemEnv: {
         openapiPrefix,
@@ -141,7 +143,8 @@ export function formatFormData2ConfigStore({
       systemTitle,
       limit,
       customApiDomain,
-      customSharePageDomain
+      customSharePageDomain,
+      scripts
     },
     systemEnv,
     ...models
@@ -175,7 +178,8 @@ export function formatFormData2ConfigStore({
       github: fastgptPro.auth?.github?.clientId,
       google: fastgptPro.auth?.google?.clientId
     },
-    googleClientVerKey: fastgptPro.auth?.googleV3Ver.clientKey
+    googleClientVerKey: fastgptPro.auth?.googleV3Ver.clientKey,
+    scripts: scripts ? JSON.parse(scripts) : []
   };
 
   // format fastgptPro

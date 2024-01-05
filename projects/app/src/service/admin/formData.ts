@@ -33,6 +33,9 @@ export const uiSchema = {
         websiteSyncLimitMinuted: {
           'ui:emptyValue': 0
         }
+      },
+      scripts: {
+        'ui:widget': CustomJsonEditor
       }
     },
     systemEnv: {
