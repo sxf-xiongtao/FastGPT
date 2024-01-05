@@ -1,5 +1,5 @@
 import { initDatasetStatus, initGlobal, initProServiceData } from './init';
-import { authLicense } from '@/utils/service/common/license';
+import { authLicense } from './core/license';
 import { exit } from 'process';
 import { connectMongo } from '@fastgpt/service/common/mongo/init';
 import { reduceTeamBalanceTimer } from './support/wallet/controller';

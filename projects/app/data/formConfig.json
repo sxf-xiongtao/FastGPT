@@ -7,7 +7,7 @@
       "properties": {
         "feConfigs": {
           "type": "object",
-          "title": "前端展示配置",
+          "title": "主站前端展示配置",
           "properties": {
             "switches": {
               "type": "object",
@@ -54,20 +54,32 @@
             "concatMd": { "type": "string", "title": "联系弹窗Markdown" }
           }
         },
-        "models": {
-          "title": "模型配置",
+
+        "systemEnv": {
+          "type": "object",
+          "title": "主站系统配置",
           "properties": {
-            "chatModels": { "type": "string" },
-            "qaModels": { "type": "string" },
-            "cqModels": { "type": "string" },
-            "extractModels": { "type": "string" },
-            "qgModels": { "type": "string" },
-            "vectorModels": { "type": "string" },
-            "reRankModels": { "type": "string" },
-            "audioSpeechModels": { "type": "string" },
-            "whisperModel": { "type": "string" }
+            "openapiPrefix": { "type": "string", "title": "OpenAPI 前缀" },
+            "vectorMaxProcess": { "type": "number", "title": "向量训练最大进程" },
+            "qaMaxProcess": { "type": "number", "title": "QA训练最大进程" },
+            "pgHNSWEfSearch": { "type": "number", "title": "HNSW ef_search" }
           }
-        }
+        },
+
+        "placeholder1": {
+          "type": "object",
+          "title": "模型配置"
+        },
+
+        "chatModels": { "type": "string" },
+        "qaModels": { "type": "string" },
+        "cqModels": { "type": "string" },
+        "extractModels": { "type": "string" },
+        "qgModels": { "type": "string" },
+        "vectorModels": { "type": "string" },
+        "reRankModels": { "type": "string" },
+        "audioSpeechModels": { "type": "string" },
+        "whisperModel": { "type": "string" }
       }
     },
     "fastgptPro": {

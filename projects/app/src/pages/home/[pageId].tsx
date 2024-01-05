@@ -2,7 +2,7 @@ import Apps from './Apps';
 import HeadBar from './Mods/HeadBar';
 import SideBar from './Mods/SideBar';
 import { Settings } from './Settings';
-import { getAllPageIds, getPageData } from '@/utils/web/getPageData';
+import { getAllPageIds, getPageData } from '@/web/common/system/utils';
 import Users from './Users';
 import DashBoard from './Dashboard';
 import Pays from './Pays';

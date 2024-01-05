@@ -35,43 +35,55 @@ export const uiSchema = {
         }
       }
     },
-    models: {
+    systemEnv: {
       chatModels: {
-        'ui:widget': CustomJsonEditor,
         'ui:emptyValue': ``
       },
-      qaModels: {
-        'ui:widget': CustomJsonEditor,
-        'ui:emptyValue': ``
+      vectorMaxProcess: {
+        'ui:emptyValue': 0
       },
-      cqModels: {
-        'ui:widget': CustomJsonEditor,
-        'ui:emptyValue': ``
+      qaMaxProcess: {
+        'ui:emptyValue': 0
       },
-      extractModels: {
-        'ui:widget': CustomJsonEditor,
-        'ui:emptyValue': ``
-      },
-      qgModels: {
-        'ui:widget': CustomJsonEditor,
-        'ui:emptyValue': ``
-      },
-      vectorModels: {
-        'ui:widget': CustomJsonEditor,
-        'ui:emptyValue': ``
-      },
-      reRankModels: {
-        'ui:widget': CustomJsonEditor,
-        'ui:emptyValue': ``
-      },
-      audioSpeechModels: {
-        'ui:widget': CustomJsonEditor,
-        'ui:emptyValue': ``
-      },
-      whisperModel: {
-        'ui:widget': CustomJsonEditor,
-        'ui:emptyValue': ``
+      pgHNSWEfSearch: {
+        'ui:emptyValue': 0
       }
+    },
+    chatModels: {
+      'ui:widget': CustomJsonEditor,
+      'ui:emptyValue': ``
+    },
+    qaModels: {
+      'ui:widget': CustomJsonEditor,
+      'ui:emptyValue': ``
+    },
+    cqModels: {
+      'ui:widget': CustomJsonEditor,
+      'ui:emptyValue': ``
+    },
+    extractModels: {
+      'ui:widget': CustomJsonEditor,
+      'ui:emptyValue': ``
+    },
+    qgModels: {
+      'ui:widget': CustomJsonEditor,
+      'ui:emptyValue': ``
+    },
+    vectorModels: {
+      'ui:widget': CustomJsonEditor,
+      'ui:emptyValue': ``
+    },
+    reRankModels: {
+      'ui:widget': CustomJsonEditor,
+      'ui:emptyValue': ``
+    },
+    audioSpeechModels: {
+      'ui:widget': CustomJsonEditor,
+      'ui:emptyValue': ``
+    },
+    whisperModel: {
+      'ui:widget': CustomJsonEditor,
+      'ui:emptyValue': ``
     }
   },
   fastgptPro: {

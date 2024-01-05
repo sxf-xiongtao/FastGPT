@@ -1,6 +1,6 @@
 import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
-import { createHashPassword } from '@/utils/tools';
+import { hashStr } from '@fastgpt/global/common/string/tools';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
@@ -35,7 +35,7 @@ export default async function addUser(req: NextApiRequest, res: NextApiResponse)
       }
       const { _id } = await MongoUser.create({
         username,
-        password: createHashPassword(password),
+        password: hashStr(password),
         createTime: new Date()
       });
       return _id;

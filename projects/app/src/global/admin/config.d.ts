@@ -28,17 +28,21 @@ export type ConfigFormType = {
       customSharePageDomain: string;
       limit?: FastGPTConfigFileType['feConfigs']['limit'];
     };
-    models: {
-      chatModels: string;
-      qaModels: string;
-      cqModels: string;
-      extractModels: string;
-      qgModels: string;
-      vectorModels: string;
-      reRankModels: string;
-      audioSpeechModels: string;
-      whisperModel: string;
+    systemEnv: {
+      openapiPrefix: string;
+      vectorMaxProcess: number;
+      qaMaxProcess: number;
+      pgHNSWEfSearch: number;
     };
+    chatModels: string;
+    qaModels: string;
+    cqModels: string;
+    extractModels: string;
+    qgModels: string;
+    vectorModels: string;
+    reRankModels: string;
+    audioSpeechModels: string;
+    whisperModel: string;
   };
   [SystemConfigsTypeEnum.fastgptPro]: {
     system: Omit<SystemConfigType['system'], 'title'>;

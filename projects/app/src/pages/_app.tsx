@@ -14,7 +14,7 @@ import 'tailwindcss/tailwind.css';
 import 'nprogress/nprogress.css';
 import '@/styles/reset.scss';
 import './home/Settings/index.css';
-import { change2DefaultLng, serviceSideProps, setLngStore } from '@/utils/web/i18n';
+import { change2DefaultLng, serviceSideProps, setLngStore } from '@/web/common/i18n';
 
 //Binding events.
 Router.events.on('routeChangeStart', () => NProgress.start());
