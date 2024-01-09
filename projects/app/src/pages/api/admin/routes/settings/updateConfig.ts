@@ -38,17 +38,6 @@ export default async function updateConfig(req: NextApiRequest, res: NextApiResp
 
     // update env
     global.systemConfig = fastgptPro;
-    // hook to update fastgpt domain
-    if (fastgptPro.system.fastgpt_domain) {
-      axios({
-        method: 'GET',
-        baseURL: fastgptPro.system.fastgpt_domain,
-        url: '/api/common/system/refreshConfig',
-        headers: {
-          rootkey: process.env.ROOT_KEY
-        }
-      });
-    }
 
     jsonRes(res, {
       data: 'success'

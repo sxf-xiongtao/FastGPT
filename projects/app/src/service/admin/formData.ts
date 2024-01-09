@@ -91,9 +91,6 @@ export const uiSchema = {
   },
   fastgptPro: {
     system: {
-      fastgpt_domain: {
-        'ui:emptyValue': ''
-      },
       userDefaultBalance: {
         'ui:emptyValue': 0
       },

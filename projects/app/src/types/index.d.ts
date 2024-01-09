@@ -1,6 +1,7 @@
 import type { Agent } from 'http';
 import type { Pool } from 'pg';
 import { ChatModelItemType, QAModelItemType, VectorModelItemType } from './model';
+import type { ConcatBillQueueItemType } from '@/global/support/wallet/bill/type.d';
 
 export type PagingData<T> = {
   pageNum: number;
@@ -15,10 +16,13 @@ export type SystemConfigType = {
   // license: string;
   system: {
     title: string;
-    fastgpt_domain?: string;
     userDefaultBalance?: number;
     teamDefaultMaxMember?: number;
     datasetStorePrice?: number;
+  };
+  subscription?: {
+    datasetStoreFreeSize: number;
+    datasetStorePrice: number;
   };
   censor?: {
     BAIDU_TEXT_CENSOR_CLIENTID?: string;
@@ -80,4 +84,5 @@ declare global {
   var sendInformQueueLen: number;
 
   var reduceBalanceQueue: { teamId: string; amount: number }[];
+  var concatBillQueue: ConcatBillQueueItemType[];
 }

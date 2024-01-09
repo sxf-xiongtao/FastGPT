@@ -84,9 +84,12 @@ export function formatConfigStore2FormSchema({
     },
     fastgptPro: {
       system: {
-        fastgpt_domain: fastgptPro?.system.fastgpt_domain || '',
         userDefaultBalance: fastgptPro?.system.userDefaultBalance || 3,
         teamDefaultMaxMember: fastgptPro?.system.teamDefaultMaxMember || 10
+      },
+      subscription: {
+        datasetStorePrice: fastgptPro?.subscription?.datasetStorePrice || 0,
+        datasetStoreFreeSize: fastgptPro?.subscription?.datasetStoreFreeSize || 0
       },
       censor: {
         BAIDU_TEXT_CENSOR_CLIENTID: fastgptPro?.censor?.BAIDU_TEXT_CENSOR_CLIENTID || '',
@@ -179,7 +182,11 @@ export function formatFormData2ConfigStore({
       google: fastgptPro.auth?.google?.clientId
     },
     googleClientVerKey: fastgptPro.auth?.googleV3Ver.clientKey,
-    scripts: scripts ? JSON.parse(scripts) : []
+    scripts: scripts ? JSON.parse(scripts) : [],
+    subscription: {
+      datasetStoreFreeSize: fastgptPro.subscription?.datasetStoreFreeSize || 0,
+      datasetStorePrice: fastgptPro.subscription?.datasetStorePrice || 0
+    }
   };
 
   // format fastgptPro
@@ -188,6 +195,7 @@ export function formatFormData2ConfigStore({
       ...fastgptPro.system,
       title: formatFeConfig.systemTitle || ''
     },
+    subscription: fastgptPro.subscription,
     auth: {
       github: fastgptPro.auth?.github,
       google: fastgptPro.auth?.google,

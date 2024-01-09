@@ -1,6 +1,8 @@
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { delay } from '@fastgpt/global/common/system/utils';
+import { MongoBill } from '@fastgpt/service/support/wallet/bill/schema';
+import type { ConcatBillQueueItemType } from '@/global/support/wallet/bill/type.d';
 
 /* 
   amount: min unit
@@ -50,7 +52,6 @@ export const pushReduceTeamBalanceTask = ({
     amount
   });
 };
-
 export const reduceTeamBalanceTimer = async () => {
   if (global.reduceBalanceQueue.length > 0) {
     const list = global.reduceBalanceQueue.slice();
@@ -73,11 +74,71 @@ export const reduceTeamBalanceTimer = async () => {
           teamId: item.teamId,
           amount: item.amount
         });
-      } catch (error) {}
+      } catch (error) {
+        addLog.error('reduce balance error', error);
+      }
     }
 
-    console.log('reduce timer:', reduceList.length);
+    console.log('reduce timer:', list.length);
   }
   await delay(Number(process.env.UPDATE_BALANCE_DELAY || 5000));
   reduceTeamBalanceTimer();
+};
+
+export const pushConcatBillTask = (data: ConcatBillQueueItemType[]) => {
+  global.concatBillQueue.push(...data);
+};
+export const concatBillTimer = async () => {
+  if (global.concatBillQueue.length > 0) {
+    const list = global.concatBillQueue.slice();
+    global.concatBillQueue = [];
+
+    // concat same billId
+    const map = new Map<string, ConcatBillQueueItemType>();
+    list.forEach(({ billId, total, inputTokens, outputTokens, listIndex }) => {
+      const id = `${billId}-${listIndex}`;
+      const data = map.get(id);
+      if (data) {
+        map.set(id, {
+          billId,
+          total: data.total + total,
+          inputTokens: data.inputTokens + inputTokens,
+          outputTokens: data.outputTokens + outputTokens,
+          listIndex
+        });
+      } else {
+        map.set(id, {
+          billId,
+          total,
+          inputTokens,
+          outputTokens,
+          listIndex
+        });
+      }
+    });
+
+    const concatList = Array.from(map).map(([_, data]) => data);
+
+    for await (const item of concatList) {
+      const { billId, listIndex, total, inputTokens, outputTokens } = item;
+      try {
+        await MongoBill.findByIdAndUpdate(billId, {
+          $inc: {
+            total,
+            ...(listIndex !== undefined && {
+              [`list.${listIndex}.amount`]: total,
+              [`list.${listIndex}.inputTokens`]: inputTokens,
+              [`list.${listIndex}.outputTokens`]: outputTokens
+            })
+          }
+        });
+      } catch (error) {
+        addLog.error('concat bill error', error);
+      }
+    }
+    console.log('concat bill timer:', list.length);
+  }
+
+  await delay(3000);
+  concatBillTimer();
 };

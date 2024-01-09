@@ -61,8 +61,7 @@ export default function DashBoard() {
           userIncrease: item.increase,
           userIncreaseRate: item.increaseRate,
           payCount: pay ? pay.count / PRICE_SCALE : 0,
-          chatCount: chat ? chat.count : 0,
-          chatIncrease: chat ? chat.increase : 0
+          chatCount: chat ? chat.count : 0
         };
       });
       setChartData(data);
@@ -159,13 +158,10 @@ const CustomTooltip = ({ active, payload }: any) => {
           用户总数: <strong>{data.userCount}</strong>
         </p>
         <p className="label">
-          对话总数: <strong>{data.chatCount}</strong>
+          今日用户增长数量: <strong>{data.userIncrease}</strong>
         </p>
         <p className="label">
-          用户今日增长数量: <strong>{data.userIncrease}</strong>
-        </p>
-        <p className="label">
-          对话今日增长数量: <strong>{data.chatIncrease}</strong>
+          今日对话数量: <strong>{data.chatCount}</strong>
         </p>
         <p className="label">
           今日支付: <strong>{data.payCount}</strong>元

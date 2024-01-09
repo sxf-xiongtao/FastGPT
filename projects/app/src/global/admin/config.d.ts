@@ -47,6 +47,7 @@ export type ConfigFormType = {
   };
   [SystemConfigsTypeEnum.fastgptPro]: {
     system: Omit<SystemConfigType['system'], 'title'>;
+    subscription: SystemConfigType['subscription'];
     censor: SystemConfigType['censor'];
     auth: {
       googleV3Ver: {

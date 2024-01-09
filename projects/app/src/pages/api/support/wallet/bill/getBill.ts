@@ -29,7 +29,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { teamId, tmbId, isOwner } = await authUserRole({ req, authToken: true });
 
     const where = {
-      ...(isOwner ? { teamId: new Types.ObjectId(teamId) } : { tmbId: new Types.ObjectId(tmbId) }),
+      teamId: new Types.ObjectId(teamId),
+      ...(isOwner && { tmbId: new Types.ObjectId(tmbId) }),
       time: {
         $gte: new Date(dateStart),
         $lte: new Date(dateEnd)

@@ -31,8 +31,7 @@
             },
             "openAPIDocUrl": {
               "type": "string",
-              "title": "api 文档地址",
-              "description": "文档地址以 / 为结尾"
+              "title": "api 文档地址"
             },
             "docUrl": {
               "type": "string",
@@ -93,12 +92,21 @@
           "type": "object",
           "title": "关键系统配置",
           "properties": {
-            "fastgpt_domain": { "type": "string", "title": "主站域名" },
             "userDefaultBalance": { "type": "number", "title": "默认用户余额" },
-            "teamDefaultMaxMember": { "type": "number", "title": "默认团队成员上限" },
+            "teamDefaultMaxMember": { "type": "number", "title": "默认团队成员上限" }
+          }
+        },
+        "subscription": {
+          "type": "object",
+          "title": "订阅套餐",
+          "properties": {
             "datasetStorePrice": {
               "type": "number",
-              "title": "知识库存储费用（xx元/1000组/天）"
+              "title": "知识库存储费用（xx元/1000条/月）"
+            },
+            "datasetStoreFreeSize": {
+              "type": "number",
+              "title": "知识库存储免费条数"
             }
           }
         },

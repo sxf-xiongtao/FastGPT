@@ -32,8 +32,11 @@ export const initProServiceData = async () => {
 export function initGlobal() {
   global.sendInformQueue = [];
   global.sendInformQueueLen = 0;
-  global.reduceBalanceQueue = [];
+
   global.store = {};
+
+  global.reduceBalanceQueue = [];
+  global.concatBillQueue = [];
 }
 
 export async function initDatasetStatus() {
