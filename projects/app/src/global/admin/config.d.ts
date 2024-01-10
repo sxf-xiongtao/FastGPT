@@ -60,5 +60,6 @@ export type ConfigFormType = {
       phone: SystemConfigType['auth']['phone'];
     };
     pay: SystemConfigType['pay'];
+    fastLogin: string;
   };
 };

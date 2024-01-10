@@ -83,6 +83,7 @@ export function formatConfigStore2FormSchema({
       whisperModel: JSON.stringify(whisperModel, null, 2)
     },
     fastgptPro: {
+      ...fastgptPro,
       system: {
         userDefaultBalance: fastgptPro?.system.userDefaultBalance || 3,
         teamDefaultMaxMember: fastgptPro?.system.teamDefaultMaxMember || 10
@@ -129,7 +130,8 @@ export function formatConfigStore2FormSchema({
           SNED_PHONE_SIGNNAME: fastgptPro?.auth?.phone?.SNED_PHONE_SIGNNAME || '',
           SNED_PHONE_TEMPLATE: fastgptPro?.auth?.phone?.SNED_PHONE_TEMPLATE || ''
         }
-      }
+      },
+      fastLogin: JSON.stringify(fastgptPro.fastLogin || {}, null, 2)
     }
   };
 }
@@ -191,6 +193,7 @@ export function formatFormData2ConfigStore({
 
   // format fastgptPro
   const fastgptProConfig: ConfigStoreType['fastgptPro'] = {
+    ...fastgptPro,
     system: {
       ...fastgptPro.system,
       title: formatFeConfig.systemTitle || ''
@@ -204,7 +207,14 @@ export function formatFormData2ConfigStore({
       googleServiceVerKey: fastgptPro.auth.googleV3Ver.serviceKey
     },
     censor: fastgptPro.censor,
-    pay: fastgptPro.pay
+    pay: fastgptPro.pay,
+    fastLogin: (() => {
+      try {
+        return JSON.parse(fastgptPro.fastLogin);
+      } catch (error) {
+        return {};
+      }
+    })()
   };
 
   return {

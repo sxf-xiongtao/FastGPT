@@ -182,6 +182,10 @@ export const uiSchema = {
       BAIDU_TEXT_CENSOR_CLIENTSECRET: {
         'ui:emptyValue': ''
       }
+    },
+    fastLogin: {
+      'ui:widget': CustomJsonEditor,
+      'ui:emptyValue': ``
     }
   }
 };

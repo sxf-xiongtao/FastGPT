@@ -5,7 +5,7 @@ import { authDataset } from '@fastgpt/service/support/permission/auth/dataset';
 import { crawlWebsite, type CrawlDataItemType } from '@/service/common/crawler';
 import { MongoDatasetCollection } from '@fastgpt/service/core/dataset/collection/schema';
 import {
-  DatasetCollectionTrainingModeEnum,
+  TrainingModeEnum,
   DatasetCollectionTypeEnum,
   DatasetStatusEnum
 } from '@fastgpt/global/core/dataset/constant';
@@ -104,7 +104,7 @@ async function createCollectionAndPushData(props: {
       datasetId: dataset._id,
       type: DatasetCollectionTypeEnum.link,
       name: item.url,
-      trainingType: DatasetCollectionTrainingModeEnum.chunk,
+      trainingType: TrainingModeEnum.chunk,
       chunkSize,
       rawLink: item.url,
       metadata: {}
