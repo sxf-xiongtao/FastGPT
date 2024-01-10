@@ -26,7 +26,7 @@
               "type": "object",
               "title": "",
               "properties": {
-                "favicon": { "type": "string", "title": "favicon" }
+                "favicon": { "type": "image", "title": "favicon" }
               }
             },
             "openAPIDocUrl": {
@@ -50,7 +50,7 @@
                 }
               }
             },
-            "concatMd": { "type": "string", "title": "联系弹窗Markdown" }
+            "concatMd": { "type": "textarea", "title": "联系弹窗Markdown" }
           }
         },
 
@@ -74,15 +74,15 @@
           "title": "模型配置"
         },
 
-        "chatModels": { "type": "string" },
-        "qaModels": { "type": "string" },
-        "cqModels": { "type": "string" },
-        "extractModels": { "type": "string" },
-        "qgModels": { "type": "string" },
-        "vectorModels": { "type": "string" },
-        "reRankModels": { "type": "string" },
-        "audioSpeechModels": { "type": "string" },
-        "whisperModel": { "type": "string" }
+        "chatModels": { "type": "json" },
+        "qaModels": { "type": "json" },
+        "cqModels": { "type": "json" },
+        "extractModels": { "type": "json" },
+        "qgModels": { "type": "json" },
+        "vectorModels": { "type": "json" },
+        "reRankModels": { "type": "json" },
+        "audioSpeechModels": { "type": "json" },
+        "whisperModel": { "type": "json" }
       }
     },
     "fastgptPro": {
@@ -93,7 +93,7 @@
           "title": "关键系统配置",
           "properties": {
             "userDefaultBalance": { "type": "number", "title": "默认用户余额" },
-            "teamDefaultMaxMember": { "type": "number", "title": "默认团队成员上限" }
+            "teamDefaultMaxMember": { "type": "number", "title": "默认团队成员上限", "defaultValue": 1 }
           }
         },
         "subscription": {
@@ -102,7 +102,8 @@
           "properties": {
             "datasetStorePrice": {
               "type": "number",
-              "title": "知识库存储费用（xx元/1000条/月）"
+              "title": "知识库存储费用（xx元/1000条/月）",
+              "defaultValue": 1
             },
             "datasetStoreFreeSize": {
               "type": "number",
@@ -220,7 +221,7 @@
                   "description": "点管理证书进去看到\n![](https://oss.laf.dev/lk63dw-fastgpt/wx_serial_no.png)"
                 },
                 "WX_PRIVATE_KEY": {
-                  "type": "string",
+                  "type": "textarea",
                   "title": "Private Key",
                   "description": "按微信教程拿到这几个文件，txt打开key\n![](https://oss.laf.dev/lk63dw-fastgpt/wx_private_key.png)"
                 }

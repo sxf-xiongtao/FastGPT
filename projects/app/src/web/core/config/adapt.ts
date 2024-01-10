@@ -1,5 +1,9 @@
 import { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
+import CustomImage from '@/pages/home/Settings/Customization/CustomImage';
+import CustomJsonEditor from '@/pages/home/Settings/Customization/CustomJsonEditor';
+import CustomTextarea from '@/pages/home/Settings/Customization/CustomTextArea';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
+import { RJSFSchema } from '@rjsf/utils';
 
 export function formatConfigStore2FormSchema({
   fastgpt,
@@ -226,4 +230,62 @@ export function formatFormData2ConfigStore({
     },
     [SystemConfigsTypeEnum.fastgptPro]: fastgptProConfig
   };
+}
+
+export function formConfig2uiSchema(formConfig: RJSFSchema) {
+  let uiSchema: any = {};
+
+  for (let key in formConfig.properties) {
+    if (formConfig.properties[key].type === 'object' || !formConfig.properties[key].type) {
+      uiSchema[key] = formConfig2uiSchema(formConfig.properties[key]);
+    } else {
+      let defaultValue = formConfig.properties[key].defaultValue;
+      switch (formConfig.properties[key].type) {
+        case 'number':
+          uiSchema[key] = { 'ui:emptyValue': defaultValue !== undefined ? defaultValue : 0 };
+          break;
+        case 'image':
+          uiSchema[key] = {
+            'ui:emptyValue': defaultValue !== undefined ? defaultValue : '',
+            'ui:widget': CustomImage
+          };
+          break;
+        case 'textarea':
+          uiSchema[key] = {
+            'ui:emptyValue': defaultValue !== undefined ? defaultValue : '',
+            'ui:widget': CustomTextarea
+          };
+          break;
+        case 'json':
+          uiSchema[key] = {
+            'ui:emptyValue': defaultValue !== undefined ? defaultValue : '',
+            'ui:widget': CustomJsonEditor
+          };
+          break;
+        default:
+          uiSchema[key] = { 'ui:emptyValue': defaultValue !== undefined ? defaultValue : '' };
+      }
+    }
+  }
+
+  return uiSchema;
+}
+
+export function formatFormConfig(formConfig: RJSFSchema) {
+  let formattedConfig = { ...formConfig };
+
+  for (let key in formattedConfig.properties) {
+    if (
+      formattedConfig.properties[key].type === 'object' ||
+      !formattedConfig.properties[key].type
+    ) {
+      formattedConfig.properties[key] = formatFormConfig(formattedConfig.properties[key]);
+    } else {
+      if (['image', 'json', 'textarea'].includes(formattedConfig.properties[key].type)) {
+        formattedConfig.properties[key].type = 'string';
+      }
+    }
+  }
+
+  return formattedConfig;
 }

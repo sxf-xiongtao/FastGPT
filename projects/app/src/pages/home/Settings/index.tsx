@@ -5,11 +5,15 @@ import { Box, Button, Center, Spinner, useToast } from '@chakra-ui/react';
 import CustomCheckbox from './Customization/CustomCheckbox';
 import DescriptionFieldTemplate from './Customization/DescriptionFieldTemplate';
 import { GET, POST } from '@/service/common/request';
-import { uiSchema } from '@/service/admin/formData';
 import TitleFieldTemplate from './Customization/TitleFieldTemplate';
 import { extractThirdLevelTitles } from '@/web/core/config/utils';
 import { throttle } from '@/utils/tools';
-import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';
+import {
+  formConfig2uiSchema,
+  formatConfigStore2FormSchema,
+  formatFormConfig,
+  formatFormData2ConfigStore
+} from '@/web/core/config/adapt';
 import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
 import { useQuery } from '@tanstack/react-query';
 import { getInitFormConfig, getInitFormData } from '@/web/core/config/api';
@@ -22,6 +26,7 @@ export const Settings = () => {
   const [formData, setFormData] = useState<ConfigFormType>();
   const [isLoading, setIsLoading] = useState(false);
   const [schemaConfig, setSchemaConfig] = useState({});
+  const [uiSchema, setUiSchema] = useState({});
   const [titles, setTitles] = useState<string[]>([]);
   const [activeTitle, setActiveTitle] = useState('');
   const [isSchemaLoading, setIsSchemaLoading] = useState(true);
@@ -46,13 +51,14 @@ export const Settings = () => {
 
   useQuery(['getInitFormConfig'], () => getInitFormConfig(), {
     onSuccess: (data: ConfigFormType) => {
-      setSchemaConfig(data);
+      setUiSchema(formConfig2uiSchema(data));
+      setSchemaConfig(formatFormConfig(data));
       setTitles(extractThirdLevelTitles(data));
       setIsSchemaLoading(false);
     },
     onError: () => {
       toast({
-        title: '获取初始化配置失败',
+        title: '初始化配置失败',
         status: 'error',
         duration: 3000,
         isClosable: true,
