@@ -41,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await delDatasetRelevantData({ datasetIds: [dataset._id] });
 
     // 2. crawl all website
-    await crawlWebsite({
+    crawlWebsite({
       uid: datasetId,
       url: dataset.websiteConfig.url.trim(),
       maxPage: maxCrawlPage,
@@ -62,7 +62,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     });
 
-    await updateWebSyncLimit(teamId);
+    updateWebSyncLimit(teamId);
 
     jsonRes(res, {
       data: []
@@ -103,7 +103,7 @@ async function createCollectionAndPushData(props: {
       tmbId: dataset.tmbId,
       datasetId: dataset._id,
       type: DatasetCollectionTypeEnum.link,
-      name: item.url,
+      name: item.title || item.url,
       trainingType: TrainingModeEnum.chunk,
       chunkSize,
       rawLink: item.url,

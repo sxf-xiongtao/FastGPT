@@ -93,7 +93,11 @@
           "title": "关键系统配置",
           "properties": {
             "userDefaultBalance": { "type": "number", "title": "默认用户余额" },
-            "teamDefaultMaxMember": { "type": "number", "title": "默认团队成员上限", "defaultValue": 1 }
+            "teamDefaultMaxMember": {
+              "type": "number",
+              "title": "默认团队成员上限",
+              "defaultValue": 1
+            }
           }
         },
         "subscription": {
@@ -103,7 +107,7 @@
             "datasetStorePrice": {
               "type": "number",
               "title": "知识库存储费用（xx元/1000条/月）",
-              "defaultValue": 1
+              "defaultValue": 0
             },
             "datasetStoreFreeSize": {
               "type": "number",

@@ -146,7 +146,7 @@ export const Settings = () => {
       </Box>
       <Box className="w-1/4 flex flex-col mt-8 justify-between">
         <Box
-          className="bg-white w-full pr-6 pt-8 pb-12 max-h-[360px]"
+          className="bg-white w-full pr-6 pt-8 pb-12"
           style={{ boxShadow: '0px 2px 10px rgba(76, 141, 235, 0.1)' }}
         >
           <ul className="flex flex-col space-y-4 text-lg">

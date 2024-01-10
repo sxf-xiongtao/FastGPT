@@ -12,7 +12,7 @@ const excludeList = [/(\.edu\.cn|\.gov\.cn)/g];
 // too short content will be ignored
 const contentMinLength = 20;
 
-export type CrawlDataItemType = { url: string; content: string };
+export type CrawlDataItemType = { url: string; title: string; content: string };
 
 export const crawlWebsite = async ({
   uid,
@@ -29,7 +29,7 @@ export const crawlWebsite = async ({
   crawlOnePageCallback?: (e: CrawlDataItemType, stopCrawler: () => void) => any;
   onSuccess?: (e: CrawlDataItemType[]) => any;
 }) => {
-  const datas: { url: string; content: string }[] = [];
+  const datas: CrawlDataItemType[] = [];
 
   const config = new Configuration({
     defaultDatasetId: uid,
@@ -50,7 +50,7 @@ export const crawlWebsite = async ({
       async requestHandler({ $, request, enqueueLinks, log }) {
         log.info(request.url);
 
-        const { html } = cheerioToHtml({
+        const { title, html } = cheerioToHtml({
           fetchUrl: request.url,
           $,
           selector
@@ -60,6 +60,7 @@ export const crawlWebsite = async ({
 
         const item: CrawlDataItemType = {
           url: request.url,
+          title,
           content: markdown
         };
 
@@ -99,12 +100,7 @@ export const crawlWebsite = async ({
 
   stopCrawler();
 
-  const reuslts = datas
-    .filter((item) => item.content.length > contentMinLength)
-    .map((item) => ({
-      ...item,
-      content: simpleText(item.content)
-    }));
+  const reuslts = datas.filter((item) => item.content.length > contentMinLength);
 
   onSuccess?.(reuslts);
 
