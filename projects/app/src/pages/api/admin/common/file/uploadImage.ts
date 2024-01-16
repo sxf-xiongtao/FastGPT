@@ -4,6 +4,7 @@ import { connectToDatabase } from '@/service/mongo';
 import { uploadMongoImg } from '@fastgpt/service/common/file/image/controller';
 import { adminCert } from '@/service/support/permission/adminCert';
 import mongoose from 'mongoose';
+import { MongoImageTypeEnum } from '@fastgpt/global/common/file/image/constants';
 
 type Props = { base64Img: string; expiredTime?: Date };
 
@@ -14,6 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { base64Img, expiredTime } = req.body as Props;
 
     const data = await uploadMongoImg({
+      type: MongoImageTypeEnum.systemAvatar,
       teamId: String(new mongoose.Types.ObjectId()),
       base64Img,
       expiredTime

@@ -8,12 +8,12 @@ import {
   TrainingModeEnum,
   DatasetCollectionTypeEnum,
   DatasetStatusEnum
-} from '@fastgpt/global/core/dataset/constant';
+} from '@fastgpt/global/core/dataset/constants';
 import { delay } from '@fastgpt/global/common/system/utils';
 import { DatasetSchemaType } from '@fastgpt/global/core/dataset/type';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { PostWebsiteSyncParams } from '@fastgpt/global/core/dataset/api.d';
-import { delDatasetRelevantData } from '@fastgpt/service/core/dataset/data/controller';
+import { delDatasetRelevantData } from '@fastgpt/service/core/dataset/controller';
 import { reloadCollectionChunks } from '@fastgpt/service/core/dataset/collection/utils';
 import { updateWebSyncLimit } from '@fastgpt/service/support/user/utils';
 
@@ -38,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // 1. clear dataset all data
-    await delDatasetRelevantData({ datasetIds: [dataset._id] });
+    await delDatasetRelevantData({ datasets: [dataset] });
 
     // 2. crawl all website
     crawlWebsite({

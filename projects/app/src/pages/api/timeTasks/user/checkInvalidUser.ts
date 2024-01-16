@@ -7,7 +7,7 @@ import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSc
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { createTeam } from '@/service/support/user/team/controller';
-import { addDays } from 'date-fns';
+import { addHours } from 'date-fns';
 
 /* 
   创建用户流程：
@@ -24,14 +24,13 @@ import { addDays } from 'date-fns';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { startDay = 5, endDay = 1 } = req.body as { startDay?: number; endDay?: number };
+    const { startHour = 72, endHour = 24 } = req.body as { startHour?: number; endHour?: number };
     await authCert({ req, authRoot: true });
     await connectToDatabase();
 
     // start: now - maxDay, end: now - 3 day
-    const start = addDays(new Date(), -startDay);
-    const end = addDays(new Date(), -endDay);
-    console.log(start, end);
+    const start = addHours(new Date(), -startHour);
+    const end = addHours(new Date(), -endHour);
 
     const invalidUserIds = await checkInvalidUser(start, end);
 
@@ -74,7 +73,7 @@ export async function checkInvalidUser(start: Date, end: Date) {
 
       // 其中一个为空，说明tmb都没有创建出来。
       if (teamCount === 0 || tmbCount === 0) {
-        addLog.warn('无效用户:', { userId: _id });
+        addLog.warn('无效用户, 正在为他创建团队:', { userId: _id });
         invalidUserIds.push(_id);
 
         // 给他创建团队
@@ -86,7 +85,7 @@ export async function checkInvalidUser(start: Date, end: Date) {
         });
       }
     } catch (error) {}
-    console.log('finish', ++finish);
+    console.log('check user', ++finish);
   }
 
   return invalidUserIds;

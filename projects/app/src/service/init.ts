@@ -1,7 +1,7 @@
 import { SystemConfigType } from '@/types';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
 import { delay } from '@fastgpt/global/common/system/utils';
-import { DatasetStatusEnum } from '@fastgpt/global/core/dataset/constant';
+import { DatasetStatusEnum } from '@fastgpt/global/core/dataset/constants';
 import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 
