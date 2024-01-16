@@ -17,12 +17,14 @@ import {
 import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
 import { useQuery } from '@tanstack/react-query';
 import { getInitFormConfig, getInitFormData } from '@/web/core/config/api';
+import ImportModal from './ImportModal';
 
 const widgets = {
   CheckboxWidget: CustomCheckbox
 };
 
 export const Settings = () => {
+  const [rawData, setRawData] = useState<any>({});
   const [formData, setFormData] = useState<ConfigFormType>();
   const [isLoading, setIsLoading] = useState(false);
   const [schemaConfig, setSchemaConfig] = useState({});
@@ -35,6 +37,7 @@ export const Settings = () => {
 
   useQuery(['getInitFormData'], () => getInitFormData(), {
     onSuccess: (data: ConfigStoreType) => {
+      setRawData(data);
       const aggregatedConfigs: ConfigFormType = formatConfigStore2FormSchema(data);
       setFormData(aggregatedConfigs);
     },
@@ -174,6 +177,11 @@ export const Settings = () => {
           className="bg-white w-full px-6 py-4"
           style={{ boxShadow: '0px 2px 10px rgba(76, 141, 235, 0.1)' }}
         >
+          <ImportModal value={rawData} setFormData={setFormData} setRawData={setRawData}>
+            <Button isLoading={isLoading || isSchemaLoading} className="w-full mb-4">
+              配置文件
+            </Button>
+          </ImportModal>
           <Button
             onClick={handleClick}
             isLoading={isLoading || isSchemaLoading}
