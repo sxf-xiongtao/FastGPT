@@ -8,7 +8,7 @@ import {
 import { Box, Center, HStack, Spinner } from '@chakra-ui/react';
 import { GET } from '@/service/common/request';
 import { useQuery } from '@tanstack/react-query';
-import DetailModal from '../Mods/DetailModal';
+import DetailModal from '../components/DetailModal';
 import Pagination from '@/components/Pagination';
 import Icons from '@/components/Icons';
 

@@ -18,7 +18,7 @@ import Icons from '@/components/Icons';
 import { GET } from '@/service/common/request';
 import Pagination from '@/components/Pagination';
 import { useQuery } from '@tanstack/react-query';
-import DetailModal from '../Mods/DetailModal';
+import DetailModal from '../components/DetailModal';
 import { SearchIcon } from '@chakra-ui/icons';
 import { formatDate } from '@/utils/tools';
 

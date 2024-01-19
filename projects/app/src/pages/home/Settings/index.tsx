@@ -2,10 +2,10 @@ import React, { useState, useRef } from 'react';
 import validator from '@rjsf/validator-ajv8';
 import Form from '@rjsf/core';
 import { Box, Button, Center, Spinner, useToast } from '@chakra-ui/react';
-import CustomCheckbox from './Customization/CustomCheckbox';
-import DescriptionFieldTemplate from './Customization/DescriptionFieldTemplate';
+import CustomCheckbox from './components/Customization/CustomCheckbox';
+import DescriptionFieldTemplate from './components/Customization/DescriptionFieldTemplate';
 import { GET, POST } from '@/service/common/request';
-import TitleFieldTemplate from './Customization/TitleFieldTemplate';
+import TitleFieldTemplate from './components/Customization/TitleFieldTemplate';
 import { extractThirdLevelTitles } from '@/web/core/config/utils';
 import { throttle } from '@/utils/tools';
 import {
@@ -17,7 +17,7 @@ import {
 import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
 import { useQuery } from '@tanstack/react-query';
 import { getInitFormConfig, getInitFormData } from '@/web/core/config/api';
-import ImportModal from './ImportModal';
+import ImportModal from './components/ImportModal';
 
 const widgets = {
   CheckboxWidget: CustomCheckbox

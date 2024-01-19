@@ -1,7 +1,7 @@
 import { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
-import CustomImage from '@/pages/home/Settings/Customization/CustomImage';
-import CustomJsonEditor from '@/pages/home/Settings/Customization/CustomJsonEditor';
-import CustomTextarea from '@/pages/home/Settings/Customization/CustomTextArea';
+import CustomImage from '@/pages/home/Settings/components/Customization/CustomImage';
+import CustomJsonEditor from '@/pages/home/Settings/components/Customization/CustomJsonEditor';
+import CustomTextarea from '@/pages/home/Settings/components/Customization/CustomTextArea';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
 import { RJSFSchema } from '@rjsf/utils';
 

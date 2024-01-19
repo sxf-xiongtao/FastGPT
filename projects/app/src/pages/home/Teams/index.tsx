@@ -18,8 +18,8 @@ import { SearchIcon } from '@chakra-ui/icons';
 import { GET } from '@/service/common/request';
 import { useQuery } from '@tanstack/react-query';
 import Pagination from '@/components/Pagination';
-import DetailTeamModal from './mods/DetailTeamModal';
-import EditTeamModal from './mods/EditTeamModal';
+import DetailTeamModal from './components/DetailTeamModal';
+import EditTeamModal from './components/EditTeamModal';
 import Icons from '@/components/Icons';
 import { formatDate } from '@/utils/tools';
 

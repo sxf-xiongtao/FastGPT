@@ -16,11 +16,11 @@ import {
 } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
 import { GET } from '@/service/common/request';
-import UserEditModal from './mods/UserEditModal';
+import UserEditModal from './components/UserEditModal';
 import Pagination from '@/components/Pagination';
 import { useQuery } from '@tanstack/react-query';
-import UserDetailModal from './mods/UserDetailModal';
-import UserAddModal from './mods/UserAddModal';
+import UserDetailModal from './components/UserDetailModal';
+import UserAddModal from './components/UserAddModal';
 import Icons from '@/components/Icons';
 import { formatDate } from '@/utils/tools';
 

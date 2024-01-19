@@ -1,6 +1,6 @@
 import Apps from './Apps';
-import HeadBar from './Mods/HeadBar';
-import SideBar from './Mods/SideBar';
+import HeadBar from './components/HeadBar';
+import SideBar from './components/SideBar';
 import { Settings } from './Settings';
 import { getAllPageIds, getPageData } from '@/web/common/system/utils';
 import Users from './Users';
