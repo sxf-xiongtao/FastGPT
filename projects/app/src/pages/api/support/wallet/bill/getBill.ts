@@ -12,19 +12,20 @@ import { PagingData } from '@/types';
 import { BillItemType } from '@fastgpt/global/support/wallet/bill/type';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const {
+    pageNum = 1,
+    pageSize = 10,
+    dateStart = addDays(new Date(), -7),
+    dateEnd = new Date()
+  } = req.body as {
+    pageNum: number;
+    pageSize: number;
+    dateStart: Date;
+    dateEnd: Date;
+  };
+
   try {
     await connectToDatabase();
-    const {
-      pageNum = 1,
-      pageSize = 10,
-      dateStart = addDays(new Date(), -7),
-      dateEnd = new Date()
-    } = req.body as {
-      pageNum: number;
-      pageSize: number;
-      dateStart: Date;
-      dateEnd: Date;
-    };
 
     const { teamId, tmbId, isOwner } = await authUserRole({ req, authToken: true });
 

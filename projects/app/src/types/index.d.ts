@@ -1,7 +1,11 @@
 import type { Agent } from 'http';
 import type { Pool } from 'pg';
-import { ChatModelItemType, QAModelItemType, VectorModelItemType } from './model';
 import type { ConcatBillQueueItemType } from '@/global/support/wallet/bill/type.d';
+import {
+  FastGPTConfigFileType,
+  FastGPTFeConfigsType,
+  SystemEnvType
+} from '@fastgpt/global/common/system/types';
 
 export type PagingData<T> = {
   pageNum: number;
@@ -77,6 +81,8 @@ export type LicenseDataType = {
 
 declare global {
   var systemConfig: SystemConfigType;
+  var fatgptMainConfig: FastGPTConfigFileType;
+
   var store: Record<string, any>;
   var licenseData: LicenseDataType;
 

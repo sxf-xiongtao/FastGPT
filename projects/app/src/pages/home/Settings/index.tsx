@@ -18,6 +18,7 @@ import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
 import { useQuery } from '@tanstack/react-query';
 import { getInitFormConfig, getInitFormData } from '@/web/core/config/api';
 import ImportModal from './components/ImportModal';
+import { RJSFSchema } from '@rjsf/utils';
 
 const widgets = {
   CheckboxWidget: CustomCheckbox
@@ -53,7 +54,7 @@ export const Settings = () => {
   });
 
   useQuery(['getInitFormConfig'], () => getInitFormConfig(), {
-    onSuccess: (data: ConfigFormType) => {
+    onSuccess: (data: RJSFSchema) => {
       setUiSchema(formConfig2uiSchema(data));
       setSchemaConfig(formatFormConfig(data));
       setTitles(extractThirdLevelTitles(data));

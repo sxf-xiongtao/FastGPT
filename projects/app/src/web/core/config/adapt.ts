@@ -40,14 +40,17 @@ export function formatConfigStore2FormSchema({
       exportDatasetLimitMinutes: 20,
       websiteSyncLimitMinuted: 60
     },
-    scripts = []
+    scripts = [],
+    uploadFileMaxSize = 500,
+    ...feConfigsProps
   } = feConfigs || {};
 
   const {
     openapiPrefix = 'openapi',
     vectorMaxProcess = 10,
     qaMaxProcess = 10,
-    pgHNSWEfSearch = 100
+    pgHNSWEfSearch = 100,
+    ...systemEnvProps
   } = systemEnv || {};
 
   return {
@@ -68,13 +71,16 @@ export function formatConfigStore2FormSchema({
         limit,
         customApiDomain,
         customSharePageDomain,
-        scripts: JSON.stringify(scripts, null, 2)
+        scripts: JSON.stringify(scripts, null, 2),
+        uploadFileMaxSize,
+        ...feConfigsProps
       },
       systemEnv: {
         openapiPrefix,
         vectorMaxProcess,
         qaMaxProcess,
-        pgHNSWEfSearch
+        pgHNSWEfSearch,
+        ...systemEnvProps
       },
       chatModels: JSON.stringify(chatModels, null, 2),
       qaModels: JSON.stringify(qaModels, null, 2),
@@ -153,7 +159,8 @@ export function formatFormData2ConfigStore({
       limit,
       customApiDomain,
       customSharePageDomain,
-      scripts
+      scripts,
+      uploadFileMaxSize
     },
     systemEnv,
     ...models
@@ -192,7 +199,8 @@ export function formatFormData2ConfigStore({
     subscription: {
       datasetStoreFreeSize: fastgptPro.subscription?.datasetStoreFreeSize || 0,
       datasetStorePrice: fastgptPro.subscription?.datasetStorePrice || 0
-    }
+    },
+    uploadFileMaxSize
   };
 
   // format fastgptPro

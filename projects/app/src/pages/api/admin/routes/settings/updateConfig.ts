@@ -38,6 +38,7 @@ export default async function updateConfig(req: NextApiRequest, res: NextApiResp
 
     // update env
     global.systemConfig = fastgptPro;
+    global.fatgptMainConfig = fastgpt;
 
     jsonRes(res, {
       data: 'success'

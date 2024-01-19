@@ -28,6 +28,7 @@ export type ConfigFormType = {
       customSharePageDomain: string;
       limit?: FastGPTConfigFileType['feConfigs']['limit'];
       scripts?: string;
+      uploadFileMaxSize: number;
     };
     systemEnv: {
       openapiPrefix: string;

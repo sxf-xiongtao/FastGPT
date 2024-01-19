@@ -50,6 +50,12 @@
                 }
               }
             },
+            "uploadFileMaxSize": {
+              "type": "number",
+              "title": "上传文件最大大小（M)",
+              "default": 15,
+              "description": "用户上传知识库时，每个文件最大是多少。放大的话，需要注意网关也要设置得够大。"
+            },
             "concatMd": { "type": "textarea", "title": "联系弹窗Markdown" }
           }
         },

@@ -87,6 +87,7 @@ export async function checkInvalidData(start: Date, end: Date) {
             await item.data.save();
           }
           deleteDataAmount++;
+          console.log('invalid mongo data', item.data._id);
         } catch (error) {}
       }
 

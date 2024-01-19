@@ -6,6 +6,7 @@ import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { authUserExistTeam } from '@/service/support/user/team/controller';
 import { createJWT } from '@fastgpt/service/support/permission/controller';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
+import { MongoUser } from '@fastgpt/service/support/user/schema';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -18,6 +19,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!tmb) {
       throw new Error(TeamErrEnum.unAuthTeam);
     }
+
+    // update user lastLoginTmbId
+    await MongoUser.findByIdAndUpdate(userId, { lastLoginTmbId: tmb._id });
 
     jsonRes(res, {
       data: {

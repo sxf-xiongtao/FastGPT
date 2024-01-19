@@ -11,14 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     await connectToDatabase();
     await authCert({ req, authRoot: true });
-    const {
-      teamId,
-      billId,
-      total = 0,
-      listIndex,
-      inputTokens = 0,
-      outputTokens = 0
-    } = req.body as ConcatBillProps;
+    const { teamId, billId, total = 0, listIndex, charsLength = 0 } = req.body as ConcatBillProps;
 
     // 没有Id，或者不符合 mongoose ObjectId
     if (!billId || !Types.ObjectId.isValid(billId)) return;
@@ -28,8 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         billId,
         listIndex,
         total,
-        inputTokens,
-        outputTokens
+        charsLength
       }
     ]);
     pushReduceTeamBalanceTask({ teamId, amount: -total });

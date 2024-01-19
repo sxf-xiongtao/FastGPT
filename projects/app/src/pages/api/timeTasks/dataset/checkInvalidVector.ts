@@ -56,6 +56,10 @@ export async function checkInvalidVector(start: Date, end: Date) {
   let index = 0;
 
   for await (const item of rows) {
+    if (!item.teamId || !item.datasetId || !item.id) {
+      console.log('error data', item);
+      continue;
+    }
     try {
       // 2. find dataset.data
       const hasData = await MongoDatasetData.countDocuments({

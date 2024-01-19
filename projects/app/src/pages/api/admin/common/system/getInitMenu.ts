@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import fs from 'fs';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { readConfigData } from '@/service/common/file/reqd';
+import { readConfigData } from '@/service/common/file/loadConfig';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
