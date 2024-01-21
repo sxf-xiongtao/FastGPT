@@ -41,4 +41,10 @@ const PaySchema = new Schema({
   }
 });
 
+try {
+  PaySchema.index({ createTime: 1 }, { background: true });
+} catch (error) {
+  console.log(error);
+}
+
 export const MongoPay: Model<PayType> = models['pay'] || model('pay', PaySchema);

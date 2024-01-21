@@ -4,7 +4,7 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { authUserExistTeam } from '@/service/support/user/team/controller';
-import { createJWT } from '@fastgpt/service/support/permission/controller';
+import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 
@@ -23,13 +23,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // update user lastLoginTmbId
     await MongoUser.findByIdAndUpdate(userId, { lastLoginTmbId: tmb._id });
 
+    const token = createJWT({
+      _id: userId,
+      team: { teamId: tmb.teamId, tmbId: tmb._id }
+    });
+    setCookie(res, token);
+
     jsonRes(res, {
-      data: {
-        cookie: createJWT({
-          _id: userId,
-          team: { teamId: tmb.teamId, tmbId: tmb._id }
-        })
-      }
+      data: token
     });
   } catch (err) {
     jsonRes(res, {

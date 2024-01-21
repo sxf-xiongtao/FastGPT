@@ -33,8 +33,8 @@ export const initProServiceData = async () => {
     global.systemConfig = config;
     global.fatgptMainConfig = fastgptConfig?.value as unknown as FastGPTConfigFileType;
 
-    console.log(fastgptConfig);
-    console.log(config);
+    console.log(global.fatgptMainConfig);
+    console.log(global.systemConfig);
   } catch (error) {
     console.log('init config error', error);
   }

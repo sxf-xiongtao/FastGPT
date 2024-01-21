@@ -32,17 +32,8 @@ const upload = getUploadModel({
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   let filePaths: string[] = [];
 
-  const { datasetId } = req.query as { datasetId: string };
-
   try {
     await connectToDatabase();
-
-    const { teamId, tmbId, dataset } = await authDataset({
-      req,
-      authApiKey: true,
-      per: 'w',
-      datasetId
-    });
 
     const { file, data, bucketName } = await upload.doUpload<FileCreateDatasetCollectionParams>(
       req,
@@ -54,6 +45,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     if (!file || !bucketName) {
       throw new Error('file is empty');
     }
+
+    const { teamId, tmbId, dataset } = await authDataset({
+      req,
+      authApiKey: true,
+      per: 'w',
+      datasetId: data.datasetId
+    });
 
     const {
       trainingType = TrainingModeEnum.chunk,
