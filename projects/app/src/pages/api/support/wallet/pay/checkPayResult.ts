@@ -53,7 +53,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           }
         );
         if (updateRes.modifiedCount === 1) {
-          dealWithSuccessOrder(payOrder);
+          await dealWithSuccessOrder(payOrder);
 
           // 增加邀请者的默认的团队收益
           if (inviter) {
@@ -126,10 +126,6 @@ async function unLockTrainingData(teamId: string, retry = 3): Promise<any> {
 }
 
 export const dealWithSuccessOrder = async (payOrder: PaySchema) => {
-  if (payOrder.status !== PayStatusEnum.SUCCESS) {
-    return Promise.reject('订单未支付');
-  }
-
   // Add balance to team
   if (payOrder.type === PayTypeEnum.balance) {
     await updateTeamBalance({ teamId: payOrder.teamId, amount: payOrder.price });
