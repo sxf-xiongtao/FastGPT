@@ -6,7 +6,7 @@ import { DatasetStatusEnum } from '@fastgpt/global/core/dataset/constants';
 import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 
-export const initProServiceData = async () => {
+export const getProInitData = async () => {
   try {
     const [fastgptConfig, fastgptProConfig] = await Promise.all([
       MongoSystemConfigs.findOne({

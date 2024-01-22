@@ -5,6 +5,7 @@ import { connectToDatabase } from '@/service/mongo';
 import { MongoPay } from '@/service/support/wallet/pay/schema';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 import { WXPay } from '@/service/support/wallet/pay/pay';
+import { PayStatusEnum, PayTypeEnum } from '@fastgpt/global/support/wallet/pay/constants';
 
 /* 获取支付二维码 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -23,8 +24,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const payOrder = await MongoPay.create({
       teamId,
       tmbId,
+      orderId,
       price: amount * PRICE_SCALE,
-      orderId
+      status: PayStatusEnum.NOTPAY,
+
+      type: PayTypeEnum.balance
     });
 
     jsonRes(res, {

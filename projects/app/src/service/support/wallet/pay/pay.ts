@@ -1,6 +1,5 @@
 import { Payment } from './payment';
-import { customAlphabet } from 'nanoid';
-const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 20);
+import { getNanoid } from '@fastgpt/global/common/string/tools';
 
 export class WXPay {
   async getPayment() {
@@ -57,7 +56,7 @@ export class WXPay {
     if (!amount) {
       return Promise.reject('amount is error');
     }
-    const id = nanoid();
+    const id = getNanoid(24);
 
     const code_url = await this.nativePay(amount * 100, id);
 

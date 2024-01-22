@@ -12,6 +12,7 @@ import { updateTeamBalance } from '@/service/support/wallet/controller';
 import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
 import { delay } from '@fastgpt/global/common/system/utils';
 import { addLog } from '@fastgpt/service/common/system/log';
+import { PayTypeEnum, PayStatusEnum } from '@fastgpt/global/support/wallet/pay/constants';
 
 /* 校验支付结果 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -52,8 +53,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           }
         );
         if (updateRes.modifiedCount === 1) {
-          // Add balance to team
-          await updateTeamBalance({ teamId: payOrder.teamId, amount: payOrder.price });
+          dealWithSuccessOrder(payOrder);
 
           // 增加邀请者的默认的团队收益
           if (inviter) {
@@ -65,8 +65,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               amount
             });
           }
-
-          unLockTrainingData(payOrder.teamId);
 
           return jsonRes(res, {
             data: '支付成功'
@@ -126,3 +124,18 @@ async function unLockTrainingData(teamId: string, retry = 3): Promise<any> {
     }
   }
 }
+
+export const dealWithSuccessOrder = async (payOrder: PaySchema) => {
+  if (payOrder.status !== PayStatusEnum.SUCCESS) {
+    return Promise.reject('订单未支付');
+  }
+
+  // Add balance to team
+  if (payOrder.type === PayTypeEnum.balance) {
+    await updateTeamBalance({ teamId: payOrder.teamId, amount: payOrder.price });
+  } else {
+    return Promise.reject('订单类型错误');
+  }
+
+  unLockTrainingData(payOrder.teamId);
+};

@@ -5,12 +5,9 @@ import {
   TeamCollectionName,
   TeamMemberCollectionName
 } from '@fastgpt/global/support/user/team/constant';
+import { payStatusMap, payTypeMap } from '@fastgpt/global/support/wallet/pay/constants';
 
 const PaySchema = new Schema({
-  userId: {
-    type: Schema.Types.ObjectId,
-    ref: 'user'
-  },
   teamId: {
     type: Schema.Types.ObjectId,
     ref: TeamCollectionName,
@@ -25,24 +22,34 @@ const PaySchema = new Schema({
     type: Date,
     default: () => new Date()
   },
-  price: {
-    type: Number,
-    required: true
-  },
   orderId: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   status: {
-    // 支付的状态
     type: String,
     default: 'NOTPAY',
-    enum: ['SUCCESS', 'REFUND', 'NOTPAY', 'CLOSED']
+    enum: Object.keys(payStatusMap)
+  },
+  type: {
+    type: String,
+    enum: Object.keys(payTypeMap),
+    required: true
+  },
+
+  price: {
+    // total price
+    type: Number,
+    required: true
   }
 });
 
 try {
   PaySchema.index({ createTime: 1 }, { background: true });
+  PaySchema.index({ status: 1 }, { background: true });
+  PaySchema.index({ type: 1 }, { background: true });
+  PaySchema.index({ teamId: 1 }, { background: true });
 } catch (error) {
   console.log(error);
 }

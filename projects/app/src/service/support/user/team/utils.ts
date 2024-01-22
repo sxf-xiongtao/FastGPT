@@ -7,4 +7,8 @@ export const authTeamBalance = async (teamId: string, minBalance = 0) => {
   if (!team || team.balance < minBalance) {
     return Promise.reject(UserErrEnum.balanceNotEnough);
   }
+
+  return {
+    balance: team.balance
+  };
 };
