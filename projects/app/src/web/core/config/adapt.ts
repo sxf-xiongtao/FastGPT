@@ -3,6 +3,7 @@ import CustomImage from '@/pages/home/Settings/components/Customization/CustomIm
 import CustomJsonEditor from '@/pages/home/Settings/components/Customization/CustomJsonEditor';
 import CustomTextarea from '@/pages/home/Settings/components/Customization/CustomTextArea';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
+import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import { RJSFSchema } from '@rjsf/utils';
 
 export function formatConfigStore2FormSchema({
@@ -12,6 +13,7 @@ export function formatConfigStore2FormSchema({
   const {
     feConfigs,
     systemEnv,
+    subPlans = {},
     chatModels = [],
     qaModels = [],
     cqModels = [],
@@ -82,6 +84,12 @@ export function formatConfigStore2FormSchema({
         pgHNSWEfSearch,
         ...systemEnvProps
       },
+      subPlans: {
+        // @ts-ignore
+        standard: JSON.stringify(subPlans[SubTypeEnum.standard], null, 2) || '{}',
+        // @ts-ignore
+        extraDatasetSizePrice: subPlans[SubTypeEnum.extraDatasetSize]?.price || 0
+      },
       chatModels: JSON.stringify(chatModels, null, 2),
       qaModels: JSON.stringify(qaModels, null, 2),
       cqModels: JSON.stringify(cqModels, null, 2),
@@ -97,10 +105,6 @@ export function formatConfigStore2FormSchema({
       system: {
         userDefaultBalance: fastgptPro?.system.userDefaultBalance || 3,
         teamDefaultMaxMember: fastgptPro?.system.teamDefaultMaxMember || 10
-      },
-      subscription: {
-        datasetStorePrice: fastgptPro?.subscription?.datasetStorePrice || 0,
-        datasetStoreFreeSize: fastgptPro?.subscription?.datasetStoreFreeSize || 0
       },
       censor: {
         BAIDU_TEXT_CENSOR_CLIENTID: fastgptPro?.censor?.BAIDU_TEXT_CENSOR_CLIENTID || '',
@@ -163,6 +167,7 @@ export function formatFormData2ConfigStore({
       uploadFileMaxSize
     },
     systemEnv,
+    subPlans,
     ...models
   },
   fastgptPro
@@ -196,12 +201,16 @@ export function formatFormData2ConfigStore({
     },
     googleClientVerKey: fastgptPro.auth?.googleV3Ver.clientKey,
     scripts: scripts ? JSON.parse(scripts) : [],
-    subscription: {
-      datasetStoreFreeSize: fastgptPro.subscription?.datasetStoreFreeSize || 0,
-      datasetStorePrice: fastgptPro.subscription?.datasetStorePrice || 0
-    },
     uploadFileMaxSize
   };
+
+  const standardSubPlanJson = (() => {
+    try {
+      return JSON.parse(subPlans.standard);
+    } catch (error) {
+      return {};
+    }
+  })();
 
   // format fastgptPro
   const fastgptProConfig: ConfigStoreType['fastgptPro'] = {
@@ -210,7 +219,6 @@ export function formatFormData2ConfigStore({
       ...fastgptPro.system,
       title: formatFeConfig.systemTitle || ''
     },
-    subscription: fastgptPro.subscription,
     auth: {
       github: fastgptPro.auth?.github,
       google: fastgptPro.auth?.google,
@@ -234,13 +242,19 @@ export function formatFormData2ConfigStore({
     [SystemConfigsTypeEnum.fastgpt]: {
       feConfigs: formatFeConfig,
       systemEnv,
+      subPlans: {
+        [SubTypeEnum.standard]: standardSubPlanJson,
+        [SubTypeEnum.extraDatasetSize]: {
+          price: subPlans.extraDatasetSizePrice
+        }
+      },
       ...formatModels
     },
     [SystemConfigsTypeEnum.fastgptPro]: fastgptProConfig
   };
 }
 
-export function formConfig2uiSchema(formConfig: RJSFSchema) {
+export function formConfig2uiSchema(formConfig: any) {
   let uiSchema: any = {};
 
   for (let key in formConfig.properties) {
@@ -279,7 +293,7 @@ export function formConfig2uiSchema(formConfig: RJSFSchema) {
   return uiSchema;
 }
 
-export function formatFormConfig(formConfig: RJSFSchema) {
+export function formatFormConfig(formConfig: any) {
   let formattedConfig = { ...formConfig };
 
   for (let key in formattedConfig.properties) {

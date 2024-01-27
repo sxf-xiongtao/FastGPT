@@ -75,6 +75,23 @@
           }
         },
 
+        "subPlans": {
+          "type": "object",
+          "title": "订阅套餐",
+          "properties": {
+            "standard": {
+              "title": "标准订阅套餐（需严格按模板填写，可修改里面的子项）",
+              "type": "json",
+              "default": "{}"
+            },
+            "extraDatasetSizePrice": {
+              "type": "number",
+              "title": "知识库存储费用（xx元/1000条/月）",
+              "default": 0
+            }
+          }
+        },
+
         "placeholder1": {
           "type": "object",
           "title": "模型配置"
@@ -103,21 +120,6 @@
               "type": "number",
               "title": "默认团队成员上限",
               "defaultValue": 1
-            }
-          }
-        },
-        "subscription": {
-          "type": "object",
-          "title": "订阅套餐",
-          "properties": {
-            "datasetStorePrice": {
-              "type": "number",
-              "title": "知识库存储费用（xx元/1000条/月）",
-              "defaultValue": 0
-            },
-            "datasetStoreFreeSize": {
-              "type": "number",
-              "title": "知识库存储免费条数"
             }
           }
         },

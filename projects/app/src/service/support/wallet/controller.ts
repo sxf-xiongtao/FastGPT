@@ -3,6 +3,7 @@ import { addLog } from '@fastgpt/service/common/system/log';
 import { delay } from '@fastgpt/global/common/system/utils';
 import { MongoBill } from '@fastgpt/service/support/wallet/bill/schema';
 import type { ConcatBillQueueItemType } from '@/global/support/wallet/bill/type.d';
+import { ClientSession } from '@fastgpt/service/common/mongo';
 
 /* 
   amount: min unit
@@ -10,11 +11,13 @@ import type { ConcatBillQueueItemType } from '@/global/support/wallet/bill/type.
 export async function updateTeamBalance({
   teamId,
   amount,
-  retry = 3
+  retry = 3,
+  session
 }: {
   teamId: string;
   amount: number;
   retry?: number;
+  session?: ClientSession;
 }): Promise<any> {
   if (amount === 0) return;
   if (Math.abs(amount) < 10) {
@@ -27,10 +30,18 @@ export async function updateTeamBalance({
   });
 
   try {
-    await MongoTeam.findByIdAndUpdate(teamId, {
-      $inc: { balance: amount }
-    });
+    await MongoTeam.findByIdAndUpdate(
+      teamId,
+      {
+        $inc: { balance: amount }
+      },
+      { session }
+    );
   } catch (error) {
+    if (session) {
+      return Promise.reject(error);
+    }
+
     console.log(error, retry);
 
     if (retry > 0) {
@@ -131,7 +142,7 @@ export const concatBillTimer = async () => {
           }
         });
       } catch (error) {
-        addLog.error('concat bill error', error);
+        addLog.error('Concat bill error', error);
       }
     }
     console.log('concat bill timer:', list.length);

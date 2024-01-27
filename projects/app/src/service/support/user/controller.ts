@@ -9,6 +9,7 @@ import { hashStr } from '@fastgpt/global/common/string/tools';
 import { sendInform2OneUser } from './inform/controller';
 import { createJWT } from '@fastgpt/service/support/permission/controller';
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 8);
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 
 /* create user and team */
 export async function createUserByUsername({
@@ -23,15 +24,27 @@ export async function createUserByUsername({
   inviterId?: string;
 }): Promise<UserType> {
   await authMaxUsers();
-  const user = await MongoUser.create({
-    username,
-    avatar,
-    password,
-    inviterId: inviterId ? inviterId : undefined,
-    balance: (global.systemConfig.system?.userDefaultBalance || 2) * PRICE_SCALE
-  });
 
-  const team = await getAndCreateUserDefaultTeam(user._id);
+  const { user, team } = await mongoSessionRun(async (session) => {
+    const [user] = await MongoUser.create(
+      [
+        {
+          username,
+          avatar,
+          password,
+          inviterId: inviterId ? inviterId : undefined,
+          balance: (global.systemConfig.system?.userDefaultBalance || 2) * PRICE_SCALE
+        }
+      ],
+      { session }
+    );
+
+    const team = await getAndCreateUserDefaultTeam(user._id, session);
+    return {
+      user,
+      team
+    };
+  });
 
   return {
     _id: user._id,

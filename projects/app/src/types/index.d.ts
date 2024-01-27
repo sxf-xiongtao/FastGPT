@@ -24,10 +24,6 @@ export type SystemConfigType = {
     teamDefaultMaxMember?: number;
     datasetStorePrice?: number;
   };
-  subscription?: {
-    datasetStoreFreeSize: number;
-    datasetStorePrice: number;
-  };
   censor?: {
     BAIDU_TEXT_CENSOR_CLIENTID?: string;
     BAIDU_TEXT_CENSOR_CLIENTSECRET?: string;

@@ -23,6 +23,9 @@ import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 import { MongoOpenApi } from '@fastgpt/service/support/openapi/schema';
 import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
+import { ClientSession } from '@fastgpt/service/common/mongo';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { createTeamFreeSubPlan } from '../../wallet/sub/utils';
 
 /* -------- format --------- */
 export function teamMemberSchema2TeamItemType(data: TeamMemberWithTeamAndUserSchema): TeamItemType {
@@ -47,33 +50,56 @@ export async function createTeam({
   ownerId,
   name,
   avatar,
-  defaultTeam = false
-}: CreateTeamProps & { ownerId: string }) {
+  defaultTeam = false,
+  session
+}: CreateTeamProps & { ownerId: string; session?: ClientSession }) {
   try {
-    // find team, if not exist, create
-    const teamId = await (async () => {
-      const team = await MongoTeam.findOne({ ownerId }, '_id');
-      if (team) {
-        return team._id;
-      }
-      const { _id } = await MongoTeam.create({
-        ownerId,
-        name,
-        avatar,
-        maxSize: global.systemConfig.system?.teamDefaultMaxMember || 5,
-        balance: (global.systemConfig.system?.userDefaultBalance || 2) * PRICE_SCALE
-      });
-      return _id;
-    })();
-    await MongoTeamMember.create({
-      teamId,
-      userId: ownerId,
-      name: 'Owner',
-      role: TeamMemberRoleEnum.owner,
-      status: TeamMemberStatusEnum.active,
-      defaultTeam
+    const [team] = await MongoTeam.create(
+      [
+        {
+          ownerId,
+          name,
+          avatar,
+          maxSize: global.systemConfig.system?.teamDefaultMaxMember || 5,
+          balance: (global.systemConfig.system?.userDefaultBalance || 2) * PRICE_SCALE
+        }
+      ],
+      { session }
+    );
+    const [tmb] = await MongoTeamMember.create(
+      [
+        {
+          teamId: team._id,
+          userId: ownerId,
+          name: 'Owner',
+          role: TeamMemberRoleEnum.owner,
+          status: TeamMemberStatusEnum.active,
+          defaultTeam
+        }
+      ],
+      { session }
+    );
+
+    // create sub plan
+    await createTeamFreeSubPlan({
+      teamId: team._id,
+      session
     });
-    return teamId;
+
+    return {
+      userId: String(ownerId),
+      teamId: String(team._id),
+      teamName: team.name,
+      memberName: tmb.name,
+      avatar: team.avatar,
+      balance: team.balance,
+      tmbId: String(tmb._id),
+      role: tmb.role,
+      status: tmb.status,
+      defaultTeam: tmb.defaultTeam,
+      canWrite: tmb.role !== TeamMemberRoleEnum.visitor,
+      maxSize: team.maxSize
+    };
   } catch (error) {
     return Promise.reject(error);
   }
@@ -114,19 +140,23 @@ export async function getTeamByTmbId(tmbId: string) {
   return teamMemberSchema2TeamItemType(tmb);
 }
 // get default team, if not exit, create one
-export async function getAndCreateUserDefaultTeam(userId: string): Promise<TeamItemType> {
+export async function getAndCreateUserDefaultTeam(
+  userId: string,
+  session?: ClientSession
+): Promise<TeamItemType> {
   const tmb = (await MongoTeamMember.findOne({
     userId,
     defaultTeam: true
   }).populate('teamId userId')) as TeamMemberWithTeamAndUserSchema;
+
   if (!tmb) {
-    await createTeam({
+    return createTeam({
       ownerId: userId,
       name: 'My Team',
       avatar: '/icon/logo.svg',
-      defaultTeam: true
+      defaultTeam: true,
+      session
     });
-    return getAndCreateUserDefaultTeam(userId);
   }
   return teamMemberSchema2TeamItemType(tmb);
 }
@@ -136,7 +166,7 @@ export async function getUserTeamOrDefaultTeam(tmbId?: string, userId?: string) 
     return getTeamByTmbId(tmbId);
   }
   if (userId) {
-    return getAndCreateUserDefaultTeam(userId);
+    return mongoSessionRun((session) => getAndCreateUserDefaultTeam(userId, session));
   }
 
   return Promise.reject('tmbId or userId is required');

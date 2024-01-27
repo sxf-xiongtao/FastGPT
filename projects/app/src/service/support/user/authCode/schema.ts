@@ -17,14 +17,14 @@ const AuthCodeSchema = new Schema({
     enum: ['register', 'findPassword'],
     required: true
   },
-  expiredTime: {
-    type: Number,
-    default: () => Date.now() + 5 * 60 * 1000
+  time: {
+    type: Date,
+    default: () => Date.now()
   }
 });
 
 try {
-  AuthCodeSchema.index({ expiredTime: 1 }, { expireAfterSeconds: 6 * 60 });
+  AuthCodeSchema.index({ time: 1 }, { expireAfterSeconds: 5 * 60 });
 } catch (error) {
   console.log(error);
 }

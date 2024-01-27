@@ -8,6 +8,7 @@ import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { createTeam } from '@/service/support/user/team/controller';
 import { addHours } from 'date-fns';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 
 /* 
   创建用户流程：
@@ -77,12 +78,15 @@ export async function checkInvalidUser(start: Date, end: Date) {
         invalidUserIds.push(_id);
 
         // 给他创建团队
-        await createTeam({
-          ownerId: _id,
-          name: 'My Team',
-          avatar: user.avatar,
-          defaultTeam: true
-        });
+        await mongoSessionRun(async (session) =>
+          createTeam({
+            ownerId: _id,
+            name: 'My Team',
+            avatar: user.avatar,
+            defaultTeam: true,
+            session
+          })
+        );
       }
     } catch (error) {}
     console.log('check user', ++finish);

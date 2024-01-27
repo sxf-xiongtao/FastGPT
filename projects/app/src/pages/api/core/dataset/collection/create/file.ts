@@ -99,8 +99,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     // 5. check dataset limit
     await checkDatasetLimit({
       teamId,
-      freeSize: global?.fatgptMainConfig?.feConfigs?.subscription?.datasetStoreFreeSize,
-      insertLen: predictDataLimitLength(trainingType, chunks)
+      insertLen: predictDataLimitLength(trainingType, chunks),
+      standardPlans: global.fatgptMainConfig?.subPlans?.standard
     });
 
     // 6. create collection and training bill

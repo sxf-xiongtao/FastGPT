@@ -8,6 +8,7 @@ import { authUserNotVisitor } from '@fastgpt/service/support/permission/auth/use
 import { calcDatasetSizeSubUpdateData } from './preCheck';
 import { updateTeamExtraDatasetSizeSub } from '@/service/support/wallet/sub/utils';
 import { createExtraDatasetSizeSubBill } from '@/service/support/wallet/sub/bill';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 
 /* Update dataset size sub. */
 
@@ -36,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       balanceEnough,
       newSubSize,
       payPrice,
-      newPrice,
+      newPlanPrice,
       newSubStartTime,
       newSubExpiredTime
     } = await calcDatasetSizeSubUpdateData({ size, team });
@@ -58,23 +59,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       throw new Error('余额不足');
     }
 
-    //  创建订单 & 扣费
-    await createExtraDatasetSizeSubBill({
-      teamId,
-      tmbId,
-      payPrice,
-      size: newSubSize
-    });
+    await mongoSessionRun(async (session) => {
+      //  创建订单 & 扣费
+      await createExtraDatasetSizeSubBill({
+        teamId,
+        tmbId,
+        payPrice,
+        size: newSubSize,
+        session
+      });
 
-    // 更新订阅
-    await updateTeamExtraDatasetSizeSub({
-      sub,
-      teamId,
-      startTime: newSubStartTime,
-      expiredTime: newSubExpiredTime,
-      price: newPrice,
-      currentExtraDatasetSize: newSubSize,
-      nextExtraDatasetSize: newSubSize
+      // 更新订阅
+      await updateTeamExtraDatasetSizeSub({
+        sub,
+        teamId,
+        startTime: newSubStartTime,
+        expiredTime: newSubExpiredTime,
+        price: newPlanPrice,
+        currentExtraDatasetSize: newSubSize,
+        nextExtraDatasetSize: newSubSize,
+        session
+      });
     });
 
     jsonRes(res);

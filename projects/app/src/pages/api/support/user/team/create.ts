@@ -5,6 +5,7 @@ import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { createTeam } from '@/service/support/user/team/controller';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { TeamMemberRoleEnum } from '@fastgpt/global/support/user/team/constant';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -20,11 +21,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       throw new Error('仅限1个团队');
     }
 
-    jsonRes(res, {
-      data: await createTeam({
+    const result = await mongoSessionRun((session) =>
+      createTeam({
         ...req.body,
-        ownerId: userId
+        ownerId: userId,
+        session
       })
+    );
+
+    jsonRes(res, {
+      data: result
     });
   } catch (err) {
     jsonRes(res, {

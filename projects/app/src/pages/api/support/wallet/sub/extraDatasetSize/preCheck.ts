@@ -15,6 +15,7 @@ import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
 import { authUserNotVisitor } from '@fastgpt/service/support/permission/auth/user';
 import { TeamItemType } from '@fastgpt/global/support/user/team/type';
 import { addDays } from 'date-fns';
+import { getExtraDatasetSizePrice } from '@/service/support/wallet/sub/utils';
 
 /* Update dataset size sub. */
 
@@ -48,7 +49,7 @@ export const calcDatasetSizeSubUpdateData = async ({
   }
 
   // one month, 1000 group price
-  const DatasetStorePrice = global.systemConfig?.subscription?.datasetStorePrice || 0;
+  const DatasetStorePrice = getExtraDatasetSizePrice('store');
 
   // find the sub
   const sub = await MongoTeamSub.findOne({
@@ -69,7 +70,7 @@ export const calcDatasetSizeSubUpdateData = async ({
       newSubSize,
       alreadySubSize,
       payPrice: 0,
-      newPrice: 0,
+      newPlanPrice: 0,
       newSubStartTime: sub?.startTime || new Date(),
       newSubExpiredTime: sub?.expiredTime || new Date()
     };
@@ -83,9 +84,9 @@ export const calcDatasetSizeSubUpdateData = async ({
   const remainPrice =
     alreadySubDay > 0 ? Math.floor((remainDay / alreadySubDay) * alreadySubPrice) : 0;
   // 3. cal new sub price
-  const newPrice = DatasetStorePrice * size * PRICE_SCALE;
+  const newPlanPrice = DatasetStorePrice * size;
   // 4. cal total price
-  const payPrice = newPrice - remainPrice;
+  const payPrice = newPlanPrice - remainPrice;
 
   return {
     payForNewSub: true,
@@ -93,7 +94,7 @@ export const calcDatasetSizeSubUpdateData = async ({
     newSubSize,
     alreadySubSize,
     payPrice: payPrice > 0 ? payPrice : 0,
-    newPrice,
+    newPlanPrice,
     // 订阅30天
     newSubStartTime: new Date(),
     newSubExpiredTime: addDays(new Date(), 30)

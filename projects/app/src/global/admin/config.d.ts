@@ -1,6 +1,7 @@
 import { SystemConfigType } from '@/types';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
 import { FastGPTConfigFileType } from '@fastgpt/global/common/system/types';
+import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 
 export type ConfigStoreType = {
   [SystemConfigsTypeEnum.fastgpt]: FastGPTConfigFileType;
@@ -36,6 +37,10 @@ export type ConfigFormType = {
       qaMaxProcess: number;
       pgHNSWEfSearch: number;
     };
+    subPlans: {
+      standard: string;
+      extraDatasetSizePrice: number;
+    };
     chatModels: string;
     qaModels: string;
     cqModels: string;
@@ -48,7 +53,6 @@ export type ConfigFormType = {
   };
   [SystemConfigsTypeEnum.fastgptPro]: {
     system: Omit<SystemConfigType['system'], 'title'>;
-    subscription: SystemConfigType['subscription'];
     censor: SystemConfigType['censor'];
     auth: {
       googleV3Ver: {

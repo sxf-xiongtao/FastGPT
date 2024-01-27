@@ -8,16 +8,19 @@ import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { SubStatusEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { createExtraDatasetSizeSubBill } from '@/service/support/wallet/sub/bill';
-import { updateTeamExtraDatasetSizeSub } from '@/service/support/wallet/sub/utils';
-import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
+import {
+  getExtraDatasetSizePrice,
+  updateTeamExtraDatasetSizeSub
+} from '@/service/support/wallet/sub/utils';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 
 /* 更新额外知识库订阅 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await authCert({ req, authRoot: true });
     await connectToDatabase();
-    const DatasetStorePrice = global.systemConfig?.subscription?.datasetStorePrice || 0;
+    const DatasetStorePrice = getExtraDatasetSizePrice('store');
 
     // 1. Get all expired plan
     const plans = await MongoTeamSub.find({
@@ -46,7 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         const extraSize = plan.nextExtraDatasetSize || 0;
-        const price = (extraSize / 1000) * DatasetStorePrice * PRICE_SCALE;
+        const price = (extraSize / 1000) * DatasetStorePrice;
 
         // check balance
         if (team.balance < price) {
@@ -56,20 +59,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         // create bill and update team balance
-        await createExtraDatasetSizeSubBill({
-          teamId: team._id,
-          tmbId: ownerTmb._id,
-          payPrice: price,
-          size: extraSize
-        });
-        await updateTeamExtraDatasetSizeSub({
-          sub: plan,
-          teamId: team._id,
-          startTime: new Date(),
-          expiredTime: addDays(new Date(), 30),
-          price,
-          currentExtraDatasetSize: extraSize,
-          nextExtraDatasetSize: extraSize
+        await mongoSessionRun(async (session) => {
+          await createExtraDatasetSizeSubBill({
+            teamId: team._id,
+            tmbId: ownerTmb._id,
+            payPrice: price,
+            size: extraSize,
+            session
+          });
+          await updateTeamExtraDatasetSizeSub({
+            sub: plan,
+            teamId: team._id,
+            startTime: new Date(),
+            expiredTime: addDays(new Date(), 30),
+            price,
+            currentExtraDatasetSize: extraSize,
+            nextExtraDatasetSize: extraSize,
+            session
+          });
         });
 
         console.log('update sub success', {

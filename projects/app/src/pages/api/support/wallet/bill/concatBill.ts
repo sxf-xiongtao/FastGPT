@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     jsonRes(res);
   } catch (err) {
-    addLog.error('Concat Bill Error', err);
+    addLog.error('Push Concat Bill Error', err);
     console.log(err);
 
     jsonRes(res);

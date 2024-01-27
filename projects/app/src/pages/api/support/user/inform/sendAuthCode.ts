@@ -10,6 +10,7 @@ import axios from 'axios';
 import { customAlphabet } from 'nanoid';
 import requestIp from 'request-ip';
 import { Obj2Query } from '@/utils/tools';
+import { addMinutes } from 'date-fns';
 const nanoid = customAlphabet('123456789', 6);
 
 enum UserAuthTypeEnum {
@@ -45,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const authCode = await MongoAuthCode.findOne({
       username,
       type,
-      expiredTime: { $gte: Date.now() + 4 * 60 * 1000 } // 如果有一个记录的过期时间，大于当前+4分钟，说明距离上次发送还没到1分钟。（因为默认创建时，过期时间是未来5分钟）
+      time: { $gte: addMinutes(Date.now(), -1) }
     });
 
     if (authCode) {
@@ -58,8 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await MongoAuthCode.create({
       username,
       type,
-      code,
-      expiredTime: Date.now() + expiredMinute * 60 * 1000
+      code
     });
 
     if (username.includes('@')) {
@@ -157,8 +157,7 @@ export const authCode = async ({
   const result = await MongoAuthCode.findOne({
     username,
     type,
-    code,
-    expiredTime: { $gte: Date.now() }
+    code
   });
 
   if (!result) {
