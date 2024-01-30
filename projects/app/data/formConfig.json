@@ -92,20 +92,17 @@
           }
         },
 
-        "placeholder1": {
+        "models": {
           "type": "object",
-          "title": "模型配置"
-        },
-
-        "chatModels": { "type": "json" },
-        "qaModels": { "type": "json" },
-        "cqModels": { "type": "json" },
-        "extractModels": { "type": "json" },
-        "qgModels": { "type": "json" },
-        "vectorModels": { "type": "json" },
-        "reRankModels": { "type": "json" },
-        "audioSpeechModels": { "type": "json" },
-        "whisperModel": { "type": "json" }
+          "title": "模型配置",
+          "properties": {
+            "llmModels": { "title": "LLM大预言模型（用于对话、分类、内容提取等）", "type": "json" },
+            "vectorModels": { "title": "向量模型（知识库索引）", "type": "json" },
+            "reRankModels": { "title": "重排模型", "type": "json" },
+            "audioSpeechModels": { "title": "语音播放模型", "type": "json" },
+            "whisperModel": { "title": "语音输入模型", "type": "json" }
+          }
+        }
       }
     },
     "fastgptPro": {

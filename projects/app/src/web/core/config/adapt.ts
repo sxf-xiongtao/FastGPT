@@ -14,11 +14,7 @@ export function formatConfigStore2FormSchema({
     feConfigs,
     systemEnv,
     subPlans = {},
-    chatModels = [],
-    qaModels = [],
-    cqModels = [],
-    extractModels = [],
-    qgModels = [],
+    llmModels = [],
     vectorModels = [],
     reRankModels = [],
     audioSpeechModels = [],
@@ -90,15 +86,13 @@ export function formatConfigStore2FormSchema({
         // @ts-ignore
         extraDatasetSizePrice: subPlans[SubTypeEnum.extraDatasetSize]?.price || 0
       },
-      chatModels: JSON.stringify(chatModels, null, 2),
-      qaModels: JSON.stringify(qaModels, null, 2),
-      cqModels: JSON.stringify(cqModels, null, 2),
-      extractModels: JSON.stringify(extractModels, null, 2),
-      qgModels: JSON.stringify(qgModels, null, 2),
-      vectorModels: JSON.stringify(vectorModels, null, 2),
-      reRankModels: JSON.stringify(reRankModels, null, 2),
-      audioSpeechModels: JSON.stringify(audioSpeechModels, null, 2),
-      whisperModel: JSON.stringify(whisperModel, null, 2)
+      models: {
+        llmModels: JSON.stringify(llmModels, null, 2),
+        vectorModels: JSON.stringify(vectorModels, null, 2),
+        reRankModels: JSON.stringify(reRankModels, null, 2),
+        audioSpeechModels: JSON.stringify(audioSpeechModels, null, 2),
+        whisperModel: JSON.stringify(whisperModel, null, 2)
+      }
     },
     fastgptPro: {
       ...fastgptPro,
@@ -168,7 +162,7 @@ export function formatFormData2ConfigStore({
     },
     systemEnv,
     subPlans,
-    ...models
+    models
   },
   fastgptPro
 }: ConfigFormType): ConfigStoreType {
