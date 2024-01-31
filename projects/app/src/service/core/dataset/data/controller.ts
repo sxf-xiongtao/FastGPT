@@ -13,7 +13,7 @@ export async function pushDataToTrainingQueue(
   const result = await pushDataListToTrainingQueue({
     ...props,
     vectorModelList: global.fatgptMainConfig?.vectorModels,
-    qaModelList: global.fatgptMainConfig?.qaModels
+    datasetModelList: global.fatgptMainConfig?.llmModels
   });
 
   return result;

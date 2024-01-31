@@ -2,6 +2,7 @@ import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
+import { addDays } from 'date-fns';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const day = 60;
@@ -12,10 +13,10 @@ export default async function getUserFormData(req: NextApiRequest, res: NextApiR
     await adminCert({ req, authToken: true });
 
     let startCount = await MongoUser.countDocuments({
-      createTime: { $lt: new Date(Date.now() - day * 24 * 60 * 60 * 1000) }
+      createTime: { $lt: addDays(new Date(), -60) }
     });
     const usersRaw = await MongoUser.aggregate([
-      { $match: { createTime: { $gte: new Date(Date.now() - day * 24 * 60 * 60 * 1000) } } },
+      { $match: { createTime: { $gte: addDays(new Date(), -60) } } },
       {
         $group: {
           _id: {

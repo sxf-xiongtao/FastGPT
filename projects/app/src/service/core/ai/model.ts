@@ -1,31 +1,14 @@
-export const getChatModel = (model?: string) => {
+export const getLlmModel = (model?: string) => {
   return (
-    global.fatgptMainConfig?.chatModels.find((item) => item.model === model) ??
-    global.fatgptMainConfig?.chatModels?.[0]
+    global.fatgptMainConfig?.llmModels.find((item) => item.model === model) ??
+    global.fatgptMainConfig?.llmModels?.[0]
   );
 };
-export const getQAModel = (model?: string) => {
+export const getDatasetModel = (model?: string) => {
   return (
-    global.fatgptMainConfig?.qaModels.find((item) => item.model === model) ||
-    global.fatgptMainConfig?.qaModels?.[0]
-  );
-};
-export const getCQModel = (model?: string) => {
-  return (
-    global.fatgptMainConfig?.cqModels.find((item) => item.model === model) ||
-    global.fatgptMainConfig?.cqModels?.[0]
-  );
-};
-export const getExtractModel = (model?: string) => {
-  return (
-    global.fatgptMainConfig?.extractModels.find((item) => item.model === model) ||
-    global.fatgptMainConfig?.extractModels?.[0]
-  );
-};
-export const getQGModel = (model?: string) => {
-  return (
-    global.fatgptMainConfig?.qgModels.find((item) => item.model === model) ||
-    global.fatgptMainConfig?.qgModels?.[0]
+    global.fatgptMainConfig?.llmModels
+      ?.filter((item) => item.datasetProcess)
+      ?.find((item) => item.model === model) ?? global.fatgptMainConfig?.llmModels[0]
   );
 };
 

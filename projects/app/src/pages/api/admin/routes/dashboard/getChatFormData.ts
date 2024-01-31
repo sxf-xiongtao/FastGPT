@@ -3,6 +3,7 @@ import { adminCert } from '@/service/support/permission/adminCert';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { MongoChatItem } from '@fastgpt/service/core/chat/chatItemSchema';
 import { jsonRes } from '@fastgpt/service/common/response';
+import { addDays } from 'date-fns';
 
 const day = 60;
 
@@ -11,12 +12,12 @@ export default async function getChatFormData(req: NextApiRequest, res: NextApiR
     await connectToDatabase();
     await adminCert({ req, authToken: true });
 
-    // 获取今天的对话总数
+    // 获取对话总数
     const chatsRaw = await MongoChatItem.aggregate([
       {
         $match: {
           obj: 'Human',
-          time: { $gte: new Date(Date.now() - day * 24 * 60 * 60 * 1000 + 8 * 60 * 60 * 1000) }
+          time: { $gte: addDays(new Date(), -60) }
         }
       },
       {

@@ -19,7 +19,7 @@ import { predictDataLimitLength } from '@fastgpt/global/core/dataset/utils';
 import { pushDataToTrainingQueue } from '@/service/core/dataset/data/controller';
 import { createTrainingBill } from '@fastgpt/service/support/wallet/bill/controller';
 import { BillSourceEnum } from '@fastgpt/global/support/wallet/bill/constants';
-import { getQAModel, getVectorModel } from '@/service/core/ai/model';
+import { getDatasetModel, getVectorModel } from '@/service/core/ai/model';
 import { BucketNameEnum } from '@fastgpt/global/common/file/constants';
 
 /**
@@ -125,7 +125,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         appName: collectionName,
         billSource: BillSourceEnum.training,
         vectorModel: getVectorModel(dataset.vectorModel)?.name,
-        agentModel: getQAModel(dataset.agentModel)?.name
+        agentModel: getDatasetModel(dataset.agentModel)?.name
       })
     ]);
 

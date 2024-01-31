@@ -20,6 +20,7 @@ import { useForm } from 'react-hook-form';
 import { POST } from '@/service/common/request';
 import { useQueryClient } from '@tanstack/react-query';
 import { EditIcon } from '@chakra-ui/icons';
+import { hashStr } from '@fastgpt/global/common/string/tools';
 
 type TFormData = {
   password: string;
@@ -38,8 +39,10 @@ export default function UserEditModal(props: { data: any }) {
 
   const onSubmit = async (formData: TFormData) => {
     try {
-      const res = await POST(`/admin/routes/users/updateUser`, formData);
-      console.log(res);
+      const res = await POST(`/admin/routes/users/updateUser`, {
+        ...formData,
+        password: hashStr(formData.password)
+      });
       toast({
         title: '更新成功',
         status: 'success',

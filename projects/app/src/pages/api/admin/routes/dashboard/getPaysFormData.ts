@@ -2,6 +2,7 @@ import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { MongoPay } from '@/service/support/wallet/pay/schema';
 import { jsonRes } from '@fastgpt/service/common/response';
+import { addDays } from 'date-fns';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const day = 60;
@@ -18,21 +19,16 @@ export default async function getPaysFormData(req: NextApiRequest, res: NextApiR
         $match: {
           status: 'SUCCESS',
           createTime: {
-            $gte: new Date(Date.now() - day * 24 * 60 * 60 * 1000 + 8 * 60 * 60 * 1000) // 补时差
+            $gte: addDays(new Date(), -60)
           }
-        }
-      },
-      {
-        $addFields: {
-          adjustedCreateTime: { $add: ['$createTime', 8 * 60 * 60 * 1000] }
         }
       },
       {
         $group: {
           _id: {
-            year: { $year: '$adjustedCreateTime' },
-            month: { $month: '$adjustedCreateTime' },
-            day: { $dayOfMonth: '$adjustedCreateTime' }
+            year: { $year: '$createTime' },
+            month: { $month: '$createTime' },
+            day: { $dayOfMonth: '$createTime' }
           },
           count: { $sum: '$price' }
         }

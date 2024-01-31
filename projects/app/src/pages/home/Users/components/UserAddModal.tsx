@@ -17,6 +17,7 @@ import { useForm } from 'react-hook-form';
 import { POST } from '@/service/common/request';
 import { useQueryClient } from '@tanstack/react-query';
 import { AddIcon } from '@chakra-ui/icons';
+import { hashStr } from '@fastgpt/global/common/string/tools';
 
 type TFormData = {
   username: string;
@@ -40,7 +41,10 @@ export default function UserAddModal(props: { data: any }) {
 
   const onSubmit = async (formData: TFormData) => {
     try {
-      await POST(`/admin/routes/users/addUser`, formData);
+      await POST(`/admin/routes/users/addUser`, {
+        ...formData,
+        password: hashStr(formData.password)
+      });
       toast({
         title: '添加成功',
         status: 'success',
