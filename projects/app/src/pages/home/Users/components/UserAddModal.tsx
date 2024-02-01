@@ -12,7 +12,7 @@ import {
   useDisclosure,
   useToast
 } from '@chakra-ui/react';
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { POST } from '@/service/common/request';
 import { useQueryClient } from '@tanstack/react-query';
@@ -29,6 +29,7 @@ export default function UserAddModal(props: { data: any }) {
   const { data } = props;
   const queryClient = useQueryClient();
   const toast = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -45,6 +46,7 @@ export default function UserAddModal(props: { data: any }) {
         ...formData,
         password: hashStr(formData.password)
       });
+      setIsLoading(true);
       toast({
         title: '添加成功',
         status: 'success',
@@ -63,6 +65,7 @@ export default function UserAddModal(props: { data: any }) {
         position: 'top'
       });
     }
+    setIsLoading(false);
   };
 
   return (
@@ -123,7 +126,7 @@ export default function UserAddModal(props: { data: any }) {
             <Button variant="text" onClick={onClose}>
               关闭
             </Button>
-            <Button variant="confirm" onClick={handleSubmit(onSubmit)}>
+            <Button variant="confirm" onClick={handleSubmit(onSubmit)} isLoading={isLoading}>
               确定
             </Button>
           </ModalFooter>

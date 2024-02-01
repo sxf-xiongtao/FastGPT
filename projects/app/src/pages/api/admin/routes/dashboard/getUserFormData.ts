@@ -76,7 +76,7 @@ export default async function getUserFormData(req: NextApiRequest, res: NextApiR
       } else {
         const emptyValue = {
           date: date.toISOString(),
-          count: userCount.length > 0 ? userCount[0].count : 0,
+          count: userCount.length > 0 ? userCount[0].count - userCount[0].increase : 0,
           increase: 0,
           increaseRate: '0.00%'
         };

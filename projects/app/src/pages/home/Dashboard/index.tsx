@@ -174,7 +174,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 
 const UserChart = ({ data }: { data: chatDataType[] }) => {
   return (
-    <ResponsiveContainer width="100%" height={320} className="mt-4">
+    <ResponsiveContainer width="100%" height={360} className="mt-4">
       <AreaChart
         width={730}
         height={250}

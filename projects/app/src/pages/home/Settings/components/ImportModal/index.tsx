@@ -50,7 +50,7 @@ export default function ImportModal(props: {
           <ModalBody>
             <JsonEditor
               height={500}
-              defaultValue={JSON.stringify(value, null, 2)}
+              value={JSON.stringify(value, null, 2)}
               onChange={(value) => {
                 setConfigData(value);
               }}
@@ -65,7 +65,6 @@ export default function ImportModal(props: {
               mr={3}
               className="w-40"
               onClick={() => {
-                console.log('configData', configData);
                 try {
                   setRawData(JSON.parse(configData));
                   const aggregatedConfigs: ConfigFormType = formatConfigStore2FormSchema(
