@@ -9,20 +9,20 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  useDisclosure,
-  useToast
+  useDisclosure
 } from '@chakra-ui/react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { POST } from '@/service/common/request';
 import { useQueryClient } from '@tanstack/react-query';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
+import { useToast } from '@fastgpt/web/hooks/useToast';
 
 export default function EditTeamModal(props: { data: any }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data } = props;
   const queryClient = useQueryClient();
-  const toast = useToast();
+  const { toast } = useToast();
 
   const {
     register,
@@ -38,10 +38,7 @@ export default function EditTeamModal(props: { data: any }) {
       .then((res) => {
         toast({
           title: '变更成功',
-          status: 'success',
-          duration: 2000,
-          isClosable: false,
-          position: 'top'
+          status: 'success'
         });
         queryClient.invalidateQueries(['getTeams']);
         onClose();
@@ -49,10 +46,7 @@ export default function EditTeamModal(props: { data: any }) {
       .catch((err) => {
         toast({
           title: err.message,
-          status: 'error',
-          duration: 2000,
-          isClosable: false,
-          position: 'top'
+          status: 'error'
         });
       });
   };

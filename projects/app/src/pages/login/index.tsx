@@ -4,8 +4,7 @@ import {
   FormLabel,
   Input,
   InputGroup,
-  InputRightElement,
-  useToast
+  InputRightElement
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -15,6 +14,7 @@ import { POST } from '@/service/common/request';
 import { hashStr } from '@fastgpt/global/common/string/tools';
 import { serviceSideProps } from '@/web/common/i18n';
 import { useTranslation } from 'next-i18next';
+import { useToast } from '@fastgpt/web/hooks/useToast';
 
 type FormData = {
   account: string;
@@ -25,7 +25,7 @@ const Login = () => {
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const toast = useToast();
+  const { toast } = useToast();
   const { t } = useTranslation();
 
   const {
@@ -52,19 +52,13 @@ const Login = () => {
         router.push('/home/dashboard');
         toast({
           title: '登录成功',
-          status: 'success',
-          duration: 2000,
-          isClosable: true,
-          position: 'top'
+          status: 'success'
         });
       }
     } catch (error: any) {
       toast({
         title: error.message,
-        status: 'error',
-        duration: 2000,
-        isClosable: true,
-        position: 'top'
+        status: 'error'
       });
     } finally {
       setIsLoading(false);

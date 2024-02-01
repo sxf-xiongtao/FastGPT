@@ -9,11 +9,11 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  useDisclosure,
-  useToast
+  useDisclosure
 } from '@chakra-ui/react';
 import JsonEditor from '@fastgpt/web/components/common/Textarea/JsonEditor';
 import React, { useEffect } from 'react';
+import { useToast } from '@fastgpt/web/hooks/useToast';
 
 export default function ImportModal(props: {
   children: React.ReactElement;
@@ -28,7 +28,7 @@ export default function ImportModal(props: {
     setConfigData(JSON.stringify(value, null, 2));
   }, [value]);
 
-  const toast = useToast();
+  const { toast } = useToast();
 
   return (
     <>
@@ -74,19 +74,13 @@ export default function ImportModal(props: {
                   onClose();
                   toast({
                     title: '导入成功，请点击保存',
-                    status: 'success',
-                    duration: 3000,
-                    isClosable: true,
-                    position: 'top'
+                    status: 'success'
                   });
                 } catch (error: any) {
                   toast({
                     title: '请检查配置文件格式',
                     description: error.message,
-                    status: 'error',
-                    duration: 3000,
-                    isClosable: true,
-                    position: 'top'
+                    status: 'error'
                   });
                 }
               }}

@@ -9,8 +9,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  useDisclosure,
-  useToast
+  useDisclosure
 } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -18,6 +17,7 @@ import { POST } from '@/service/common/request';
 import { useQueryClient } from '@tanstack/react-query';
 import { AddIcon } from '@chakra-ui/icons';
 import { hashStr } from '@fastgpt/global/common/string/tools';
+import { useToast } from '@fastgpt/web/hooks/useToast';
 
 type TFormData = {
   username: string;
@@ -28,8 +28,8 @@ export default function UserAddModal(props: { data: any }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data } = props;
   const queryClient = useQueryClient();
-  const toast = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   const {
     register,
@@ -49,20 +49,14 @@ export default function UserAddModal(props: { data: any }) {
       setIsLoading(true);
       toast({
         title: '添加成功',
-        status: 'success',
-        duration: 2000,
-        isClosable: false,
-        position: 'top'
+        status: 'success'
       });
       queryClient.invalidateQueries(['getUsers']);
       onClose();
     } catch (error: any) {
       toast({
         title: error.message,
-        status: 'error',
-        duration: 2000,
-        isClosable: false,
-        position: 'top'
+        status: 'error'
       });
     }
     setIsLoading(false);

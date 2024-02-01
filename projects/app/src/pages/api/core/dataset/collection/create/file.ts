@@ -104,7 +104,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     });
 
     // 6. create collection and training bill
-    const [collectionId, { billId }] = await Promise.all([
+    const [{ _id: collectionId }, { billId }] = await Promise.all([
       createOneCollection({
         ...collectionData,
         name: collectionName,

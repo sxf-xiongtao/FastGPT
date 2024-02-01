@@ -14,8 +14,10 @@ import { DatasetSchemaType } from '@fastgpt/global/core/dataset/type';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { PostWebsiteSyncParams } from '@fastgpt/global/core/dataset/api.d';
 import { delDatasetRelevantData } from '@fastgpt/service/core/dataset/controller';
-import { reloadCollectionChunks } from '@fastgpt/service/core/dataset/collection/utils';
 import { updateWebSyncLimit } from '@fastgpt/service/support/user/utils';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { splitText2Chunks } from '@fastgpt/global/common/string/textSplitter';
+import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
 
 // config
 const maxCrawlPage = 200;
@@ -38,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // 1. clear dataset all data
-    await delDatasetRelevantData({ datasets: [dataset] });
+    await mongoSessionRun((session) => delDatasetRelevantData({ datasets: [dataset], session }));
 
     // 2. crawl all website
     crawlWebsite({
@@ -96,25 +98,50 @@ async function createCollectionAndPushData(props: {
   const { dataset, item, billId, retry } = props;
 
   try {
-    // create collection
-    const { _id: collectionId } = await MongoDatasetCollection.create({
-      parentId: null,
-      teamId: dataset.teamId,
-      tmbId: dataset.tmbId,
-      datasetId: dataset._id,
-      type: DatasetCollectionTypeEnum.link,
-      name: item.title || item.url,
-      trainingType: TrainingModeEnum.chunk,
-      chunkSize,
-      rawLink: item.url,
-      metadata: {}
+    // split data
+    const { chunks } = splitText2Chunks({
+      text: item.content,
+      chunkLen: chunkSize
     });
 
-    await reloadCollectionChunks({
-      collectionId,
-      tmbId: dataset.tmbId,
-      billId,
-      rawText: item.content
+    await mongoSessionRun(async (session) => {
+      // create collection
+      const [collection] = await MongoDatasetCollection.create(
+        [
+          {
+            parentId: null,
+            teamId: dataset.teamId,
+            tmbId: dataset.tmbId,
+            datasetId: dataset._id,
+            type: DatasetCollectionTypeEnum.link,
+            name: item.title || item.url,
+            trainingType: TrainingModeEnum.chunk,
+            chunkSize,
+            rawLink: item.url,
+            metadata: {}
+          }
+        ],
+        { session }
+      );
+
+      // insert to training queue
+      const model = dataset.vectorModel;
+      await MongoDatasetTraining.insertMany(
+        chunks.map((item, i) => ({
+          teamId: dataset.teamId,
+          tmbId: dataset.tmbId,
+          datasetId: dataset._id,
+          collectionId: collection._id,
+          billId,
+          mode: collection.trainingType,
+          prompt: '',
+          model,
+          q: item,
+          a: '',
+          chunkIndex: i
+        })),
+        { session }
+      );
     });
   } catch (err) {
     console.log(err, retry);

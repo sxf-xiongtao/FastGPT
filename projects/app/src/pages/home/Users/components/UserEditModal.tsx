@@ -12,8 +12,7 @@ import {
   ModalOverlay,
   Radio,
   RadioGroup,
-  useDisclosure,
-  useToast
+  useDisclosure
 } from '@chakra-ui/react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -21,6 +20,7 @@ import { POST } from '@/service/common/request';
 import { useQueryClient } from '@tanstack/react-query';
 import { EditIcon } from '@chakra-ui/icons';
 import { hashStr } from '@fastgpt/global/common/string/tools';
+import { useToast } from '@fastgpt/web/hooks/useToast';
 
 type TFormData = {
   password: string;
@@ -31,7 +31,7 @@ export default function UserEditModal(props: { data: any }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data } = props;
   const queryClient = useQueryClient();
-  const toast = useToast();
+  const { toast } = useToast();
 
   const { register, handleSubmit, reset } = useForm({
     defaultValues: data
@@ -45,20 +45,14 @@ export default function UserEditModal(props: { data: any }) {
       });
       toast({
         title: '更新成功',
-        status: 'success',
-        duration: 2000,
-        isClosable: false,
-        position: 'top'
+        status: 'success'
       });
       queryClient.invalidateQueries(['getUsers']);
       onClose();
     } catch (err: any) {
       toast({
         title: err.message,
-        status: 'error',
-        duration: 2000,
-        isClosable: false,
-        position: 'top'
+        status: 'error'
       });
     }
   };

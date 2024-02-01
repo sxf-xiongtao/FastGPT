@@ -1,12 +1,13 @@
-import { Image, useToast } from '@chakra-ui/react';
+import { Image } from '@chakra-ui/react';
 import { WidgetProps } from '@rjsf/utils';
 import { useRef } from 'react';
 import { compressImgFileAndUpload } from '../../../../../service/admin/compressAndUpload';
 import { AddIcon } from '@chakra-ui/icons';
+import { useToast } from '@fastgpt/web/hooks/useToast';
 
 const CustomImage: React.FC<WidgetProps> = (props) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const toast = useToast();
+  const { toast } = useToast();
 
   return (
     <div className="mt-4 mb-8">
@@ -23,10 +24,7 @@ const CustomImage: React.FC<WidgetProps> = (props) => {
             } else {
               toast({
                 title: '上传图片失败',
-                status: 'error',
-                duration: 2000,
-                isClosable: true,
-                position: 'top'
+                status: 'error'
               });
             }
           }

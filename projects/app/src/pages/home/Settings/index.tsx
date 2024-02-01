@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import validator from '@rjsf/validator-ajv8';
 import Form from '@rjsf/core';
-import { Box, Button, Center, Spinner, useToast } from '@chakra-ui/react';
+import { Box, Button, Center, Spinner } from '@chakra-ui/react';
+import { useToast } from '@fastgpt/web/hooks/useToast';
 import CustomCheckbox from './components/Customization/CustomCheckbox';
 import DescriptionFieldTemplate from './components/Customization/DescriptionFieldTemplate';
 import { GET, POST } from '@/service/common/request';
@@ -33,7 +34,7 @@ export const Settings = () => {
   const [titles, setTitles] = useState<string[]>([]);
   const [activeTitle, setActiveTitle] = useState('');
   const [isSchemaLoading, setIsSchemaLoading] = useState(true);
-  const toast = useToast();
+  const { toast } = useToast();
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   useQuery(['getInitFormData'], () => getInitFormData(), {
@@ -45,10 +46,7 @@ export const Settings = () => {
     onError: () => {
       toast({
         title: '获取配置出错',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-        position: 'top'
+        status: 'error'
       });
     }
   });
