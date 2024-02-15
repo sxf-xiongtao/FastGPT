@@ -11,7 +11,7 @@
     "husky": "^8.0.3",
     "i18next": "^23.2.11",
     "lint-staged": "^13.2.1",
-    "prettier": "2.7.1"
+    "prettier": "3.2.4"
   },
   "lint-staged": {
     "./projects/**/**/*.{ts,tsx,scss}": "npm run format"
