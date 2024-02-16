@@ -63,7 +63,7 @@
     "urllib": "^3.18.0",
     "zustand": "^4.3.8",
     "mammoth": "^1.6.0",
-    "pdfjs-dist": "^4.0.269"
+    "pdfjs-dist": "4.0.269"
   },
   "devDependencies": {
     "@svgr/webpack": "^6.5.1",
