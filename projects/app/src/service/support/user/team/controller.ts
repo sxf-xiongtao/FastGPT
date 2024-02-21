@@ -110,6 +110,11 @@ export async function updateTeam({ teamId, name, avatar }: UpdateTeamProps) {
     avatar
   });
 }
+export async function updateTeamTagsUrl({ teamId, tagsUrl }: { teamId: string; tagsUrl: string }) {
+  await MongoTeam.findByIdAndUpdate(teamId, {
+    tagsUrl
+  });
+}
 export async function getUserTeams(data: {
   userId?: string;
   tmbId?: string;
