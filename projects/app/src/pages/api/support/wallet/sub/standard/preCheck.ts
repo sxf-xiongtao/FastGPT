@@ -18,7 +18,7 @@ import {
   standardSubLevelMap,
   subModeMap
 } from '@fastgpt/global/support/wallet/sub/constants';
-import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import { authUserNotVisitor } from '@fastgpt/service/support/permission/auth/user';
 import { TeamItemType } from '@fastgpt/global/support/user/team/type';
 import { addDays, addMonths } from 'date-fns';

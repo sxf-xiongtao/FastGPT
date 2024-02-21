@@ -1,13 +1,13 @@
 import { connectionMongo, type Model } from '@fastgpt/service/common/mongo';
 const { Schema, model, models } = connectionMongo;
-import { PaySchema as PayType } from '@fastgpt/global/support/wallet/pay/type.d';
+import { BillSchemaType } from '@fastgpt/global/support/wallet/bill/type.d';
 import {
   TeamCollectionName,
   TeamMemberCollectionName
 } from '@fastgpt/global/support/user/team/constant';
-import { payStatusMap, payTypeMap } from '@fastgpt/global/support/wallet/pay/constants';
+import { billStatusMap, billTypeMap } from '@fastgpt/global/support/wallet/bill/constants';
 
-const PaySchema = new Schema({
+const BillSchema = new Schema({
   teamId: {
     type: Schema.Types.ObjectId,
     ref: TeamCollectionName,
@@ -30,28 +30,29 @@ const PaySchema = new Schema({
   status: {
     type: String,
     default: 'NOTPAY',
-    enum: Object.keys(payStatusMap)
+    enum: Object.keys(billStatusMap)
   },
   type: {
     type: String,
-    enum: Object.keys(payTypeMap),
+    enum: Object.keys(billTypeMap),
     required: true
   },
-
   price: {
-    // total price
+    // total price. 1 * PRICE_SCALE = 1RMB
     type: Number,
+    required: true
+  },
+  metadata: {
+    type: Object,
     required: true
   }
 });
 
 try {
-  PaySchema.index({ createTime: 1 }, { background: true });
-  PaySchema.index({ status: 1 }, { background: true });
-  PaySchema.index({ type: 1 }, { background: true });
-  PaySchema.index({ teamId: 1 }, { background: true });
+  BillSchema.index({ status: 1, createTime: 1 }, { background: true });
+  BillSchema.index({ teamId: 1, status: 1, type: 1, createTime: 1 }, { background: true });
 } catch (error) {
   console.log(error);
 }
 
-export const MongoPay: Model<PayType> = models['pay'] || model('pay', PaySchema);
+export const MongoBill: Model<BillSchemaType> = models['pays'] || model('pays', BillSchema);

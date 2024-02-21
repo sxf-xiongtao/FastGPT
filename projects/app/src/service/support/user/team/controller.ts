@@ -20,7 +20,7 @@ import type {
   TeamMemberWithUserSchema
 } from '@fastgpt/global/support/user/team/type.d';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
-import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import { MongoOpenApi } from '@fastgpt/service/support/openapi/schema';
 import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
 import { ClientSession } from '@fastgpt/service/common/mongo';

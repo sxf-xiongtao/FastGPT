@@ -1,6 +1,6 @@
 export type ConcatBillQueueItemType = {
   billId: string;
   listIndex?: number;
-  total: number;
+  totalPoints: number;
   charsLength: number;
 };

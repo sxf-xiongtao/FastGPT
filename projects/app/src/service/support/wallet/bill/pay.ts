@@ -1,3 +1,4 @@
+import { BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { Payment } from './payment';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
 
@@ -18,11 +19,25 @@ export class WXPay {
       return Promise.reject(error);
     }
   }
-  async nativePay(amount: number, payId: string) {
+  async nativePay({
+    amount,
+    payId,
+    type
+  }: {
+    amount: number;
+    payId: string;
+    type: `${BillTypeEnum}`;
+  }) {
+    const map = {
+      [BillTypeEnum.balance]: '余额充值',
+      [BillTypeEnum.standSubPlan]: '套餐订阅',
+      [BillTypeEnum.extraDatasetSub]: '额外知识库存储',
+      [BillTypeEnum.extraPoints]: '额外AI积分'
+    };
     try {
       const payment = await this.getPayment();
       const res = await payment.native({
-        description: `${global.systemConfig.system.title} 余额充值`,
+        description: `${global.systemConfig.system.title} ${map[type]}`,
         out_trade_no: payId,
         amount: {
           total: amount
@@ -51,14 +66,18 @@ export class WXPay {
       return Promise.reject(error);
     }
   }
-  async getPayQRUrl(amount: number) {
+  async getPayQRUrl(amount: number, type: `${BillTypeEnum}`) {
     // 单位: 元
     if (!amount) {
       return Promise.reject('amount is error');
     }
     const id = getNanoid(24);
 
-    const code_url = await this.nativePay(amount * 100, id);
+    const code_url = await this.nativePay({
+      amount: amount * 100,
+      payId: id,
+      type
+    });
 
     return {
       code_url,

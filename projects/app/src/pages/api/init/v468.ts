@@ -5,8 +5,8 @@ import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { SubStatusEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import { calculateDaysBetweenDates } from '@fastgpt/global/common/math/date';
-import { MongoPay } from '@/service/support/wallet/pay/schema';
-import { PayTypeEnum } from '@fastgpt/global/support/wallet/pay/constants';
+import { MongoBill } from '@/service/support/wallet/bill/schema';
+import { BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { delay } from '@fastgpt/global/common/system/utils';
 import {
@@ -21,9 +21,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await connectToDatabase();
 
     // 更新 pay 的type成balance
-    await MongoPay.updateMany(
+    await MongoBill.updateMany(
       { type: { $exists: false } },
-      { $set: { type: PayTypeEnum.balance } }
+      { $set: { type: BillTypeEnum.balance } }
     );
 
     await updateOldExtraDatasetSub();

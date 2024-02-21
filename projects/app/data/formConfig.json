@@ -7,12 +7,17 @@
       "properties": {
         "feConfigs": {
           "type": "object",
-          "title": "主站前端展示配置",
+          "title": "主站前端配置",
           "properties": {
             "switches": {
               "type": "object",
               "title": "",
               "properties": {
+                "show_emptyChat": {
+                  "type": "boolean",
+                  "title": "展示聊天空白页",
+                  "default": false
+                },
                 "show_git": { "type": "boolean", "title": "展示 github 图标" },
                 "show_openai_account": {
                   "type": "boolean",
@@ -22,6 +27,8 @@
               }
             },
             "systemTitle": { "type": "string", "title": "系统名" },
+            "customApiDomain": { "type": "string", "title": "自定义api域名" },
+            "customSharePageDomain": { "type": "string", "title": "自定义分享链接域名" },
             "images": {
               "type": "object",
               "title": "",
@@ -56,7 +63,8 @@
               "default": 15,
               "description": "用户上传知识库时，每个文件最大是多少。放大的话，需要注意网关也要设置得够大。"
             },
-            "concatMd": { "type": "textarea", "title": "联系弹窗Markdown" }
+            "concatMd": { "type": "textarea", "title": "联系弹窗Markdown" },
+            "scripts": { "type": "json" }
           }
         },
 
@@ -86,8 +94,11 @@
             },
             "extraDatasetSizePrice": {
               "type": "number",
-              "title": "知识库存储费用（xx元/1000条/月）",
-              "default": 0
+              "title": "知识库存储费用（xx元/1000条/月）"
+            },
+            "extraPointsPrice": {
+              "type": "number",
+              "title": "额外AI积分费用（xx元/100万积分/月）"
             }
           }
         },
@@ -113,11 +124,7 @@
           "title": "关键系统配置",
           "properties": {
             "userDefaultBalance": { "type": "number", "title": "默认用户余额" },
-            "teamDefaultMaxMember": {
-              "type": "number",
-              "title": "默认团队成员上限",
-              "defaultValue": 1
-            }
+            "teamDefaultMaxMember": { "type": "number", "title": "默认团队成员上限" }
           }
         },
         "auth": {
@@ -249,7 +256,8 @@
             },
             "BAIDU_TEXT_CENSOR_CLIENTSECRET": { "type": "string", "title": "百度安全 secret" }
           }
-        }
+        },
+        "fastLogin": { "title": "快速登录(可选)", "type": "json" }
       }
     }
   }

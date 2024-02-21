@@ -13,7 +13,7 @@ import {
 } from 'recharts';
 import Icons from '@/components/Icons';
 import { GET } from '@/service/common/request';
-import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 
 type fetchChatData = {
   count: number;

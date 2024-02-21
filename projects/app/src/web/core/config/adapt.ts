@@ -4,7 +4,6 @@ import CustomJsonEditor from '@/pages/home/Settings/components/Customization/Cus
 import CustomTextarea from '@/pages/home/Settings/components/Customization/CustomTextArea';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
 import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
-import { RJSFSchema } from '@rjsf/utils';
 
 export function formatConfigStore2FormSchema({
   fastgpt,
@@ -84,7 +83,9 @@ export function formatConfigStore2FormSchema({
         // @ts-ignore
         standard: JSON.stringify(subPlans[SubTypeEnum.standard], null, 2) || '{}',
         // @ts-ignore
-        extraDatasetSizePrice: subPlans[SubTypeEnum.extraDatasetSize]?.price || 0
+        extraDatasetSizePrice: subPlans[SubTypeEnum.extraDatasetSize]?.price || 0,
+        // @ts-ignore
+        extraPointsPrice: subPlans[SubTypeEnum.extraPoints]?.price || 0
       },
       models: {
         llmModels: JSON.stringify(llmModels, null, 2),
@@ -239,7 +240,10 @@ export function formatFormData2ConfigStore({
       subPlans: {
         [SubTypeEnum.standard]: standardSubPlanJson,
         [SubTypeEnum.extraDatasetSize]: {
-          price: subPlans.extraDatasetSizePrice
+          price: subPlans.extraDatasetSizePrice || 0
+        },
+        [SubTypeEnum.extraPoints]: {
+          price: subPlans.extraPointsPrice || 0
         }
       },
       ...formatModels

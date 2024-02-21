@@ -1,6 +1,6 @@
 import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
-import { MongoPay } from '@/service/support/wallet/pay/schema';
+import { MongoBill } from '@/service/support/wallet/bill/schema';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { addDays } from 'date-fns';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -14,7 +14,7 @@ export default async function getPaysFormData(req: NextApiRequest, res: NextApiR
 
     let startCount = 0;
 
-    const paysRaw = await MongoPay.aggregate([
+    const paysRaw = await MongoBill.aggregate([
       {
         $match: {
           status: 'SUCCESS',

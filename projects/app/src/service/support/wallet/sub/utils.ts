@@ -1,4 +1,4 @@
-import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import {
   POINTS_SCALE,
   StandardSubLevelEnum,
@@ -99,10 +99,17 @@ export const updateTeamExtraDatasetSizeSub = async ({
   }
 };
 
+/* 1k size price */
 export const getExtraDatasetSizePrice = (type?: 'read' | 'store') => {
   const scale = type === 'read' ? 1 : PRICE_SCALE;
   return (global.fatgptMainConfig?.subPlans?.extraDatasetSize?.price || 0) * scale;
 };
+/* 100w size price */
+export const getExtraPointsPrice = (type?: 'read' | 'store') => {
+  const scale = type === 'read' ? 1 : PRICE_SCALE;
+  return (global.fatgptMainConfig?.subPlans?.extraPoints?.price || 0) * scale;
+};
+
 export const getStandardPlan = (level: `${StandardSubLevelEnum}`) => {
   return global.fatgptMainConfig?.subPlans?.standard?.[level];
 };

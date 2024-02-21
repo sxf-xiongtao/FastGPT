@@ -17,8 +17,8 @@ import { splitText2Chunks } from '@fastgpt/global/common/string/textSplitter';
 import { checkDatasetLimit } from '@fastgpt/service/support/permission/limit/dataset';
 import { predictDataLimitLength } from '@fastgpt/global/core/dataset/utils';
 import { pushDataToTrainingQueue } from '@/service/core/dataset/data/controller';
-import { createTrainingBill } from '@fastgpt/service/support/wallet/bill/controller';
-import { BillSourceEnum } from '@fastgpt/global/support/wallet/bill/constants';
+import { createTrainingUsage } from '@fastgpt/service/support/wallet/usage/controller';
+import { UsageSourceEnum } from '@fastgpt/global/support/wallet/usage/constants';
 import { getDatasetModel, getVectorModel } from '@/service/core/ai/model';
 import { BucketNameEnum } from '@fastgpt/global/common/file/constants';
 
@@ -119,11 +119,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
           relatedImgId
         }
       }),
-      createTrainingBill({
+      createTrainingUsage({
         teamId,
         tmbId,
         appName: collectionName,
-        billSource: BillSourceEnum.training,
+        billSource: UsageSourceEnum.training,
         vectorModel: getVectorModel(dataset.vectorModel)?.name,
         agentModel: getDatasetModel(dataset.agentModel)?.name
       })

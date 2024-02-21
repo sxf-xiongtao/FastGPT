@@ -1,8 +1,13 @@
-import { BillSourceEnum } from '@fastgpt/global/support/wallet/bill/constants';
-import { MongoBill } from '@fastgpt/service/support/wallet/bill/schema';
 import { updateTeamBalance } from '../controller';
 import { ClientSession } from '@fastgpt/service/common/mongo';
 import { StandardSubLevelEnum, SubModeEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import { MongoBill } from '../bill/schema';
+import { getNanoid } from '@fastgpt/global/common/string/tools';
+import {
+  BillPayWayEnum,
+  BillStatusEnum,
+  BillTypeEnum
+} from '@fastgpt/global/support/wallet/bill/constants';
 
 export const createStandardSubBill = async ({
   teamId,
@@ -29,17 +34,15 @@ export const createStandardSubBill = async ({
       {
         teamId,
         tmbId,
-        appName: 'support.wallet.subscription.type.standard',
-        total: payPrice,
-        source: BillSourceEnum.standSubPlan,
-        list: [
-          {
-            moduleName: 'support.wallet.subscription.type.standard',
-            amount: payPrice,
-            level,
-            mode
-          }
-        ]
+        orderId: getNanoid(24),
+        status: BillStatusEnum.SUCCESS,
+        type: BillTypeEnum.standSubPlan,
+        price: -payPrice,
+        metadata: {
+          payWay: BillPayWayEnum.balance,
+          subMode: mode,
+          standSubLevel: level
+        }
       }
     ],
     { session }
@@ -69,16 +72,14 @@ export const createExtraDatasetSizeSubBill = async ({
       {
         teamId,
         tmbId,
-        appName: 'support.wallet.subscription.type.extraDatasetSize',
-        total: payPrice,
-        source: BillSourceEnum.extraDatasetSub,
-        list: [
-          {
-            moduleName: 'support.wallet.subscription.type.extraDatasetSize',
-            amount: payPrice,
-            datasetSize: size
-          }
-        ]
+        orderId: getNanoid(24),
+        status: BillStatusEnum.SUCCESS,
+        type: BillTypeEnum.extraDatasetSub,
+        price: -payPrice,
+        metadata: {
+          payWay: BillPayWayEnum.balance,
+          datasetSize: size
+        }
       }
     ],
     { session }

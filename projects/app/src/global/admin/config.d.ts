@@ -40,6 +40,7 @@ export type ConfigFormType = {
     subPlans: {
       standard: string;
       extraDatasetSizePrice: number;
+      extraPointsPrice: number;
     };
     models: {
       llmModels: string;

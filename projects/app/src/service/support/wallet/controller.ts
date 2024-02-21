@@ -1,9 +1,11 @@
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { delay } from '@fastgpt/global/common/system/utils';
-import { MongoBill } from '@fastgpt/service/support/wallet/bill/schema';
+import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
 import type { ConcatBillQueueItemType } from '@/global/support/wallet/bill/type.d';
 import { ClientSession } from '@fastgpt/service/common/mongo';
+import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
+import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 
 /* 
   amount: min unit
@@ -20,9 +22,6 @@ export async function updateTeamBalance({
   session?: ClientSession;
 }): Promise<any> {
   if (amount === 0) return;
-  if (Math.abs(amount) < 10) {
-    addLog.info('updateTeamBalance amount too small, maybe have error', { teamId, amount });
-  }
 
   addLog.info(`update balance`, {
     teamId,
@@ -46,51 +45,96 @@ export async function updateTeamBalance({
 
     if (retry > 0) {
       await delay(100);
-      return updateTeamBalance({ teamId, amount, retry: retry - 1 });
+      return updateTeamBalance({ teamId, amount, retry: retry - 1, session });
     }
   }
 }
-
-export const pushReduceTeamBalanceTask = ({
+export const incTeamAiPoints = async ({
   teamId,
-  amount
+  totalPoints,
+  retry = 3,
+  session
 }: {
   teamId: string;
-  amount: number;
+  totalPoints: number;
+  retry?: number;
+  session?: ClientSession;
+}): Promise<any> => {
+  if (totalPoints === 0) return;
+
+  addLog.info(`update ai points`, {
+    teamId,
+    totalPoints
+  });
+
+  try {
+    await MongoTeamSub.findOneAndUpdate(
+      {
+        teamId,
+        type: [SubTypeEnum.standard, SubTypeEnum.extraPoints],
+        surplusPoints: { $gte: totalPoints }
+      },
+      {
+        $inc: { surplusPoints: totalPoints }
+      },
+      { session }
+    ).sort({
+      expiredTime: 1
+    });
+  } catch (error) {
+    if (session) {
+      return Promise.reject(error);
+    }
+
+    console.log(error, retry);
+
+    if (retry > 0) {
+      await delay(100);
+      return incTeamAiPoints({ teamId, totalPoints, retry: retry - 1, session });
+    }
+  }
+};
+
+export const pushReduceTeamAiPointsTask = ({
+  teamId,
+  totalPoints
+}: {
+  teamId: string;
+  totalPoints: number;
 }) => {
-  global.reduceBalanceQueue.push({
+  global.reduceAiPointsQueue.push({
     teamId: String(teamId),
-    amount
+    totalPoints
   });
 };
 export const reduceTeamBalanceTimer = async () => {
-  if (global.reduceBalanceQueue.length > 0) {
-    const list = global.reduceBalanceQueue.slice();
-    global.reduceBalanceQueue = [];
+  if (global.reduceAiPointsQueue.length > 0) {
+    const list = global.reduceAiPointsQueue.slice();
+    global.reduceAiPointsQueue = [];
 
     // concat same teamId
     const map = new Map<string, number>();
-    list.forEach(({ teamId, amount }) => {
+    list.forEach(({ teamId, totalPoints }) => {
       if (map.has(teamId)) {
-        map.set(teamId, map.get(teamId)! + amount);
+        map.set(teamId, map.get(teamId)! + totalPoints);
       } else {
-        map.set(teamId, amount);
+        map.set(teamId, totalPoints);
       }
     });
-    const reduceList = Array.from(map).map(([teamId, amount]) => ({ teamId, amount }));
+    const reduceList = Array.from(map).map(([teamId, totalPoints]) => ({ teamId, totalPoints }));
 
     for await (const item of reduceList) {
       try {
-        await updateTeamBalance({
+        await incTeamAiPoints({
           teamId: item.teamId,
-          amount: item.amount
+          totalPoints: -item.totalPoints
         });
       } catch (error) {
-        addLog.error('reduce balance error', error);
+        addLog.error('Reduce ai points error', error);
       }
     }
 
-    console.log('reduce timer:', list.length);
+    console.log('reduce ai points account:', list.length);
   }
   await delay(Number(process.env.UPDATE_BALANCE_DELAY || 5000));
   reduceTeamBalanceTimer();
@@ -106,20 +150,20 @@ export const concatBillTimer = async () => {
 
     // concat same billId
     const map = new Map<string, ConcatBillQueueItemType>();
-    list.forEach(({ billId, total, charsLength, listIndex }) => {
+    list.forEach(({ billId, totalPoints, charsLength, listIndex }) => {
       const id = `${billId}-${listIndex}`;
       const data = map.get(id);
       if (data) {
         map.set(id, {
           billId,
-          total: data.total + total,
+          totalPoints: data.totalPoints + totalPoints,
           charsLength: data.charsLength + charsLength,
           listIndex
         });
       } else {
         map.set(id, {
           billId,
-          total,
+          totalPoints,
           charsLength,
           listIndex
         });
@@ -129,14 +173,13 @@ export const concatBillTimer = async () => {
     const concatList = Array.from(map).map(([_, data]) => data);
 
     for await (const item of concatList) {
-      const { billId, listIndex, total, charsLength } = item;
-
+      const { billId, listIndex, totalPoints, charsLength } = item;
       try {
-        await MongoBill.findByIdAndUpdate(billId, {
+        await MongoUsage.findByIdAndUpdate(billId, {
           $inc: {
-            total,
+            totalPoints,
             ...(listIndex !== undefined && {
-              [`list.${listIndex}.amount`]: total,
+              [`list.${listIndex}.amount`]: totalPoints,
               [`list.${listIndex}.charsLength`]: charsLength
             })
           }

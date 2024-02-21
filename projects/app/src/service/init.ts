@@ -46,7 +46,7 @@ export function initGlobal() {
 
   global.store = {};
 
-  global.reduceBalanceQueue = [];
+  global.reduceAiPointsQueue = [];
   global.concatBillQueue = [];
 }
 

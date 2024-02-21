@@ -2,9 +2,9 @@ import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { MongoPay } from '@/service/support/wallet/pay/schema';
+import { MongoBill } from '@/service/support/wallet/bill/schema';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import { isValidObjectIdString } from '../users/getUsers';
 
 export default async function getPays(req: NextApiRequest, res: NextApiResponse) {
@@ -30,7 +30,7 @@ export default async function getPays(req: NextApiRequest, res: NextApiResponse)
       where = { userId: { $in: userIds } };
     }
 
-    const paysRaw = await MongoPay.find(where)
+    const paysRaw = await MongoBill.find(where)
       .skip(start)
       .limit(end - start)
       .sort({ [sort as string]: order })
@@ -54,7 +54,7 @@ export default async function getPays(req: NextApiRequest, res: NextApiResponse)
         })
     );
 
-    const totalCount = await MongoPay.countDocuments(where);
+    const totalCount = await MongoBill.countDocuments(where);
 
     jsonRes(res, {
       data: {

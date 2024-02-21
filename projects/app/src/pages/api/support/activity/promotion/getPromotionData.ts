@@ -6,7 +6,7 @@ import { MongoPromotionRecord } from '@fastgpt/service/support/activity/promotio
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import mongoose from '@fastgpt/service/common/mongo';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/bill/tools';
+import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

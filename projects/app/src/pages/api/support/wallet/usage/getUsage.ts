@@ -2,14 +2,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
-import { MongoBill } from '@fastgpt/service/support/wallet/bill/schema';
-import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/bill/tools';
+import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
+import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
 import { addDays } from 'date-fns';
 import { authUserRole } from '@fastgpt/service/support/permission/auth/user';
 import { Types } from '@fastgpt/service/common/mongo';
 import { PagingData } from '@/types';
-import { BillItemType } from '@fastgpt/global/support/wallet/bill/type';
-import { BillSourceEnum } from '@fastgpt/global/support/wallet/bill/constants';
+import { UsageItemType } from '@fastgpt/global/support/wallet/usage/type';
+import { UsageSourceEnum } from '@fastgpt/global/support/wallet/usage/constants';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     pageSize: number;
     dateStart: Date;
     dateEnd: Date;
-    source?: `${BillSourceEnum}`;
+    source?: `${UsageSourceEnum}`;
     teamMemberId: string;
   };
 
@@ -45,14 +45,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // get bill record and total by record
     const [bills, total] = await Promise.all([
-      MongoBill.find(where)
+      MongoUsage.find(where)
         .sort({ time: -1 })
         .skip((pageNum - 1) * pageSize)
         .limit(pageSize),
-      MongoBill.countDocuments(where)
+      MongoUsage.countDocuments(where)
     ]);
 
-    jsonRes<PagingData<BillItemType>>(res, {
+    jsonRes<PagingData<UsageItemType>>(res, {
       data: {
         pageNum,
         pageSize,
@@ -60,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           id: bill._id,
           source: bill.source,
           time: bill.time,
-          total: formatStorePrice2Read(bill.total),
+          totalPoints: bill.totalPoints,
           appName: bill.appName,
           list: bill.list
         })),

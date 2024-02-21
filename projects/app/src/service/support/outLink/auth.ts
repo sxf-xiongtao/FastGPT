@@ -1,5 +1,5 @@
 import { authIpLimit } from '@/service/common/ipLimit/tools';
-import { PRICE_SCALE } from '@fastgpt/global/support/wallet/bill/constants';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import type {
   AuthOutLinkInitProps,
   AuthOutLinkLimitProps,
@@ -30,7 +30,11 @@ export async function authOutLinkLimit({
     return Promise.reject('分享链接已过期');
   }
 
-  if (outLink.limit.credit > -1 && outLink.total > outLink.limit.credit * PRICE_SCALE) {
+  if (
+    outLink.limit.maxUsagePoints &&
+    outLink.limit.maxUsagePoints > -1 &&
+    outLink.usagePoints > outLink.limit.maxUsagePoints
+  ) {
     return Promise.reject('链接超出使用限制');
   }
 

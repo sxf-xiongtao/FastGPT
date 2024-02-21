@@ -14,11 +14,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (openApi?.limit?.expiredTime && new Date(openApi.limit.expiredTime).getTime() < Date.now()) {
       throw new Error(`Key ${openApi.apiKey} is expired`);
     }
-
     if (
-      openApi?.limit?.credit &&
-      openApi.limit.credit > -1 &&
-      openApi.usage > openApi.limit.credit
+      openApi?.limit?.maxUsagePoints &&
+      openApi.limit.maxUsagePoints > -1 &&
+      openApi.usagePoints > openApi.limit.maxUsagePoints
     ) {
       throw new Error(`Key ${openApi.apiKey} is over usage`);
     }
