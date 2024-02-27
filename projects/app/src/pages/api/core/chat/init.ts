@@ -8,48 +8,40 @@ import { MongoApp } from '@fastgpt/service/core/app/schema';
 
 type userInfoType = {
   data: {
-    userId: string;
-    tagsList: Array<string>;
+    uid: string;
+    tags: Array<string>;
   };
 };
 
-export function appsShema2appsType(data: any) {
-  return {
-    userId: String(data._id),
-    teamId: String(data.teamId._id),
-    tmbId: String(data.tmbId._id),
-    name: data.name,
-    type: data.type,
-    simpleTemplateId: data.simpleTemplateId,
-    avatar: data.avatar,
-    intro: data.intro,
-    updateTime: new Date(data.updateTime),
-    modules: data.modules,
-    inited: data.inited,
-    permission: data.permission,
-    teamTags: data.teamTags
-  };
-}
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
     //
-    const { teamId, autoken } = req.query as {
-      teamId: string;
-      autoken: string;
+    const { shareTeamId, authToken } = req.body as {
+      shareTeamId: string;
+      authToken: string;
     };
-    const teamInfo = await getTeamsInfo(teamId);
-    const tagsUrl = teamInfo?.tagsUrl as never;
-    const userInfo: userInfoType = await axios.get(tagsUrl + `/getUseInfor?autoken=${autoken}`);
+    if (shareTeamId) {
+      throw new Error('search Error');
+    }
+    const teamInfo = await getTeamsInfo(shareTeamId);
+    if (teamInfo && teamInfo.tagsUrl) {
+      throw new Error('search Error');
+    }
+    const tagsUrl = teamInfo?.tagsUrl;
+    const { data: userInfo }: { data: userInfoType } = await axios.post(tagsUrl + `/getUserInfo`, {
+      autoken: authToken
+    });
 
-    const { tagsList, userId = '' } = userInfo.data;
-    if (!userId) {
+    const { tags, uid = '' } = userInfo?.data;
+    if (!uid) {
       throw new Error('暂无你的用户信息');
     }
     // 获取相应的
     const query = {
-      teamId: teamId,
-      teamTags: { $in: tagsList }
+      teamId: shareTeamId,
+      teamTags: { $in: tags },
+      uid: uid
     };
 
     // 执行查询
@@ -69,16 +61,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       code: 500,
       error: err
     });
-  }
-}
-
-function extractString(str: string) {
-  const regex = /"(.*?)"/;
-  const match = str.match(regex);
-
-  if (match) {
-    return match[1];
-  } else {
-    return '';
   }
 }

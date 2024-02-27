@@ -7,16 +7,22 @@ import { connectToDatabase } from '@/service/mongo';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoTeamTags } from '@fastgpt/service/support/user/team/teamTagsSchema';
 import axios from 'axios';
-import { getUserTeamsTags, getTeamsInfo } from '@/service/support/user/teamTags/controller';
+type props = {
+  teamId: string;
+  tagsUrl: string;
+};
+type tagsType = {
+  label: string;
+  key: string;
+};
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
-    const { teamId, tagsUrl } = req.body;
-    console.log(' req.body', req.body);
+    const { teamId, tagsUrl } = req.body as props;
 
-    const res2 = await axios.get(tagsUrl + '/tag/sync');
+    const { data: res } = await axios.get(tagsUrl + '/tag/sync');
 
-    const tagsList = res2.data.map((item: any) => {
+    const tagsList = res.data.map((item: tagsType) => {
       return { ...item, teamId };
     });
     if (teamId) {
