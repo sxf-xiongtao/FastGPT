@@ -13,6 +13,7 @@ export type ConfigFormType = {
     feConfigs: {
       switches: {
         show_emptyChat: boolean;
+        show_team_chat: boolean;
         show_git: boolean;
         show_openai_account: boolean;
         show_promotion: boolean;

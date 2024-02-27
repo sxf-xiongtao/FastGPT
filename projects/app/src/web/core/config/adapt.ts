@@ -22,6 +22,7 @@ export function formatConfigStore2FormSchema({
 
   const {
     show_emptyChat = false,
+    show_team_chat = false,
     show_git = false,
     show_openai_account = false,
     show_promotion = false,
@@ -55,6 +56,7 @@ export function formatConfigStore2FormSchema({
       feConfigs: {
         switches: {
           show_emptyChat,
+          show_team_chat,
           show_git,
           show_openai_account,
           show_promotion

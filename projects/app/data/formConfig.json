@@ -13,6 +13,11 @@
               "type": "object",
               "title": "",
               "properties": {
+                "show_team_chat": {
+                  "type": "boolean",
+                  "title": "展示团队分享",
+                  "defalut": "false"
+                },
                 "show_emptyChat": {
                   "type": "boolean",
                   "title": "展示聊天空白页",
