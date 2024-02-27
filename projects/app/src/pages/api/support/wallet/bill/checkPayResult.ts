@@ -19,6 +19,7 @@ import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { SubStatusEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import { addMonths } from 'date-fns';
 import { getErrText } from '@/utils/tools';
+import { ClientSession } from '@fastgpt/service/common/mongo';
 
 /* 校验支付结果 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -116,17 +117,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-export const dealWithSuccessOrder = async (payOrder: BillSchemaType) => {
+export const dealWithSuccessOrder = async (payOrder: BillSchemaType, session?: ClientSession) => {
   // Add balance to team
   if (payOrder.type === BillTypeEnum.balance) {
     await dealBalancePay(payOrder);
   } else if (payOrder.type === BillTypeEnum.extraDatasetSub) {
-    await dealExtraDatasetSubPay(payOrder);
+    await dealExtraDatasetSubPay(payOrder, session);
   } else if (payOrder.type === BillTypeEnum.extraPoints) {
-    await dealExtraPointsSubPay(payOrder);
+    await dealExtraPointsSubPay(payOrder, session);
   } else {
     return Promise.reject('订单类型错误');
   }
+  unLockTrainingData(payOrder.teamId);
 };
 
 const unLockTrainingData = async (teamId: string, retry = 3): Promise<any> => {
@@ -150,46 +152,51 @@ const unLockTrainingData = async (teamId: string, retry = 3): Promise<any> => {
 
 const dealBalancePay = async (payOrder: BillSchemaType) => {
   await updateTeamBalance({ teamId: payOrder.teamId, amount: payOrder.price });
-  unLockTrainingData(payOrder.teamId);
 };
-const dealExtraDatasetSubPay = async (payOrder: BillSchemaType) => {
+const dealExtraDatasetSubPay = async (payOrder: BillSchemaType, session?: ClientSession) => {
   const { month, datasetSize } = payOrder.metadata;
   if (!month || !datasetSize) {
     throw new Error('缺少关键参数，更新账单失败，请联系管理员');
   }
 
   // push extra dataset size sub
-  await MongoTeamSub.create([
-    {
-      teamId: payOrder.teamId,
-      type: SubTypeEnum.extraDatasetSize,
-      status: SubStatusEnum.active,
-      startTime: new Date(),
-      expiredTime: addMonths(new Date(), month),
-      price: payOrder.price,
+  await MongoTeamSub.create(
+    [
+      {
+        teamId: payOrder.teamId,
+        type: SubTypeEnum.extraDatasetSize,
+        status: SubStatusEnum.active,
+        startTime: new Date(),
+        expiredTime: addMonths(new Date(), month),
+        price: payOrder.price,
 
-      currentExtraDatasetSize: datasetSize
-    }
-  ]);
+        currentExtraDatasetSize: datasetSize
+      }
+    ],
+    { session }
+  );
 };
-const dealExtraPointsSubPay = async (payOrder: BillSchemaType) => {
+const dealExtraPointsSubPay = async (payOrder: BillSchemaType, session?: ClientSession) => {
   const { month, extraPoints } = payOrder.metadata;
   if (!month || !extraPoints) {
     throw new Error('缺少关键参数，更新账单失败，请联系管理员');
   }
 
   // push extra dataset size sub
-  await MongoTeamSub.create([
-    {
-      teamId: payOrder.teamId,
-      type: SubTypeEnum.extraPoints,
-      status: SubStatusEnum.active,
-      startTime: new Date(),
-      expiredTime: addMonths(new Date(), month),
-      price: payOrder.price,
+  await MongoTeamSub.create(
+    [
+      {
+        teamId: payOrder.teamId,
+        type: SubTypeEnum.extraPoints,
+        status: SubStatusEnum.active,
+        startTime: new Date(),
+        expiredTime: addMonths(new Date(), month),
+        price: payOrder.price,
 
-      totalPoints: extraPoints,
-      surplusPoints: extraPoints
-    }
-  ]);
+        totalPoints: extraPoints,
+        surplusPoints: extraPoints
+      }
+    ],
+    { session }
+  );
 };

@@ -11,7 +11,6 @@ import {
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { calculateDaysBetweenDates } from '@fastgpt/global/common/math/date';
 import {
-  POINTS_SCALE,
   StandardSubLevelEnum,
   SubModeEnum,
   SubTypeEnum,
@@ -21,12 +20,12 @@ import {
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import { authUserNotVisitor } from '@fastgpt/service/support/permission/auth/user';
 import { TeamItemType } from '@fastgpt/global/support/user/team/type';
-import { addDays, addMonths } from 'date-fns';
-import { checkStandardPlanLarge, getStandardPlan } from '@/service/support/wallet/sub/utils';
+import { addMonths } from 'date-fns';
+import { getStandardPlan } from '@/service/support/wallet/sub/utils';
+import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
 
 /* Update dataset size sub. */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // size: N 1000 group
   const { level, mode } = req.body as StandardSubPlanParams;
 
   try {
@@ -34,7 +33,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { team } = await authUserNotVisitor({ req, authToken: true });
 
     jsonRes(res, {
-      data: await calcStandardSubUpdateData({ level, mode, team })
+      data: await calcStandardSubUpdateData({
+        level,
+        mode,
+        teamId: team.teamId,
+        teamBalance: team.balance
+      })
     });
   } catch (err) {
     console.log(err);
@@ -49,15 +53,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 export const calcStandardSubUpdateData = async ({
   level,
   mode,
-  team
-}: StandardSubPlanParams & { team: TeamItemType }): Promise<StandardSubPlanUpdateResponse> => {
+  teamId,
+  teamBalance
+}: StandardSubPlanParams & {
+  teamId: string;
+  teamBalance: number;
+}): Promise<StandardSubPlanUpdateResponse> => {
   if (!standardSubLevelMap[level] || !subModeMap[mode]) {
     return Promise.reject('Plan or mode not found.');
   }
 
   // find the plan
   const oldPlan = await MongoTeamSub.findOne({
-    teamId: team.teamId,
+    teamId,
     type: SubTypeEnum.standard
   });
 
@@ -72,17 +80,16 @@ export const calcStandardSubUpdateData = async ({
 
   if (!oldPlanContent || !newPlanContent) return Promise.reject('Plan not found.');
 
+  const newPlanUnitPrice = newPlanContent.price * PRICE_SCALE;
+  const newPlanPrice = mode === SubModeEnum.month ? newPlanUnitPrice : newPlanUnitPrice * 10;
+
   /* 
-    不需要支付，只需要修改下个周期的相关参数（mode，nextLevel）
-    1. 同等级变更
-    2. 降级
+    如果新套餐价格小于旧套餐价格，不需要支付，只需要修改下个周期的相关参数（mode，nextLevel）
   */
-  if (
-    level === oldPlan.currentSubLevel ||
-    !checkStandardPlanLarge(oldPlan.currentSubLevel, level)
-  ) {
+  if (newPlanPrice <= oldPlan.price) {
     return {
       balanceEnough: true,
+      teamBalance,
 
       planPrice: oldPlan.price,
       planPointPrice: oldPlan.pointPrice,
@@ -124,19 +131,17 @@ export const calcStandardSubUpdateData = async ({
       ? 0
       : remainPointValue + remainOtherValue || 0;
 
-  const newTotalPoints =
-    newPlanContent.totalPoints * (mode === SubModeEnum.month ? 1 : 12) * POINTS_SCALE;
+  const newTotalPoints = newPlanContent.totalPoints * (mode === SubModeEnum.month ? 1 : 12);
   const newPlanPointUnitPrice = newPlanContent.pointPrice * PRICE_SCALE;
   const newPlanPointPrice =
     mode === SubModeEnum.month ? newPlanPointUnitPrice : newPlanPointUnitPrice * 10;
-  const newPlanUnitPrice = newPlanContent.price * PRICE_SCALE;
-  const newPlanPrice = mode === SubModeEnum.month ? newPlanUnitPrice : newPlanUnitPrice * 10;
 
-  // 可能会有负数的情况(本来年付,改成月)
-  const payPrice = newPlanPrice - remainValue || 0;
+  // 都向上取整
+  const payPrice = Math.ceil(formatStorePrice2Read(newPlanPrice - remainValue)) * PRICE_SCALE;
 
   return {
-    balanceEnough: team.balance >= payPrice,
+    balanceEnough: teamBalance >= payPrice,
+    teamBalance: teamBalance,
     payPrice,
 
     planPrice: newPlanPrice,

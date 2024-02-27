@@ -18,6 +18,8 @@ import { updateWebSyncLimit } from '@fastgpt/service/support/user/utils';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { splitText2Chunks } from '@fastgpt/global/common/string/textSplitter';
 import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
+import { checkTeamWebSyncPermission } from '@/service/support/permission/teamLimit';
+import { MongoBill } from '@/service/support/wallet/bill/schema';
 
 // config
 const maxCrawlPage = 200;
@@ -38,6 +40,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!dataset?.websiteConfig?.url) {
       throw new Error('Dataset is not website dataset');
     }
+
+    await checkTeamWebSyncPermission(teamId);
 
     // 1. clear dataset all data
     await mongoSessionRun((session) => delDatasetRelevantData({ datasets: [dataset], session }));
@@ -69,19 +73,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     jsonRes(res, {
       data: []
     });
+
+    // update collection status to active
+    setTimeout(async () => {
+      await updateStatusToActive(datasetId);
+    }, 20000);
   } catch (err) {
     try {
+      MongoBill.findByIdAndDelete(billId);
+      updateStatusToActive(datasetId);
     } catch (error) {}
     jsonRes(res, {
       code: 500,
       error: err
     });
   }
-
-  // update collection status to active
-  setTimeout(async () => {
-    await updateStatusToActive(datasetId);
-  }, 20000);
 }
 
 async function checkDatasetExist(datasetId: string) {

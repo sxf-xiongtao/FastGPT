@@ -1,17 +1,15 @@
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import {
-  POINTS_SCALE,
   StandardSubLevelEnum,
   SubModeEnum,
   SubStatusEnum,
   SubTypeEnum
 } from '@fastgpt/global/support/wallet/sub/constants';
-import { TeamSubSchema } from '@fastgpt/global/support/wallet/sub/type';
 import { ClientSession } from '@fastgpt/service/common/mongo';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { addMonths } from 'date-fns';
 
-export const createTeamFreeSubPlan = ({
+export const initTeamSubPlan2Free = async ({
   teamId,
   session
 }: {
@@ -19,7 +17,26 @@ export const createTeamFreeSubPlan = ({
   session?: ClientSession;
 }) => {
   const freePoints = getFreeSubPlanPoints();
-  const freePlanContent = getStandardPlan('free');
+
+  const teamStandardSub = await MongoTeamSub.findOne({ teamId, type: SubTypeEnum.standard });
+
+  if (teamStandardSub) {
+    teamStandardSub.status = SubStatusEnum.active;
+    teamStandardSub.currentMode = SubModeEnum.month;
+    teamStandardSub.nextMode = SubModeEnum.month;
+    teamStandardSub.startTime = new Date();
+    teamStandardSub.expiredTime = addMonths(new Date(), 1);
+
+    teamStandardSub.currentSubLevel = StandardSubLevelEnum.free;
+    teamStandardSub.nextSubLevel = StandardSubLevelEnum.free;
+
+    teamStandardSub.price = 0;
+    teamStandardSub.pointPrice = 0;
+
+    teamStandardSub.totalPoints = freePoints;
+    teamStandardSub.surplusPoints = freePoints;
+    return teamStandardSub.save({ session });
+  }
 
   return MongoTeamSub.create(
     [
@@ -45,66 +62,12 @@ export const createTeamFreeSubPlan = ({
   );
 };
 
-export const updateTeamExtraDatasetSizeSub = async ({
-  sub,
-  teamId,
-  startTime,
-  expiredTime,
-  price,
-  currentExtraDatasetSize,
-  nextExtraDatasetSize,
-  session
-}: {
-  sub?: TeamSubSchema | null;
-  teamId: string;
-  startTime: Date;
-  expiredTime: Date;
-  price: number;
-  currentExtraDatasetSize: number;
-  nextExtraDatasetSize: number;
-  session: ClientSession;
-}) => {
-  if (sub) {
-    await MongoTeamSub.findByIdAndUpdate(
-      sub._id,
-      {
-        startTime,
-        expiredTime,
-        currentExtraDatasetSize,
-        nextExtraDatasetSize,
-        price
-      },
-      { session }
-    );
-  } else {
-    // 创建新的订阅
-    await MongoTeamSub.create(
-      [
-        {
-          teamId,
-          type: SubTypeEnum.extraDatasetSize,
-          status: SubStatusEnum.active,
-          currentMode: SubModeEnum.month,
-          nextMode: SubModeEnum.month,
-          startTime: startTime,
-          expiredTime: expiredTime,
-          price: price,
-
-          currentExtraDatasetSize: currentExtraDatasetSize,
-          nextExtraDatasetSize: nextExtraDatasetSize
-        }
-      ],
-      { session }
-    );
-  }
-};
-
 /* 1k size price */
 export const getExtraDatasetSizePrice = (type?: 'read' | 'store') => {
   const scale = type === 'read' ? 1 : PRICE_SCALE;
   return (global.fatgptMainConfig?.subPlans?.extraDatasetSize?.price || 0) * scale;
 };
-/* 100w size price */
+/* 100w points price */
 export const getExtraPointsPrice = (type?: 'read' | 'store') => {
   const scale = type === 'read' ? 1 : PRICE_SCALE;
   return (global.fatgptMainConfig?.subPlans?.extraPoints?.price || 0) * scale;
@@ -113,22 +76,31 @@ export const getExtraPointsPrice = (type?: 'read' | 'store') => {
 export const getStandardPlan = (level: `${StandardSubLevelEnum}`) => {
   return global.fatgptMainConfig?.subPlans?.standard?.[level];
 };
-export const checkStandardPlanLarge = (
-  oldLevel: `${StandardSubLevelEnum}`,
-  newLevel: `${StandardSubLevelEnum}`
-) => {
-  const arr = [
+export const getStandardPlans = () => {
+  return global.fatgptMainConfig?.subPlans?.standard;
+};
+export const openSubPlaning = () => !!global.fatgptMainConfig?.subPlans?.standard?.free;
+
+/**
+ * 获取较高级的一个level
+ */
+export const getLargeStandardSubLevel = (levelList: `${StandardSubLevelEnum}`[]) => {
+  const arr: `${StandardSubLevelEnum}`[] = [
     StandardSubLevelEnum.free,
     StandardSubLevelEnum.experience,
     StandardSubLevelEnum.team,
     StandardSubLevelEnum.enterprise
   ];
-  const oldIndex = arr.findIndex((item) => item === oldLevel);
-  const newIndex = arr.findIndex((item) => item === newLevel);
 
-  return newIndex > oldIndex;
+  let level = levelList[0];
+  for (let i = 1; i < levelList.length; i++) {
+    if (arr.indexOf(levelList[i]) > arr.indexOf(level)) {
+      level = levelList[i];
+    }
+  }
+  return level;
 };
 
 export const getFreeSubPlanPoints = () => {
-  return (global.fatgptMainConfig?.subPlans?.standard?.free?.totalPoints || 10) * POINTS_SCALE;
+  return global.fatgptMainConfig?.subPlans?.standard?.free?.totalPoints || 100;
 };

@@ -8,6 +8,7 @@ import { authUserNotVisitor } from '@fastgpt/service/support/permission/auth/use
 import { calcStandardSubUpdateData } from './preCheck';
 import { createStandardSubBill } from '@/service/support/wallet/sub/bill';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { UserErrEnum } from '@fastgpt/global/common/error/code/user';
 
 /* Update dataset size sub. */
 
@@ -34,24 +35,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       surplusPoints,
       planStartTime,
       planExpiredTime
-    } = await calcStandardSubUpdateData({ level, mode, team });
-    // console.log({
-    //   balanceEnough,
-    //   payPrice,
-    //   planPrice,
-    //   planPointPrice,
-    //   currentMode,
-    //   nextMode,
-    //   currentSubLevel,
-    //   nextSubLevel,
-    //   totalPoints,
-    //   surplusPoints,
-    //   planStartTime,
-    //   planExpiredTime
-    // });
+    } = await calcStandardSubUpdateData({
+      level,
+      mode,
+      teamId: team.teamId,
+      teamBalance: team.balance
+    });
 
     if (!balanceEnough) {
-      throw new Error('余额不足');
+      throw new Error(UserErrEnum.balanceNotEnough);
     }
 
     await mongoSessionRun(async (session) => {

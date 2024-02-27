@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const res2 = await axios.get(tagsUrl + '/tag/sync');
 
-    const tagsList = res2.data.map((item) => {
+    const tagsList = res2.data.map((item: any) => {
       return { ...item, teamId };
     });
     if (teamId) {

@@ -14,7 +14,7 @@ import {
 import { readFileContent } from '@/service/common/file/read/utils';
 import { getNanoid, hashStr } from '@fastgpt/global/common/string/tools';
 import { splitText2Chunks } from '@fastgpt/global/common/string/textSplitter';
-import { checkDatasetLimit } from '@fastgpt/service/support/permission/limit/dataset';
+import { checkDatasetLimit } from '@/service/support/permission/teamLimit';
 import { predictDataLimitLength } from '@fastgpt/global/core/dataset/utils';
 import { pushDataToTrainingQueue } from '@/service/core/dataset/data/controller';
 import { createTrainingUsage } from '@fastgpt/service/support/wallet/usage/controller';
@@ -99,8 +99,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     // 5. check dataset limit
     await checkDatasetLimit({
       teamId,
-      insertLen: predictDataLimitLength(trainingType, chunks),
-      standardPlans: global.fatgptMainConfig?.subPlans?.standard
+      insertLen: predictDataLimitLength(trainingType, chunks)
     });
 
     // 6. create collection and training bill

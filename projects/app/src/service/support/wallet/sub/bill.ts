@@ -37,48 +37,11 @@ export const createStandardSubBill = async ({
         orderId: getNanoid(24),
         status: BillStatusEnum.SUCCESS,
         type: BillTypeEnum.standSubPlan,
-        price: -payPrice,
+        price: payPrice,
         metadata: {
           payWay: BillPayWayEnum.balance,
           subMode: mode,
           standSubLevel: level
-        }
-      }
-    ],
-    { session }
-  );
-};
-
-export const createExtraDatasetSizeSubBill = async ({
-  teamId,
-  tmbId,
-  payPrice,
-  size,
-  session
-}: {
-  teamId: string;
-  tmbId: string;
-  payPrice: number;
-  size: number;
-  session: ClientSession;
-}) => {
-  await updateTeamBalance({
-    teamId,
-    amount: -payPrice,
-    session
-  });
-  await MongoBill.create(
-    [
-      {
-        teamId,
-        tmbId,
-        orderId: getNanoid(24),
-        status: BillStatusEnum.SUCCESS,
-        type: BillTypeEnum.extraDatasetSub,
-        price: -payPrice,
-        metadata: {
-          payWay: BillPayWayEnum.balance,
-          datasetSize: size
         }
       }
     ],

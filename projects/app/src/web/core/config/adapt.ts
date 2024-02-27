@@ -97,10 +97,6 @@ export function formatConfigStore2FormSchema({
     },
     fastgptPro: {
       ...fastgptPro,
-      system: {
-        userDefaultBalance: fastgptPro?.system.userDefaultBalance || 3,
-        teamDefaultMaxMember: fastgptPro?.system.teamDefaultMaxMember || 10
-      },
       censor: {
         BAIDU_TEXT_CENSOR_CLIENTID: fastgptPro?.censor?.BAIDU_TEXT_CENSOR_CLIENTID || '',
         BAIDU_TEXT_CENSOR_CLIENTSECRET: fastgptPro?.censor?.BAIDU_TEXT_CENSOR_CLIENTSECRET || ''
@@ -211,7 +207,6 @@ export function formatFormData2ConfigStore({
   const fastgptProConfig: ConfigStoreType['fastgptPro'] = {
     ...fastgptPro,
     system: {
-      ...fastgptPro.system,
       title: formatFeConfig.systemTitle || ''
     },
     auth: {

@@ -32,8 +32,7 @@ export async function createUserByUsername({
           username,
           avatar,
           password,
-          inviterId: inviterId ? inviterId : undefined,
-          balance: (global.systemConfig.system?.userDefaultBalance || 2) * PRICE_SCALE
+          inviterId
         }
       ],
       { session }

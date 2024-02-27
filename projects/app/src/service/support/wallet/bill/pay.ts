@@ -21,11 +21,11 @@ export class WXPay {
   }
   async nativePay({
     amount,
-    payId,
+    orderId,
     type
   }: {
     amount: number;
-    payId: string;
+    orderId: string;
     type: `${BillTypeEnum}`;
   }) {
     const map = {
@@ -38,7 +38,7 @@ export class WXPay {
       const payment = await this.getPayment();
       const res = await payment.native({
         description: `${global.systemConfig.system.title} ${map[type]}`,
-        out_trade_no: payId,
+        out_trade_no: orderId,
         amount: {
           total: amount
         }
@@ -66,22 +66,28 @@ export class WXPay {
       return Promise.reject(error);
     }
   }
-  async getPayQRUrl(amount: number, type: `${BillTypeEnum}`) {
+  async getPayQRUrl({
+    amount,
+    type,
+    orderId
+  }: {
+    amount: number;
+    type: `${BillTypeEnum}`;
+    orderId: string;
+  }) {
     // 单位: 元
     if (!amount) {
       return Promise.reject('amount is error');
     }
-    const id = getNanoid(24);
 
     const code_url = await this.nativePay({
       amount: amount * 100,
-      payId: id,
+      orderId,
       type
     });
 
     return {
-      code_url,
-      orderId: id
+      code_url
     };
   }
 }

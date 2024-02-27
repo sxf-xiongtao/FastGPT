@@ -13,7 +13,9 @@ import {
   billTypeMap
 } from '@fastgpt/global/support/wallet/bill/constants';
 import { getExtraDatasetSizePrice, getExtraPointsPrice } from '@/service/support/wallet/sub/utils';
-import { GetPayQRCodeResponse, GetPayQRCodeProps } from '@fastgpt/global/support/wallet/bill/api';
+import { CreateBillProps, CreateBillResponse } from '@fastgpt/global/support/wallet/bill/api';
+import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
+import { getNanoid } from '@fastgpt/global/common/string/tools';
 
 /* 获取支付二维码 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -25,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       month,
       extraDatasetSize = 0,
       extraPoints = 0
-    } = req.body as GetPayQRCodeProps;
+    } = req.body as CreateBillProps;
 
     if (!billTypeMap[type]) {
       throw new Error('Invalid type');
@@ -35,6 +37,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const { teamId, tmbId } = await authCert({ req, authToken: true });
+
+    // get team balance
+    const team = await MongoTeam.findById(teamId).lean();
+    if (!team) {
+      throw new Error('Team not found');
+    }
 
     // amount: read price
     const { readPrice, metadata = {} } = (() => {
@@ -54,9 +62,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           }
         };
       }
-      if (type === BillTypeEnum.extraPoints && month && extraPoints) {
+      if (type === BillTypeEnum.extraPoints && extraPoints) {
         const pointsPrice = getExtraPointsPrice('read');
-
+        const month = 1;
         return {
           readPrice: extraPoints * month * pointsPrice,
           metadata: {
@@ -75,12 +83,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       throw new Error('Invalid amount');
     }
 
-    const wxPay = new WXPay();
-    const { code_url, orderId } = await wxPay.getPayQRUrl(readPrice, type);
-
     const storePrice = readPrice * PRICE_SCALE;
+    const orderId = getNanoid(24);
+
+    const wxPay = new WXPay();
+    const { code_url } = await wxPay.getPayQRUrl({
+      amount: readPrice,
+      type,
+      orderId
+    });
+
     // add one pay record
-    const payOrder = await MongoBill.create({
+    const bill = await MongoBill.create({
       teamId,
       tmbId,
       orderId,
@@ -93,10 +107,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     });
 
-    jsonRes<GetPayQRCodeResponse>(res, {
+    jsonRes<CreateBillResponse>(res, {
       data: {
+        billId: bill._id,
         readPrice,
-        payId: String(payOrder._id),
         codeUrl: code_url
       }
     });

@@ -9,7 +9,7 @@ import { getTeamsInfo } from '@/service/support/user/teamTags/controller';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
-    const { teamId } = req.query;
+    const { teamId } = req.query as { teamId: string };
     // get team info by teamId
     jsonRes(res, {
       data: await getTeamsInfo(teamId)

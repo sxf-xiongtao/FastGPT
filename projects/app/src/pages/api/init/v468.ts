@@ -9,10 +9,7 @@ import { MongoBill } from '@/service/support/wallet/bill/schema';
 import { BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { delay } from '@fastgpt/global/common/system/utils';
-import {
-  createTeamFreeSubPlan,
-  getExtraDatasetSizePrice
-} from '@/service/support/wallet/sub/utils';
+import { initTeamSubPlan2Free, getExtraDatasetSizePrice } from '@/service/support/wallet/sub/utils';
 
 /* 初始化旧的订阅字段 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -25,8 +22,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       { type: { $exists: false } },
       { $set: { type: BillTypeEnum.balance } }
     );
-
-    await updateOldExtraDatasetSub();
 
     jsonRes(res, {
       data: {
@@ -45,50 +40,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-const updateOldExtraDatasetSub = async () => {
-  const DatasetStorePrice = getExtraDatasetSizePrice('store');
-
-  // 更新旧的订阅 type 成新的
-  await MongoTeamSub.updateMany(
-    { type: 'datasetStore' },
-    { $set: { type: SubTypeEnum.extraDatasetSize } }
-  );
-
-  // 把旧的知识库容量， datasetStoreAmount ，赋值给currentExtraDatasetSize和nextExtraDatasetSize
-  const subs = await MongoTeamSub.find({
-    type: SubTypeEnum.extraDatasetSize,
-    currentExtraDatasetSize: { $exists: false },
-    nextExtraDatasetSize: { $exists: false }
-  }).lean();
-
-  await Promise.all(
-    subs.map((sub) => {
-      const datasetStoreAmount = sub.datasetStoreAmount || 0;
-      // 计算 startTime 到月底的天数
-      const day = calculateDaysBetweenDates(sub.startTime, sub.expiredTime);
-      const lastSubPrice = Math.round((day / 30) * (datasetStoreAmount / 1000) * DatasetStorePrice);
-
-      console.log({
-        DatasetStorePrice,
-        day,
-        currentExtraDatasetSize: datasetStoreAmount,
-        nextExtraDatasetSize: datasetStoreAmount,
-        status: sub.renew ? SubStatusEnum.active : SubStatusEnum.canceled, // renew=false 代表不再续费
-        price: lastSubPrice // 上期的订阅价格记录为0
-      });
-
-      return MongoTeamSub.findByIdAndUpdate(sub._id, {
-        $set: {
-          currentExtraDatasetSize: datasetStoreAmount,
-          nextExtraDatasetSize: datasetStoreAmount,
-          status: sub.renew ? SubStatusEnum.active : SubStatusEnum.canceled, // renew=false 代表不再续费
-          price: lastSubPrice // 上期的订阅价格记录为0
-        }
-      });
-    })
-  );
-};
-
 const addTeamDefaultSub = async () => {
   const allTeamId = await MongoTeam.find({}, '_id');
   console.log('total team', allTeamId.length);
@@ -101,7 +52,7 @@ const addTeamDefaultSub = async () => {
         console.log(++success);
         return;
       }
-      await createTeamFreeSubPlan({
+      await initTeamSubPlan2Free({
         teamId
       });
     } catch (error) {

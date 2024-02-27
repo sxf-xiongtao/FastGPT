@@ -66,13 +66,13 @@ export const incTeamAiPoints = async ({
     teamId,
     totalPoints
   });
-
   try {
-    await MongoTeamSub.findOneAndUpdate(
+    // 先按日期过期的先扣
+    const updateResult = await MongoTeamSub.findOneAndUpdate(
       {
         teamId,
         type: [SubTypeEnum.standard, SubTypeEnum.extraPoints],
-        surplusPoints: { $gte: totalPoints }
+        surplusPoints: { $gte: Math.abs(totalPoints) }
       },
       {
         $inc: { surplusPoints: totalPoints }
@@ -81,6 +81,22 @@ export const incTeamAiPoints = async ({
     ).sort({
       expiredTime: 1
     });
+
+    // 如果没有一个扣除成功，就直接扣余额多的
+    if (!updateResult) {
+      await MongoTeamSub.findOneAndUpdate(
+        {
+          teamId,
+          type: [SubTypeEnum.standard, SubTypeEnum.extraPoints]
+        },
+        {
+          $inc: { surplusPoints: totalPoints }
+        },
+        { session }
+      ).sort({
+        surplusPoints: -1
+      });
+    }
   } catch (error) {
     if (session) {
       return Promise.reject(error);

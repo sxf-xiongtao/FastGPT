@@ -20,9 +20,6 @@ export type SystemConfigType = {
   // license: string;
   system: {
     title: string;
-    userDefaultBalance?: number;
-    teamDefaultMaxMember?: number;
-    datasetStorePrice?: number;
   };
   censor?: {
     BAIDU_TEXT_CENSOR_CLIENTID?: string;

@@ -20,12 +20,11 @@ import type {
   TeamMemberWithUserSchema
 } from '@fastgpt/global/support/user/team/type.d';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
-import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import { MongoOpenApi } from '@fastgpt/service/support/openapi/schema';
 import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
 import { ClientSession } from '@fastgpt/service/common/mongo';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
-import { createTeamFreeSubPlan } from '../../wallet/sub/utils';
+import { initTeamSubPlan2Free } from '../../wallet/sub/utils';
 
 /* -------- format --------- */
 export function teamMemberSchema2TeamItemType(data: TeamMemberWithTeamAndUserSchema): TeamItemType {
@@ -59,9 +58,7 @@ export async function createTeam({
         {
           ownerId,
           name,
-          avatar,
-          maxSize: global.systemConfig.system?.teamDefaultMaxMember || 5,
-          balance: (global.systemConfig.system?.userDefaultBalance || 2) * PRICE_SCALE
+          avatar
         }
       ],
       { session }
@@ -81,7 +78,7 @@ export async function createTeam({
     );
 
     // create sub plan
-    await createTeamFreeSubPlan({
+    await initTeamSubPlan2Free({
       teamId: team._id,
       session
     });

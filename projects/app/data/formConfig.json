@@ -90,7 +90,7 @@
             "standard": {
               "title": "标准订阅套餐（需严格按模板填写，可修改里面的子项）",
               "type": "json",
-              "default": "{}"
+              "default": ""
             },
             "extraDatasetSizePrice": {
               "type": "number",
@@ -98,7 +98,7 @@
             },
             "extraPointsPrice": {
               "type": "number",
-              "title": "额外AI积分费用（xx元/100万积分/月）"
+              "title": "额外AI积分费用（xx元/1000积分/月）"
             }
           }
         },
@@ -119,14 +119,6 @@
     "fastgptPro": {
       "title": "",
       "properties": {
-        "system": {
-          "type": "object",
-          "title": "关键系统配置",
-          "properties": {
-            "userDefaultBalance": { "type": "number", "title": "默认用户余额" },
-            "teamDefaultMaxMember": { "type": "number", "title": "默认团队成员上限" }
-          }
-        },
         "auth": {
           "type": "object",
           "title": "登录配置",
