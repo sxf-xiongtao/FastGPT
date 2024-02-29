@@ -19,9 +19,8 @@ import {
 } from '@fastgpt/global/support/wallet/sub/constants';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import { authUserNotVisitor } from '@fastgpt/service/support/permission/auth/user';
-import { TeamItemType } from '@fastgpt/global/support/user/team/type';
 import { addMonths } from 'date-fns';
-import { getStandardPlan } from '@/service/support/wallet/sub/utils';
+import { getStandardPlan } from '@fastgpt/service/support/wallet/sub/utils';
 import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
 
 /* Update dataset size sub. */

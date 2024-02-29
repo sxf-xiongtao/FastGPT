@@ -97,18 +97,6 @@ export default function EditTeamModal(props: { data: any }) {
                 placeholder="余额"
               />
             </FormControl>
-            <FormControl className="mt-4">
-              <FormLabel htmlFor="maxSize" className="!mb-0 !font-bold text-grayModern-700">
-                团队最大成员数
-              </FormLabel>
-              <Input
-                {...register('maxSize', {})}
-                className="!text-xl"
-                id="maxSize"
-                variant="outline"
-                placeholder="团队最大成员数"
-              />
-            </FormControl>
           </ModalBody>
           <ModalFooter>
             <Button variant="text" onClick={onClose}>

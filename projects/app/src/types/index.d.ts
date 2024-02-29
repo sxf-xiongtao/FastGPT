@@ -74,7 +74,6 @@ export type LicenseDataType = {
 
 declare global {
   var systemConfig: SystemConfigType;
-  var fatgptMainConfig: FastGPTConfigFileType;
 
   var store: Record<string, any>;
   var licenseData: LicenseDataType;

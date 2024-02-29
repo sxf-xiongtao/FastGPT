@@ -8,9 +8,7 @@ import { TeamSubSchema } from '@fastgpt/global/support/wallet/sub/type';
 import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
 import { addDays } from 'date-fns';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
-import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
-import { delDatasetRelevantData } from '@fastgpt/service/core/dataset/controller';
-import { openSubPlaning } from '@/service/support/wallet/sub/utils';
+import { systemUseTeamPlanning } from '@/service/support/wallet/sub/utils';
 
 /* 
     清除不活跃用户的知识库
@@ -26,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { expiredDay = 15 } = req.body as { expiredDay: number };
 
     // 检查是否开启了订阅模式
-    if (!openSubPlaning()) {
+    if (!systemUseTeamPlanning()) {
       return jsonRes(res);
     }
 

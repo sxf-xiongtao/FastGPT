@@ -3,7 +3,7 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
-import { initTeamSubPlan2Free } from '@/service/support/wallet/sub/utils';
+import { initTeamStandardPlan2Free } from '@fastgpt/service/support/wallet/sub/utils';
 
 /* 初始化默认订阅成免费 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { teamId } = await authCert({ req, authToken: true });
     await MongoTeamSub.deleteMany({ teamId });
 
-    await initTeamSubPlan2Free({ teamId });
+    await initTeamStandardPlan2Free({ teamId });
 
     jsonRes(res, {
       message: 'success'

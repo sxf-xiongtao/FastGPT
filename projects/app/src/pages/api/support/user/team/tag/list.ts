@@ -5,20 +5,21 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { connectToDatabase } from '@/service/mongo';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { insertUserTeamsTags } from '@/service/support/user/teamTags/controller';
+import { getTeamTags } from '@/service/support/user/team/tagController';
+import { authCert } from '@fastgpt/service/support/permission/auth/common';
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
-    const { tags } = req.body;
-    // get team tags by teamId
+    const { teamId } = await authCert({ req, authToken: true });
+
     jsonRes(res, {
-      data: { list: await insertUserTeamsTags(tags) }
+      data: await getTeamTags(teamId)
     });
   } catch (err) {
     jsonRes(res, {
       code: 500,
-      error: err,
-      data: req.body
+      error: err
     });
   }
 }

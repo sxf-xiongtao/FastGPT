@@ -28,7 +28,6 @@ type APP = {
   ownerName: string;
   name: string;
   balance: number;
-  maxSize: number;
   createTime: string;
   operation?: any;
 };
@@ -51,10 +50,6 @@ const columns = [
   columnHelper.accessor('balance', {
     header: () => '余额',
     cell: (info) => info.renderValue()
-  }),
-  columnHelper.accessor('maxSize', {
-    header: () => '团队最大成员数',
-    cell: (info) => <div className="w-32 text-center">{info.renderValue()}</div>
   }),
   columnHelper.accessor('createTime', {
     header: () => '创建时间',

@@ -9,7 +9,7 @@ import {
   SubTypeEnum
 } from '@fastgpt/global/support/wallet/sub/constants';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
-import { getStandardPlan, initTeamSubPlan2Free } from '@/service/support/wallet/sub/utils';
+import { getStandardPlan } from '@fastgpt/service/support/wallet/sub/utils';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import { addMonths } from 'date-fns';
@@ -17,18 +17,22 @@ import { createStandardSubBill } from '@/service/support/wallet/sub/bill';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { TeamMemberRoleEnum } from '@fastgpt/global/support/user/team/constant';
 import { TeamSubSchema } from '@fastgpt/global/support/wallet/sub/type';
+import { initTeamStandardPlan2Free } from '@fastgpt/service/support/wallet/sub/utils';
 
 /* 
-  更新过期的标准订阅
+  更新非免费的过期订阅。
+  续费。
+  免费的需要用户登录一次才会更新。
 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await authCert({ req, authRoot: true });
     await connectToDatabase();
 
-    // 1. 找出所有过期的
+    // 1. 找出所有非免费的过期计划
     const plans = await MongoTeamSub.find({
       type: SubTypeEnum.standard,
+      currentSubLevel: { $ne: StandardSubLevelEnum.free },
       expiredTime: { $lte: new Date() }
     });
 
@@ -82,7 +86,7 @@ const updatePlan = async (plan: TeamSubSchema) => {
 
     // 余额不足，改成免费版
     if (!balanceEnough) {
-      await initTeamSubPlan2Free({ teamId: team._id });
+      await initTeamStandardPlan2Free({ teamId: team._id });
       return;
     }
 
@@ -107,7 +111,6 @@ const updatePlan = async (plan: TeamSubSchema) => {
         { session }
       );
 
-      // 检查是否需要创建余额
       await createStandardSubBill({
         teamId: team._id,
         tmbId: owner._id,

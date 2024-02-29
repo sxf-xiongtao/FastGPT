@@ -50,7 +50,6 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
           id: team._id,
           name: team.name,
           balance: formatStorePrice2Read(team.balance),
-          maxSize: team.maxSize,
           createTime: team.createTime,
           owner: owner,
           ownerName: owner[0].username

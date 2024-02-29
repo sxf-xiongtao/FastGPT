@@ -24,7 +24,7 @@ import { MongoOpenApi } from '@fastgpt/service/support/openapi/schema';
 import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
 import { ClientSession } from '@fastgpt/service/common/mongo';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
-import { initTeamSubPlan2Free } from '../../wallet/sub/utils';
+import { initTeamStandardPlan2Free } from '@fastgpt/service/support/wallet/sub/utils';
 
 /* -------- format --------- */
 export function teamMemberSchema2TeamItemType(data: TeamMemberWithTeamAndUserSchema): TeamItemType {
@@ -36,11 +36,11 @@ export function teamMemberSchema2TeamItemType(data: TeamMemberWithTeamAndUserSch
     avatar: data.teamId.avatar,
     balance: data.teamId.balance,
     tmbId: String(data._id),
+    teamDomain: data.teamId.teamDomain,
     role: data.role,
     status: data.status,
     defaultTeam: data.defaultTeam,
-    canWrite: data.role !== TeamMemberRoleEnum.visitor,
-    maxSize: data.teamId.maxSize
+    canWrite: data.role !== TeamMemberRoleEnum.visitor
   };
 }
 
@@ -78,7 +78,7 @@ export async function createTeam({
     );
 
     // create sub plan
-    await initTeamSubPlan2Free({
+    await initTeamStandardPlan2Free({
       teamId: team._id,
       session
     });
@@ -91,27 +91,24 @@ export async function createTeam({
       avatar: team.avatar,
       balance: team.balance,
       tmbId: String(tmb._id),
+      teamDomain: team.teamDomain,
       role: tmb.role,
       status: tmb.status,
       defaultTeam: tmb.defaultTeam,
-      canWrite: tmb.role !== TeamMemberRoleEnum.visitor,
-      maxSize: team.maxSize
+      canWrite: tmb.role !== TeamMemberRoleEnum.visitor
     };
   } catch (error) {
     return Promise.reject(error);
   }
 }
-export async function updateTeam({ teamId, name, avatar }: UpdateTeamProps) {
+export async function updateTeam({ teamId, name, avatar, teamDomain }: UpdateTeamProps) {
   await MongoTeam.findByIdAndUpdate(teamId, {
     name,
-    avatar
+    avatar,
+    teamDomain
   });
 }
-export async function updateTeamTagsUrl({ teamId, tagsUrl }: { teamId: string; tagsUrl: string }) {
-  await MongoTeam.findByIdAndUpdate(teamId, {
-    tagsUrl
-  });
-}
+
 export async function getUserTeams(data: {
   userId?: string;
   tmbId?: string;
@@ -263,19 +260,7 @@ export async function authTeamRole({
     return Promise.reject(error);
   }
 }
-// auth max member, if  over, reject
-export async function authTeamMaxMember(teamId: string, addAmount: number) {
-  const [team, members] = await Promise.all([
-    MongoTeam.findById(teamId, 'maxSize'),
-    MongoTeamMember.countDocuments({ teamId, status: notLeaveStatus })
-  ]);
-  if (!team) {
-    return Promise.reject('Team not exit');
-  }
-  if (members + addAmount >= team.maxSize) {
-    return Promise.reject(TeamErrEnum.teamOverSize);
-  }
-}
+
 // tmbId exist or userId and teamId has tmb data
 export async function authUserExistTeam({ userId, teamId }: { userId?: string; teamId?: string }) {
   if (userId && teamId) {

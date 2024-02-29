@@ -3,13 +3,12 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
-import { SubStatusEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
-import { calculateDaysBetweenDates } from '@fastgpt/global/common/math/date';
+import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import { MongoBill } from '@/service/support/wallet/bill/schema';
 import { BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { delay } from '@fastgpt/global/common/system/utils';
-import { initTeamSubPlan2Free, getExtraDatasetSizePrice } from '@/service/support/wallet/sub/utils';
+import { initTeamStandardPlan2Free } from '@fastgpt/service/support/wallet/sub/utils';
 
 /* 初始化旧的订阅字段 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -52,7 +51,7 @@ const addTeamDefaultSub = async () => {
         console.log(++success);
         return;
       }
-      await initTeamSubPlan2Free({
+      await initTeamStandardPlan2Free({
         teamId
       });
     } catch (error) {

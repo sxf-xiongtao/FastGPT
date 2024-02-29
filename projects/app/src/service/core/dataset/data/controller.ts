@@ -12,8 +12,8 @@ export async function pushDataToTrainingQueue(
 ): Promise<PushDatasetDataResponse> {
   const result = await pushDataListToTrainingQueue({
     ...props,
-    vectorModelList: global.fatgptMainConfig?.vectorModels,
-    datasetModelList: global.fatgptMainConfig?.llmModels
+    vectorModelList: global?.vectorModels,
+    datasetModelList: global?.llmModels
   });
 
   return result;

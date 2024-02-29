@@ -2,11 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
-import {
-  authUserExistTeam,
-  authTeamMaxMember,
-  authTeamRole
-} from '@/service/support/user/team/controller';
+import { authUserExistTeam, authTeamRole } from '@/service/support/user/team/controller';
 import type {
   InviteMemberProps,
   InviteMemberResponse
@@ -17,6 +13,7 @@ import {
 } from '@fastgpt/global/support/user/team/constant';
 import { authUserExist } from '@fastgpt/service/support/user/controller';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
+import { checkTeamMaxMembersPermission } from '@/service/support/permission/teamLimit';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -80,7 +77,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // insert teamMember and send inform
     if (userMap.invite.length > 0) {
-      await authTeamMaxMember(teamId, userMap.invite.length);
+      await checkTeamMaxMembersPermission(teamId, userMap.invite.length);
 
       await MongoTeamMember.insertMany(
         userMap.invite.map((user) => {

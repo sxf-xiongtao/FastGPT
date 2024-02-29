@@ -10,12 +10,11 @@ export default async function updateTeam(req: NextApiRequest, res: NextApiRespon
     await connectToDatabase();
     await adminCert({ req, authToken: true });
 
-    let { id, balance, maxSize, name } = req.body;
+    let { id, balance, name } = req.body;
 
     await MongoTeam.findByIdAndUpdate(id, {
       ...(name && { name: name }),
-      ...(balance !== undefined && { balance: balance * PRICE_SCALE }),
-      ...(maxSize !== undefined && { maxSize })
+      ...(balance !== undefined && { balance: balance * PRICE_SCALE })
     });
 
     jsonRes(res, {

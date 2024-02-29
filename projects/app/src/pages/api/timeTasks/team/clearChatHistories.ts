@@ -9,11 +9,11 @@ import { addDays } from 'date-fns';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import {
   getLargeStandardSubLevel,
-  getStandardPlan,
-  openSubPlaning
+  systemUseTeamPlanning
 } from '@/service/support/wallet/sub/utils';
 import { MongoChatItem } from '@fastgpt/service/core/chat/chatItemSchema';
 import { MongoChat } from '@fastgpt/service/core/chat/chatSchema';
+import { getStandardPlan } from '@fastgpt/service/support/wallet/sub/utils';
 
 /* 
     清除用户过期的聊天记录
@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await connectToDatabase();
 
     // 检查是否开启了订阅模式
-    if (!openSubPlaning()) {
+    if (!systemUseTeamPlanning()) {
       return jsonRes(res);
     }
 

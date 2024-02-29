@@ -14,12 +14,12 @@ import {
 import { readFileContent } from '@/service/common/file/read/utils';
 import { getNanoid, hashStr } from '@fastgpt/global/common/string/tools';
 import { splitText2Chunks } from '@fastgpt/global/common/string/textSplitter';
-import { checkDatasetLimit } from '@/service/support/permission/teamLimit';
+import { checkDatasetLimit } from '@fastgpt/service/support/permission/teamLimit';
 import { predictDataLimitLength } from '@fastgpt/global/core/dataset/utils';
 import { pushDataToTrainingQueue } from '@/service/core/dataset/data/controller';
 import { createTrainingUsage } from '@fastgpt/service/support/wallet/usage/controller';
 import { UsageSourceEnum } from '@fastgpt/global/support/wallet/usage/constants';
-import { getDatasetModel, getVectorModel } from '@/service/core/ai/model';
+import { getDatasetModel, getVectorModel } from '@fastgpt/service/core/ai/model';
 import { BucketNameEnum } from '@fastgpt/global/common/file/constants';
 
 /**

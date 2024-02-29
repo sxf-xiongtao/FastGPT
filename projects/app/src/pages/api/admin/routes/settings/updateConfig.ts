@@ -5,8 +5,8 @@ import { adminCert } from '@/service/support/permission/adminCert';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { ConfigStoreType } from '@/global/admin/config';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
-import axios from 'axios';
 import { addMonths } from 'date-fns';
+import { initFastGPTConfig } from '@fastgpt/service/common/system/tools';
 
 export default async function updateConfig(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -33,7 +33,8 @@ export default async function updateConfig(req: NextApiRequest, res: NextApiResp
 
     // update env
     global.systemConfig = fastgptPro;
-    global.fatgptMainConfig = fastgpt;
+    initFastGPTConfig(fastgpt);
+
     console.log(fastgptPro, fastgpt);
 
     jsonRes(res, {

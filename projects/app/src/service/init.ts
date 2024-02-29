@@ -4,6 +4,7 @@ import { FastGPTConfigFileType } from '@fastgpt/global/common/system/types';
 import { delay } from '@fastgpt/global/common/system/utils';
 import { DatasetStatusEnum } from '@fastgpt/global/core/dataset/constants';
 import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema';
+import { initFastGPTConfig } from '@fastgpt/service/common/system/tools';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 
 export const getProInitData = async () => {
@@ -31,9 +32,18 @@ export const getProInitData = async () => {
         };
 
     global.systemConfig = config;
-    global.fatgptMainConfig = fastgptConfig?.value as unknown as FastGPTConfigFileType;
 
-    console.log(global.fatgptMainConfig);
+    initFastGPTConfig(fastgptConfig?.value as unknown as FastGPTConfigFileType);
+
+    console.log({
+      feConfigs: global.feConfigs,
+      subPlans: global.subPlans,
+      llmModels: global.llmModels,
+      vectorModels: global.vectorModels,
+      reRankModels: global.reRankModels,
+      audioSpeechModels: global.audioSpeechModels,
+      whisperModel: global.whisperModel
+    });
     console.log(global.systemConfig);
   } catch (error) {
     console.log('init config error', error);
