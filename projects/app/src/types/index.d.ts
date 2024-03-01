@@ -18,9 +18,6 @@ export type RequestPaging = { pageNum: number; pageSize: number; [key]: any };
 
 export type SystemConfigType = {
   // license: string;
-  system: {
-    title: string;
-  };
   censor?: {
     BAIDU_TEXT_CENSOR_CLIENTID?: string;
     BAIDU_TEXT_CENSOR_CLIENTSECRET?: string;
@@ -83,4 +80,6 @@ declare global {
 
   var reduceAiPointsQueue: { teamId: string; totalPoints: number }[];
   var concatBillQueue: ConcatBillQueueItemType[];
+
+  var autoTrainingLen: number;
 }

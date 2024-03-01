@@ -208,9 +208,6 @@ export function formatFormData2ConfigStore({
   // format fastgptPro
   const fastgptProConfig: ConfigStoreType['fastgptPro'] = {
     ...fastgptPro,
-    system: {
-      title: formatFeConfig.systemTitle || ''
-    },
     auth: {
       github: fastgptPro.auth?.github,
       google: fastgptPro.auth?.google,

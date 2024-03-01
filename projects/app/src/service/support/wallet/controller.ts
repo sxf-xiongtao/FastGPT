@@ -7,6 +7,8 @@ import { ClientSession } from '@fastgpt/service/common/mongo';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 
+const batchUpdateTime = Number(process.env.BATCH_UPDATE_TIME || 3000);
+
 /* 
   amount: min unit
 */
@@ -123,7 +125,7 @@ export const pushReduceTeamAiPointsTask = ({
     totalPoints
   });
 };
-export const reduceTeamBalanceTimer = async () => {
+export const reduceAiPointsTimer = async () => {
   if (global.reduceAiPointsQueue.length > 0) {
     const list = global.reduceAiPointsQueue.slice();
     global.reduceAiPointsQueue = [];
@@ -152,8 +154,8 @@ export const reduceTeamBalanceTimer = async () => {
 
     console.log('reduce ai points account:', list.length);
   }
-  await delay(Number(process.env.UPDATE_BALANCE_DELAY || 5000));
-  reduceTeamBalanceTimer();
+  await delay(batchUpdateTime);
+  reduceAiPointsTimer();
 };
 
 export const pushConcatBillTask = (data: ConcatBillQueueItemType[]) => {
@@ -166,21 +168,21 @@ export const concatBillTimer = async () => {
 
     // concat same billId
     const map = new Map<string, ConcatBillQueueItemType>();
-    list.forEach(({ billId, totalPoints, charsLength, listIndex }) => {
+    list.forEach(({ billId, totalPoints, tokens, listIndex }) => {
       const id = `${billId}-${listIndex}`;
       const data = map.get(id);
       if (data) {
         map.set(id, {
           billId,
           totalPoints: data.totalPoints + totalPoints,
-          charsLength: data.charsLength + charsLength,
+          tokens: data.tokens + tokens,
           listIndex
         });
       } else {
         map.set(id, {
           billId,
           totalPoints,
-          charsLength,
+          tokens,
           listIndex
         });
       }
@@ -189,14 +191,14 @@ export const concatBillTimer = async () => {
     const concatList = Array.from(map).map(([_, data]) => data);
 
     for await (const item of concatList) {
-      const { billId, listIndex, totalPoints, charsLength } = item;
+      const { billId, listIndex, totalPoints, tokens } = item;
       try {
         await MongoUsage.findByIdAndUpdate(billId, {
           $inc: {
             totalPoints,
             ...(listIndex !== undefined && {
               [`list.${listIndex}.amount`]: totalPoints,
-              [`list.${listIndex}.charsLength`]: charsLength
+              [`list.${listIndex}.tokens`]: tokens
             })
           }
         });
@@ -207,6 +209,6 @@ export const concatBillTimer = async () => {
     console.log('concat bill timer:', list.length);
   }
 
-  await delay(3000);
+  await delay(batchUpdateTime);
   concatBillTimer();
 };

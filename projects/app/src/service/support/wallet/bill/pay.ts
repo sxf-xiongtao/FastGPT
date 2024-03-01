@@ -37,7 +37,7 @@ export class WXPay {
     try {
       const payment = await this.getPayment();
       const res = await payment.native({
-        description: `${global.systemConfig.system.title} ${map[type]}`,
+        description: `${global.feConfigs.systemTitle} ${map[type]}`,
         out_trade_no: orderId,
         amount: {
           total: amount

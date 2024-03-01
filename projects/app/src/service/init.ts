@@ -25,11 +25,7 @@ export const getProInitData = async () => {
     // concat config
     const config: SystemConfigType = fastgptProConfig?.value
       ? (fastgptProConfig?.value as SystemConfigType)
-      : {
-          system: {
-            title: 'FastGPT'
-          }
-        };
+      : {};
 
     global.systemConfig = config;
 
@@ -37,6 +33,7 @@ export const getProInitData = async () => {
 
     console.log({
       feConfigs: global.feConfigs,
+      systemEnv: global.systemEnv,
       subPlans: global.subPlans,
       llmModels: global.llmModels,
       vectorModels: global.vectorModels,
@@ -58,6 +55,8 @@ export function initGlobal() {
 
   global.reduceAiPointsQueue = [];
   global.concatBillQueue = [];
+
+  global.autoTrainingLen = 0;
 }
 
 export async function initDatasetStatus() {

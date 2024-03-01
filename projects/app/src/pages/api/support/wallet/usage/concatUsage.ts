@@ -14,26 +14,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     await connectToDatabase();
     await authCert({ req, authRoot: true });
-    const {
-      teamId,
-      billId,
-      totalPoints = 0,
-      listIndex,
-      charsLength = 0
-    } = req.body as ConcatUsageProps;
+    const body = req.body as ConcatUsageProps;
 
-    // 没有Id，或者不符合 mongoose ObjectId
-    if (!billId || !Types.ObjectId.isValid(billId)) return;
-
-    pushConcatBillTask([
-      {
-        billId,
-        listIndex,
-        charsLength,
-        totalPoints
-      }
-    ]);
-    pushReduceTeamAiPointsTask({ teamId, totalPoints });
+    await concatUsage(body);
 
     jsonRes(res);
   } catch (err) {
@@ -43,3 +26,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     jsonRes(res);
   }
 }
+
+export const concatUsage = async ({
+  teamId,
+  billId,
+  totalPoints = 0,
+  listIndex,
+  tokens = 0
+}: ConcatUsageProps) => {
+  // 没有Id，或者不符合 mongoose ObjectId
+  if (!billId || !Types.ObjectId.isValid(billId)) return;
+
+  pushConcatBillTask([
+    {
+      billId,
+      listIndex,
+      tokens,
+      totalPoints
+    }
+  ]);
+  pushReduceTeamAiPointsTask({ teamId, totalPoints });
+};

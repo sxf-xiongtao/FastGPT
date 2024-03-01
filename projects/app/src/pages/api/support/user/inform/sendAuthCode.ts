@@ -83,14 +83,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 export const sendEmailCode = (email: string, code: string, type: `${UserAuthTypeEnum}`) => {
   const emailMap: { [key: string]: any } = {
     [UserAuthTypeEnum.register]: {
-      subject: `注册 ${global.systemConfig?.system?.title} 账号`,
+      subject: `注册 ${global.feConfigs?.systemTitle} 账号`,
       html: (code: string) =>
-        `<div>您正在注册 ${global.systemConfig?.system?.title} 账号，验证码为：${code}</div>`
+        `<div>您正在注册 ${global.feConfigs?.systemTitle} 账号，验证码为：${code}</div>`
     },
     [UserAuthTypeEnum.findPassword]: {
-      subject: `修改 ${global.systemConfig?.system?.title} 密码`,
+      subject: `修改 ${global.feConfigs?.systemTitle} 密码`,
       html: (code: string) =>
-        `<div>您正在修改 ${global.systemConfig?.system?.title} 账号密码，验证码为：${code}</div>`
+        `<div>您正在修改 ${global.feConfigs?.systemTitle} 账号密码，验证码为：${code}</div>`
     }
   };
 
@@ -106,7 +106,7 @@ export const sendEmailCode = (email: string, code: string, type: `${UserAuthType
 
   return new Promise((resolve, reject) => {
     const options = {
-      from: `"${global.systemConfig?.system?.title}" ${global.systemConfig?.auth?.email?.user}`,
+      from: `"${global.feConfigs?.systemTitle}" ${global.systemConfig?.auth?.email?.user}`,
       to: email,
       subject: emailMap[type]?.subject,
       html: emailMap[type]?.html(code)
