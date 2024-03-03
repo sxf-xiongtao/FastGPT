@@ -136,6 +136,10 @@ export function formatConfigStore2FormSchema({
           SNED_PHONE_ACCESSSECRET: fastgptPro?.auth?.phone?.SNED_PHONE_ACCESSSECRET || '',
           SNED_PHONE_SIGNNAME: fastgptPro?.auth?.phone?.SNED_PHONE_SIGNNAME || '',
           SNED_PHONE_TEMPLATE: fastgptPro?.auth?.phone?.SNED_PHONE_TEMPLATE || ''
+        },
+        wechat: {
+          appID: fastgptPro?.auth?.wechat?.appID || '',
+          appSecret: fastgptPro?.auth?.wechat?.appSecret || ''
         }
       },
       fastLogin: JSON.stringify(fastgptPro.fastLogin || {}, null, 2)
@@ -190,8 +194,11 @@ export function formatFormData2ConfigStore({
     ),
     oauth: {
       github: fastgptPro.auth?.github?.clientId,
-      google: fastgptPro.auth?.google?.clientId
+      google: fastgptPro.auth?.google?.clientId,
+      wechat: fastgptPro.auth?.wechat?.appID
     },
+    showPhoneLogin: !!fastgptPro.auth?.phone.SNED_PHONE_TEMPLATE,
+    showEmailLogin: !!fastgptPro.auth?.email?.service,
     googleClientVerKey: fastgptPro.auth?.googleV3Ver.clientKey,
     scripts: scripts ? JSON.parse(scripts) : [],
     uploadFileMaxSize
@@ -213,7 +220,8 @@ export function formatFormData2ConfigStore({
       google: fastgptPro.auth?.google,
       email: fastgptPro.auth?.email,
       phone: fastgptPro.auth?.phone,
-      googleServiceVerKey: fastgptPro.auth.googleV3Ver.serviceKey
+      googleServiceVerKey: fastgptPro.auth.googleV3Ver.serviceKey,
+      wechat: fastgptPro.auth?.wechat
     },
     censor: fastgptPro.censor,
     pay: fastgptPro.pay,

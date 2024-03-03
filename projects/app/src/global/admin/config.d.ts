@@ -62,6 +62,7 @@ export type ConfigFormType = {
       google: SystemConfigType['auth']['google'];
       email: SystemConfigType['auth']['email'];
       phone: SystemConfigType['auth']['phone'];
+      wechat: SystemConfigType['auth']['wechat'];
     };
     pay: SystemConfigType['pay'];
     fastLogin: string;

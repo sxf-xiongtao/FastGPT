@@ -43,6 +43,10 @@ export type SystemConfigType = {
       SNED_PHONE_SIGNNAME: string;
       SNED_PHONE_TEMPLATE: string;
     };
+    wechat?: {
+      appID: string;
+      appSecret: string;
+    };
   };
   pay?: {
     wx?: {

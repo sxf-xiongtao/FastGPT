@@ -17,6 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const { username, avatarUrl } = await (async () => {
       if (type === OAuthEnum.github) return authGithub(code);
       if (type === OAuthEnum.google) return authGoogle(code, callbackUrl);
+      if (type === OAuthEnum.wechat) return authWechat(code);
       return Promise.reject('type error');
     })();
 
@@ -87,6 +88,28 @@ export async function authGoogle(code: string, callbackUrl: string) {
 
   return {
     avatarUrl: picture,
+    username
+  };
+}
+
+export async function authWechat(code: string) {
+  const { data } = await axios.get(
+    `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${global.systemConfig.auth?.wechat?.appID}&secret=${global.systemConfig.auth?.wechat?.appSecret}`,
+    { headers: { Accept: 'application/json' } }
+  );
+  const { access_token } = data;
+  const { data: userInfo } = await axios.get(
+    `https://api.weixin.qq.com/cgi-bin/user/info?access_token=${access_token}&openid=${code}&lang=zh_CN`
+  );
+
+  if (!userInfo.openid) {
+    throw new Error('Failed to obtain WeChat information');
+  }
+
+  const username = `wechat-${userInfo.username}`;
+
+  return {
+    avatarUrl: userInfo.headimgurl,
     username
   };
 }

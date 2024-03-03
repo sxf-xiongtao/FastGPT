@@ -197,6 +197,18 @@
                 },
                 "secret": { "type": "string", "title": "Google Secret" }
               }
+            },
+            "wechat": {
+              "type": "object",
+              "title": "微信配置",
+              "properties": {
+                "appID": {
+                  "type": "string",
+                  "title": "AppID",
+                  "description": ""
+                },
+                "appSecret": { "type": "string", "title": "AppSecret" }
+              }
             }
           }
         },

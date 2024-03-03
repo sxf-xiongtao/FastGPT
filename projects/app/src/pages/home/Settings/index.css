@@ -34,8 +34,9 @@ button:hover {
   background-color: #0069d9;
 }
 
-#root_fastgpt_FeConfig_switches,
-#root_fastgpt_FeConfig_images {
+#root_fastgpt_feConfigs_switches,
+#root_fastgpt_feConfigs_images {
+  width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr); 
 }
