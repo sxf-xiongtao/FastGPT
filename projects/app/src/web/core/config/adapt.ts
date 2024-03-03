@@ -197,8 +197,8 @@ export function formatFormData2ConfigStore({
       google: fastgptPro.auth?.google?.clientId,
       wechat: fastgptPro.auth?.wechat?.appID
     },
-    showPhoneLogin: !!fastgptPro.auth?.phone.SNED_PHONE_TEMPLATE,
-    showEmailLogin: !!fastgptPro.auth?.email?.service,
+    show_phoneLogin: !!fastgptPro.auth?.phone.SNED_PHONE_TEMPLATE,
+    show_emailLogin: !!fastgptPro.auth?.email?.service,
     googleClientVerKey: fastgptPro.auth?.googleV3Ver.clientKey,
     scripts: scripts ? JSON.parse(scripts) : [],
     uploadFileMaxSize

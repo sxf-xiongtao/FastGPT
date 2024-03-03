@@ -2,9 +2,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { connectToDatabase } from '@/service/mongo';
-import { UserAuthTypeEnum } from '@fastgpt/global/support/user/constant';
+import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
 import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
-import { authCode } from '../../inform/sendAuthCode';
+import { authCode } from '@/service/support/user/auth/controller';
 import { getUserDetail } from '@/service/support/user/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {

@@ -10,26 +10,27 @@ import { initFastGPTConfig } from '@fastgpt/service/common/system/tools';
 
 export default async function updateConfig(req: NextApiRequest, res: NextApiResponse) {
   try {
+    const { fastgpt, fastgptPro } = req.body as ConfigStoreType;
     await connectToDatabase();
     await adminCert({ req, authToken: true });
 
-    const { fastgpt, fastgptPro } = req.body as ConfigStoreType;
+    if (!fastgpt && !fastgptPro) {
+      throw new Error('fastgpt and fastgptPro cannot be empty');
+    }
 
-    if (fastgpt) {
-      await MongoSystemConfigs.create({
+    await Promise.all([
+      MongoSystemConfigs.create({
         type: SystemConfigsTypeEnum.fastgpt,
         value: fastgpt
-      });
-    }
-    if (fastgptPro) {
-      await MongoSystemConfigs.create({
+      }),
+      MongoSystemConfigs.create({
         type: SystemConfigsTypeEnum.fastgptPro,
         value: fastgptPro
-      });
-    }
-    await MongoSystemConfigs.deleteMany({
-      createTime: { $lte: addMonths(new Date(), -1) }
-    });
+      }),
+      MongoSystemConfigs.deleteMany({
+        createTime: { $lte: addMonths(new Date(), -1) }
+      })
+    ]);
 
     // update env
     global.systemConfig = fastgptPro;

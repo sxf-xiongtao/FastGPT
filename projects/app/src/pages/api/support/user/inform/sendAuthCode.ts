@@ -5,20 +5,14 @@ import Dysmsapi, * as dysmsapi from '@alicloud/dysmsapi20170525';
 import * as OpenApi from '@alicloud/openapi-client';
 import * as Util from '@alicloud/tea-util';
 import { connectToDatabase } from '@/service/mongo';
-import { MongoAuthCode } from '@/service/support/user/authCode/schema';
+import { MongoUserAuth } from '@/service/support/user/auth/schema';
 import axios from 'axios';
 import { customAlphabet } from 'nanoid';
 import requestIp from 'request-ip';
 import { Obj2Query } from '@/utils/tools';
 import { addMinutes } from 'date-fns';
+import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
 const nanoid = customAlphabet('123456789', 6);
-
-enum UserAuthTypeEnum {
-  register = 'register',
-  findPassword = 'findPassword'
-}
-
-const expiredMinute = 5;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -43,8 +37,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }));
 
     // 判断 1 分钟内是否有重复数据
-    const authCode = await MongoAuthCode.findOne({
-      username,
+    const authCode = await MongoUserAuth.findOne({
+      key: username,
       type,
       time: { $gte: addMinutes(Date.now(), -1) }
     });
@@ -56,8 +50,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const code = nanoid();
 
     // 创建 auth 记录
-    await MongoAuthCode.create({
-      username,
+    await MongoUserAuth.create({
+      key: username,
       type,
       code
     });
@@ -143,28 +137,6 @@ export const sendPhoneCode = async (phone: string, code: string) => {
   if (res.body.code !== 'OK') {
     return Promise.reject(res.body.message || '发送短信失败');
   }
-};
-
-export const authCode = async ({
-  username,
-  code,
-  type
-}: {
-  username: string;
-  code: string;
-  type: `${UserAuthTypeEnum}`;
-}) => {
-  const result = await MongoAuthCode.findOne({
-    username,
-    type,
-    code
-  });
-
-  if (!result) {
-    return Promise.reject('验证码错误');
-  }
-
-  return 'SUCCESS';
 };
 
 // service run

@@ -1,0 +1,47 @@
+import { connectionMongo, type Model } from '@fastgpt/service/common/mongo';
+const { Schema, model, models } = connectionMongo;
+import { UserAuthSchemaType } from '@/global/user/auth/type.d';
+import { userAuthTypeMap } from '@fastgpt/global/support/user/auth/constants';
+
+/* 
+  user account auth
+  1. login
+  2. register
+  3. find password
+  4. wx login
+*/
+
+const UserAuthSchema = new Schema({
+  key: {
+    type: String,
+    required: true
+  },
+  code: {
+    // auth code
+    type: String,
+    length: 6
+  },
+  openid: {
+    // wx openid
+    type: String
+  },
+  type: {
+    type: String,
+    enum: Object.keys(userAuthTypeMap),
+    required: true
+  },
+  createTime: {
+    type: Date,
+    default: () => Date.now()
+  }
+});
+
+try {
+  UserAuthSchema.index({ key: 1, type: 1 });
+  UserAuthSchema.index({ createTime: 1 }, { expireAfterSeconds: 5 * 60 });
+} catch (error) {
+  console.log(error);
+}
+
+export const MongoUserAuth: Model<UserAuthSchemaType> =
+  models['auth_code'] || model('auth_code', UserAuthSchema);

@@ -17,15 +17,16 @@ export async function connectToDatabase(): Promise<void> {
     afterHook: async () => {
       try {
         startCron();
+
         initDatasetStatus();
 
         reduceAiPointsTimer();
         concatBillTimer();
 
-        startTrainingProcess();
-
-        await getProInitData();
         await authLicense();
+        await getProInitData();
+
+        startTrainingProcess();
       } catch (error) {
         console.log(error);
         return exit(1);

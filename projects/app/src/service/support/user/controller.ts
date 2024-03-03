@@ -5,10 +5,9 @@ import { ERROR_ENUM } from '@fastgpt/global/common/error/errorCode';
 import { UserType } from '@fastgpt/global/support/user/type';
 import { getAndCreateUserDefaultTeam, getUserTeamOrDefaultTeam } from './team/controller';
 import { customAlphabet } from 'nanoid';
-import { hashStr } from '@fastgpt/global/common/string/tools';
+import { getNanoid, hashStr } from '@fastgpt/global/common/string/tools';
 import { sendInform2OneUser } from './inform/controller';
 import { createJWT } from '@fastgpt/service/support/permission/controller';
-const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 8);
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 
 /* create user and team */
@@ -80,20 +79,18 @@ export async function getUserDetail(tmbId?: string, userId?: string): Promise<Us
 export async function usernameLogin({
   username,
   avatar,
-  inviterId,
-  tmbId
+  inviterId
 }: {
   username: string;
   avatar?: string;
   inviterId?: string;
-  tmbId?: string;
 }) {
   // try to login
-  const user = await MongoUser.findOne({ username }, '_id');
+  const user = await MongoUser.findOne({ username }, '_id lastLoginTmbId');
 
   // register
   if (!user) {
-    const password = nanoid();
+    const password = getNanoid();
     const user = await createUserByUsername({
       username,
       password: hashStr(password),
@@ -116,7 +113,7 @@ export async function usernameLogin({
   }
 
   // login
-  const userInfo = await getUserDetail(tmbId, user._id);
+  const userInfo = await getUserDetail(user.lastLoginTmbId, user._id);
 
   const token = createJWT(userInfo);
 

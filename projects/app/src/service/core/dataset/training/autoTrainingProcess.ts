@@ -72,7 +72,7 @@ export async function generateAutoTraining(): Promise<any> {
         text: data.q
       };
     } catch (error) {
-      console.log(`Get Training Data error`, error);
+      addLog.error(`[Auto Training Queue] Error`, error);
       return {
         error: true
       };
@@ -81,7 +81,7 @@ export async function generateAutoTraining(): Promise<any> {
 
   if (done || !data) {
     if (reduceQueue()) {
-      console.log(`【Auto training】Task Done`);
+      addLog.info(`[Auto Training Queue] Done`);
     }
     return;
   }
@@ -89,11 +89,10 @@ export async function generateAutoTraining(): Promise<any> {
     reduceQueue();
     return generateAutoTraining();
   }
-  console.log('Start Auto Training');
+  addLog.info(`[Auto Training Queue] Start`);
 
   // auth balance
   if (!(await checkTeamAiPointsAndLock(data.teamId, data.tmbId))) {
-    console.log('balance not enough');
     reduceQueue();
     return generateAutoTraining();
   }
@@ -124,7 +123,7 @@ export async function generateAutoTraining(): Promise<any> {
 
     const splitIndexResult = formatSplitText2Index(answer, text); // 格式化后的索引
 
-    addLog.info(`Auto Training Finish`, {
+    addLog.info(`[Auto Training Queue] Finish`, {
       time: `${(Date.now() - startTime) / 1000}s`,
       splitLength: splitIndexResult.indexes?.length,
       usage: chatResponse.usage
@@ -158,7 +157,7 @@ export async function generateAutoTraining(): Promise<any> {
         model
       });
     } else {
-      addLog.info(`Auto training result 0:`, { answer });
+      addLog.info(`[Auto Training Queue] Result 0:`, { answer });
     }
 
     reduceQueue();

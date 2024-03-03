@@ -1,6 +1,9 @@
-export type AuthCodeSchema = {
-  username: string;
-  code: string;
-  type: 'register' | 'findPassword';
-  time: number;
+import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
+
+export type UserAuthSchemaType = {
+  key: string;
+  type: `${UserAuthTypeEnum}`;
+  code?: string;
+  openid?: string;
+  createTime: number;
 };
