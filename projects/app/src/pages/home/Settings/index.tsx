@@ -177,15 +177,11 @@ export const Settings = () => {
           style={{ boxShadow: '0px 2px 10px rgba(76, 141, 235, 0.1)' }}
         >
           <ImportModal value={rawData} setFormData={setFormData} setRawData={setRawData}>
-            <Button isLoading={isLoading || isSchemaLoading} className="w-full mb-4">
+            <Button variant={'whiteBase'} mb={3} isLoading={isLoading || isSchemaLoading}>
               配置文件
             </Button>
           </ImportModal>
-          <Button
-            onClick={handleClick}
-            isLoading={isLoading || isSchemaLoading}
-            className="w-full !bg-blue-500 !text-white hover:!bg-blue-600 "
-          >
+          <Button onClick={handleClick} isLoading={isLoading || isSchemaLoading}>
             保存
           </Button>
         </Box>

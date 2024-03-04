@@ -16,11 +16,12 @@
                 "show_team_chat": {
                   "type": "boolean",
                   "title": "展示团队分享",
-                  "defalut": "false"
+                  "default": "false",
+                  "description": "详细使用，请参考：[团队标签方案](https://fael3z0zfze.feishu.cn/wiki/FopHwjMraib3L6k4hL5cryIfnWc)。可以创建一个多个应用的分享窗口，通过已有系统的用户标签进行鉴权。"
                 },
                 "show_emptyChat": {
                   "type": "boolean",
-                  "title": "展示聊天空白页",
+                  "title": "展示聊天空白页（都关闭即可）",
                   "default": false
                 },
                 "show_git": { "type": "boolean", "title": "展示 github 图标" },
@@ -32,8 +33,16 @@
               }
             },
             "systemTitle": { "type": "string", "title": "系统名" },
-            "customApiDomain": { "type": "string", "title": "自定义api域名" },
-            "customSharePageDomain": { "type": "string", "title": "自定义分享链接域名" },
+            "customApiDomain": {
+              "type": "string",
+              "title": "自定义api域名",
+              "description": "可以设置一个额外的api地址，不使用主站的地址，需配置域名的cname和ssl证书。"
+            },
+            "customSharePageDomain": {
+              "type": "string",
+              "title": "自定义分享链接域名",
+              "description": "可以设置一个额外的分享链接地址，不使用主站的地址，需配置域名的cname和ssl证书。"
+            },
             "images": {
               "type": "object",
               "title": "",
@@ -43,12 +52,12 @@
             },
             "openAPIDocUrl": {
               "type": "string",
-              "title": "api 文档地址"
+              "title": "api 文档地址",
+              "description": "openapi的文档地址"
             },
             "docUrl": {
               "type": "string",
-              "title": "文档地址",
-              "description": "文档地址以 / 为结尾"
+              "title": "文档地址（加一个 / 结尾，否则会携带子路径跳转）"
             },
             "chatbotUrl": { "type": "string", "title": "聊天机器人地址" },
             "limit": {
@@ -68,8 +77,15 @@
               "default": 15,
               "description": "用户上传知识库时，每个文件最大是多少。放大的话，需要注意网关也要设置得够大。"
             },
-            "concatMd": { "type": "textarea", "title": "联系弹窗Markdown" },
-            "scripts": { "type": "json" }
+            "concatMd": {
+              "type": "textarea",
+              "title": "联系弹窗Markdown",
+              "description": "配之后，在网页了“联系我们”相关的内容，会提示填写的内容。"
+            },
+            "scripts": {
+              "type": "json",
+              "title": "自定义Script脚本，可以全局插入（可以做站点流量监控之类的）"
+            }
           }
         },
 
@@ -95,6 +111,7 @@
             "standard": {
               "title": "标准订阅套餐（需严格按模板填写，可修改里面的子项）",
               "type": "json",
+              "description": "如果需要提供Saas服务，可以私聊我们拿配置。",
               "default": ""
             },
             "extraDatasetSizePrice": {
@@ -169,9 +186,21 @@
                   "title": "ACCESSKEYID",
                   "description": "阿里云短信参数\nhttps://dysms.console.aliyun.com/overview\n申请对应的签名和短信模板，提供：\nACCESSKEYID\nACCESSSECRET\n签名名称\n模板CODE，SM开头的"
                 },
-                "SNED_PHONE_ACCESSSECRET": { "type": "string", "title": "ACCESSSECRET" },
-                "SNED_PHONE_SIGNNAME": { "type": "string", "title": "签名名称" },
-                "SNED_PHONE_TEMPLATE": { "type": "string", "title": "模板CODE" }
+                "SNED_PHONE_ACCESSSECRET": {
+                  "type": "string",
+                  "title": "ACCESSSECRET",
+                  "description": "阿里云账号的secret key"
+                },
+                "SNED_PHONE_SIGNNAME": {
+                  "type": "string",
+                  "title": "签名名称",
+                  "description": "短信签名"
+                },
+                "SNED_PHONE_TEMPLATE": {
+                  "type": "string",
+                  "title": "模板CODE",
+                  "description": "短信签名的Code，一般是SM_xxx"
+                }
               }
             },
             "github": {
@@ -205,9 +234,13 @@
                 "appID": {
                   "type": "string",
                   "title": "AppID",
-                  "description": ""
+                  "description": "服务号的 Appid。微信服务号的验证地址填写：商业版域名//api/support/user/account/login/wx/callback"
                 },
-                "appSecret": { "type": "string", "title": "AppSecret" }
+                "appSecret": {
+                  "type": "string",
+                  "title": "AppSecret",
+                  "description": "服务号的 Secret"
+                }
               }
             }
           }

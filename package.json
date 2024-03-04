@@ -4,9 +4,12 @@
   "description": "",
   "scripts": {
     "prepare": "husky install",
-    "format": "prettier --config \"./.prettierrc.js\" --write \"./projects/**/src/**/*.{ts,tsx,scss}\""
+    "format": "prettier --config \"./.prettierrc.js\" --write \"./projects/**/src/**/*.{ts,tsx,scss}\"",
+    "gen:theme-typings": "chakra-cli tokens FastGPT/packages/web/styles/theme.ts --out node_modules/.pnpm/node_modules/@chakra-ui/styled-system/dist/theming.types.d.ts",
+    "postinstall": "sh ./scripts/postinstall.sh"
   },
   "devDependencies": {
+    "@chakra-ui/cli": "^2.4.1",
     "@types/node": "^20.10.6",
     "husky": "^8.0.3",
     "i18next": "^23.2.11",

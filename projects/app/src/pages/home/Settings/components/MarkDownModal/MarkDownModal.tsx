@@ -5,18 +5,10 @@ import RemarkGfm from 'remark-gfm';
 import RemarkMath from 'remark-math';
 import RehypeKatex from 'rehype-katex';
 import RemarkBreaks from 'remark-breaks';
-import {
-  Modal,
-  ModalContent,
-  ModalOverlay,
-  useDisclosure,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter
-} from '@chakra-ui/react';
+import { useDisclosure, ModalBody, ModalFooter } from '@chakra-ui/react';
 
 import styles from './index.module.scss';
+import MyModal from '@/components/common/MyModal';
 
 function Image({ src }: { src?: string }) {
   return <MDImage src={src} />;
@@ -63,19 +55,12 @@ export default function MarkdownModal(props: { children: React.ReactElement; sou
           }
         })}
 
-      <Modal isOpen={isOpen} onClose={onClose} size={'6xl'}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>
-            详情
-            <ModalCloseButton />
-          </ModalHeader>
-          <ModalBody>
-            <Markdown source={source} />
-          </ModalBody>
-          <ModalFooter></ModalFooter>
-        </ModalContent>
-      </Modal>
+      <MyModal isOpen={isOpen} onClose={onClose} title={'配置介绍'}>
+        <ModalBody>
+          <Markdown source={source} />
+        </ModalBody>
+        <ModalFooter></ModalFooter>
+      </MyModal>
     </>
   );
 }

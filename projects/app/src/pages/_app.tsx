@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
-import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { ChakraProvider } from '@chakra-ui/react';
-import theme from '@/styles/theme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import NProgress from 'nprogress';
 import Router, { useRouter } from 'next/router';
 import { appWithTranslation, useTranslation } from 'next-i18next';
+import { theme } from '@fastgpt/web/styles/theme';
 
 import '../styles/globals.scss';
 import 'tailwindcss/tailwind.css';
@@ -14,7 +13,7 @@ import 'tailwindcss/tailwind.css';
 import 'nprogress/nprogress.css';
 import '@/styles/reset.scss';
 import './home/Settings/index.css';
-import { change2DefaultLng, serviceSideProps, setLngStore } from '@/web/common/i18n';
+import { change2DefaultLng, setLngStore } from '@/web/common/i18n';
 
 //Binding events.
 Router.events.on('routeChangeStart', () => NProgress.start());
@@ -32,7 +31,7 @@ const queryClient = new QueryClient({
   }
 });
 
-function App({ Component, pageProps, oneAPIUrl }: any) {
+function App({ Component, pageProps }: any) {
   const router = useRouter();
   const { i18n } = useTranslation();
 
