@@ -173,7 +173,7 @@ export const Settings = () => {
           </ul>
         </Box>
         <Box
-          className="bg-white w-full px-6 py-4"
+          className="bg-white w-full px-6 py-4 flex-col flex"
           style={{ boxShadow: '0px 2px 10px rgba(76, 141, 235, 0.1)' }}
         >
           <ImportModal value={rawData} setFormData={setFormData} setRawData={setRawData}>

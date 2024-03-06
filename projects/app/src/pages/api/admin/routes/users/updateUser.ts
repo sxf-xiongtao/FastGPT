@@ -1,7 +1,5 @@
-import { hashStr } from '@fastgpt/global/common/string/tools';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
@@ -11,11 +9,9 @@ export default async function updateUser(req: NextApiRequest, res: NextApiRespon
     await connectToDatabase();
     await adminCert({ req, authToken: true });
 
-    let { id: tmbId, password, status } = req.body;
+    let { _id: id, password, status } = req.body;
 
-    const tmb = await MongoTeamMember.findById(tmbId);
-
-    const result = await MongoUser.findByIdAndUpdate(tmb?.userId, {
+    const result = await MongoUser.findByIdAndUpdate(id, {
       ...(password && { password }),
       ...(status && { status })
     });

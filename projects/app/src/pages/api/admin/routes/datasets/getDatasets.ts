@@ -11,34 +11,29 @@ export default async function getApps(req: NextApiRequest, res: NextApiResponse)
     await connectToDatabase();
     await adminCert({ req, authToken: true });
 
-    const start = parseInt(req.query._start as string) || 0;
-    const end = parseInt(req.query._end as string) || 20;
-    const order = req.query._order === 'DESC' ? -1 : 1;
-    const sort = req.query._sort === 'id' ? '_id' : req.query._sort || '_id';
-    const tag = req.query.tag || '';
-    const name = req.query.name || '';
-
-    const where = {
-      ...(name
-        ? {
-            name: { $regex: name, $options: 'i' }
-          }
-        : {}),
-      ...(tag
-        ? {
-            tags: { $elemMatch: { $regex: tag, $options: 'i' } }
-          }
-        : {})
+    const { pageNum = 1, pageSize = 20 } = req.body as {
+      pageNum: number;
+      pageSize: number;
     };
 
-    const kbsRaw = await MongoDataset.find(where)
-      .skip(start)
-      .limit(end - start)
-      .sort({ [sort as string]: order });
+    const match = {};
+
+    // const kbsRaw = await MongoDataset.find(where)
+    //   .skip(start)
+    //   .limit(end - start)
+    //   .sort({ [sort as string]: order });
 
     const datasets = [];
 
-    for (const kbRaw of kbsRaw) {
+    const [records, total] = await Promise.all([
+      MongoDataset.find(match)
+        .sort({ createTime: -1 })
+        .skip((pageNum - 1) * pageSize)
+        .limit(pageSize),
+      MongoDataset.countDocuments(match)
+    ]);
+
+    for (const kbRaw of records) {
       const kb: any = kbRaw.toObject();
 
       const tmb = await MongoTeamMember.findOne({
@@ -58,11 +53,13 @@ export default async function getApps(req: NextApiRequest, res: NextApiResponse)
 
       datasets.push(orderedKb);
     }
-    const totalCount = await MongoDataset.countDocuments(where);
+
     jsonRes(res, {
       data: {
-        datasets,
-        total: totalCount
+        pageNum,
+        pageSize,
+        data: datasets,
+        total
       }
     });
   } catch (err) {

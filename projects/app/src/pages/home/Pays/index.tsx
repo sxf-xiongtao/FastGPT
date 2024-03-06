@@ -1,201 +1,310 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  useReactTable
-} from '@tanstack/react-table';
-import {
+  Button,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableContainer,
+  Flex,
   Box,
-  Center,
+  ModalBody,
   HStack,
-  Input,
   InputGroup,
-  InputLeftElement,
-  Spinner
+  Input,
+  InputLeftAddon,
+  InputLeftElement
 } from '@chakra-ui/react';
-import Icons from '@/components/Icons';
-import { GET } from '@/service/common/request';
-import Pagination from '@/components/Pagination';
-import { useQuery } from '@tanstack/react-query';
-import DetailModal from '../components/DetailModal';
-import { SearchIcon } from '@chakra-ui/icons';
-import { formatDate } from '@/utils/tools';
+import type { BillSchemaType } from '@fastgpt/global/support/wallet/bill/type.d';
+import dayjs from 'dayjs';
+import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
+import MyIcon from '@fastgpt/web/components/common/Icon';
+import { useTranslation } from 'next-i18next';
+import {
+  BillPayWayEnum,
+  BillStatusEnum,
+  BillTypeEnum
+} from '@fastgpt/global/support/wallet/bill/constants';
+import { StandardSubLevelEnum, SubModeEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import MySelect from '@fastgpt/web/components/common/MySelect';
+import MyModal from '@fastgpt/web/components/common/CustomModal';
+import { usePagination } from '@fastgpt/web/hooks/usePagination';
+import { getPays } from '@/web/admin/pays/api';
 
-type User = {
-  id: string;
-  username: string;
-  price: number;
-  status: string;
-  createTime: string;
-  operation?: any;
-};
-
-const columnHelper = createColumnHelper<User>();
-
-const columns = [
-  columnHelper.accessor('id', {
-    header: () => 'id',
-    cell: (info) => info.getValue()
-  }),
-  columnHelper.accessor('username', {
-    header: () => '用户名',
-    cell: (info) => info.renderValue()
-  }),
-  columnHelper.accessor('price', {
-    header: () => '金额',
-    cell: (info) => info.renderValue()
-  }),
-  columnHelper.accessor('status', {
-    header: () => '状态',
-    cell: (info) => info.renderValue()
-  }),
-  columnHelper.accessor('createTime', {
-    header: () => '创建时间',
-    cell: (info) => <span>{formatDate(info.cell.getValue())}</span>
-  }),
-  columnHelper.accessor('operation', {
-    header: () => '操作',
-    cell: (info) => (
-      <div className="flex ml-2">
-        <DetailModal data={info.row.original} />
-      </div>
-    )
-  })
+const billTypeList = [
+  { label: '全部', value: '' },
+  { label: '余额充值', value: 'balance' },
+  { label: '套餐订阅', value: 'standSubPlan' },
+  { label: '知识库扩容', value: 'extraDatasetSub' },
+  { label: 'AI积分套餐', value: 'extraPoints' }
 ];
 
-const defaultQueryParams = {
-  _start: 0,
-  _end: 20,
-  _sort: '',
-  _order: '',
-  search: ''
+const billTypeMap = {
+  [BillTypeEnum.balance]: {
+    label: '余额充值'
+  },
+  [BillTypeEnum.standSubPlan]: {
+    label: '套餐订阅'
+  },
+  [BillTypeEnum.extraDatasetSub]: {
+    label: '知识库扩容'
+  },
+  [BillTypeEnum.extraPoints]: {
+    label: 'AI积分套餐'
+  }
 };
 
-export default function Pays() {
-  const [queryParams, setQueryParams] = useState(defaultQueryParams);
-  const [data, setData] = useState([]);
-  const [total, setTotal] = useState(0);
+const billStatusMap = {
+  [BillStatusEnum.SUCCESS]: {
+    label: '成功'
+  },
+  [BillStatusEnum.REFUND]: {
+    label: '退款'
+  },
+  [BillStatusEnum.NOTPAY]: {
+    label: '未支付'
+  },
+  [BillStatusEnum.CLOSED]: {
+    label: '关闭'
+  }
+};
 
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel()
-  } as any);
+const subModeMap = {
+  [SubModeEnum.month]: {
+    label: '按月'
+  },
+  [SubModeEnum.year]: {
+    label: '按年'
+  }
+};
 
-  const { isLoading } = useQuery(
-    ['getUsers', queryParams],
-    () => {
-      return GET('/admin/routes/pays/getPays', queryParams);
+const standardSubLevelMap = {
+  [StandardSubLevelEnum.free]: {
+    label: '免费'
+  },
+  [StandardSubLevelEnum.experience]: {
+    label: '体验'
+  },
+  [StandardSubLevelEnum.team]: {
+    label: '团队'
+  },
+  [StandardSubLevelEnum.enterprise]: {
+    label: '企业'
+  },
+  [StandardSubLevelEnum.custom]: {
+    label: '自定义'
+  }
+};
+
+const billPayWayMap = {
+  [BillPayWayEnum.wx]: {
+    label: '微信'
+  },
+  [BillPayWayEnum.balance]: {
+    label: '余额'
+  }
+};
+
+const BillTable = () => {
+  const [billType, setBillType] = useState<`${BillTypeEnum}` | ''>('');
+  const [username, setUsername] = useState<string>();
+  const [billDetail, setBillDetail] = useState<BillSchemaType>();
+
+  const {
+    data: bills,
+    setData: setBills,
+    isLoading,
+    ScrollData,
+    getData
+  } = usePagination<BillSchemaType>({
+    api: getPays,
+    pageSize: 20,
+    params: {
+      type: billType,
+      username
     },
-    {
-      onSuccess: (res: any) => {
-        setData(res.pays);
-        setTotal(res.total);
-      },
-      onError: () => {
-        setData([]);
-        setTotal(0);
-      }
-    }
-  );
+    type: 'scroll',
+    defaultRequest: false
+  });
+
+  useEffect(() => {
+    setBills([]);
+    getData(1);
+  }, [billType, getData]);
 
   return (
-    <div className="w-[90%] m-auto h-[95%] pb-8">
+    <Box className="w-[90%] m-auto h-[95%] pb-8">
       <Box
         className="bg-white mt-8 w-full pl-12 pb-4 pt-6 h-full flex flex-col"
         style={{ boxShadow: '0px 2px 10px  rgba(76, 141, 235, 0.1)' }}
       >
-        <HStack className="justify-between h-16 pr-4">
-          <Box className="flex flex-1">
-            <Box className="text-[20px] font-bold text-[#405169] mb-2">账单管理</Box>
-            <Box className="mt-[2px]">
-              <InputGroup className="ml-4">
-                <InputLeftElement className="!h-8 text-[#E5E5E5]">
-                  <SearchIcon />
-                </InputLeftElement>
-                <Input
-                  variant={'search'}
-                  className="!w-[240px]"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      setQueryParams({
-                        ...queryParams,
-                        search: e.currentTarget.value
-                      });
-                    }
-                  }}
-                  onBlur={(e) => {
-                    setQueryParams({
-                      ...queryParams,
-                      search: e.currentTarget.value
-                    });
-                  }}
-                  placeholder="输入用户 id 或用户名，回车搜索"
-                ></Input>
-              </InputGroup>
-            </Box>
-          </Box>
-          <Box className="!h-8 -mt-2">
-            <Pagination
-              values={{
-                page: queryParams._start / 20 + 1,
-                pageSize: 20,
-                total: total
+        <HStack px={8}>
+          <Box className="text-2xl font-bold text-[#405169]">账单管理</Box>
+          <Box className="flex-grow"></Box>
+          <InputGroup w={200}>
+            <InputLeftElement h={'full'}>
+              <MyIcon name="common/searchLight" w={4} color={'myGray.400'} />
+            </InputLeftElement>
+            <Input
+              placeholder="请输入用户名，回车搜索"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  setBills([]);
+                  getData(1);
+                }
               }}
-              onChange={(values) => {
-                setQueryParams({
-                  ...queryParams,
-                  _start: (values.page - 1) * 20,
-                  _end: values.page * 20
-                });
-              }}
-              notShowSelect
-            />
-          </Box>
+              onChange={(e) => setUsername(e.target.value)}
+              h={8}
+            ></Input>
+          </InputGroup>
         </HStack>
-        <Box className="overflow-auto h-full flex-1 pr-4">
-          {isLoading ? (
-            <Center className="h-full">
-              <Spinner />
-            </Center>
-          ) : data.length === 0 ? (
-            <Center className="h-[400px]">
-              <Box className="flex flex-col">
-                <Icons type="empty" />
-                <span className="w-full text-center mt-4 text-[#c5cae9]">暂无数据</span>
-              </Box>
-            </Center>
-          ) : (
-            <table className="w-full rounded-lg">
-              <thead className="text-lg h-10">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <th key={header.id} align="left" className="pl-2 text-[#132047] font-bold">
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(header.column.columnDef.header, header.getContext())}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody className="text-md">
-                {table.getRowModel().rows.map((row) => (
-                  <tr key={row.id} className="hover:drop-shadow-lg">
-                    {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className="pl-2 h-12 font-medium">
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <Box position={'relative'} h={'100%'} overflow={'overlay'} py={[0, 5]} px={[3, 8]}>
+          <ScrollData>
+            <TableContainer>
+              <Table>
+                <Thead>
+                  <Tr>
+                    <Th>#</Th>
+                    <Th>用户名</Th>
+                    <Th>
+                      <MySelect
+                        list={billTypeList}
+                        value={billType}
+                        size={'sm'}
+                        onchange={(e) => {
+                          setBillType(e);
+                        }}
+                        w={'130px'}
+                      ></MySelect>
+                    </Th>
+                    <Th>时间</Th>
+                    <Th>金额</Th>
+                    <Th>状态</Th>
+                    <Th></Th>
+                  </Tr>
+                </Thead>
+                <Tbody fontSize={'sm'}>
+                  {bills.map((item, i) => (
+                    <Tr key={item._id}>
+                      <Td>{i + 1}</Td>
+                      <Td>{item.username}</Td>
+                      <Td>{billTypeMap[item.type]?.label}</Td>
+                      <Td>
+                        {item.createTime
+                          ? dayjs(item.createTime).format('YYYY/MM/DD HH:mm:ss')
+                          : '-'}
+                      </Td>
+                      <Td>{formatStorePrice2Read(item.price)}元</Td>
+                      <Td>{billStatusMap[item.status]?.label}</Td>
+                      <Td>
+                        <Button
+                          variant={'whiteBase'}
+                          size={'sm'}
+                          onClick={() => setBillDetail(item)}
+                        >
+                          详情
+                        </Button>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+              {!isLoading && bills.length === 0 && (
+                <Flex
+                  mt={'20vh'}
+                  flexDirection={'column'}
+                  alignItems={'center'}
+                  justifyContent={'center'}
+                >
+                  <MyIcon name="empty" w={'48px'} h={'48px'} color={'transparent'} />
+                  <Box mt={2} color={'myGray.500'}>
+                    无账单记录～
+                  </Box>
+                </Flex>
+              )}
+            </TableContainer>
+          </ScrollData>
+
+          {!!billDetail && (
+            <BillDetailModal bill={billDetail} onClose={() => setBillDetail(undefined)} />
           )}
         </Box>
       </Box>
-    </div>
+    </Box>
+  );
+};
+
+export default BillTable;
+
+function BillDetailModal({ bill, onClose }: { bill: BillSchemaType; onClose: () => void }) {
+  return (
+    <MyModal
+      isOpen={true}
+      onClose={onClose}
+      iconSrc="/imgs/modal/bill.svg"
+      title={'订单详情'}
+      maxW={['90vw', '700px']}
+    >
+      <ModalBody>
+        <Flex alignItems={'center'} pb={4}>
+          <Box flex={'0 0 120px'}>订单号:</Box>
+          <Box>{bill.orderId}</Box>
+        </Flex>
+        <Flex alignItems={'center'} pb={4}>
+          <Box flex={'0 0 120px'}>生成时间:</Box>
+          <Box>{dayjs(bill.createTime).format('YYYY/MM/DD HH:mm:ss')}</Box>
+        </Flex>
+        <Flex alignItems={'center'} pb={4}>
+          <Box flex={'0 0 120px'}>状态:</Box>
+          <Box>{billStatusMap[bill.status]?.label}</Box>
+        </Flex>
+        {!!bill.metadata?.payWay && (
+          <Flex alignItems={'center'} pb={4}>
+            <Box flex={'0 0 120px'}>支付方式:</Box>
+            <Box>{billPayWayMap[bill.metadata.payWay]?.label}</Box>
+          </Flex>
+        )}
+        <Flex alignItems={'center'} pb={4}>
+          <Box flex={'0 0 120px'}>金额:</Box>
+          <Box>{formatStorePrice2Read(bill.price)}元</Box>
+        </Flex>
+        <Flex alignItems={'center'} pb={4}>
+          <Box flex={'0 0 120px'}>订单类型:</Box>
+          <Box>{billTypeMap[bill.type]?.label}</Box>
+        </Flex>
+        {!!bill.metadata?.subMode && (
+          <Flex alignItems={'center'} pb={4}>
+            <Box flex={'0 0 120px'}>订阅周期:</Box>
+            <Box>{subModeMap[bill.metadata.subMode]?.label}</Box>
+          </Flex>
+        )}
+        {!!bill.metadata?.standSubLevel && (
+          <Flex alignItems={'center'} pb={4}>
+            <Box flex={'0 0 120px'}>订阅套餐:</Box>
+            <Box>{standardSubLevelMap[bill.metadata.standSubLevel]?.label}</Box>
+          </Flex>
+        )}
+        {bill.metadata?.month !== undefined && (
+          <Flex alignItems={'center'} pb={4}>
+            <Box flex={'0 0 120px'}>月数:</Box>
+            <Box>{bill.metadata?.month}</Box>
+          </Flex>
+        )}
+        {bill.metadata?.datasetSize !== undefined && (
+          <Flex alignItems={'center'} pb={4}>
+            <Box flex={'0 0 120px'}>额外知识库容量:</Box>
+            <Box>{bill.metadata?.datasetSize}</Box>
+          </Flex>
+        )}
+        {bill.metadata?.extraPoints !== undefined && (
+          <Flex alignItems={'center'} pb={4}>
+            <Box flex={'0 0 120px'}>额外AI积分:</Box>
+            <Box>{bill.metadata.extraPoints}</Box>
+          </Flex>
+        )}
+      </ModalBody>
+    </MyModal>
   );
 }

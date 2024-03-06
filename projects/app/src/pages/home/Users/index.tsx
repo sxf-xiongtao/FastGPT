@@ -1,200 +1,176 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  useReactTable
-} from '@tanstack/react-table';
-import {
+  Button,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableContainer,
+  Flex,
   Box,
-  Center,
+  ModalBody,
   HStack,
-  Input,
   InputGroup,
-  InputLeftElement,
-  Spinner
+  Input,
+  InputLeftElement
 } from '@chakra-ui/react';
-import { SearchIcon } from '@chakra-ui/icons';
-import { GET } from '@/service/common/request';
+import dayjs from 'dayjs';
+import MyIcon from '@fastgpt/web/components/common/Icon';
+import MyModal from '@fastgpt/web/components/common/CustomModal';
+import { usePagination } from '@fastgpt/web/hooks/usePagination';
+import { getUsers } from '@/web/admin/users/api';
 import UserEditModal from './components/UserEditModal';
-import Pagination from '@/components/Pagination';
-import { useQuery } from '@tanstack/react-query';
-import UserDetailModal from './components/UserDetailModal';
+import { UserModelSchema } from '@fastgpt/global/support/user/type';
 import UserAddModal from './components/UserAddModal';
-import Icons from '@/components/Icons';
-import { formatDate } from '@/utils/tools';
 
-export type User = {
-  userId: string;
-  username: string;
-  createTime: string;
-  status: string;
-  operation?: any;
-};
+const UserTable = () => {
+  const [username, setUsername] = useState<string>();
+  const [userDetail, setUserDetail] = useState();
 
-const columnHelper = createColumnHelper<User>();
-
-const columns = [
-  columnHelper.accessor('userId', {
-    header: () => 'id',
-    cell: (info) => info.getValue()
-  }),
-  columnHelper.accessor('username', {
-    header: () => '用户名',
-    cell: (info) => info.renderValue()
-  }),
-  columnHelper.accessor('createTime', {
-    header: () => '创建时间',
-    cell: (info) => <span>{formatDate(info.cell.getValue())}</span>
-  }),
-  columnHelper.accessor('status', {
-    header: () => '状态',
-    cell: (info) => info.renderValue()
-  }),
-  columnHelper.accessor('operation', {
-    header: () => '操作',
-    cell: (info) => (
-      <div className="flex">
-        <UserDetailModal data={info.row.original} />
-        <UserEditModal data={info.row.original} />
-      </div>
-    )
-  })
-];
-
-const defaultQueryParams = {
-  _start: 0,
-  _end: 20,
-  _sort: 'balance',
-  _order: '',
-  search: ''
-};
-
-export default function Users() {
-  const [queryParams, setQueryParams] = useState(defaultQueryParams);
-  const [data, setData] = useState([]);
-  const [total, setTotal] = useState(0);
-
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel()
-  } as any);
-
-  const { isLoading } = useQuery(
-    ['getUsers', queryParams],
-    () => {
-      return GET('/admin/routes/users/getUsers', queryParams);
+  const {
+    data: users,
+    setData: setUsers,
+    isLoading,
+    ScrollData,
+    getData
+  } = usePagination({
+    api: getUsers,
+    pageSize: 20,
+    params: {
+      username
     },
-    {
-      onSuccess: (res: any) => {
-        setData(res.users);
-        setTotal(res.total);
-      },
-      onError: () => {
-        setData([]);
-        setTotal(0);
-      }
-    }
-  );
+    type: 'scroll',
+    defaultRequest: false
+  });
+
+  useEffect(() => {
+    getData(1);
+  }, [getData]);
 
   return (
-    <div className="w-[90%] m-auto h-[95%] pb-8">
+    <Box className="w-[90%] m-auto h-[95%] pb-8">
       <Box
         className="bg-white mt-8 w-full pl-12 pb-4 pt-6 h-full flex flex-col"
-        style={{ boxShadow: '0px 2px 10px rgba(76, 141, 235, 0.1)' }}
+        style={{ boxShadow: '0px 2px 10px  rgba(76, 141, 235, 0.1)' }}
       >
-        <HStack className="justify-between h-16 pr-4">
-          <Box className="flex flex-1">
-            <Box className="text-[20px] font-bold text-[#405169] mb-2">用户列表</Box>
-            <Box className="mt-[2px]">
-              <InputGroup className="ml-4">
-                <InputLeftElement className="!h-8 text-[#E5E5E5]">
-                  <SearchIcon />
-                </InputLeftElement>
-                <Input
-                  variant={'search'}
-                  className="!w-[240px]"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      setQueryParams({
-                        ...queryParams,
-                        search: e.currentTarget.value
-                      });
-                    }
-                  }}
-                  onBlur={(e) => {
-                    setQueryParams({
-                      ...queryParams,
-                      search: e.currentTarget.value
-                    });
-                  }}
-                  placeholder="输入用户 id 或用户名，回车搜索"
-                ></Input>
-              </InputGroup>
-            </Box>
-            <UserAddModal data={{}} />
-          </Box>
-          <Box className="!h-8 -mt-2">
-            <Pagination
-              values={{
-                page: queryParams._start / 20 + 1,
-                pageSize: 20,
-                total: total
+        <HStack px={8}>
+          <Box className="text-2xl font-bold text-[#405169]">用户信息</Box>
+          <Box className="flex-grow"></Box>
+          <UserAddModal
+            data={{}}
+            updateData={() => {
+              setUsers([]);
+              getData(1);
+            }}
+          />
+          <InputGroup w={200}>
+            <InputLeftElement h={'full'}>
+              <MyIcon name="common/searchLight" w={4} color={'myGray.400'} />
+            </InputLeftElement>
+            <Input
+              placeholder="请输入用户名，回车搜索"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  setUsers([]);
+                  getData(1);
+                }
               }}
-              onChange={(values) => {
-                setQueryParams({
-                  ...queryParams,
-                  _start: (values.page - 1) * 20,
-                  _end: values.page * 20
-                });
-              }}
-              notShowSelect
-            />
-          </Box>
+              onChange={(e) => setUsername(e.target.value)}
+              h={10}
+            ></Input>
+          </InputGroup>
         </HStack>
-        <Box className="overflow-auto h-full flex-1 pr-4">
-          {isLoading ? (
-            <Center className="h-full">
-              <Spinner />
-            </Center>
-          ) : data.length === 0 ? (
-            <Center className="h-[400px]">
-              <Box className="flex flex-col">
-                <Icons type="empty" />
-                <span className="w-full text-center mt-4 text-[#c5cae9]">暂无数据</span>
-              </Box>
-            </Center>
-          ) : (
-            <table className="w-full rounded-lg">
-              <thead className="text-lg h-10">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <th key={header.id} align="left" className="pl-2 text-[#132047] font-bold">
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(header.column.columnDef.header, header.getContext())}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody className="text-md">
-                {table.getRowModel().rows.map((row) => (
-                  <tr key={row.id} className="hover:drop-shadow-lg">
-                    {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className="pl-2 h-12 font-medium">
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <Box position={'relative'} h={'100%'} overflow={'overlay'} py={[0, 5]} px={[3, 8]}>
+          <ScrollData>
+            <TableContainer>
+              <Table>
+                <Thead>
+                  <Tr>
+                    <Th>#</Th>
+                    <Th>用户名</Th>
+                    <Th>创建时间</Th>
+                    <Th>状态</Th>
+                    <Th></Th>
+                  </Tr>
+                </Thead>
+                <Tbody fontSize={'sm'}>
+                  {users.map((item, i) => (
+                    <Tr key={item._id}>
+                      <Td>{i + 1}</Td>
+                      <Td>{item.username}</Td>
+                      <Td>
+                        {item.createTime
+                          ? dayjs(item.createTime).format('YYYY/MM/DD HH:mm:ss')
+                          : '-'}
+                      </Td>
+                      <Td>{item.status}</Td>
+                      <Td>
+                        <Button
+                          variant={'whiteBase'}
+                          size={'sm'}
+                          mr={2}
+                          onClick={() => setUserDetail(item)}
+                        >
+                          详情
+                        </Button>
+                        <UserEditModal
+                          data={item}
+                          getData={() => {
+                            setUsers([]);
+                            getData(1);
+                          }}
+                        />
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+              {!isLoading && users.length === 0 && (
+                <Flex
+                  mt={'20vh'}
+                  flexDirection={'column'}
+                  alignItems={'center'}
+                  justifyContent={'center'}
+                >
+                  <MyIcon name="empty" w={'48px'} h={'48px'} color={'transparent'} />
+                  <Box mt={2} color={'myGray.500'}>
+                    无用户记录～
+                  </Box>
+                </Flex>
+              )}
+            </TableContainer>
+          </ScrollData>
+
+          {!!userDetail && (
+            <UserDetailModal user={userDetail} onClose={() => setUserDetail(undefined)} />
           )}
         </Box>
       </Box>
-    </div>
+    </Box>
+  );
+};
+
+export default UserTable;
+
+function UserDetailModal({ user, onClose }: { user: UserModelSchema; onClose: () => void }) {
+  return (
+    <MyModal isOpen={true} onClose={onClose} iconSrc="" title={'用户详情'} maxW={['90vw', '700px']}>
+      <ModalBody>
+        <Flex alignItems={'center'} pb={4}>
+          <Box flex={'0 0 120px'}>用户名</Box>
+          <Box>{user.username}</Box>
+        </Flex>
+        <Flex alignItems={'center'} pb={4}>
+          <Box flex={'0 0 120px'}>创建时间:</Box>
+          <Box>{dayjs(user.createTime).format('YYYY/MM/DD HH:mm:ss')}</Box>
+        </Flex>
+        <Flex alignItems={'center'} pb={4}>
+          <Box flex={'0 0 120px'}>状态:</Box>
+          <Box>{user.status}</Box>
+        </Flex>
+      </ModalBody>
+    </MyModal>
   );
 }

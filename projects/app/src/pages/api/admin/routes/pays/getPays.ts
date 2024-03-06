@@ -4,62 +4,65 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { MongoBill } from '@/service/support/wallet/bill/schema';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
-import { isValidObjectIdString } from '../users/getUsers';
+import { BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 
 export default async function getPays(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
     await adminCert({ req, authToken: true });
 
-    const start = parseInt(req.query._start as string) || 0;
-    const end = parseInt(req.query._end as string) || 20;
-    const order = req.query._order === 'ASC' ? 1 : -1;
-    const sort = req.query._sort === 'id' ? '_id' : req.query._sort || '_id';
-    const search = (req.query.search as string) || '';
+    const {
+      pageNum = 1,
+      pageSize = 20,
+      type,
+      username
+    } = req.body as {
+      pageNum: number;
+      pageSize: number;
+      type?: `${BillTypeEnum}`;
+      username: string;
+    };
 
-    const users = await MongoUser.find({ username: new RegExp(search, 'i') });
+    const users = await MongoUser.find({ username: new RegExp(username, 'i') });
     const userIds = users.map((user) => user._id);
 
-    let where = {};
-    if (search && isValidObjectIdString(search)) {
-      where = {
-        $or: [{ userId: Object(search) }, { userId: { $in: userIds } }]
-      };
-    } else if (search) {
-      where = { userId: { $in: userIds } };
-    }
+    const tmbs = await MongoTeamMember.find({ userId: { $in: userIds } });
+    const tmbIds = tmbs.map((tmb) => tmb._id);
 
-    const paysRaw = await MongoBill.find(where)
-      .skip(start)
-      .limit(end - start)
-      .sort({ [sort as string]: order })
-      .populate('tmbId')
-      .lean();
+    const match = {
+      status: { $ne: 'CLOSED' },
+      ...(type && { type }),
+      tmbId: { $in: tmbIds }
+    };
 
-    const pays = await Promise.all(
-      paysRaw
-        .filter((item) => item.tmbId)
-        .map(async (item: any) => {
-          const user = await MongoUser.findById(item.tmbId.userId, 'username');
+    const [records, total] = await Promise.all([
+      MongoBill.find(match)
+        .sort({ createTime: -1 })
+        .skip((pageNum - 1) * pageSize)
+        .limit(pageSize),
+      MongoBill.countDocuments(match)
+    ]);
 
-          return {
-            id: item._id.toString(),
-            username: user?.username,
-            price: item.price / PRICE_SCALE,
-            orderId: item.orderId,
-            status: item.status,
-            createTime: item.createTime
-          };
-        })
+    const newRecords = await Promise.all(
+      records.map(async (record) => {
+        const tmbId = record.tmbId;
+        const tmb = await MongoTeamMember.findOne({ _id: tmbId });
+        const userId = tmb?.userId;
+        const user = await MongoUser.findOne({ _id: userId });
+        return {
+          ...record.toObject(),
+          username: user?.username
+        };
+      })
     );
-
-    const totalCount = await MongoBill.countDocuments(where);
 
     jsonRes(res, {
       data: {
-        pays,
-        total: totalCount
+        pageNum,
+        pageSize,
+        data: newRecords,
+        total
       }
     });
   } catch (err) {

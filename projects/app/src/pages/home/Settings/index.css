@@ -9,7 +9,7 @@ label {
   color: rgba(15, 12, 43, 1);
 }
 
-input {
+.rjsf input {
   margin-bottom: 20px;
   height: 36px;
   font-size: 14px;
@@ -20,18 +20,8 @@ input {
   width: 88%;
 }
 
-input:focus {
+.rjsf input:focus {
   border: 1px solid rgba(15, 12, 43, 0.5);
-}
-
-button {
-  background-color: #007bff;
-  color: #fff;
-  width: 100%;
-}
-
-button:hover {
-  background-color: #0069d9;
 }
 
 #root_fastgpt_feConfigs_switches,

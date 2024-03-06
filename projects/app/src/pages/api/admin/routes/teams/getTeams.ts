@@ -4,7 +4,6 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { TeamSchema as TeamType } from '@fastgpt/global/support/user/team/type';
 import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
 
 export default async function getTeams(req: NextApiRequest, res: NextApiResponse) {
@@ -12,36 +11,34 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
     await connectToDatabase();
     await adminCert({ req, authToken: true });
 
-    const start = parseInt(req.query._start as string) || 0;
-    const end = parseInt(req.query._end as string) || 20;
-    const search = (req.query.search as string) || '';
-
-    let where: any = {
-      name: new RegExp(search, 'i')
+    const {
+      pageNum = 1,
+      pageSize = 20,
+      search
+    } = req.body as {
+      pageNum: number;
+      pageSize: number;
+      search: string;
     };
 
-    if (search !== '') {
-      const usersRaw = await MongoUser.find(
-        {
-          username: new RegExp(search, 'i')
-        },
-        '_id'
-      );
+    const users = await MongoUser.find({
+      username: new RegExp(search, 'i')
+    });
 
-      const userIds = usersRaw.map((user) => user._id);
+    const match = {
+      $or: [{ name: new RegExp(search, 'i') }, { ownerId: { $in: users.map((user) => user._id) } }]
+    };
 
-      where = {
-        $or: [{ name: new RegExp(search, 'i') }, { ownerId: { $in: userIds } }]
-      };
-    }
-
-    const teamsRaw: TeamType[] = await MongoTeam.find(where)
-      .sort({ createTime: -1 })
-      .skip(start)
-      .limit(end - start);
+    const [records, total] = await Promise.all([
+      MongoTeam.find(match)
+        .sort({ createTime: -1 })
+        .skip((pageNum - 1) * pageSize)
+        .limit(pageSize),
+      MongoTeam.countDocuments(match)
+    ]);
 
     const teams = await Promise.all(
-      teamsRaw.map(async (team) => {
+      records.map(async (team) => {
         const owner = await MongoUser.find({
           _id: team.ownerId
         });
@@ -52,17 +49,17 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
           balance: formatStorePrice2Read(team.balance),
           createTime: team.createTime,
           owner: owner,
-          ownerName: owner[0].username
+          ownerName: owner[0]?.username
         };
       })
     );
 
-    const totalCount = await MongoTeam.countDocuments(where);
-
     jsonRes(res, {
       data: {
-        teams: teams,
-        total: totalCount
+        pageNum,
+        pageSize,
+        data: teams,
+        total
       }
     });
   } catch (err) {

@@ -78,12 +78,7 @@ const Login = () => {
           <FormLabel className="text-[#245373] font-medium" htmlFor="account">
             {t('Username')}
           </FormLabel>
-          <Input
-            {...register('account', { required: true })}
-            id="account"
-            placeholder={''}
-            variant="login"
-          />
+          <Input {...register('account', { required: true })} id="account" placeholder={''} />
         </FormControl>
         <FormControl isInvalid={!!errors.password} className="mb-16 flex flex-col">
           <FormLabel className="text-[#245373] font-medium" htmlFor="password">
@@ -95,14 +90,13 @@ const Login = () => {
               {...register('password', { required: true })}
               id="password"
               placeholder={''}
-              variant="login"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   handleSubmit(onSubmit)();
                 }
               }}
             />
-            <InputRightElement className="mt-2">
+            <InputRightElement>
               {isShowPassword ? (
                 <ViewOffIcon className="cursor-pointer" onClick={() => setIsShowPassword(false)} />
               ) : (
@@ -113,9 +107,10 @@ const Login = () => {
         </FormControl>
         <Button
           type="submit"
-          variant="login"
           onClick={handleSubmit(onSubmit)}
           isLoading={isLoading}
+          variant="primary"
+          className="w-full"
         >
           {t('Login')}
         </Button>

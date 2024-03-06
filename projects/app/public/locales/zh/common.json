@@ -9,5 +9,8 @@
     "Apps": "应用信息",
     "Billing": "账单管理",
     "KnowledgeBase": "知识库管理"
+  },
+  "common": {
+    "All": "全部"
   }
 }

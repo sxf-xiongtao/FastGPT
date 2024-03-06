@@ -1,202 +1,137 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  useReactTable
-} from '@tanstack/react-table';
-import {
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableContainer,
+  Flex,
   Box,
-  Center,
   HStack,
-  Input,
   InputGroup,
-  InputLeftElement,
-  Spinner
+  Input,
+  InputLeftElement
 } from '@chakra-ui/react';
-import { SearchIcon } from '@chakra-ui/icons';
-import { GET } from '@/service/common/request';
-import { useQuery } from '@tanstack/react-query';
-import Pagination from '@/components/Pagination';
+import dayjs from 'dayjs';
+import MyIcon from '@fastgpt/web/components/common/Icon';
+import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import DetailTeamModal from './components/DetailTeamModal';
+import { getTeams } from '@/web/admin/teams/api';
+import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
 import EditTeamModal from './components/EditTeamModal';
-import Icons from '@/components/Icons';
-import { formatDate } from '@/utils/tools';
 
-type APP = {
-  id: string;
-  ownerName: string;
-  name: string;
-  balance: number;
-  createTime: string;
-  operation?: any;
-};
+const UserTable = () => {
+  const [search, setSearch] = useState<string>();
 
-const columnHelper = createColumnHelper<APP>();
-
-const columns = [
-  columnHelper.accessor('id', {
-    header: () => 'id',
-    cell: (info) => info.getValue()
-  }),
-  columnHelper.accessor('name', {
-    header: () => '团队名',
-    cell: (info) => info.renderValue()
-  }),
-  columnHelper.accessor('ownerName', {
-    header: () => '用户名',
-    cell: (info) => info.getValue()
-  }),
-  columnHelper.accessor('balance', {
-    header: () => '余额',
-    cell: (info) => info.renderValue()
-  }),
-  columnHelper.accessor('createTime', {
-    header: () => '创建时间',
-    cell: (info) => <span>{formatDate(info.cell.getValue())}</span>
-  }),
-  columnHelper.accessor('operation', {
-    header: () => '操作',
-    cell: (info) => (
-      <div className="flex">
-        <DetailTeamModal teamId={info.row.original.id} />
-        <EditTeamModal data={info.row.original} />
-      </div>
-    )
-  })
-];
-
-const defaultQueryParams = {
-  _start: 0,
-  _end: 20,
-  search: ''
-};
-
-export default function Teams() {
-  const [queryParams, setQueryParams] = useState(defaultQueryParams);
-  const [total, setTotal] = useState(0);
-
-  const [data, setData] = useState([]);
-
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel()
-  } as any);
-
-  const { isLoading } = useQuery(
-    ['getTeams', queryParams],
-    () => {
-      return GET('/admin/routes/teams/getTeams', queryParams);
+  const {
+    data: teams,
+    setData: setTeams,
+    isLoading,
+    ScrollData,
+    getData
+  } = usePagination({
+    api: getTeams,
+    pageSize: 20,
+    params: {
+      search
     },
-    {
-      onSuccess: (res: any) => {
-        setData(res.teams);
-        setTotal(res.total);
-      },
-      onError: (err) => {
-        setData([]);
-        setTotal(0);
-      }
-    }
-  );
+    type: 'scroll',
+    defaultRequest: false
+  });
+
+  useEffect(() => {
+    getData(1);
+  }, [getData]);
 
   return (
-    <div className="w-[90%] m-auto h-[95%] pb-8">
+    <Box className="w-[90%] m-auto h-[95%] pb-8">
       <Box
         className="bg-white mt-8 w-full pl-12 pb-4 pt-6 h-full flex flex-col"
-        style={{ boxShadow: '0px 2px 10px rgba(76, 141, 235, 0.1)' }}
+        style={{ boxShadow: '0px 2px 10px  rgba(76, 141, 235, 0.1)' }}
       >
-        <HStack className="justify-between h-16 pr-4">
-          <Box className="flex">
-            <Box className="text-[20px] font-bold text-[#405169] mb-2">团队列表</Box>
-            <Box className="mt-[2px]">
-              <InputGroup className="ml-4">
-                <InputLeftElement className="!h-8 text-[#E5E5E5]">
-                  <SearchIcon />
-                </InputLeftElement>
-                <Input
-                  variant={'search'}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      setQueryParams({
-                        ...queryParams,
-                        search: e.currentTarget.value
-                      });
-                    }
-                  }}
-                  onBlur={(e) => {
-                    setQueryParams({
-                      ...queryParams,
-                      search: e.currentTarget.value
-                    });
-                  }}
-                  className="!w-[240px]"
-                  placeholder="输入团队名或用户名，回车搜索"
-                ></Input>
-              </InputGroup>
-            </Box>
-          </Box>
-          <Box className="!h-8 -mt-2">
-            <Pagination
-              values={{
-                page: queryParams._start / 20 + 1,
-                pageSize: 20,
-                total: total
+        <HStack px={8}>
+          <Box className="text-2xl font-bold text-[#405169]">团队列表</Box>
+          <Box className="flex-grow"></Box>
+          <InputGroup w={240}>
+            <InputLeftElement h={'full'}>
+              <MyIcon name="common/searchLight" w={4} color={'myGray.400'} />
+            </InputLeftElement>
+            <Input
+              placeholder="请输入团队名或用户名，回车搜索"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  setTeams([]);
+                  getData(1);
+                }
               }}
-              onChange={(values) => {
-                setQueryParams({
-                  ...queryParams,
-                  _start: (values.page - 1) * 20,
-                  _end: values.page * 20
-                });
-              }}
-              notShowSelect
-            />
-          </Box>
+              onChange={(e) => setSearch(e.target.value)}
+              h={8}
+            ></Input>
+          </InputGroup>
         </HStack>
-        <Box className="overflow-auto h-full flex-1 pr-4">
-          {isLoading ? (
-            <Center className="h-full">
-              <Spinner />
-            </Center>
-          ) : data.length === 0 ? (
-            <Center className="h-[400px]">
-              <Box className="flex flex-col">
-                <Icons type="empty" />
-                <span className="w-full text-center mt-4 text-[#c5cae9]">暂无数据</span>
-              </Box>
-            </Center>
-          ) : (
-            <table className="w-full rounded-lg mt-2">
-              <thead className="text-xl h-10">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <th key={header.id} align="left" className="pl-2 text-[#132047] font-bold">
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(header.column.columnDef.header, header.getContext())}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody className="text-lg">
-                {table.getRowModel().rows.map((row) => (
-                  <tr key={row.id} className="hover:drop-shadow-lg">
-                    {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className="pl-2 h-12 font-medium">
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+        <Box position={'relative'} h={'100%'} overflow={'overlay'} py={[0, 5]} px={[3, 8]}>
+          <ScrollData>
+            <TableContainer>
+              <Table>
+                <Thead>
+                  <Tr>
+                    <Th>#</Th>
+                    <Th>团队名</Th>
+                    <Th>用户名</Th>
+                    <Th>余额</Th>
+                    <Th>创建时间</Th>
+                    <Th></Th>
+                  </Tr>
+                </Thead>
+                <Tbody fontSize={'sm'}>
+                  {teams.map((item, i) => (
+                    <Tr key={item._id}>
+                      <Td>{i + 1}</Td>
+                      <Td>{item.name}</Td>
+                      <Td>{item.ownerName}</Td>
+                      <Td>{formatStorePrice2Read(item.balance, 100000)}元</Td>
+                      <Td>
+                        {item.createTime
+                          ? dayjs(item.createTime).format('YYYY/MM/DD HH:mm:ss')
+                          : '-'}
+                      </Td>
+                      <Td>
+                        <Box className="space-x-2">
+                          <DetailTeamModal teamId={item.id} />
+                          <EditTeamModal
+                            data={item}
+                            updateData={() => {
+                              setTeams([]);
+                              getData(1);
+                            }}
+                          />
+                        </Box>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+              {!isLoading && teams.length === 0 && (
+                <Flex
+                  mt={'20vh'}
+                  flexDirection={'column'}
+                  alignItems={'center'}
+                  justifyContent={'center'}
+                >
+                  <MyIcon name="empty" w={'48px'} h={'48px'} color={'transparent'} />
+                  <Box mt={2} color={'myGray.500'}>
+                    无团队记录～
+                  </Box>
+                </Flex>
+              )}
+            </TableContainer>
+          </ScrollData>
         </Box>
       </Box>
-    </div>
+    </Box>
   );
-}
+};
+
+export default UserTable;
