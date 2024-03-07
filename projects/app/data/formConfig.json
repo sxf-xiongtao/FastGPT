@@ -94,6 +94,16 @@
           "title": "主站系统配置",
           "properties": {
             "openapiPrefix": { "type": "string", "title": "OpenAPI 前缀" },
+            "oneapiUrl": {
+              "type": "string",
+              "title": "oneAPI地址",
+              "description": "oneAPI地址，可以使用 oneapi 来实现多模型接入"
+            },
+            "chatApiKey": {
+              "type": "string",
+              "title": "通用Key",
+              "description": "可以是 openai 的，也可以是 oneapi 的\n此处逻辑：优先走 ONEAPI_URL，如果填写了 ONEAPI_URL，key 也需要是 ONEAPI 的 key"
+            },
             "vectorMaxProcess": { "type": "number", "title": "向量训练最大进程" },
             "qaMaxProcess": { "type": "number", "title": "QA训练最大进程" },
             "pgHNSWEfSearch": {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Button,
   Table,
@@ -18,8 +18,9 @@ import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import { getApps } from '@/web/admin/apps/api';
 import MyModal from '@/components/common/MyModal';
 
-const UserTable = () => {
+const AppTable = () => {
   const [appDetail, setAppDetail] = useState();
+  const elementRef = useRef<HTMLDivElement>(null);
 
   const {
     data: apps,
@@ -30,7 +31,8 @@ const UserTable = () => {
     api: getApps,
     pageSize: 20,
     type: 'scroll',
-    defaultRequest: false
+    defaultRequest: false,
+    elementRef
   });
 
   useEffect(() => {
@@ -47,7 +49,14 @@ const UserTable = () => {
           <Box className="text-2xl font-bold text-[#405169]">应用列表</Box>
           <Box className="flex-grow"></Box>
         </HStack>
-        <Box position={'relative'} h={'100%'} overflow={'overlay'} py={[0, 5]} px={[3, 8]}>
+        <Box
+          position={'relative'}
+          h={'100%'}
+          overflow={'overlay'}
+          ref={elementRef}
+          py={[0, 5]}
+          px={[3, 8]}
+        >
           <ScrollData>
             <TableContainer>
               <Table>
@@ -62,7 +71,7 @@ const UserTable = () => {
                 </Thead>
                 <Tbody fontSize={'sm'}>
                   {apps.map((item, i) => (
-                    <Tr key={item._id}>
+                    <Tr key={i}>
                       <Td>{i + 1}</Td>
                       <Td>{item.name}</Td>
                       <Td>{item['share.collection']}</Td>
@@ -105,7 +114,7 @@ const UserTable = () => {
   );
 };
 
-export default UserTable;
+export default AppTable;
 
 function AppDetailModal({ app, onClose }: { app: any; onClose: () => void }) {
   return (

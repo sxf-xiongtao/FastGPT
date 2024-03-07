@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Table,
   Thead,
@@ -22,8 +22,9 @@ import { getTeams } from '@/web/admin/teams/api';
 import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
 import EditTeamModal from './components/EditTeamModal';
 
-const UserTable = () => {
+const TeamTable = () => {
   const [search, setSearch] = useState<string>();
+  const elementRef = useRef<HTMLDivElement>(null);
 
   const {
     data: teams,
@@ -38,7 +39,8 @@ const UserTable = () => {
       search
     },
     type: 'scroll',
-    defaultRequest: false
+    defaultRequest: false,
+    elementRef
   });
 
   useEffect(() => {
@@ -71,7 +73,14 @@ const UserTable = () => {
             ></Input>
           </InputGroup>
         </HStack>
-        <Box position={'relative'} h={'100%'} overflow={'overlay'} py={[0, 5]} px={[3, 8]}>
+        <Box
+          position={'relative'}
+          h={'100%'}
+          overflow={'overlay'}
+          ref={elementRef}
+          py={[0, 5]}
+          px={[3, 8]}
+        >
           <ScrollData>
             <TableContainer>
               <Table>
@@ -87,7 +96,7 @@ const UserTable = () => {
                 </Thead>
                 <Tbody fontSize={'sm'}>
                   {teams.map((item, i) => (
-                    <Tr key={item._id}>
+                    <Tr key={i}>
                       <Td>{i + 1}</Td>
                       <Td>{item.name}</Td>
                       <Td>{item.ownerName}</Td>
@@ -134,4 +143,4 @@ const UserTable = () => {
   );
 };
 
-export default UserTable;
+export default TeamTable;

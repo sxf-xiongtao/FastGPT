@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Button,
   Table,
@@ -14,14 +14,12 @@ import {
   HStack,
   InputGroup,
   Input,
-  InputLeftAddon,
   InputLeftElement
 } from '@chakra-ui/react';
 import type { BillSchemaType } from '@fastgpt/global/support/wallet/bill/type.d';
 import dayjs from 'dayjs';
 import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
 import MyIcon from '@fastgpt/web/components/common/Icon';
-import { useTranslation } from 'next-i18next';
 import {
   BillPayWayEnum,
   BillStatusEnum,
@@ -111,6 +109,7 @@ const BillTable = () => {
   const [billType, setBillType] = useState<`${BillTypeEnum}` | ''>('');
   const [username, setUsername] = useState<string>();
   const [billDetail, setBillDetail] = useState<BillSchemaType>();
+  const elementRef = useRef<HTMLDivElement>(null);
 
   const {
     data: bills,
@@ -126,19 +125,20 @@ const BillTable = () => {
       username
     },
     type: 'scroll',
-    defaultRequest: false
+    defaultRequest: false,
+    elementRef
   });
 
   useEffect(() => {
     setBills([]);
     getData(1);
-  }, [billType, getData]);
+  }, [billType, getData, setBills]);
 
   return (
     <Box className="w-[90%] m-auto h-[95%] pb-8">
       <Box
         className="bg-white mt-8 w-full pl-12 pb-4 pt-6 h-full flex flex-col"
-        style={{ boxShadow: '0px 2px 10px  rgba(76, 141, 235, 0.1)' }}
+        style={{ boxShadow: '0px 2px 10px rgba(76, 141, 235, 0.1)' }}
       >
         <HStack px={8}>
           <Box className="text-2xl font-bold text-[#405169]">账单管理</Box>
@@ -160,7 +160,14 @@ const BillTable = () => {
             ></Input>
           </InputGroup>
         </HStack>
-        <Box position={'relative'} h={'100%'} overflow={'overlay'} py={[0, 5]} px={[3, 8]}>
+        <Box
+          position={'relative'}
+          h={'100%'}
+          overflow={'overlay'}
+          ref={elementRef}
+          py={[0, 5]}
+          px={[3, 8]}
+        >
           <ScrollData>
             <TableContainer>
               <Table>
@@ -187,7 +194,7 @@ const BillTable = () => {
                 </Thead>
                 <Tbody fontSize={'sm'}>
                   {bills.map((item, i) => (
-                    <Tr key={item._id}>
+                    <Tr key={i}>
                       <Td>{i + 1}</Td>
                       <Td>{item.username}</Td>
                       <Td>{billTypeMap[item.type]?.label}</Td>

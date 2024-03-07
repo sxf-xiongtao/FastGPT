@@ -10,18 +10,18 @@ label {
 }
 
 .rjsf input {
-  margin-bottom: 20px;
-  height: 36px;
-  font-size: 14px;
-  border: 1px solid rgba(206, 213, 228, 1);
-  color: rgba(15, 12, 43, 1);
-  outline: none;
-  padding-left: 20px;
+  border: 1px solid;
+  border-color: var(--chakra-colors-borderColor-low);
+  height: 36px; 
   width: 88%;
+  padding-left: 20px;
+  margin-bottom: 20px;
 }
 
 .rjsf input:focus {
-  border: 1px solid rgba(15, 12, 43, 0.5);
+  border-color: var(--chakra-colors-primary-500);
+  box-shadow: 0px 0px 0px 2.4px rgba(51, 112, 255, 0.15);
+  background-color: white;
 }
 
 #root_fastgpt_feConfigs_switches,

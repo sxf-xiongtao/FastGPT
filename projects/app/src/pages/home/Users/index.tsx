@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Button,
   Table,
@@ -28,6 +28,7 @@ import UserAddModal from './components/UserAddModal';
 const UserTable = () => {
   const [username, setUsername] = useState<string>();
   const [userDetail, setUserDetail] = useState();
+  const elementRef = useRef<HTMLDivElement>(null);
 
   const {
     data: users,
@@ -42,7 +43,8 @@ const UserTable = () => {
       username
     },
     type: 'scroll',
-    defaultRequest: false
+    defaultRequest: false,
+    elementRef
   });
 
   useEffect(() => {
@@ -82,7 +84,14 @@ const UserTable = () => {
             ></Input>
           </InputGroup>
         </HStack>
-        <Box position={'relative'} h={'100%'} overflow={'overlay'} py={[0, 5]} px={[3, 8]}>
+        <Box
+          position={'relative'}
+          h={'100%'}
+          overflow={'overlay'}
+          ref={elementRef}
+          py={[0, 5]}
+          px={[3, 8]}
+        >
           <ScrollData>
             <TableContainer>
               <Table>
@@ -97,7 +106,7 @@ const UserTable = () => {
                 </Thead>
                 <Tbody fontSize={'sm'}>
                   {users.map((item, i) => (
-                    <Tr key={item._id}>
+                    <Tr key={i}>
                       <Td>{i + 1}</Td>
                       <Td>{item.username}</Td>
                       <Td>
