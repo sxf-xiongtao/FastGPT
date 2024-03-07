@@ -3,9 +3,7 @@ import { adminCert } from '@/service/support/permission/adminCert';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { MongoChatItem } from '@fastgpt/service/core/chat/chatItemSchema';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { addDays } from 'date-fns';
-
-const day = 60;
+import { getDashboardDataStartTime } from '@/service/admin/common/dashboard/utils';
 
 export default async function getChatFormData(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -17,7 +15,7 @@ export default async function getChatFormData(req: NextApiRequest, res: NextApiR
       {
         $match: {
           obj: 'Human',
-          time: { $gte: addDays(new Date(), -60) }
+          time: { $gte: getDashboardDataStartTime() }
         }
       },
       {

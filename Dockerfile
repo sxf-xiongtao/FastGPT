@@ -11,7 +11,7 @@ RUN apk add --no-cache libc6-compat && npm install -g pnpm@8.6.0
 RUN [ -z "$proxy" ] || pnpm config set registry https://registry.npmmirror.com
 
 # copy packages and one project
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY ./FastGPT/packages ./FastGPT/packages
 COPY ./projects/$name/package.json ./projects/$name/package.json
 

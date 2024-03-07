@@ -2,10 +2,8 @@ import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { MongoBill } from '@/service/support/wallet/bill/schema';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { addDays } from 'date-fns';
 import { NextApiRequest, NextApiResponse } from 'next';
-
-const day = 60;
+import { getDashboardDataStartTime } from '@/service/admin/common/dashboard/utils';
 
 export default async function getPaysFormData(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -19,7 +17,7 @@ export default async function getPaysFormData(req: NextApiRequest, res: NextApiR
         $match: {
           status: 'SUCCESS',
           createTime: {
-            $gte: addDays(new Date(), -60)
+            $gte: getDashboardDataStartTime()
           }
         }
       },
