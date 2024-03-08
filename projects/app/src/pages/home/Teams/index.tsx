@@ -87,6 +87,7 @@ const TeamTable = () => {
                 <Thead>
                   <Tr>
                     <Th>#</Th>
+                    <Th>团队id</Th>
                     <Th>团队名</Th>
                     <Th>用户名</Th>
                     <Th>余额</Th>
@@ -98,6 +99,7 @@ const TeamTable = () => {
                   {teams.map((item, i) => (
                     <Tr key={i}>
                       <Td>{i + 1}</Td>
+                      <Td>{item.id}</Td>
                       <Td>{item.name}</Td>
                       <Td>{item.ownerName}</Td>
                       <Td>{formatStorePrice2Read(item.balance, 100000)}元</Td>
