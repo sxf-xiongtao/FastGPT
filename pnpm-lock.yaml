@@ -44,9 +44,12 @@ importers:
       nanoid:
         specifier: ^4.0.1
         version: 4.0.1
+      next:
+        specifier: 13.5.2
+        version: 13.5.2(@babel/core@7.24.0)(react-dom@18.2.0)(react@18.2.0)(sass@1.58.3)
       openai:
-        specifier: 4.23.0
-        version: 4.23.0(encoding@0.1.13)
+        specifier: 4.28.0
+        version: 4.28.0(encoding@0.1.13)
       timezones-list:
         specifier: ^3.0.2
         version: 3.0.2
@@ -72,6 +75,9 @@ importers:
       '@fastgpt/global':
         specifier: workspace:*
         version: link:../global
+      '@node-rs/jieba':
+        specifier: ^1.7.2
+        version: 1.7.2
       axios:
         specifier: ^1.5.1
         version: 1.5.1
@@ -90,6 +96,9 @@ importers:
       encoding:
         specifier: ^0.1.13
         version: 0.1.13
+      json5:
+        specifier: ^2.2.3
+        version: 2.2.3
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -137,22 +146,22 @@ importers:
   FastGPT/packages/web:
     dependencies:
       '@chakra-ui/anatomy':
-        specifier: ^2.2.1
+        specifier: 2.2.1
         version: 2.2.1
       '@chakra-ui/icons':
-        specifier: ^2.1.1
+        specifier: 2.1.1
         version: 2.1.1(@chakra-ui/system@2.6.1)(react@18.2.0)
       '@chakra-ui/next-js':
-        specifier: ^2.1.5
+        specifier: 2.1.5
         version: 2.1.5(@chakra-ui/react@2.8.1)(@emotion/react@11.11.1)(next@13.5.2)(react@18.2.0)
       '@chakra-ui/react':
-        specifier: ^2.8.1
+        specifier: 2.8.1
         version: 2.8.1(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(@types/react@18.2.0)(framer-motion@11.0.8)(react-dom@18.2.0)(react@18.2.0)
       '@chakra-ui/styled-system':
-        specifier: ^2.9.1
+        specifier: 2.9.1
         version: 2.9.1
       '@chakra-ui/system':
-        specifier: ^2.6.1
+        specifier: 2.6.1
         version: 2.6.1(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(react@18.2.0)
       '@emotion/react':
         specifier: ^11.11.1
@@ -255,22 +264,22 @@ importers:
         specifier: ^1.4.7
         version: 1.4.7
       '@chakra-ui/anatomy':
-        specifier: ^2.2.1
+        specifier: 2.2.1
         version: 2.2.1
       '@chakra-ui/icons':
-        specifier: ^2.1.1
+        specifier: 2.1.1
         version: 2.1.1(@chakra-ui/system@2.6.1)(react@18.2.0)
       '@chakra-ui/next-js':
-        specifier: ^2.1.5
+        specifier: 2.1.5
         version: 2.1.5(@chakra-ui/react@2.8.1)(@emotion/react@11.11.1)(next@13.5.2)(react@18.2.0)
       '@chakra-ui/react':
-        specifier: ^2.8.1
+        specifier: 2.8.1
         version: 2.8.1(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(@types/react@18.2.0)(framer-motion@11.0.8)(react-dom@18.2.0)(react@18.2.0)
       '@chakra-ui/styled-system':
-        specifier: ^2.9.1
+        specifier: 2.9.1
         version: 2.9.1
       '@chakra-ui/system':
-        specifier: ^2.6.1
+        specifier: 2.6.1
         version: 2.6.1(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(react@18.2.0)
       '@emotion/react':
         specifier: ^11.11.1
@@ -4653,6 +4662,146 @@ packages:
     os: [win32]
     requiresBuild: true
     optional: true
+
+  /@node-rs/jieba-android-arm-eabi@1.7.2:
+    resolution: {integrity: sha512-FyDHRNSRIHOQO7S6Q4RwuGffnnnuNwaXPH7K8WqSzifEY+zFIaSPcNqrZHrnqyeXc4JiYpBIHeP+0Mkf1kIGRA==}
+    engines: {node: '>= 10'}
+    cpu: [arm]
+    os: [android]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@node-rs/jieba-android-arm64@1.7.2:
+    resolution: {integrity: sha512-z0UEZCGrAX/IiarhuDMsEIDZBS77UZv4SQyL/J48yrsbWKbb2lJ1vCrYxXIWqwp6auXHEu4r1O/pMriDAcEnPg==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [android]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@node-rs/jieba-darwin-arm64@1.7.2:
+    resolution: {integrity: sha512-M2cHIWRaaOmXGKy446SH2+Y2PzREaI2oYznPbg55wYEdioUp01YS/2WRG8CaoCKEj0aUocA7MFM2vVcoIAsbQw==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@node-rs/jieba-darwin-x64@1.7.2:
+    resolution: {integrity: sha512-euDawBU2FxB0CGTR803BA6WABsiicIrqa61z2AFFDPkJCDrauEM0jbMg3GDKLAvbaLbZ1Etu3QNN5xyroqp4Qw==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@node-rs/jieba-freebsd-x64@1.7.2:
+    resolution: {integrity: sha512-vXCaYxPb90d/xTBVG+ZZXrFLXsO2719pZSyiZCL2tey+UY28U7MOoK6394Wwmf0FCB/eRTQMCKjVIUDi+IRMUg==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [freebsd]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@node-rs/jieba-linux-arm-gnueabihf@1.7.2:
+    resolution: {integrity: sha512-HTep79XlJYO3KRYZ2kJChG9HnYr1DKSQTB+HEYWKLK0ifphqybcxGNLAdH0S4dViG2ciD0+iN/refgtqZEidpw==}
+    engines: {node: '>= 10'}
+    cpu: [arm]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@node-rs/jieba-linux-arm64-gnu@1.7.2:
+    resolution: {integrity: sha512-P8QJdQydOVewL1MIqYiRpI7LOfrRQag+p4/hwExe+YXH8C7DOrR8rWJD/7XNRTbpOimlHq1UN/e+ZzhxQF/cLw==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@node-rs/jieba-linux-arm64-musl@1.7.2:
+    resolution: {integrity: sha512-WjnN0hmDvTXb2h3hMW5VnUGkK1xaqhs+WHfMMilau55+YN+YOYALKZ0TeBY4BapClLuBx54wqwmBX+B4hAXunQ==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@node-rs/jieba-linux-x64-gnu@1.7.2:
+    resolution: {integrity: sha512-gBXds/DwNSA6lNUxJjL6WIaNT6pnlM5juUgV/krLLkBJ8vXpOrQ07p0rrK1tnigz9b20xhsHaFRSwED1Y8zeXw==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@node-rs/jieba-linux-x64-musl@1.7.2:
+    resolution: {integrity: sha512-tNVD3SMuG5zAj7+bLS2Enio3zR7BPxi3PhQtpQ+Hv83jajIcN46QQ0EdoMFz/aB+hkQ9PlLAstu+VREFegs5EA==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@node-rs/jieba-win32-arm64-msvc@1.7.2:
+    resolution: {integrity: sha512-/e1iQ0Dh02lGPNCYTU/H3cfIsWydaGRzZ3TDj6GfWrxkWqXORL98x/VJ/C/uKLpc7GSLLd9ygyZG7SOAfKe2tA==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [win32]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@node-rs/jieba-win32-ia32-msvc@1.7.2:
+    resolution: {integrity: sha512-cYjA6YUiOwtuEzWErvwMMt/RETNWQDLcmAaiHA8ohsa6c0eB0kRJlQCc683tlaczZxqroY/7C9mxgJNGvoGRbw==}
+    engines: {node: '>= 10'}
+    cpu: [ia32]
+    os: [win32]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@node-rs/jieba-win32-x64-msvc@1.7.2:
+    resolution: {integrity: sha512-2M+Um3woFF17sa8VBYQQ6E5PNMe9Kf9fdzmeDh/GzuNHXlxW4LyK9VTV8zchIv/bDNAR5Z85kfW4wASULUxvFQ==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@node-rs/jieba@1.7.2:
+    resolution: {integrity: sha512-zGto08NDU+KWm670qVHYGTb0YTEJ0A97dwH3WCnnhyRYMqTbOXKC6OwTc/cjzfSJP1UDBSar9Ug9BlmWmEThWg==}
+    engines: {node: '>= 10'}
+    optionalDependencies:
+      '@node-rs/jieba-android-arm-eabi': 1.7.2
+      '@node-rs/jieba-android-arm64': 1.7.2
+      '@node-rs/jieba-darwin-arm64': 1.7.2
+      '@node-rs/jieba-darwin-x64': 1.7.2
+      '@node-rs/jieba-freebsd-x64': 1.7.2
+      '@node-rs/jieba-linux-arm-gnueabihf': 1.7.2
+      '@node-rs/jieba-linux-arm64-gnu': 1.7.2
+      '@node-rs/jieba-linux-arm64-musl': 1.7.2
+      '@node-rs/jieba-linux-x64-gnu': 1.7.2
+      '@node-rs/jieba-linux-x64-musl': 1.7.2
+      '@node-rs/jieba-win32-arm64-msvc': 1.7.2
+      '@node-rs/jieba-win32-ia32-msvc': 1.7.2
+      '@node-rs/jieba-win32-x64-msvc': 1.7.2
+    dev: false
 
   /@nodelib/fs.scandir@2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -11811,8 +11960,8 @@ packages:
       mimic-fn: 4.0.0
     dev: true
 
-  /openai@4.23.0(encoding@0.1.13):
-    resolution: {integrity: sha512-ey2CXh1OTcTUa0AWZWuTpgA9t5GuAG3DVU1MofCRUI7fQJij8XJ3Sr0VtgxoAE69C9wbHBMCux8Z/IQZfSwHiA==}
+  /openai@4.28.0(encoding@0.1.13):
+    resolution: {integrity: sha512-JM8fhcpmpGN0vrUwGquYIzdcEQHtFuom6sRCbbCM6CfzZXNuRk33G7KfeRAIfnaCxSpzrP5iHtwJzIm6biUZ2Q==}
     hasBin: true
     dependencies:
       '@types/node': 18.14.0
