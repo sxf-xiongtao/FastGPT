@@ -4,6 +4,7 @@ import { MongoBill } from '@/service/support/wallet/bill/schema';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getDashboardDataStartTime } from '@/service/admin/common/dashboard/utils';
+import { BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
 
 export default async function getPaysFormData(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -16,6 +17,7 @@ export default async function getPaysFormData(req: NextApiRequest, res: NextApiR
       {
         $match: {
           status: 'SUCCESS',
+          type: [BillTypeEnum.balance, BillTypeEnum.extraDatasetSub, BillTypeEnum.extraPoints],
           createTime: {
             $gte: getDashboardDataStartTime()
           }

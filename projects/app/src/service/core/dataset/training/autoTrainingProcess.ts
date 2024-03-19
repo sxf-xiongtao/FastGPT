@@ -2,7 +2,7 @@ import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/sch
 import { pushAutoTrainingUsage } from '@/service/support/wallet/usage/push';
 import { TrainingModeEnum } from '@fastgpt/global/core/dataset/constants';
 import { getAIApi } from '@fastgpt/service/core/ai/config';
-import type { ChatMessageItemType } from '@fastgpt/global/core/ai/type.d';
+import type { ChatCompletionMessageParam } from '@fastgpt/global/core/ai/type.d';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { splitText2Chunks } from '@fastgpt/global/common/string/textSplitter';
 import { replaceVariable } from '@fastgpt/global/common/string/tools';
@@ -17,6 +17,7 @@ import { checkTeamAiPointsAndLock } from './utils';
 import { checkInvalidChunkAndLock } from '@fastgpt/service/core/dataset/training/utils';
 import { addMinutes } from 'date-fns';
 import { countGptMessagesTokens } from '@fastgpt/global/common/string/tiktoken';
+import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
 
 const reduceQueue = () => {
   global.autoTrainingLen = global.autoTrainingLen > 0 ? global.autoTrainingLen - 1 : 0;
@@ -103,9 +104,9 @@ export async function generateAutoTraining(): Promise<any> {
     const prompt = replaceVariable(AUTO_TRAINING_PROMPT, { text });
 
     // request LLM to get QA
-    const messages: ChatMessageItemType[] = [
+    const messages: ChatCompletionMessageParam[] = [
       {
-        role: 'user',
+        role: ChatCompletionRequestMessageRoleEnum.User,
         content: prompt
       }
     ];

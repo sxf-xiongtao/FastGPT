@@ -9,6 +9,8 @@ import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
 import { addDays } from 'date-fns';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { systemUseTeamPlanning } from '@/service/support/wallet/sub/utils';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { delDatasetRelevantData } from '@fastgpt/service/core/dataset/controller';
 
 /* 
     清除不活跃用户的知识库
@@ -77,17 +79,17 @@ const checkDeadTeam = async (plan: TeamSubSchema, expiredDay: number) => {
     if (!activeUsage && !extraPlan) {
       // get all dataset
       const datasets = await MongoDataset.find({ teamId: plan.teamId }, '_id teamId').lean();
-      // await mongoSessionRun(async (session) => {
-      //   // delete dataset data
-      //   await delDatasetRelevantData({ datasets, session });
-      //   await MongoDataset.deleteMany(
-      //     {
-      //       _id: { $in: datasets.map((d) => d._id) }
-      //     },
-      //     { session }
-      //   );
-      // });
-      console.log('删除不活跃用户', ++deleteUser, plan.teamId);
+      await mongoSessionRun(async (session) => {
+        // delete dataset data
+        await delDatasetRelevantData({ datasets, session });
+        await MongoDataset.deleteMany(
+          {
+            teamId: plan.teamId
+          },
+          { session }
+        );
+      });
+      console.log('清除不活跃用户知识库', ++deleteUser, plan.teamId);
     }
   } catch (error) {}
 };

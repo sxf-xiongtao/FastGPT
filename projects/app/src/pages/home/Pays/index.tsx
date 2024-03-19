@@ -27,7 +27,7 @@ import {
 } from '@fastgpt/global/support/wallet/bill/constants';
 import { StandardSubLevelEnum, SubModeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import MySelect from '@fastgpt/web/components/common/MySelect';
-import MyModal from '@fastgpt/web/components/common/CustomModal';
+import MyModal from '@fastgpt/web/components/common/MyModal';
 import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import { getPays } from '@/web/admin/pays/api';
 

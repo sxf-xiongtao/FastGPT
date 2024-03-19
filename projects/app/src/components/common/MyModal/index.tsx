@@ -1,6 +1,6 @@
 import React from 'react';
 import { ModalContentProps } from '@chakra-ui/react';
-import CustomModal from '@fastgpt/web/components/common/CustomModal';
+import CustomModal from '@fastgpt/web/components/common/MyModal';
 
 export interface MyModalProps extends ModalContentProps {
   iconSrc?: string;

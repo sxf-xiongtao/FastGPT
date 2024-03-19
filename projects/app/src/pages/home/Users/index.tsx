@@ -18,7 +18,7 @@ import {
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import MyIcon from '@fastgpt/web/components/common/Icon';
-import MyModal from '@fastgpt/web/components/common/CustomModal';
+import MyModal from '@fastgpt/web/components/common/MyModal';
 import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import { getUsers } from '@/web/admin/users/api';
 import UserEditModal from './components/UserEditModal';
