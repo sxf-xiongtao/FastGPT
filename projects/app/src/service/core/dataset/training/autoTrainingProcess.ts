@@ -11,13 +11,13 @@ import {
   AUTO_TRAINING_SPLIT_CHAT
 } from '@/global/core/ai/prompt/autoTraining';
 import type { PushDatasetDataChunkProps } from '@fastgpt/global/core/dataset/api.d';
-import { pushDataToTrainingQueue } from '@/service/core/dataset/data/controller';
 import { getLLMModel } from '@fastgpt/service/core/ai/model';
 import { checkTeamAiPointsAndLock } from './utils';
 import { checkInvalidChunkAndLock } from '@fastgpt/service/core/dataset/training/utils';
 import { addMinutes } from 'date-fns';
 import { countGptMessagesTokens } from '@fastgpt/global/common/string/tiktoken';
 import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
+import { pushDataListToTrainingQueue } from '@fastgpt/service/core/dataset/training/controller';
 
 const reduceQueue = () => {
   global.autoTrainingLen = global.autoTrainingLen > 0 ? global.autoTrainingLen - 1 : 0;
@@ -131,7 +131,7 @@ export async function generateAutoTraining(): Promise<any> {
     });
 
     // get vector and insert
-    const { insertLen } = await pushDataToTrainingQueue({
+    const { insertLen } = await pushDataListToTrainingQueue({
       teamId: data.teamId,
       tmbId: data.tmbId,
       collectionId: data.collectionId,
