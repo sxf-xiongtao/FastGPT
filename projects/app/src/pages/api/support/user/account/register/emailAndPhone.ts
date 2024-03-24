@@ -40,7 +40,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const user = await createUserByUsername({
       username,
       password,
-      inviterId
+      inviterId,
+      email: username.includes('@') ? username : undefined,
+      phonePrefix: 86, // 目前只支持国内的
+      phone: username.includes('@') ? undefined : username
     });
 
     const token = createJWT(user);

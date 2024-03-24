@@ -16,14 +16,14 @@ import { delDatasetRelevantData } from '@fastgpt/service/core/dataset/controller
     清除不活跃用户的知识库
     1. free 计划
     2. 没有额外资源包
-    3. 15天没有usage记录的
+    3. 30天没有usage记录的
 */
 let deleteUser = 0;
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await authCert({ req, authRoot: true });
     await connectToDatabase();
-    const { expiredDay = 15 } = req.body as { expiredDay: number };
+    const { expiredDay = 30 } = req.body as { expiredDay: number };
 
     // 检查是否开启了订阅模式
     if (!systemUseTeamPlanning()) {

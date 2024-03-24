@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     await connectToDatabase();
     const { type, code, inviterId, callbackUrl } = req.body as OauthLoginProps;
 
-    const { username, avatarUrl } = await (async () => {
+    const { username, avatarUrl, email } = await (async () => {
       if (type === OAuthEnum.github) return authGithub(code);
       if (type === OAuthEnum.google) return authGoogle(code, callbackUrl);
       return Promise.reject('type error');
@@ -23,6 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const { user, token } = await usernameLogin({
       username,
       avatar: avatarUrl,
+      email,
       inviterId
     });
 
@@ -56,17 +57,19 @@ export async function authGithub(code: string) {
   const { data } = await axios.get<{
     login: string;
     avatar_url: string;
+    email?: string;
   }>('https://api.github.com/user', {
     headers: {
       Authorization: `Bearer ${access_token}`
     }
   });
-  const { login, avatar_url } = data;
-  const username = `git-${login}`;
+
+  const username = `git-${data.login}`;
 
   return {
-    avatarUrl: avatar_url,
-    username
+    avatarUrl: data.avatar_url,
+    username,
+    email: data.email
   };
 }
 
@@ -86,6 +89,7 @@ export async function authGoogle(code: string, callbackUrl: string) {
 
   return {
     avatarUrl: picture,
-    username
+    username,
+    email: undefined
   };
 }

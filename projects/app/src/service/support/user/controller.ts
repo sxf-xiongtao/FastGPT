@@ -1,26 +1,33 @@
 import { authMaxUsers } from '@/service/support/user/auth';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import { ERROR_ENUM } from '@fastgpt/global/common/error/errorCode';
 import { UserType } from '@fastgpt/global/support/user/type';
 import { getAndCreateUserDefaultTeam, getUserTeamOrDefaultTeam } from './team/controller';
-import { customAlphabet } from 'nanoid';
 import { getNanoid, hashStr } from '@fastgpt/global/common/string/tools';
 import { sendInform2OneUser } from './inform/controller';
 import { createJWT } from '@fastgpt/service/support/permission/controller';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 
+type UserProps = {
+  username: string;
+  email?: string;
+  phonePrefix?: number;
+  phone?: string;
+  avatar?: string;
+  inviterId?: string;
+};
+
 /* create user and team */
 export async function createUserByUsername({
   username,
   password,
+  email,
+  phone,
+  phonePrefix,
   avatar,
   inviterId
-}: {
-  username: string;
+}: UserProps & {
   password: string;
-  avatar?: string;
-  inviterId?: string;
 }): Promise<UserType> {
   await authMaxUsers();
 
@@ -31,7 +38,10 @@ export async function createUserByUsername({
           username,
           avatar,
           password,
-          inviterId
+          inviterId,
+          email,
+          phone,
+          phonePrefix
         }
       ],
       { session }
@@ -48,7 +58,6 @@ export async function createUserByUsername({
     _id: user._id,
     username: user.username,
     avatar: user.avatar,
-    balance: user.balance,
     timezone: user.timezone,
     promotionRate: user.promotionRate,
     openaiAccount: user.openaiAccount,
@@ -68,7 +77,6 @@ export async function getUserDetail(tmbId?: string, userId?: string): Promise<Us
     _id: user._id,
     username: user.username,
     avatar: user.avatar,
-    balance: user.balance,
     timezone: user.timezone,
     promotionRate: user.promotionRate,
     openaiAccount: user.openaiAccount,
@@ -76,15 +84,15 @@ export async function getUserDetail(tmbId?: string, userId?: string): Promise<Us
   };
 }
 
+/* 通过用户名快速登录，要求前置校验是否有登录权限 */
 export async function usernameLogin({
   username,
   avatar,
+  email,
+  phonePrefix,
+  phone,
   inviterId
-}: {
-  username: string;
-  avatar?: string;
-  inviterId?: string;
-}) {
+}: UserProps) {
   // try to login
   const user = await MongoUser.findOne({ username }, '_id lastLoginTmbId');
 
@@ -94,6 +102,9 @@ export async function usernameLogin({
     const user = await createUserByUsername({
       username,
       password: hashStr(password),
+      email,
+      phonePrefix,
+      phone,
       avatar,
       inviterId
     });
@@ -110,6 +121,15 @@ export async function usernameLogin({
       user,
       token
     };
+  } else {
+    // update user
+    if (email || phone) {
+      await user.updateOne({
+        email,
+        phonePrefix,
+        phone
+      });
+    }
   }
 
   // login
