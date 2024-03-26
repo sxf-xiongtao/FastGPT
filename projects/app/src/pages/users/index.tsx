@@ -63,7 +63,7 @@ const UserTable = () => {
             getData(1);
           }}
         />
-        <InputGroup w={200}>
+        <InputGroup w={'350px'}>
           <InputLeftElement h={'full'}>
             <MyIcon name="common/searchLight" w={4} color={'myGray.400'} />
           </InputLeftElement>
@@ -76,7 +76,7 @@ const UserTable = () => {
               }
             }}
             onChange={(e) => setUsername(e.target.value)}
-            h={10}
+            size={'sm'}
           ></Input>
         </InputGroup>
       </HStack>

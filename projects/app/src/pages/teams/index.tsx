@@ -52,7 +52,7 @@ const TeamTable = () => {
       <HStack px={8}>
         <Box className="text-2xl font-bold text-[#405169]">团队列表</Box>
         <Box className="flex-grow"></Box>
-        <InputGroup w={240}>
+        <InputGroup w={'350px'}>
           <InputLeftElement h={'full'}>
             <MyIcon name="common/searchLight" w={4} color={'myGray.400'} />
           </InputLeftElement>
@@ -64,8 +64,8 @@ const TeamTable = () => {
                 getData(1);
               }
             }}
+            size={'sm'}
             onChange={(e) => setSearch(e.target.value)}
-            h={8}
           ></Input>
         </InputGroup>
       </HStack>

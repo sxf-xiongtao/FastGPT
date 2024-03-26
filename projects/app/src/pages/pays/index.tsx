@@ -139,7 +139,7 @@ const BillTable = () => {
       <HStack px={8}>
         <Box className="text-2xl font-bold text-[#405169]">账单管理</Box>
         <Box className="flex-grow"></Box>
-        <InputGroup w={200}>
+        <InputGroup w={350}>
           <InputLeftElement h={'full'}>
             <MyIcon name="common/searchLight" w={4} color={'myGray.400'} />
           </InputLeftElement>
@@ -152,7 +152,7 @@ const BillTable = () => {
               }
             }}
             onChange={(e) => setUsername(e.target.value)}
-            h={8}
+            size={'sm'}
           ></Input>
         </InputGroup>
       </HStack>
