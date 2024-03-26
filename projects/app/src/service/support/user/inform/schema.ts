@@ -1,7 +1,7 @@
 import { connectionMongo, type Model } from '@fastgpt/service/common/mongo';
 const { Schema, model, models } = connectionMongo;
 import type { UserInformSchema } from '@fastgpt/global/support/user/inform/type';
-import { InformTypeMap } from '@fastgpt/global/support/user/inform/constants';
+import { InformLevelEnum, InformLevelMap } from '@fastgpt/global/support/user/inform/constants';
 
 const InformSchema = new Schema({
   userId: {
@@ -13,9 +13,10 @@ const InformSchema = new Schema({
     type: Date,
     default: () => new Date()
   },
-  type: {
+  level: {
     type: String,
-    enum: Object.keys(InformTypeMap)
+    enum: Object.keys(InformLevelMap),
+    default: InformLevelEnum.common
   },
   title: {
     type: String,
@@ -32,9 +33,8 @@ const InformSchema = new Schema({
 });
 
 try {
-  InformSchema.index({ time: -1 });
-  InformSchema.index({ userId: 1 });
-  InformSchema.index({ time: 1 }, { expireAfterSeconds: 30 * 24 * 60 * 60 });
+  InformSchema.index({ userId: 1, time: -1 });
+  InformSchema.index({ time: 1 }, { expireAfterSeconds: 180 * 24 * 60 * 60 });
 } catch (error) {
   console.log(error);
 }

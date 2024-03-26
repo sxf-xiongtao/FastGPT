@@ -7,6 +7,7 @@ import { getNanoid, hashStr } from '@fastgpt/global/common/string/tools';
 import { sendInform2OneUser } from './inform/controller';
 import { createJWT } from '@fastgpt/service/support/permission/controller';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { InformLevelEnum } from '@fastgpt/global/support/user/inform/constants';
 
 type UserProps = {
   username: string;
@@ -110,8 +111,8 @@ export async function usernameLogin({
     });
     // send default password inform
     sendInform2OneUser({
+      level: InformLevelEnum.common,
       tmbId: user.team.tmbId,
-      type: 'system',
       title: '新用户注册',
       content: `您的初始密码为: ${password}`
     });

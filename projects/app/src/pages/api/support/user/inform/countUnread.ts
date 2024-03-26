@@ -4,6 +4,7 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { MongoUserInform } from '@/service/support/user/inform/schema';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
+import { InformLevelEnum } from '@fastgpt/global/support/user/inform/constants';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -15,14 +16,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     const { userId } = await authCert({ req, authToken: true });
 
-    const data = await MongoUserInform.countDocuments({
-      userId,
-      read: false,
-      active: true
-    });
+    const [unReadCount, importantInforms] = await Promise.all([
+      MongoUserInform.countDocuments({
+        userId,
+        read: false
+      }),
+      MongoUserInform.find({
+        userId,
+        read: false,
+        level: { $ne: InformLevelEnum.common }
+      })
+        .limit(2)
+        .sort({ time: -1 })
+    ]);
 
     jsonRes(res, {
-      data
+      data: {
+        unReadCount,
+        importantInforms
+      }
     });
   } catch (err) {
     jsonRes(res, {

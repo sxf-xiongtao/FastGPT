@@ -135,109 +135,98 @@ const BillTable = () => {
   }, [billType, getData, setBills]);
 
   return (
-    <Box className="w-[90%] m-auto h-[95%] pb-8">
+    <Box className="pb-4 pt-3 h-full flex flex-col">
+      <HStack px={8}>
+        <Box className="text-2xl font-bold text-[#405169]">账单管理</Box>
+        <Box className="flex-grow"></Box>
+        <InputGroup w={200}>
+          <InputLeftElement h={'full'}>
+            <MyIcon name="common/searchLight" w={4} color={'myGray.400'} />
+          </InputLeftElement>
+          <Input
+            placeholder="请输入用户名，回车搜索"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                setBills([]);
+                getData(1);
+              }
+            }}
+            onChange={(e) => setUsername(e.target.value)}
+            h={8}
+          ></Input>
+        </InputGroup>
+      </HStack>
       <Box
-        className="bg-white mt-8 w-full pl-12 pb-4 pt-6 h-full flex flex-col"
-        style={{ boxShadow: '0px 2px 10px rgba(76, 141, 235, 0.1)' }}
+        position={'relative'}
+        h={'100%'}
+        overflow={'overlay'}
+        ref={elementRef}
+        py={[0, 5]}
+        px={[3, 8]}
       >
-        <HStack px={8}>
-          <Box className="text-2xl font-bold text-[#405169]">账单管理</Box>
-          <Box className="flex-grow"></Box>
-          <InputGroup w={200}>
-            <InputLeftElement h={'full'}>
-              <MyIcon name="common/searchLight" w={4} color={'myGray.400'} />
-            </InputLeftElement>
-            <Input
-              placeholder="请输入用户名，回车搜索"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  setBills([]);
-                  getData(1);
-                }
-              }}
-              onChange={(e) => setUsername(e.target.value)}
-              h={8}
-            ></Input>
-          </InputGroup>
-        </HStack>
-        <Box
-          position={'relative'}
-          h={'100%'}
-          overflow={'overlay'}
-          ref={elementRef}
-          py={[0, 5]}
-          px={[3, 8]}
-        >
-          <ScrollData>
-            <TableContainer>
-              <Table>
-                <Thead>
-                  <Tr>
-                    <Th>#</Th>
-                    <Th>用户名</Th>
-                    <Th>
-                      <MySelect
-                        list={billTypeList}
-                        value={billType}
-                        size={'sm'}
-                        onchange={(e) => {
-                          setBillType(e);
-                        }}
-                        w={'130px'}
-                      ></MySelect>
-                    </Th>
-                    <Th>时间</Th>
-                    <Th>金额</Th>
-                    <Th>状态</Th>
-                    <Th></Th>
+        <ScrollData>
+          <TableContainer>
+            <Table>
+              <Thead>
+                <Tr>
+                  <Th>#</Th>
+                  <Th>用户名</Th>
+                  <Th>
+                    <MySelect
+                      list={billTypeList}
+                      value={billType}
+                      size={'sm'}
+                      onchange={(e) => {
+                        setBillType(e);
+                      }}
+                      w={'130px'}
+                    ></MySelect>
+                  </Th>
+                  <Th>时间</Th>
+                  <Th>金额</Th>
+                  <Th>状态</Th>
+                  <Th></Th>
+                </Tr>
+              </Thead>
+              <Tbody fontSize={'sm'}>
+                {bills.map((item, i) => (
+                  <Tr key={i}>
+                    <Td>{i + 1}</Td>
+                    <Td>{item.username}</Td>
+                    <Td>{billTypeMap[item.type]?.label}</Td>
+                    <Td>
+                      {item.createTime ? dayjs(item.createTime).format('YYYY/MM/DD HH:mm:ss') : '-'}
+                    </Td>
+                    <Td>{formatStorePrice2Read(item.price)}元</Td>
+                    <Td>{billStatusMap[item.status]?.label}</Td>
+                    <Td>
+                      <Button variant={'whiteBase'} size={'sm'} onClick={() => setBillDetail(item)}>
+                        详情
+                      </Button>
+                    </Td>
                   </Tr>
-                </Thead>
-                <Tbody fontSize={'sm'}>
-                  {bills.map((item, i) => (
-                    <Tr key={i}>
-                      <Td>{i + 1}</Td>
-                      <Td>{item.username}</Td>
-                      <Td>{billTypeMap[item.type]?.label}</Td>
-                      <Td>
-                        {item.createTime
-                          ? dayjs(item.createTime).format('YYYY/MM/DD HH:mm:ss')
-                          : '-'}
-                      </Td>
-                      <Td>{formatStorePrice2Read(item.price)}元</Td>
-                      <Td>{billStatusMap[item.status]?.label}</Td>
-                      <Td>
-                        <Button
-                          variant={'whiteBase'}
-                          size={'sm'}
-                          onClick={() => setBillDetail(item)}
-                        >
-                          详情
-                        </Button>
-                      </Td>
-                    </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-              {!isLoading && bills.length === 0 && (
-                <Flex
-                  mt={'20vh'}
-                  flexDirection={'column'}
-                  alignItems={'center'}
-                  justifyContent={'center'}
-                >
-                  <MyIcon name="empty" w={'48px'} h={'48px'} color={'transparent'} />
-                  <Box mt={2} color={'myGray.500'}>
-                    无账单记录～
-                  </Box>
-                </Flex>
-              )}
-            </TableContainer>
-          </ScrollData>
+                ))}
+              </Tbody>
+            </Table>
+            {!isLoading && bills.length === 0 && (
+              <Flex
+                mt={'20vh'}
+                flexDirection={'column'}
+                alignItems={'center'}
+                justifyContent={'center'}
+              >
+                <MyIcon name="empty" w={'48px'} h={'48px'} color={'transparent'} />
+                <Box mt={2} color={'myGray.500'}>
+                  无账单记录～
+                </Box>
+              </Flex>
+            )}
+          </TableContainer>
+        </ScrollData>
 
-          {!!billDetail && (
-            <BillDetailModal bill={billDetail} onClose={() => setBillDetail(undefined)} />
-          )}
-        </Box>
+        {!!billDetail && (
+          <BillDetailModal bill={billDetail} onClose={() => setBillDetail(undefined)} />
+        )}
       </Box>
     </Box>
   );

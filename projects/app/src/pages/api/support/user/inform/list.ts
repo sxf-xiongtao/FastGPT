@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const [informs, total] = await Promise.all([
       MongoUserInform.find({ userId })
-        .sort({ time: -1 }) // 按照创建时间倒序排列
+        .sort({ read: 1, time: -1 }) // 按照创建时间倒序排列
         .skip((pageNum - 1) * pageSize)
         .limit(pageSize),
       MongoUserInform.countDocuments({ userId })

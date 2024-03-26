@@ -77,49 +77,40 @@ export default function DashBoard() {
   }, []);
 
   return (
-    <div className="w-[90%] m-auto">
-      <VStack className="w-full">
-        <Box
-          className="bg-white mt-8 w-full px-6 py-8"
-          style={{ boxShadow: '0px 2px 10px  rgba(76, 141, 235, 0.1)' }}
-        >
-          <Box className="w-full text-[20px] font-normal text-[#405169] mb-2">信息总览</Box>
-          <Divider />
-          <HStack gap={6} className="w-full my-4">
-            <GridItem flex={1} className="border-r">
-              <DataItem
-                icon={<Icons type="user" />}
-                title={'用户'}
-                count={numbers?.usersCount || 0}
-              />
-            </GridItem>
-            <GridItem flex={1} className="border-r">
-              <DataItem
-                icon={<Icons type="dataset" />}
-                title={'知识库'}
-                count={numbers?.datasetsCount || 0}
-              />
-            </GridItem>
-            <GridItem flex={1}>
-              <DataItem
-                icon={<Icons type="app" />}
-                title={'应用'}
-                count={numbers?.appsCount || 0}
-              />
-            </GridItem>
-          </HStack>
-          <Divider />
-        </Box>
+    <>
+      <Box>
+        <Box className="w-full text-[20px] font-normal text-[#405169] mb-2">信息总览</Box>
+        <Divider />
+        <HStack gap={6} className="w-full my-4">
+          <GridItem flex={1} className="border-r">
+            <DataItem
+              icon={<Icons type="user" />}
+              title={'用户'}
+              count={numbers?.usersCount || 0}
+            />
+          </GridItem>
+          <GridItem flex={1} className="border-r">
+            <DataItem
+              icon={<Icons type="dataset" />}
+              title={'知识库'}
+              count={numbers?.datasetsCount || 0}
+            />
+          </GridItem>
+          <GridItem flex={1}>
+            <DataItem icon={<Icons type="app" />} title={'应用'} count={numbers?.appsCount || 0} />
+          </GridItem>
+        </HStack>
+        <Divider />
+      </Box>
 
-        <Box
-          className="bg-white my-2 w-full px-6 py-8"
-          style={{ boxShadow: '0px 2px 10px  rgba(76, 141, 235, 0.1)' }}
-        >
-          <span className="w-full text-[20px] font-normal text-[#405169] mb-2">趋势图</span>
-          <UserChart data={chartData} />
-        </Box>
-      </VStack>
-    </div>
+      <Box
+        className="bg-white my-2 w-full px-6 py-8"
+        style={{ boxShadow: '0px 2px 10px  rgba(76, 141, 235, 0.1)' }}
+      >
+        <span className="w-full text-[20px] font-normal text-[#405169] mb-2">趋势图</span>
+        <UserChart data={chartData} />
+      </Box>
+    </>
   );
 }
 

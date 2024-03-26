@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import validator from '@rjsf/validator-ajv8';
 import Form from '@rjsf/core';
-import { Box, Button, Center, Spinner } from '@chakra-ui/react';
+import { Box, Button, Center, Flex, Spinner } from '@chakra-ui/react';
 import { useToast } from '@fastgpt/web/hooks/useToast';
 import CustomCheckbox from './components/Customization/CustomCheckbox';
 import DescriptionFieldTemplate from './components/Customization/DescriptionFieldTemplate';
@@ -117,12 +117,8 @@ export const Settings = () => {
   }, 100);
 
   return (
-    <div className="w-[90%] m-auto flex space-x-4 h-full pb-4">
-      <Box
-        className="bg-white mt-8 px-6 py-4 w-3/4 overflow-y-auto"
-        style={{ boxShadow: '0px 2px 10px rgba(76, 141, 235, 0.1)' }}
-        onScroll={handleScroll}
-      >
+    <Flex h={'100%'} gap={4}>
+      <Box overflowY={'auto'} flex={3} onScroll={handleScroll}>
         {(isSchemaLoading || isLoading) && (
           <Center className="h-full text-gray-500">
             <Spinner size={'lg'} />
@@ -146,11 +142,8 @@ export const Settings = () => {
           </Form>
         )}
       </Box>
-      <Box className="w-1/4 flex flex-col mt-8 justify-between">
-        <Box
-          className="bg-white w-full pr-6 pt-8 pb-12"
-          style={{ boxShadow: '0px 2px 10px rgba(76, 141, 235, 0.1)' }}
-        >
+      <Flex flexDirection={'column'} flex={1}>
+        <Box flex={'1 0 0'} className="bg-white w-full pr-6 pt-8 pb-12">
           <ul className="flex flex-col space-y-4 text-lg">
             {titles.map((title) => (
               <li
@@ -172,10 +165,7 @@ export const Settings = () => {
             ))}
           </ul>
         </Box>
-        <Box
-          className="bg-white w-full px-6 py-4 flex-col flex"
-          style={{ boxShadow: '0px 2px 10px rgba(76, 141, 235, 0.1)' }}
-        >
+        <Box className="bg-white w-full px-6 py-4 flex-col flex">
           <ImportModal value={rawData} setFormData={setFormData} setRawData={setRawData}>
             <Button variant={'whiteBase'} mb={3} isLoading={isLoading || isSchemaLoading}>
               配置文件
@@ -185,8 +175,8 @@ export const Settings = () => {
             保存
           </Button>
         </Box>
-      </Box>
-    </div>
+      </Flex>
+    </Flex>
   );
 };
 

@@ -6,7 +6,6 @@ export function getAllPageIds() {
     { params: { pageId: 'apps' } },
     { params: { pageId: 'pays' } },
     { params: { pageId: 'datasets' } },
-    { params: { pageId: 'oneAPI' } },
     { params: { pageId: 'settings' } }
   ];
 }

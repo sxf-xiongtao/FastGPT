@@ -4,6 +4,7 @@ import { lockTrainingDataByTeamId } from '@fastgpt/service/core/dataset/training
 import { sendInform2OneUser } from '@/service/support/user/inform/controller';
 import { generateAutoTraining } from './autoTrainingProcess';
 import { addLog } from '@fastgpt/service/common/system/log';
+import { InformLevelEnum } from '@fastgpt/global/support/user/inform/constants';
 
 export const startTrainingProcess = () => {
   generateAutoTraining();
@@ -19,7 +20,7 @@ export const checkTeamAiPointsAndLock = async (teamId: string, tmbId: string) =>
       try {
         global.sendInformQueue.push(() =>
           sendInform2OneUser({
-            type: 'system',
+            level: InformLevelEnum.important,
             title: '文本训练任务中止',
             content:
               '该团队账号AI积分不足，文本训练任务中止，重新充值后将会继续。暂停的任务将在 7 天后被删除。',

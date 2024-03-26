@@ -6,13 +6,14 @@ import NProgress from 'nprogress';
 import Router, { useRouter } from 'next/router';
 import { appWithTranslation, useTranslation } from 'next-i18next';
 import { theme } from '@fastgpt/web/styles/theme';
+import Layout from '@/components/Layout';
 
 import '../styles/globals.scss';
 import 'tailwindcss/tailwind.css';
 
 import 'nprogress/nprogress.css';
 import '@/styles/reset.scss';
-import './home/Settings/index.css';
+import '@/styles/default.scss';
 import { change2DefaultLng, setLngStore } from '@/web/common/i18n';
 
 //Binding events.
@@ -52,7 +53,9 @@ function App({ Component, pageProps }: any) {
 
       <QueryClientProvider client={queryClient}>
         <ChakraProvider theme={theme}>
-          <Component {...pageProps} />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
         </ChakraProvider>
       </QueryClientProvider>
     </>

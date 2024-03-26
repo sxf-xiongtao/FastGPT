@@ -1,7 +1,7 @@
 import { Image } from '@chakra-ui/react';
 import { WidgetProps } from '@rjsf/utils';
 import { useRef } from 'react';
-import { compressImgFileAndUpload } from '../../../../../service/admin/compressAndUpload';
+import { compressImgFileAndUpload } from '@/service/admin/compressAndUpload';
 import { AddIcon } from '@chakra-ui/icons';
 import { useToast } from '@fastgpt/web/hooks/useToast';
 

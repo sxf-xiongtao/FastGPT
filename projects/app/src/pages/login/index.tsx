@@ -49,7 +49,7 @@ const Login = () => {
 
       if (response.token) {
         localStorage.setItem('token', response.token);
-        router.push('/home/dashboard');
+        router.push('/dashboard');
         toast({
           title: '登录成功',
           status: 'success'
@@ -71,18 +71,16 @@ const Login = () => {
         className="w-[450px] h-[540px] absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-[16px] bg-white px-12 pt-16"
         style={{ boxShadow: '0px 14px 53px  rgba(84, 85, 144, 0.16)' }}
       >
-        <div className="mb-12 text-[24px] text-center font-medium text-[#245373]">
-          {t('AdminLogin')}
-        </div>
+        <div className="mb-12 text-[24px] text-center font-medium text-[#245373]">管理员登录</div>
         <FormControl className="mb-10 flex flex-col">
           <FormLabel className="text-[#245373] font-medium" htmlFor="account">
-            {t('Username')}
+            用户名
           </FormLabel>
           <Input {...register('account', { required: true })} id="account" placeholder={''} />
         </FormControl>
         <FormControl isInvalid={!!errors.password} className="mb-16 flex flex-col">
           <FormLabel className="text-[#245373] font-medium" htmlFor="password">
-            {t('Password')}
+            密码
           </FormLabel>
           <InputGroup>
             <Input
@@ -112,7 +110,7 @@ const Login = () => {
           variant="primary"
           className="w-full"
         >
-          {t('Login')}
+          登录
         </Button>
       </div>
     </div>

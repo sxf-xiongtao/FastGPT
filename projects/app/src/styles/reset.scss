@@ -46,16 +46,11 @@ svg {
 
 div {
   &::-webkit-scrollbar-thumb {
-    background: transparent !important;
-    transition: background 1s;
+    background: rgba(189, 193, 197, 0.7) !important;
   }
-  &:hover {
-    &::-webkit-scrollbar-thumb {
-      background: rgba(189, 193, 197, 0.7) !important;
-    }
-    &::-webkit-scrollbar-thumb:hover {
-      background: rgba(189, 193, 197, 1) !important;
-    }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(189, 193, 197, 1) !important;
   }
 }
 

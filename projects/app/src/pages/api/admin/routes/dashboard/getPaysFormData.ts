@@ -17,7 +17,9 @@ export default async function getPaysFormData(req: NextApiRequest, res: NextApiR
       {
         $match: {
           status: 'SUCCESS',
-          type: [BillTypeEnum.balance, BillTypeEnum.extraDatasetSub, BillTypeEnum.extraPoints],
+          type: {
+            $in: [BillTypeEnum.standSubPlan, BillTypeEnum.extraDatasetSub, BillTypeEnum.extraPoints]
+          },
           createTime: {
             $gte: getDashboardDataStartTime()
           }

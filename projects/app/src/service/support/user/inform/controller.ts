@@ -4,11 +4,11 @@ import type { SendInformProps } from '@fastgpt/global/support/user/inform/type';
 import { delay } from '@fastgpt/global/common/system/utils';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 
-export async function sendInform2AllUser({ type, title, content }: SendInformProps) {
+export async function sendInform2AllUser({ title, content, level }: SendInformProps) {
   const users = await MongoUser.find({}, '_id');
   await MongoUserInform.insertMany(
     users.map(({ _id }) => ({
-      type,
+      level,
       title,
       content,
       userId: _id,
@@ -18,17 +18,16 @@ export async function sendInform2AllUser({ type, title, content }: SendInformPro
 }
 
 export async function sendInform2OneUser({
-  type,
   title,
   content,
-  tmbId
+  tmbId,
+  level
 }: SendInformProps & { tmbId: string }) {
   const tmb = await MongoTeamMember.findById(tmbId, 'userId');
   if (!tmb) return;
   // random delay 500ms ~ 5s
   await delay(Math.random() * 4500 + 500);
   const inform = await MongoUserInform.findOne({
-    type,
     title,
     content,
     userId: tmb.userId,
@@ -38,7 +37,7 @@ export async function sendInform2OneUser({
   if (inform) return;
 
   await MongoUserInform.create({
-    type,
+    level,
     title,
     content,
     userId: tmb.userId
