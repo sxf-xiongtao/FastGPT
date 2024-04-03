@@ -40,7 +40,8 @@ export function teamMemberSchema2TeamItemType(data: TeamMemberWithTeamAndUserSch
     role: data.role,
     status: data.status,
     defaultTeam: data.defaultTeam,
-    canWrite: data.role !== TeamMemberRoleEnum.visitor
+    canWrite: data.role !== TeamMemberRoleEnum.visitor,
+    lafAccount: data.teamId.lafAccount
   };
 }
 
@@ -101,11 +102,18 @@ export async function createTeam({
     return Promise.reject(error);
   }
 }
-export async function updateTeam({ teamId, name, avatar, teamDomain }: UpdateTeamProps) {
+export async function updateTeam({
+  teamId,
+  name,
+  avatar,
+  teamDomain,
+  lafAccount
+}: UpdateTeamProps) {
   await MongoTeam.findByIdAndUpdate(teamId, {
     name,
     avatar,
-    teamDomain
+    teamDomain,
+    lafAccount
   });
 }
 
@@ -155,7 +163,7 @@ export async function getAndCreateUserDefaultTeam(
       avatar: '/icon/logo.svg',
       defaultTeam: true,
       session
-    });
+    }) as any;
   }
   return teamMemberSchema2TeamItemType(tmb);
 }

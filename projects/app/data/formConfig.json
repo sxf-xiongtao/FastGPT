@@ -85,6 +85,11 @@
             "scripts": {
               "type": "json",
               "title": "自定义Script脚本，可以全局插入（可以做站点流量监控之类的）"
+            },
+            "lafEnv": {
+              "type": "string",
+              "title": "laf 环境",
+              "description": "laf 环境，默认是 laf.dev"
             }
           }
         },

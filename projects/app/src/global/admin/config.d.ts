@@ -31,6 +31,7 @@ export type ConfigFormType = {
       limit?: FastGPTConfigFileType['feConfigs']['limit'];
       scripts?: string;
       uploadFileMaxSize: number;
+      lafEnv: string;
     };
     systemEnv: {
       openapiPrefix: string;
