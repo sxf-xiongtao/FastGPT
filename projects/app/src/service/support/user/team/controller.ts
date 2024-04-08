@@ -163,7 +163,7 @@ export async function getAndCreateUserDefaultTeam(
       avatar: '/icon/logo.svg',
       defaultTeam: true,
       session
-    }) as any;
+    });
   }
   return teamMemberSchema2TeamItemType(tmb);
 }

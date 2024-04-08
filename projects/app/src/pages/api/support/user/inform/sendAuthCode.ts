@@ -6,12 +6,11 @@ import * as OpenApi from '@alicloud/openapi-client';
 import * as Util from '@alicloud/tea-util';
 import { connectToDatabase } from '@/service/mongo';
 import { MongoUserAuth } from '@/service/support/user/auth/schema';
-import axios from 'axios';
 import { customAlphabet } from 'nanoid';
 import requestIp from 'request-ip';
-import { Obj2Query } from '@/utils/tools';
 import { addMinutes } from 'date-fns';
 import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
+import { authGoogleToken } from '@/service/common/ipLimit/tools';
 const nanoid = customAlphabet('123456789', 6);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -29,12 +28,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // google auth
-    global.systemConfig?.auth?.googleServiceVerKey &&
-      (await authGoogleToken({
-        secret: global.systemConfig?.auth?.googleServiceVerKey,
-        response: googleToken,
-        remoteip: requestIp.getClientIp(req) || undefined
-      }));
+    await authGoogleToken({
+      googleToken: googleToken,
+      remoteip: requestIp.getClientIp(req)
+    });
 
     // 判断 1 分钟内是否有重复数据
     const authCode = await MongoUserAuth.findOne({
@@ -137,22 +134,4 @@ export const sendPhoneCode = async (phone: string, code: string) => {
   if (res.body.code !== 'OK') {
     return Promise.reject(res.body.message || '发送短信失败');
   }
-};
-
-// service run
-export const authGoogleToken = async (data: {
-  secret: string;
-  response: string;
-  remoteip?: string;
-}) => {
-  const res = await axios.post<{
-    score?: number;
-    success: boolean;
-    'error-codes': string[];
-  }>(`https://www.recaptcha.net/recaptcha/api/siteverify?${Obj2Query(data)}`);
-
-  if (res.data.success) {
-    return Promise.resolve('');
-  }
-  return Promise.reject(res?.data?.['error-codes']?.[0] || '非法环境');
 };

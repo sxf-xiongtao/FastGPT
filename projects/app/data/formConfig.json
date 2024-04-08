@@ -71,10 +71,16 @@
                 }
               }
             },
+            "uploadFileMaxAmount": {
+              "type": "number",
+              "title": "单次最多上传多少个文件",
+              "default": 15,
+              "description": "用户上传知识库时，每次上传最多选择多少个文件"
+            },
             "uploadFileMaxSize": {
               "type": "number",
               "title": "上传文件最大大小（M)",
-              "default": 15,
+              "default": 100,
               "description": "用户上传知识库时，每个文件最大是多少。放大的话，需要注意网关也要设置得够大。"
             },
             "concatMd": {
@@ -88,8 +94,8 @@
             },
             "lafEnv": {
               "type": "string",
-              "title": "laf 环境",
-              "description": "laf 环境，默认是 laf.dev"
+              "title": "laf 环境的地址",
+              "description": "laf 环境，例如 https://laf.dev"
             }
           }
         },
@@ -173,7 +179,7 @@
             },
             "email": {
               "type": "object",
-              "title": "邮箱配置",
+              "title": "邮箱登录配置",
               "properties": {
                 "service": {
                   "type": "string",
@@ -194,7 +200,7 @@
             },
             "phone": {
               "type": "object",
-              "title": "手机配置",
+              "title": "手机短信登录配置",
               "properties": {
                 "SNED_PHONE_ACCESSKEYID": {
                   "type": "string",
@@ -220,7 +226,7 @@
             },
             "github": {
               "type": "object",
-              "title": "GitHub 配置",
+              "title": "GitHub 登录配置",
               "properties": {
                 "clientId": {
                   "type": "string",
@@ -232,7 +238,7 @@
             },
             "google": {
               "type": "object",
-              "title": "Google 配置",
+              "title": "Google 登录配置",
               "properties": {
                 "clientId": {
                   "type": "string",
@@ -244,7 +250,7 @@
             },
             "wechat": {
               "type": "object",
-              "title": "微信配置",
+              "title": "微信服务号登录配置",
               "properties": {
                 "appID": {
                   "type": "string",

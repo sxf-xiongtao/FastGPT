@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 /**
  * 对象转成 query 字符串
  */
-export const Obj2Query = (obj: Record<string, string | number>) => {
+export const Obj2Query = (obj: Record<string, string | number | null | undefined>) => {
   const queryParams = new URLSearchParams();
   for (const key in obj) {
     queryParams.append(key, `${obj[key]}`);

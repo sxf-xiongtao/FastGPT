@@ -39,8 +39,9 @@ export function formatConfigStore2FormSchema({
       websiteSyncLimitMinuted: 60
     },
     scripts = [],
+    uploadFileMaxAmount = 15,
     uploadFileMaxSize = 500,
-    lafEnv = 'laf.dev',
+    lafEnv,
     ...feConfigsProps
   } = feConfigs || {};
 
@@ -72,6 +73,7 @@ export function formatConfigStore2FormSchema({
         customApiDomain,
         customSharePageDomain,
         scripts: JSON.stringify(scripts, null, 2),
+        uploadFileMaxAmount,
         uploadFileMaxSize,
         lafEnv,
         ...feConfigsProps
@@ -163,6 +165,7 @@ export function formatFormData2ConfigStore({
       customApiDomain,
       customSharePageDomain,
       scripts,
+      uploadFileMaxAmount,
       uploadFileMaxSize,
       lafEnv
     },
@@ -204,6 +207,7 @@ export function formatFormData2ConfigStore({
     show_emailLogin: !!fastgptPro.auth?.email?.service,
     googleClientVerKey: fastgptPro.auth?.googleV3Ver.clientKey,
     scripts: scripts ? JSON.parse(scripts) : [],
+    uploadFileMaxAmount,
     uploadFileMaxSize,
     lafEnv
   };

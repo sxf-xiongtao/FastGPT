@@ -1,0 +1,124 @@
+import { createStandardSubBill } from '@/service/support/wallet/sub/bill';
+import { TeamMemberRoleEnum } from '@fastgpt/global/support/user/team/constant';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
+import {
+  StandardSubLevelEnum,
+  SubModeEnum,
+  SubTypeEnum
+} from '@fastgpt/global/support/wallet/sub/constants';
+import { TeamSubSchema } from '@fastgpt/global/support/wallet/sub/type';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { addLog } from '@fastgpt/service/common/system/log';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
+import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
+import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
+import {
+  getStandardPlan,
+  initTeamStandardPlan2Free
+} from '@fastgpt/service/support/wallet/sub/utils';
+import { addMonths } from 'date-fns';
+
+export const clearExpiredSubPlan = async () => {
+  const plans = await MongoTeamSub.deleteMany({
+    type: [SubTypeEnum.extraDatasetSize, SubTypeEnum.extraPoints],
+    expiredTime: { $lte: new Date() }
+  });
+
+  addLog.info(`删除过期的额外套餐: ${plans.deletedCount}`);
+};
+
+export const updateStandardPlan = async () => {
+  const updatePlan = async (plan: TeamSubSchema) => {
+    try {
+      // 计算出下一个周期的相关订阅参数
+      const [team, owner] = await Promise.all([
+        MongoTeam.findById(plan.teamId),
+        MongoTeamMember.findOne({ teamId: plan.teamId, role: TeamMemberRoleEnum.owner })
+      ]);
+      if (!team || !owner) return;
+
+      const newPlanContent = getStandardPlan(plan.nextSubLevel);
+      if (!newPlanContent) return;
+
+      const monthMap =
+        plan.nextMode === SubModeEnum.month || plan.nextSubLevel === StandardSubLevelEnum.free
+          ? {
+              num: 1,
+              priceNum: 1
+            }
+          : { num: 12, priceNum: 10 };
+
+      const newTotalPoints = newPlanContent.totalPoints * monthMap.num;
+      const newPlanPointUnitPrice = newPlanContent.pointPrice * PRICE_SCALE;
+      const newPlanPointPrice = newPlanPointUnitPrice * monthMap.priceNum;
+
+      const newPlanUnitPrice = newPlanContent.price * PRICE_SCALE;
+      const newPlanPrice = newPlanUnitPrice * monthMap.priceNum;
+
+      const balanceEnough = team.balance >= newPlanPrice;
+
+      // 余额不足，改成免费版
+      if (!balanceEnough) {
+        await initTeamStandardPlan2Free({ teamId: team._id });
+        return;
+      }
+
+      // 余额充足，更新订阅内容
+      await mongoSessionRun(async (session) => {
+        // 更新订阅内容
+        await MongoTeamSub.findOneAndUpdate(
+          {
+            teamId: team._id,
+            type: SubTypeEnum.standard
+          },
+          {
+            currentMode: plan.nextMode,
+            price: newPlanPrice,
+            pointPrice: newPlanPointPrice,
+            currentSubLevel: plan.nextSubLevel,
+            startTime: new Date(),
+            expiredTime: addMonths(new Date(), monthMap.num),
+            totalPoints: newTotalPoints,
+            surplusPoints: newTotalPoints
+          },
+          { session }
+        );
+
+        await createStandardSubBill({
+          teamId: team._id,
+          tmbId: owner._id,
+          payPrice: newPlanPrice,
+          level: plan.nextSubLevel,
+          mode: plan.nextMode,
+          session
+        });
+      });
+
+      addLog.info('Update team plan', {
+        currentMode: plan.nextMode,
+        price: newPlanPrice,
+        pointPrice: newPlanPointPrice,
+        currentSubLevel: plan.nextSubLevel,
+        startTime: new Date(),
+        expiredTime: addMonths(new Date(), monthMap.num),
+        totalPoints: newTotalPoints,
+        surplusPoints: newTotalPoints
+      });
+    } catch (error) {
+      console.log('更新团队订阅失败', error);
+    }
+  };
+
+  // 1. 找出所有非免费的过期计划
+  const plans = await MongoTeamSub.find({
+    type: SubTypeEnum.standard,
+    currentSubLevel: { $ne: StandardSubLevelEnum.free },
+    expiredTime: { $lte: new Date() }
+  });
+
+  for await (const plan of plans) {
+    await updatePlan(plan);
+  }
+
+  addLog.info(`更新标准套餐完成`);
+};

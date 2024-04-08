@@ -17,7 +17,7 @@ import { checkInvalidChunkAndLock } from '@fastgpt/service/core/dataset/training
 import { addMinutes } from 'date-fns';
 import { countGptMessagesTokens } from '@fastgpt/global/common/string/tiktoken';
 import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
-import { pushDataListToTrainingQueue } from '@fastgpt/service/core/dataset/training/controller';
+import { pushDataListToTrainingQueueByCollectionId } from '@fastgpt/service/core/dataset/training/controller';
 
 const reduceQueue = () => {
   global.autoTrainingLen = global.autoTrainingLen > 0 ? global.autoTrainingLen - 1 : 0;
@@ -131,7 +131,7 @@ export async function generateAutoTraining(): Promise<any> {
     });
 
     // get vector and insert
-    const { insertLen } = await pushDataListToTrainingQueue({
+    const { insertLen } = await pushDataListToTrainingQueueByCollectionId({
       teamId: data.teamId,
       tmbId: data.tmbId,
       collectionId: data.collectionId,

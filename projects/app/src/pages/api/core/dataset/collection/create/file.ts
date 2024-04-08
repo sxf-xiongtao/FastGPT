@@ -21,15 +21,16 @@ import { createTrainingUsage } from '@fastgpt/service/support/wallet/usage/contr
 import { UsageSourceEnum } from '@fastgpt/global/support/wallet/usage/constants';
 import { getDatasetModel, getVectorModel } from '@fastgpt/service/core/ai/model';
 import { BucketNameEnum } from '@fastgpt/global/common/file/constants';
-
-/**
- * Creates the multer uploader
- */
-const upload = getUploadModel({
-  maxSize: 500 * 1024 * 1024
-});
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { MongoImage } from '@fastgpt/service/common/file/image/schema';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
+  /**
+   * Creates the multer uploader
+   */
+  const upload = getUploadModel({
+    maxSize: (global.feConfigs?.uploadFileMaxSize || 500) * 1024 * 1024
+  });
   let filePaths: string[] = [];
 
   try {
@@ -60,7 +61,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       qaPrompt
     } = data;
     const { fileMetadata, collectionMetadata, ...collectionData } = data;
-    const collectionName = collectionData.name || file.originalname;
+    const collectionName = file.originalname;
 
     const relatedImgId = getNanoid();
 
@@ -103,8 +104,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     });
 
     // 6. create collection and training bill
-    const [{ _id: collectionId }, { billId }] = await Promise.all([
-      createOneCollection({
+    const { collectionId, insertResults } = await mongoSessionRun(async (session) => {
+      const { _id: collectionId } = await createOneCollection({
         ...collectionData,
         name: collectionName,
         teamId,
@@ -116,30 +117,56 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         metadata: {
           ...collectionMetadata,
           relatedImgId
-        }
-      }),
-      createTrainingUsage({
+        },
+        session
+      });
+      const { billId } = await createTrainingUsage({
         teamId,
         tmbId,
         appName: collectionName,
         billSource: UsageSourceEnum.training,
         vectorModel: getVectorModel(dataset.vectorModel)?.name,
         agentModel: getDatasetModel(dataset.agentModel)?.name
-      })
-    ]);
+      });
 
-    // 7. push chunks to training queue
-    const insertResults = await pushDataListToTrainingQueue({
-      teamId,
-      tmbId,
-      collectionId,
-      trainingMode: trainingType,
-      prompt: qaPrompt,
-      billId,
-      data: chunks.map((text, index) => ({
-        q: text,
-        chunkIndex: index
-      }))
+      // 7. push chunks to training queue
+      const insertResults = await pushDataListToTrainingQueue({
+        teamId,
+        tmbId,
+        datasetId: dataset._id,
+        collectionId,
+        agentModel: dataset.agentModel,
+        vectorModel: dataset.vectorModel,
+        trainingMode: trainingType,
+        prompt: qaPrompt,
+        billId,
+        data: chunks.map((text, index) => ({
+          q: text,
+          chunkIndex: index
+        }))
+      });
+
+      // 8. remove image expired time
+      await MongoImage.updateMany(
+        {
+          teamId,
+          'metadata.relatedId': relatedImgId
+        },
+        {
+          // Remove expiredTime to avoid ttl expiration
+          $unset: {
+            expiredTime: 1
+          }
+        },
+        {
+          session
+        }
+      );
+
+      return {
+        collectionId,
+        insertResults
+      };
     });
 
     jsonRes(res, {
