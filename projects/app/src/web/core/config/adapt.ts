@@ -131,7 +131,7 @@ export function formatConfigStore2FormSchema({
           secret: fastgptPro?.auth?.google?.secret || ''
         },
         email: {
-          service: fastgptPro?.auth?.email?.service || '',
+          smtp: fastgptPro?.auth?.email?.smtp || '',
           user: fastgptPro?.auth?.email?.user || '',
           pass: fastgptPro?.auth?.email?.pass || ''
         },
@@ -195,16 +195,14 @@ export function formatFormData2ConfigStore({
     customSharePageDomain,
     // auto set field
     show_pay: !!fastgptPro.pay?.wx?.WX_APPID,
-    show_register: !!(
-      fastgptPro.auth?.email?.service || fastgptPro.auth?.phone.SNED_PHONE_TEMPLATE
-    ),
+    show_register: !!(fastgptPro.auth?.email?.smtp || fastgptPro.auth?.phone.SNED_PHONE_TEMPLATE),
     oauth: {
       github: fastgptPro.auth?.github?.clientId,
       google: fastgptPro.auth?.google?.clientId,
       wechat: fastgptPro.auth?.wechat?.appID
     },
     show_phoneLogin: !!fastgptPro.auth?.phone.SNED_PHONE_TEMPLATE,
-    show_emailLogin: !!fastgptPro.auth?.email?.service,
+    show_emailLogin: !!fastgptPro.auth?.email?.smtp,
     googleClientVerKey: fastgptPro.auth?.googleV3Ver.clientKey,
     scripts: scripts ? JSON.parse(scripts) : [],
     uploadFileMaxAmount,

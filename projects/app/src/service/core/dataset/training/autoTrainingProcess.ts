@@ -15,7 +15,7 @@ import { getLLMModel } from '@fastgpt/service/core/ai/model';
 import { checkTeamAiPointsAndLock } from './utils';
 import { checkInvalidChunkAndLock } from '@fastgpt/service/core/dataset/training/utils';
 import { addMinutes } from 'date-fns';
-import { countGptMessagesTokens } from '@fastgpt/global/common/string/tiktoken';
+import { countGptMessagesTokens } from '@fastgpt/service/common/string/tiktoken/index';
 import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
 import { pushDataListToTrainingQueueByCollectionId } from '@fastgpt/service/core/dataset/training/controller';
 
@@ -153,7 +153,7 @@ export async function generateAutoTraining(): Promise<any> {
       pushAutoTrainingUsage({
         teamId: data.teamId,
         tmbId: data.tmbId,
-        tokens: countGptMessagesTokens(messages),
+        tokens: await countGptMessagesTokens(messages),
         billId: data.billId,
         model
       });

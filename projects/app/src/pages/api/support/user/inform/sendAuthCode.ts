@@ -37,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const authCode = await MongoUserAuth.findOne({
       key: username,
       type,
-      time: { $gte: addMinutes(Date.now(), -1) }
+      createTime: { $gte: addMinutes(Date.now(), -1) }
     });
 
     if (authCode) {
@@ -86,9 +86,9 @@ export const sendEmailCode = (email: string, code: string, type: `${UserAuthType
   };
 
   const mailTransport = nodemailer.createTransport({
-    // host: 'smtp.qq.phone',
-    service: global.systemConfig?.auth?.email?.service,
+    host: global.systemConfig?.auth?.email?.smtp,
     secure: true, //安全方式发送,建议都加上
+    port: 465,
     auth: {
       user: global.systemConfig?.auth?.email?.user,
       pass: global.systemConfig?.auth?.email?.pass

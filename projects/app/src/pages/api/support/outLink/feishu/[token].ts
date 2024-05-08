@@ -2,19 +2,19 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { connectToDatabase } from '@/service/mongo';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { authOutLinkValid } from '@fastgpt/service/support/permission/auth/outLink';
-import {
-  setMsg,
-  decryptAES,
-  getUserChatInfoAndAuthTeamPoints
-} from '@/service/support/outLink/chat';
-import type { XmlType } from '@/service/support/outLink/chat';
-import { dispatchWorkFlow } from '@fastgpt/service/core/workflow/dispatch';
-import { setEntryEntries } from '@fastgpt/service/core/workflow/dispatch/utils';
-import { MongoApp } from '@fastgpt/service/core/app/schema';
-import { getChatItems } from '@fastgpt/service/core/chat/controller';
-import { OutlinkType } from '@fastgpt/global/support/outLink/constant';
-import { Feishu, OutLinkEditType, OutLinkSchema } from '@fastgpt/global/support/outLink/type';
-import axios from 'axios';
+// import {
+//   setMsg,
+//   decryptAES,
+//   getUserChatInfoAndAuthTeamPoints
+// } from '@/service/support/outLink/chat';
+// import type { XmlType } from '@/service/support/outLink/chat';
+// import { dispatchWorkFlow } from '@fastgpt/service/core/workflow/dispatch';
+// import { setEntryEntries } from '@fastgpt/service/core/workflow/dispatch/utils';
+// import { MongoApp } from '@fastgpt/service/core/app/schema';
+// import { getChatItems } from '@fastgpt/service/core/chat/controller';
+// import { OutlinkType } from '@fastgpt/global/support/outLink/constant';
+// import { Feishu, OutLinkEditType, OutLinkSchema } from '@fastgpt/global/support/outLink/type';
+// import axios from 'axios';
 
 // Request type from feishu
 type RequestType = 'url_verification'; // TODO: add more types
@@ -36,107 +36,99 @@ type QueryProps = {
 // refer to: https://open.feishu.cn/document/server-docs/event-subscription-guide/event-subscription-configure-/request-url-configuration-case
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    await connectToDatabase();
-    const query = req.query as QueryProps;
-    const { appId, shareChat } = await authOutLinkValid({ shareId: query.token });
-    if (!appId) {
-      throw new Error('No appId found');
-    }
-    //     appId new ObjectId("65b5f3f314a4373356f59767")
-    // shareChat {
-    //   limit: { maxUsagePoints: -1, QPM: 100 },
-    //   app: {
-    //     appId: 'cli_a69533163e00100b',
-    //     appSecret: '8EeLhaGgFm58Rql3k2PM',
-    //     encryptKey: 'IcWGxG4RkuJ4D3gxNdNU',
-    //     verificationToken: 'YnQv7wM5fOAkVdI0pY6k'
-    //   },
-    //   _id: new ObjectId("66222f37c570ab2dbc160fe0"),
-    //   shareId: '4hj0lobqt5eg06o6aqm8qc9j',
-    //   teamId: new ObjectId("65af8a83a233ad770dc8adda"),
-    //   tmbId: new ObjectId("65af8a84a233ad770dc8ade4"),
-    //   appId: new ObjectId("65b5f3f314a4373356f59767"),
-    //   type: 'feishu',
-    //   name: '测试',
-    //   usagePoints: 0,
-    //   responseDetail: false,
-    //   immediateResponse: 'immediately',
-    //   defaultResponse: 'default',
-    //   __v: 0
+    // await connectToDatabase();
+    // const query = req.query as QueryProps;
+    // const { appId, shareChat } = await authOutLinkValid({ shareId: query.token });
+    // if (!appId) {
+    //   throw new Error('No appId found');
     // }
-    console.log('shareChat', shareChat);
-    const encryptKey = shareChat.get('app.encryptKey');
-    const { encrypt } = req.body as FeiShuProps;
-    let body = req.body as FeiShuProps;
-    if (!encryptKey) {
-      // no encrypt, thus the request should be a unencrypted json
-      if (encrypt) {
-        // it is impossible to decrypt the request
-        throw new Error('Invalid Encrypt Key config');
-      }
-    } else {
-      body = decryptAES(encrypt!, encryptKey);
-    }
-
-    if (body?.type === 'url_verification' || body?.challenge) {
-      // verify the url with challenge param
-      res.send({
-        challenge: body.challenge
-      });
-      return;
-    }
-
-    console.log('body', body);
-
-    const content = body.event.message.content;
-    const message_id = body.event.message.message_id;
-
-    // get the tenant access token
-    // refer to: https://open.feishu.cn/document/server-docs/authentication-management/access-token/tenant_access_token_internal
-    const { data } = await axios.post(
-      'https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal',
-      {
-        app_id: shareChat.get('app.appId'),
-        app_secret: shareChat.get('app.appSecret')
-      }
-    );
-    // console.log("appID", shareChat.get('app.appId'))
-    // console.log("appSecret", shareChat.get('app.appSecret'))
-
-    // console.log('data', data);
-    const accessToken = data.tenant_access_token;
-
-    if (!accessToken) {
-      throw new Error('Failed to get access token');
-    }
-    const replayContent = {
-      text: 'Hello, this is a test message from FastGPT.'
-    };
-    // reply the message
-    // refer to: https://open.feishu.cn/document/server-docs/im-v1/message/reply
-    const replyAddr = `https://open.feishu.cn/open-apis/im/v1/messages/${message_id}/reply`;
-    const reply = await axios.request({
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json; charset=utf-8'
-      },
-      url: replyAddr,
-      method: 'post',
-      data: {
-        msg_type: 'text',
-        content: JSON.stringify(replayContent) // ! important: the content should be stringified
-        // reply_in_thread: false // whether to reply in the thread
-        // uuid: // the uuid of the message, generated by the server, which is not implemented here yet. TODO: add uuid
-      }
-    });
-    if (reply.status !== 200) {
-      console.log('reply', reply);
-      throw new Error('Failed to reply the message');
-    }
-    res.send('ok');
-
+    // //     appId new ObjectId("65b5f3f314a4373356f59767")
+    // // shareChat {
+    // //   limit: { maxUsagePoints: -1, QPM: 100 },
+    // //   app: {
+    // //     appId: 'cli_a69533163e00100b',
+    // //     appSecret: '8EeLhaGgFm58Rql3k2PM',
+    // //     encryptKey: 'IcWGxG4RkuJ4D3gxNdNU',
+    // //     verificationToken: 'YnQv7wM5fOAkVdI0pY6k'
+    // //   },
+    // //   _id: new ObjectId("66222f37c570ab2dbc160fe0"),
+    // //   shareId: '4hj0lobqt5eg06o6aqm8qc9j',
+    // //   teamId: new ObjectId("65af8a83a233ad770dc8adda"),
+    // //   tmbId: new ObjectId("65af8a84a233ad770dc8ade4"),
+    // //   appId: new ObjectId("65b5f3f314a4373356f59767"),
+    // //   type: 'feishu',
+    // //   name: '测试',
+    // //   usagePoints: 0,
+    // //   responseDetail: false,
+    // //   immediateResponse: 'immediately',
+    // //   defaultResponse: 'default',
+    // //   __v: 0
+    // // }
+    // console.log('shareChat', shareChat);
+    // const encryptKey = shareChat.get('app.encryptKey');
+    // const { encrypt } = req.body as FeiShuProps;
+    // let body = req.body as FeiShuProps;
+    // if (!encryptKey) {
+    //   // no encrypt, thus the request should be a unencrypted json
+    //   if (encrypt) {
+    //     // it is impossible to decrypt the request
+    //     throw new Error('Invalid Encrypt Key config');
+    //   }
+    // } else {
+    //   body = decryptAES(encrypt!, encryptKey);
+    // }
+    // if (body?.type === 'url_verification' || body?.challenge) {
+    //   // verify the url with challenge param
+    //   res.send({
+    //     challenge: body.challenge
+    //   });
+    //   return;
+    // }
+    // console.log('body', body);
+    // const content = body.event.message.content;
+    // const message_id = body.event.message.message_id;
+    // // get the tenant access token
+    // // refer to: https://open.feishu.cn/document/server-docs/authentication-management/access-token/tenant_access_token_internal
+    // const { data } = await axios.post(
+    //   'https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal',
+    //   {
+    //     app_id: shareChat.get('app.appId'),
+    //     app_secret: shareChat.get('app.appSecret')
+    //   }
+    // );
+    // // console.log("appID", shareChat.get('app.appId'))
+    // // console.log("appSecret", shareChat.get('app.appSecret'))
+    // // console.log('data', data);
+    // const accessToken = data.tenant_access_token;
+    // if (!accessToken) {
+    //   throw new Error('Failed to get access token');
+    // }
+    // const replayContent = {
+    //   text: 'Hello, this is a test message from FastGPT.'
+    // };
+    // // reply the message
+    // // refer to: https://open.feishu.cn/document/server-docs/im-v1/message/reply
+    // const replyAddr = `https://open.feishu.cn/open-apis/im/v1/messages/${message_id}/reply`;
+    // const reply = await axios.request({
+    //   headers: {
+    //     Authorization: `Bearer ${accessToken}`,
+    //     'Content-Type': 'application/json; charset=utf-8'
+    //   },
+    //   url: replyAddr,
+    //   method: 'post',
+    //   data: {
+    //     msg_type: 'text',
+    //     content: JSON.stringify(replayContent) // ! important: the content should be stringified
+    //     // reply_in_thread: false // whether to reply in the thread
+    //     // uuid: // the uuid of the message, generated by the server, which is not implemented here yet. TODO: add uuid
+    //   }
+    // });
+    // if (reply.status !== 200) {
+    //   console.log('reply', reply);
+    //   throw new Error('Failed to reply the message');
+    // }
+    // res.send('ok');
     // TODO: unimplemented
-
     // if (event) {
     //   // 用户基本配置查询
     //   console.log('shareChat', shareChat);

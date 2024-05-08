@@ -7,16 +7,7 @@ const nextConfig = {
   output: 'standalone',
   reactStrictMode: process.env.NODE_ENV === 'development' ? false : true,
   compress: true,
-  webpack(config, { isServer }) {
-    if (!isServer) {
-      config.resolve = {
-        ...config.resolve,
-        fallback: {
-          ...config.resolve.fallback,
-          fs: false
-        }
-      };
-    }
+  webpack(config, { isServer, nextRuntime }) {
     Object.assign(config.resolve.alias, {
       '@mongodb-js/zstd': false,
       '@aws-sdk/credential-providers': false,
@@ -38,22 +29,63 @@ const nextConfig = {
         },
         {
           test: /\.node$/,
-          use: [
-            {
-              loader: "nextjs-node-loader",
-            },
-          ],
+          use: [{ loader: 'nextjs-node-loader' }]
         }
       ]),
       exprContextCritical: false,
       unknownContextCritical: false
     };
 
+    if (isServer) {
+      config.externals.push('worker_threads');
+
+      if (nextRuntime === 'nodejs') {
+        // config.output.globalObject = 'self';
+
+        const oldEntry = config.entry;
+        config = {
+          ...config,
+          async entry(...args) {
+            const entries = await oldEntry(...args);
+            return {
+              ...entries,
+              'worker/htmlStr2Md': path.resolve(
+                process.cwd(),
+                '../../FastGPT/packages/service/worker/htmlStr2Md/index.ts'
+              ),
+              'worker/countGptMessagesTokens': path.resolve(
+                process.cwd(),
+                '../../FastGPT/packages/service/worker/tiktoken/countGptMessagesTokens.ts'
+              ),
+              'worker/readFile': path.resolve(
+                process.cwd(),
+                '../../FastGPT/packages/service/worker/file/read.ts'
+              )
+            };
+          }
+        };
+      }
+    } else {
+      config.resolve = {
+        ...config.resolve,
+        fallback: {
+          ...config.resolve.fallback,
+          fs: false
+        }
+      };
+      if (!config.externals) {
+        config.externals = [];
+      }
+    }
+
     return config;
   },
-  transpilePackages: ['@fastgpt/*'],
+  transpilePackages: ['@fastgpt/*', 'ahooks'],
   experimental: {
+    // 外部包独立打包
     serverComponentsExternalPackages: ['mongoose', 'pg'],
+    // 指定导出包优化，按需引入包模块
+    optimizePackageImports: ['mongoose', 'pg'],
     outputFileTracingRoot: path.join(__dirname, '../../')
   }
 };

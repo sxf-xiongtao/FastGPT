@@ -1,4 +1,3 @@
-import { ReadFileByBufferParams } from '@fastgpt/service/common/file/read/type';
 import fs from 'fs';
 import { ReadFileParams } from './type';
 import { detectFileEncoding } from '@fastgpt/global/common/file/tools';
@@ -12,17 +11,13 @@ export const readFileContent = async (params: ReadFileParams) => {
   const buffer = fs.readFileSync(path);
   const encoding = detectFileEncoding(buffer);
 
-  const readParams: ReadFileByBufferParams = {
+  const { rawText } = await readFileRawContent({
+    extension,
+    csvFormat: true,
     teamId: params.teamId,
     encoding,
     buffer,
     metadata: params.metadata
-  };
-
-  const { rawText } = await readFileRawContent({
-    extension,
-    csvFormat: true,
-    params: readParams
   });
 
   return {

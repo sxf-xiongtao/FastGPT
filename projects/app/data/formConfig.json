@@ -181,10 +181,10 @@
               "type": "object",
               "title": "邮箱登录配置",
               "properties": {
-                "service": {
+                "smtp": {
                   "type": "string",
-                  "title": "邮箱服务",
-                  "description": "发送邮件相关参数\n发送邮箱验证码的 code (QQ邮箱最简单）\nhttps://wx.mail.qq.com/account/index?sid=zZ1Cd4yyR2sugk5jACBGMwAA#/?tab=safety\n在上面的链接中生成对应授权码，并提供邮箱地址"
+                  "title": "邮箱服务SMTP地址",
+                  "description": "不同厂商不一样\nQQ: smtp.qq.com\ngmail: smtp.gmail.com"
                 },
                 "user": {
                   "type": "string",

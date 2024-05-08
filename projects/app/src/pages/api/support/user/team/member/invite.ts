@@ -17,9 +17,9 @@ import { checkTeamMaxMembersPermission } from '@/service/support/permission/team
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { teamId, usernames, role } = req.body as InviteMemberProps;
+    const { usernames, role } = req.body as InviteMemberProps;
     await connectToDatabase();
-    const { tmbId } = await authCert({ req, authToken: true });
+    const { teamId, tmbId } = await authCert({ req, authToken: true });
     await authTeamRole({ teamId, tmbId, role: TeamMemberRoleEnum.owner });
 
     let userMap: InviteMemberResponse = {
@@ -56,6 +56,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // auth user leave
       const leaveTmb = await MongoTeamMember.findOne({
         userId: user._id,
+        teamId,
         status: TeamMemberStatusEnum.leave
       });
       if (leaveTmb) {

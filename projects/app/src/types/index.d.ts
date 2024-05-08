@@ -33,7 +33,7 @@ export type SystemConfigType = {
       secret: string;
     };
     email?: {
-      service: string;
+      smtp: string;
       user: string;
       pass: string;
     };

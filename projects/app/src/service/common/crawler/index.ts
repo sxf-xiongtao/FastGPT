@@ -1,6 +1,6 @@
 import { delay } from '@fastgpt/global/common/system/utils';
 import { CheerioCrawler, LogLevel, EnqueueStrategy, Configuration } from 'crawlee';
-import { htmlToMarkdown } from '@fastgpt/service/common/string/markdown';
+import { htmlToMarkdown } from '@fastgpt/service/common/file/read/utils';
 import { cheerioToHtml } from '@fastgpt/service/common/string/cheerio';
 
 const filterRegxs = [
