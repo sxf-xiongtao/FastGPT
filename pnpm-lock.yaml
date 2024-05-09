@@ -271,9 +271,6 @@ importers:
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
-      mammoth:
-        specifier: ^1.6.0
-        version: 1.6.0
       next-i18next:
         specifier: 15.2.0
         version: 15.2.0(i18next@23.10.0)(next@13.5.2)(react-i18next@13.5.0)(react@18.2.0)
@@ -422,9 +419,6 @@ importers:
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
-      mammoth:
-        specifier: ^1.6.0
-        version: 1.6.0
       multer:
         specifier: 1.4.5-lts.1
         version: 1.4.5-lts.1
@@ -443,9 +437,6 @@ importers:
       nprogress:
         specifier: ^0.2.0
         version: 0.2.0
-      pdfjs-dist:
-        specifier: 4.0.269
-        version: 4.0.269(encoding@0.1.13)
       pg:
         specifier: ^8.10.0
         version: 8.10.0

@@ -66,8 +66,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/projects/$name/.next/server/chunk
 COPY --from=builder --chown=nextjs:nodejs /app/projects/$name/.next/server/worker /app/projects/$name/.next/server/worker
 # copy package.json to version file
 COPY --from=builder /app/projects/$name/package.json ./package.json 
-# copy woker
-COPY --from=workerDeps /app/worker /app/worker
 # copy config
 COPY ./projects/$name/data/formConfig.json /app/data/formConfig.json
 COPY ./projects/$name/data/config.json /app/data/config.json
