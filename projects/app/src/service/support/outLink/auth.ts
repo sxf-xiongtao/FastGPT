@@ -1,5 +1,4 @@
 import { authIpLimit } from '@/service/common/ipLimit/tools';
-import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import type {
   AuthOutLinkInitProps,
   AuthOutLinkLimitProps,

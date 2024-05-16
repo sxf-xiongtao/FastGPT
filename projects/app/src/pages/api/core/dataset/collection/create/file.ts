@@ -1,3 +1,4 @@
+/* 弃用 */
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
@@ -11,7 +12,7 @@ import {
   DatasetCollectionTypeEnum,
   TrainingModeEnum
 } from '@fastgpt/global/core/dataset/constants';
-import { readFileContent } from '@/service/common/file/read/utils';
+import { readRawTextByLocalFile } from '@fastgpt/service/common/file/read/utils';
 import { getNanoid, hashStr } from '@fastgpt/global/common/string/tools';
 import { splitText2Chunks } from '@fastgpt/global/common/string/textSplitter';
 import { checkDatasetLimit } from '@fastgpt/service/support/permission/teamLimit';
@@ -66,7 +67,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const relatedImgId = getNanoid();
 
     // 1. read file
-    const { rawText } = await readFileContent({
+    const { rawText } = await readRawTextByLocalFile({
       teamId,
       path: file.path,
       metadata: {

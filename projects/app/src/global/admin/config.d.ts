@@ -39,6 +39,7 @@ export type ConfigFormType = {
       vectorMaxProcess: number;
       qaMaxProcess: number;
       pgHNSWEfSearch: number;
+      tokenWorkers: number;
     };
     subPlans: {
       standard: string;
