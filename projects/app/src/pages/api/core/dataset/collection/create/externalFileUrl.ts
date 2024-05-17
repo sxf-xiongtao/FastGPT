@@ -25,7 +25,10 @@ import { ApiRequestProps } from '@fastgpt/service/type/next';
 async function handler(
   req: ApiRequestProps<ExternalFileCreateDatasetCollectionParams>,
   res: NextApiResponse<any>
-) {
+): Promise<{
+  collectionId: string;
+  insertLen: number;
+}> {
   let {
     externalUrl,
     externalId,
@@ -70,7 +73,7 @@ async function handler(
     insertLen: predictDataLimitLength(trainingType, chunks)
   });
 
-  await mongoSessionRun(async (session) => {
+  const { collectionId, insertLen } = await mongoSessionRun(async (session) => {
     // 4. create collection
     const { _id: collectionId } = await createOneCollection({
       ...body,
@@ -105,7 +108,7 @@ async function handler(
     });
 
     // 6. insert to training queue
-    await pushDataListToTrainingQueue({
+    const { insertLen } = await pushDataListToTrainingQueue({
       teamId,
       tmbId,
       datasetId: dataset._id,
@@ -139,10 +142,13 @@ async function handler(
       }
     );
 
-    return collectionId;
+    return { collectionId, insertLen };
   });
 
-  jsonRes(res);
+  return {
+    collectionId,
+    insertLen
+  };
 }
 
 export default NextAPI(handler);
