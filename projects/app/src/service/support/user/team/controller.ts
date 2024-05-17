@@ -25,6 +25,21 @@ import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
 import { ClientSession } from '@fastgpt/service/common/mongo';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { initTeamStandardPlan2Free } from '@fastgpt/service/support/wallet/sub/utils';
+import { MongoResourcePermission } from '@fastgpt/service/support/permission/resourcePermission/schema';
+import { ResourceTypeEnum } from '@fastgpt/global/support/permission/constant';
+import {
+  constructPermission,
+  NullPermission,
+  PermissionList
+} from '@fastgpt/service/support/permission/resourcePermission/permisson';
+
+const ManagerPermission = constructPermission([
+  PermissionList['Read'],
+  PermissionList['Write'],
+  PermissionList['Manage']
+]).value; // 0b111, read, write, manage, 7
+
+const TeamDefaultPermission = constructPermission([PermissionList['Read']]).value; // 0b100, read only, 4
 
 /* -------- format --------- */
 export function teamMemberSchema2TeamItemType(data: TeamMemberWithTeamAndUserSchema): TeamItemType {
@@ -41,7 +56,8 @@ export function teamMemberSchema2TeamItemType(data: TeamMemberWithTeamAndUserSch
     status: data.status,
     defaultTeam: data.defaultTeam,
     canWrite: data.role !== TeamMemberRoleEnum.visitor,
-    lafAccount: data.teamId.lafAccount
+    lafAccount: data.teamId.lafAccount,
+    defaultPermission: data.teamId.defaultPermission
   };
 }
 
@@ -59,11 +75,13 @@ export async function createTeam({
         {
           ownerId,
           name,
-          avatar
+          avatar,
+          defaultPermission: TeamDefaultPermission
         }
       ],
       { session }
     );
+
     const [tmb] = await MongoTeamMember.create(
       [
         {
@@ -96,12 +114,14 @@ export async function createTeam({
       role: tmb.role,
       status: tmb.status,
       defaultTeam: tmb.defaultTeam,
-      canWrite: tmb.role !== TeamMemberRoleEnum.visitor
+      canWrite: tmb.role !== TeamMemberRoleEnum.visitor,
+      defaultPermission: team.defaultPermission
     };
   } catch (error) {
     return Promise.reject(error);
   }
 }
+
 export async function updateTeam({
   teamId,
   name,
@@ -129,7 +149,6 @@ export async function getUserTeams(data: {
   const members = (await MongoTeamMember.find(data)
     .sort({ defaultTeam: -1 })
     .populate('teamId userId')) as TeamMemberWithTeamAndUserSchema[];
-
   return members.map(teamMemberSchema2TeamItemType);
 }
 
@@ -146,6 +165,7 @@ export async function getTeamByTmbId(tmbId: string) {
 
   return teamMemberSchema2TeamItemType(tmb);
 }
+
 // get default team, if not exit, create one
 export async function getAndCreateUserDefaultTeam(
   userId: string,
@@ -180,21 +200,79 @@ export async function getUserTeamOrDefaultTeam(tmbId?: string, userId?: string) 
 }
 
 /* --------------- member -------------- */
+// get the members of a team
+// @param teamId: the objectId of team
+// @return a object whose type is [TeamMemberItemType]
 export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType[]> {
+  const team = await MongoTeam.findById(teamId); /*  as TeamItemType; */
+
+  const permissions = await MongoResourcePermission.find({
+    teamId: teamId,
+    resourceType: ResourceTypeEnum.team
+  });
   const members = (await MongoTeamMember.find({
     teamId,
     status: notLeaveStatus
   }).populate('userId')) as TeamMemberWithUserSchema[];
-  return members.map((item) => ({
-    userId: item.userId._id,
-    tmbId: item._id,
-    teamId: item.teamId,
-    memberName: item.name,
-    avatar: item.userId.avatar,
-    role: item.role,
-    status: item.status
-  }));
+
+  return members.map((member) => {
+    return {
+      userId: member.userId._id,
+      tmbId: member._id,
+      teamId: member.teamId,
+      memberName: member.name,
+      avatar: member.userId.avatar,
+      role: member.role,
+      status: member.status,
+      permission:
+        team?.ownerId.toString() === member.userId._id.toString()
+          ? ManagerPermission // owner get all permission
+          : permissions.find((p) => p.tmbId.toString() === member._id.toString())?.permission ||
+            team!.defaultPermission
+    };
+  });
 }
+
+// get the member of a team
+// @param tmbId: the objectId of team member
+// @return a object whose type is [TeamMemberItemType]
+export async function getTeamMember(tmbId: string): Promise<TeamMemberItemType> {
+  const member = (await MongoTeamMember.findById(tmbId).populate(
+    'userId'
+  )) as TeamMemberWithUserSchema;
+
+  let permission = NullPermission;
+  const team = await MongoTeam.findById(member.teamId);
+  if (team?.ownerId.toString() == member.userId._id.toString()) {
+    // check if the owner
+    permission = ManagerPermission; // owner get all permission
+  } else {
+    const resourcePermission = await MongoResourcePermission.findOne({
+      tmbId,
+      resourceType: ResourceTypeEnum.team
+    });
+
+    if (!resourcePermission || !resourcePermission.permission) {
+      // there is not resourcePermission
+      // use the defaultPermission
+      permission = team?.defaultPermission ?? TeamDefaultPermission;
+    } else {
+      permission = resourcePermission.permission;
+    }
+  }
+
+  return {
+    userId: member.userId._id,
+    tmbId: member._id,
+    teamId: member.teamId,
+    memberName: member.name,
+    avatar: member.userId.avatar,
+    role: member.role,
+    status: member.status,
+    permission: permission
+  };
+}
+
 export async function removeUser(memberId: string) {
   const tmb = await MongoTeamMember.findById(memberId);
   if (!tmb) {

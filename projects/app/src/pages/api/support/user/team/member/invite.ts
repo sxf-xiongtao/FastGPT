@@ -2,25 +2,26 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
-import { authUserExistTeam, authTeamRole } from '@/service/support/user/team/controller';
+import { authUserExistTeam } from '@/service/support/user/team/controller';
 import type {
   InviteMemberProps,
   InviteMemberResponse
 } from '@fastgpt/global/support/user/team/controller.d';
-import {
-  TeamMemberRoleEnum,
-  TeamMemberStatusEnum
-} from '@fastgpt/global/support/user/team/constant';
+import { TeamMemberStatusEnum } from '@fastgpt/global/support/user/team/constant';
 import { authUserExist } from '@fastgpt/service/support/user/controller';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { checkTeamMaxMembersPermission } from '@/service/support/permission/teamLimit';
+import { PermissionList } from '@fastgpt/service/support/permission/resourcePermission/permisson';
+import { authMemberPermission } from '@/service/support/user/team/auth';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { usernames, role } = req.body as InviteMemberProps;
     await connectToDatabase();
+    const { usernames, role } = req.body as InviteMemberProps;
     const { teamId, tmbId } = await authCert({ req, authToken: true });
-    await authTeamRole({ teamId, tmbId, role: TeamMemberRoleEnum.owner });
+
+    // is manager
+    await authMemberPermission({ tmbId, permission: PermissionList['Manage'] });
 
     let userMap: InviteMemberResponse = {
       invite: [],
