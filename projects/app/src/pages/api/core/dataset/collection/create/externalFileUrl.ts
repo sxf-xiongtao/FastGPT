@@ -1,7 +1,6 @@
 import type { NextApiResponse } from 'next';
-import { jsonRes } from '@fastgpt/service/common/response';
 import { authDataset } from '@fastgpt/service/support/permission/auth/dataset';
-import { ExternalFileCreateDatasetCollectionParams } from '@fastgpt/global/core/dataset/api';
+import type { ExternalFileCreateDatasetCollectionParams } from '@fastgpt/global/core/dataset/api';
 import { createOneCollection } from '@fastgpt/service/core/dataset/collection/controller';
 import {
   DatasetCollectionTypeEnum,
@@ -17,7 +16,6 @@ import { createTrainingUsage } from '@fastgpt/service/support/wallet/usage/contr
 import { UsageSourceEnum } from '@fastgpt/global/support/wallet/usage/constants';
 import { getLLMModel, getVectorModel } from '@fastgpt/service/core/ai/model';
 import { getNanoid, hashStr } from '@fastgpt/global/common/string/tools';
-import { MongoRawTextBuffer } from '@fastgpt/service/common/buffer/rawText/schema';
 import { rawText2Chunks, readDatasetSourceRawText } from '@fastgpt/service/core/dataset/read';
 import { NextAPI } from '@/service/middleware/entry';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
@@ -30,8 +28,8 @@ async function handler(
   insertLen: number;
 }> {
   let {
-    externalUrl,
-    externalId,
+    externalFileUrl,
+    externalFileId,
     filename,
     trainingType = TrainingModeEnum.chunk,
     chunkSize = 512,
@@ -48,14 +46,16 @@ async function handler(
     datasetId: body.datasetId
   });
 
-  filename = decodeURIComponent(filename || externalUrl.split('/').pop() || 'Unknow file');
+  const parseFilename = decodeURIComponent(
+    filename || externalFileUrl.split('/').pop() || 'Unknow file'
+  );
   const relatedId = getNanoid(24);
 
   // 1. read file
   const rawText = await readDatasetSourceRawText({
     teamId,
     type: DatasetSourceReadTypeEnum.externalFile,
-    sourceId: externalUrl,
+    sourceId: externalFileUrl,
     isQAImport: false,
     relatedId
   });
@@ -80,7 +80,7 @@ async function handler(
       teamId,
       tmbId,
       type: DatasetCollectionTypeEnum.file,
-      name: filename,
+      name: parseFilename,
       metadata: {
         relatedImgId: relatedId
       },
@@ -91,6 +91,9 @@ async function handler(
       chunkSplitter,
       qaPrompt,
 
+      externalFileUrl,
+      externalFileId,
+
       hashRawText: hashStr(rawText),
       rawTextLength: rawText.length,
       session
@@ -100,7 +103,7 @@ async function handler(
     const { billId } = await createTrainingUsage({
       teamId,
       tmbId,
-      appName: filename,
+      appName: parseFilename,
       billSource: UsageSourceEnum.training,
       vectorModel: getVectorModel(dataset.vectorModel)?.name,
       agentModel: getLLMModel(dataset.agentModel)?.name,

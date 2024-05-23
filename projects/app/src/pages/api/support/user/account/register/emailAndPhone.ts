@@ -9,6 +9,7 @@ import { authCode } from '@/service/support/user/auth/controller';
 import { authMaxUsers } from '@/service/support/user/auth';
 import { createUserByUsername } from '@/service/support/user/controller';
 import { createOnePromotion } from '@/service/support/activity/promotion/controller';
+import { Types } from '@fastgpt/service/common/mongo';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -49,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const token = createJWT(user);
     setCookie(res, token);
 
-    if (!username.includes('@')) {
+    if (!username.includes('@') && Types.ObjectId.isValid(inviterId)) {
       createOnePromotion({
         userId: inviterId,
         objUId: user._id,

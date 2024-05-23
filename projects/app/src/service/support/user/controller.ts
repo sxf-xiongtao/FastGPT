@@ -8,6 +8,7 @@ import { sendInform2OneUser } from './inform/controller';
 import { createJWT } from '@fastgpt/service/support/permission/controller';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { InformLevelEnum } from '@fastgpt/global/support/user/inform/constants';
+import { Types } from '@fastgpt/service/common/mongo';
 
 type UserProps = {
   username: string;
@@ -39,7 +40,7 @@ export async function createUserByUsername({
           username,
           avatar,
           password,
-          inviterId,
+          inviterId: inviterId && Types.ObjectId.isValid(inviterId) ? inviterId : undefined,
           email,
           phone,
           phonePrefix
@@ -107,7 +108,7 @@ export async function usernameLogin({
       phonePrefix,
       phone,
       avatar,
-      inviterId
+      inviterId: inviterId && Types.ObjectId.isValid(inviterId) ? inviterId : undefined
     });
     // send default password inform
     sendInform2OneUser({
