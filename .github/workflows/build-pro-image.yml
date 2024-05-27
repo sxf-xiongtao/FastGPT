@@ -52,6 +52,7 @@ jobs:
           DOCKER_REPO_TAGGED: ${{ env.DOCKER_REPO_TAGGED }}
         run: |
           docker buildx build \
+          -f projects/app/Dockerfile \
           --build-arg name=app \
           --platform linux/amd64,linux/arm64 \
           --label "org.opencontainers.image.source=https://github.com/${{ github.repository_owner }}/fastgpt-pro" \
@@ -60,7 +61,6 @@ jobs:
           --cache-from=type=local,src=/tmp/.buildx-cache \
           --cache-to=type=local,dest=/tmp/.buildx-cache \
           -t ${DOCKER_REPO_TAGGED} \
-          -f Dockerfile \
           .
   push-to-ali-hub:
     needs: build-fastgpt-pro-images
