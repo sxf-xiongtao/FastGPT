@@ -42,6 +42,7 @@ const BillSchema = new Schema({
     type: Number,
     required: true
   },
+  hasInvoice: Boolean,
   metadata: {
     type: Object,
     required: true
@@ -49,6 +50,7 @@ const BillSchema = new Schema({
 });
 
 try {
+  BillSchema.index({ orderId: 1 }, { background: true });
   BillSchema.index({ status: 1, createTime: 1 }, { background: true });
   BillSchema.index({ teamId: 1, status: 1, type: 1, createTime: 1 }, { background: true });
 } catch (error) {

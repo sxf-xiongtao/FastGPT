@@ -32,12 +32,7 @@ import {
   NullPermission,
   PermissionList
 } from '@fastgpt/service/support/permission/resourcePermission/permisson';
-
-const ManagerPermission = constructPermission([
-  PermissionList['Read'],
-  PermissionList['Write'],
-  PermissionList['Manage']
-]).value; // 0b111, read, write, manage, 7
+import { OwnerPermission } from '../../permission/constants';
 
 const TeamDefaultPermission = constructPermission([PermissionList['Read']]).value; // 0b100, read only, 4
 
@@ -120,21 +115,6 @@ export async function createTeam({
   } catch (error) {
     return Promise.reject(error);
   }
-}
-
-export async function updateTeam({
-  teamId,
-  name,
-  avatar,
-  teamDomain,
-  lafAccount
-}: UpdateTeamProps) {
-  await MongoTeam.findByIdAndUpdate(teamId, {
-    name,
-    avatar,
-    teamDomain,
-    lafAccount
-  });
 }
 
 export async function getUserTeams(data: {
@@ -226,7 +206,7 @@ export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType
       status: member.status,
       permission:
         team?.ownerId.toString() === member.userId._id.toString()
-          ? ManagerPermission // owner get all permission
+          ? OwnerPermission // owner get all permission
           : permissions.find((p) => p.tmbId.toString() === member._id.toString())?.permission ||
             team!.defaultPermission
     };
@@ -245,7 +225,7 @@ export async function getTeamMember(tmbId: string): Promise<TeamMemberItemType> 
   const team = await MongoTeam.findById(member.teamId);
   if (team?.ownerId.toString() == member.userId._id.toString()) {
     // check if the owner
-    permission = ManagerPermission; // owner get all permission
+    permission = OwnerPermission; // owner get all permission
   } else {
     const resourcePermission = await MongoResourcePermission.findOne({
       tmbId,
@@ -322,30 +302,6 @@ export async function removeUser(memberId: string) {
 }
 
 /* ----------------- auth ----------------- */
-/* auth teamMember in team role */
-export async function authTeamRole({
-  teamId,
-  tmbId,
-  role
-}: AuthTeamRoleProps): Promise<TeamItemType> {
-  try {
-    if (!teamId || !tmbId) {
-      return Promise.reject(TeamErrEnum.unAuthTeam);
-    }
-
-    const teamMember = (await MongoTeamMember.findOne({
-      _id: tmbId,
-      teamId,
-      ...(role && { role })
-    }).populate('teamId userId')) as TeamMemberWithTeamAndUserSchema;
-    if (!teamMember) {
-      return Promise.reject(TeamErrEnum.unAuthTeam);
-    }
-    return teamMemberSchema2TeamItemType(teamMember);
-  } catch (error) {
-    return Promise.reject(error);
-  }
-}
 
 // tmbId exist or userId and teamId has tmb data
 export async function authUserExistTeam({ userId, teamId }: { userId?: string; teamId?: string }) {

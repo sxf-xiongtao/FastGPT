@@ -5,6 +5,7 @@ import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { UpdateInviteProps } from '@fastgpt/global/support/user/team/controller';
 
+/* update invite status */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { tmbId, status } = req.body as UpdateInviteProps;

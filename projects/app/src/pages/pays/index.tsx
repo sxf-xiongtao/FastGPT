@@ -192,6 +192,7 @@ const BillTable = () => {
                 {bills.map((item, i) => (
                   <Tr key={i}>
                     <Td>{i + 1}</Td>
+                    {/* @ts-ignore */}
                     <Td>{item.username}</Td>
                     <Td>{billTypeMap[item.type]?.label}</Td>
                     <Td>

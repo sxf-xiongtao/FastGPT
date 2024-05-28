@@ -5,7 +5,8 @@ import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { UpdateTeamMemberPermissionProps } from '@fastgpt/global/support/user/team/controller';
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/resourcePermission/schema';
 import { ResourceTypeEnum } from '@fastgpt/global/support/permission/constant';
-import { authOwner } from '@/service/support/user/team/auth';
+import { authMemberPermission } from '@/service/support/user/team/auth';
+import { OwnerPermission } from '@/service/support/permission/constants';
 
 // update permission of team member
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -13,8 +14,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await connectToDatabase();
 
     const { teamId, memberIds, permission } = req.body as UpdateTeamMemberPermissionProps;
-    const { userId } = await authCert({ req, authToken: true });
-    await authOwner({ userId, teamId });
+    const { tmbId } = await authCert({ req, authToken: true });
+    await authMemberPermission({ tmbId, permission: OwnerPermission });
+
     for (let memberId of memberIds) {
       await MongoResourcePermission.findOneAndUpdate(
         {

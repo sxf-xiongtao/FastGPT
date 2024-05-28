@@ -43,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
 export async function authGithub(code: string) {
   const { data: gitAccessToken } = await axios.post<string>(
-    `https://github.com/login/oauth/access_token?client_id=${global.systemConfig.auth?.github?.clientId}&client_secret=${global.systemConfig.auth?.github?.secret}&code=${code}`
+    `https://github.com/login/oauth/access_token?client_id=${global.systemConfig.auth?.github?.clientId}&client_secret=${global.systemConfig.auth?.github?.secret}&code=${code}&scope=user:email`
   );
   const jsonGitAccessToken = parseQueryString(gitAccessToken) as {
     access_token: string;
@@ -78,10 +78,13 @@ export async function authGoogle(code: string, callbackUrl: string) {
     `https://oauth2.googleapis.com/token?client_id=${global.systemConfig?.auth?.google?.clientId}&client_secret=${global.systemConfig?.auth?.google?.secret}&code=${code}&redirect_uri=${callbackUrl}&grant_type=authorization_code`
   );
 
-  const { sub, picture } = jwt.decode(data.id_token) as {
+  const result = jwt.decode(data.id_token) as {
     sub: string;
     picture: string;
+    email: string;
   };
+
+  const { sub, picture, email } = result;
 
   if (!sub) throw new Error('fail to get google openid');
 
@@ -90,6 +93,6 @@ export async function authGoogle(code: string, callbackUrl: string) {
   return {
     avatarUrl: picture,
     username,
-    email: undefined
+    email
   };
 }
