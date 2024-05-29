@@ -63,6 +63,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (leaveTmb) {
         leaveTmb.status = TeamMemberStatusEnum.waiting;
         leaveTmb.role = role;
+
+        await checkTeamMaxMembersPermission(teamId, 1);
+
         await leaveTmb.save();
         leaveMembers.push({
           username,

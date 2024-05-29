@@ -1,6 +1,7 @@
 import { getTeamStandPlan } from '@fastgpt/service/support/wallet/sub/utils';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
+import { TeamMemberStatusEnum } from '@fastgpt/global/support/user/team/constant';
 
 export const checkTeamWebSyncPermission = async (teamId: string) => {
   const { standardConstants } = await getTeamStandPlan({
@@ -16,7 +17,10 @@ export const checkTeamMaxMembersPermission = async (teamId: string, newCount: nu
     getTeamStandPlan({
       teamId
     }),
-    MongoTeamMember.countDocuments({ teamId })
+    MongoTeamMember.countDocuments({
+      teamId,
+      status: { $ne: TeamMemberStatusEnum.leave }
+    })
   ]);
 
   if (standardConstants && newCount + memberCount > standardConstants?.maxTeamMember) {
