@@ -38,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       avatar: data.data.avatar
     });
 
-    setCookie(res, token);
+    setCookie(res, loginToken);
     jsonRes(res, {
       data: { user, token: loginToken }
     });
