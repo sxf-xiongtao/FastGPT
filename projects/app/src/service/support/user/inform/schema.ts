@@ -34,10 +34,12 @@ const InformSchema = new Schema({
 
 try {
   InformSchema.index({ userId: 1, time: -1 });
-  InformSchema.index({ time: 1 }, { expireAfterSeconds: 180 * 24 * 60 * 60 });
+  InformSchema.index({ time: 1 }, { expireAfterSeconds: 365 * 24 * 60 * 60 });
 } catch (error) {
   console.log(error);
 }
 
 export const MongoUserInform: Model<UserInformSchema> =
   models['inform'] || model('inform', InformSchema);
+
+MongoUserInform.syncIndexes();

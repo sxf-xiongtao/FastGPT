@@ -13,7 +13,10 @@
     "@types/node": "^20.12.12",
     "husky": "^8.0.3",
     "lint-staged": "^13.3.0",
-    "prettier": "3.2.4"
+    "prettier": "3.2.4",
+    "next-i18next": "15.2.0",
+    "i18next": "23.10.0",
+    "react-i18next": "13.5.0"
   },
   "resolutions": {
     "react": "18.3.1",
