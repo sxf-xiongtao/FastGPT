@@ -117,6 +117,21 @@ export async function createTeam({
   }
 }
 
+export async function updateTeam({
+  teamId,
+  name,
+  avatar,
+  teamDomain,
+  lafAccount
+}: UpdateTeamProps) {
+  await MongoTeam.findByIdAndUpdate(teamId, {
+    name,
+    avatar,
+    teamDomain,
+    lafAccount
+  });
+}
+
 export async function getUserTeams(data: {
   userId?: string;
   tmbId?: string;
@@ -223,6 +238,23 @@ export async function getTeamMember(tmbId: string): Promise<TeamMemberItemType> 
 
   let permission = NullPermission;
   const team = await MongoTeam.findById(member.teamId);
+  if (team?.ownerId.toString() == member.userId._id.toString()) {
+    // check if the owner
+    permission = OwnerPermission; // owner get all permission
+  } else {
+    const resourcePermission = await MongoResourcePermission.findOne({
+      tmbId,
+      resourceType: ResourceTypeEnum.team
+    });
+
+    if (!resourcePermission || !resourcePermission.permission) {
+      // there is not resourcePermission
+      // use the defaultPermission
+      permission = team?.defaultPermission ?? TeamDefaultPermission;
+    } else {
+      permission = resourcePermission.permission;
+    }
+  }
   if (team?.ownerId.toString() == member.userId._id.toString()) {
     // check if the owner
     permission = OwnerPermission; // owner get all permission

@@ -10,12 +10,12 @@
   },
   "devDependencies": {
     "@chakra-ui/cli": "^2.4.1",
-    "@types/node": "^20.12.12",
+    "@types/node": "^20.13.0",
     "husky": "^8.0.3",
-    "lint-staged": "^13.3.0",
-    "prettier": "3.2.4",
-    "next-i18next": "15.2.0",
     "i18next": "23.10.0",
+    "lint-staged": "^13.3.0",
+    "next-i18next": "15.2.0",
+    "prettier": "3.2.4",
     "react-i18next": "13.5.0"
   },
   "resolutions": {
