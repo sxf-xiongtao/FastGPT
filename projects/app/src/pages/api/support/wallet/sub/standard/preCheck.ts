@@ -18,10 +18,11 @@ import {
   subModeMap
 } from '@fastgpt/global/support/wallet/sub/constants';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
-import { authUserNotVisitor } from '@fastgpt/service/support/permission/auth/user';
+import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { addMonths } from 'date-fns';
 import { getStandardPlan } from '@fastgpt/service/support/wallet/sub/utils';
 import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
+import { WritePermissionVal } from '@fastgpt/global/support/permission/constant';
 
 /* Update dataset size sub. */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -29,14 +30,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     await connectToDatabase();
-    const { team } = await authUserNotVisitor({ req, authToken: true });
+    const { tmb } = await authUserPer({ req, authToken: true, per: WritePermissionVal });
 
     jsonRes(res, {
       data: await calcStandardSubUpdateData({
         level,
         mode,
-        teamId: team.teamId,
-        teamBalance: team.balance
+        teamId: tmb.teamId,
+        teamBalance: tmb.balance
       })
     });
   } catch (err) {

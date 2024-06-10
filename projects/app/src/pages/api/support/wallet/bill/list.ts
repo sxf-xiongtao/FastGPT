@@ -2,10 +2,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { MongoBill } from '@/service/support/wallet/bill/schema';
-import { authUserRole } from '@fastgpt/service/support/permission/auth/user';
+import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import type { PagingData } from '@/types';
 import { BillSchemaType } from '@fastgpt/global/support/wallet/bill/type';
+import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -19,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       type?: `${BillTypeEnum}`;
     };
     await connectToDatabase();
-    const { teamId } = await authUserRole({ req, authToken: true });
+    const { teamId } = await authUserPer({ req, authToken: true, per: ReadPermissionVal });
 
     const match = {
       teamId,

@@ -4,19 +4,14 @@ import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { getTeamMembers } from '@/service/support/user/team/controller';
 import type { TeamMemberItemType } from '@fastgpt/global/support/user/team/type.d';
+import { NextAPI } from '@/service/middleware/entry';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    await connectToDatabase();
-    const { teamId } = await authCert({ req, authToken: true });
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { teamId } = await authCert({ req, authToken: true });
 
-    jsonRes<TeamMemberItemType[]>(res, {
-      data: await getTeamMembers(teamId)
-    });
-  } catch (err) {
-    jsonRes(res, {
-      code: 500,
-      error: err
-    });
-  }
+  jsonRes<TeamMemberItemType[]>(res, {
+    data: await getTeamMembers(teamId)
+  });
 }
+
+export default NextAPI(handler);

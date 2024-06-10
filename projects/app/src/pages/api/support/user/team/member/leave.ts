@@ -7,30 +7,23 @@ import {
   TeamMemberRoleEnum,
   TeamMemberStatusEnum
 } from '@fastgpt/global/support/user/team/constant';
+import { NextAPI } from '@/service/middleware/entry';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    const { teamId } = req.query as { teamId: string };
-    await connectToDatabase();
-    const { userId } = await authCert({ req, authToken: true });
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { teamId } = req.query as { teamId: string };
+  const { userId } = await authCert({ req, authToken: true });
 
-    // Can not leave default team or owner team
-    await MongoTeamMember.findOneAndUpdate(
-      {
-        teamId,
-        userId,
-        role: { $ne: TeamMemberRoleEnum.owner }
-      },
-      {
-        status: TeamMemberStatusEnum.leave
-      }
-    );
-
-    jsonRes(res, {});
-  } catch (err) {
-    jsonRes(res, {
-      code: 500,
-      error: err
-    });
-  }
+  // Can not leave default team or owner team
+  await MongoTeamMember.findOneAndUpdate(
+    {
+      teamId,
+      userId,
+      role: { $ne: TeamMemberRoleEnum.owner }
+    },
+    {
+      status: TeamMemberStatusEnum.leave
+    }
+  );
 }
+
+export default NextAPI(handler);

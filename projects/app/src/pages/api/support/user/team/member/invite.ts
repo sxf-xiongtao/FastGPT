@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
-import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { authUserExistTeam } from '@/service/support/user/team/controller';
 import type {
   InviteMemberProps,
@@ -11,17 +10,16 @@ import { TeamMemberStatusEnum } from '@fastgpt/global/support/user/team/constant
 import { authUserExist } from '@fastgpt/service/support/user/controller';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { checkTeamMaxMembersPermission } from '@/service/support/permission/teamLimit';
-import { PermissionList } from '@fastgpt/service/support/permission/resourcePermission/permisson';
-import { authMemberPermission } from '@/service/support/user/team/auth';
+import { ManagePermissionVal } from '@fastgpt/global/support/permission/constant';
+import { authMember } from '@/service/support/permission/team/auth';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
     const { usernames, role } = req.body as InviteMemberProps;
-    const { teamId, tmbId } = await authCert({ req, authToken: true });
 
     // is manager
-    await authMemberPermission({ tmbId, permission: PermissionList['Manage'] });
+    const { teamId } = await authMember({ req, authToken: true, per: ManagePermissionVal });
 
     let userMap: InviteMemberResponse = {
       invite: [],

@@ -1,27 +1,37 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
-import { removeUser } from '@/service/support/user/team/controller';
+import { getTeamMember, removeUser } from '@/service/support/user/team/controller';
 import { DelMemberProps } from '@fastgpt/global/support/user/team/controller';
-import { authMemberPermission } from '@/service/support/user/team/auth';
-import { PermissionList } from '@fastgpt/service/support/permission/resourcePermission/permisson';
+import { authMemberPermission } from '@/service/support/permission/team/auth';
+import {
+  ManagePermissionVal,
+  OwnerPermissionVal
+} from '@fastgpt/global/support/permission/constant';
+import { NextAPI } from '@/service/middleware/entry';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    const { memberId } = req.query as DelMemberProps;
-    await connectToDatabase();
-    const { tmbId } = await authCert({ req, authToken: true });
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { memberId } = req.query as DelMemberProps;
+  const { teamId, tmbId } = await authCert({ req, authToken: true });
 
-    await authMemberPermission({ tmbId, permission: PermissionList['Manage'] });
+  // get member permission
+  const member = await getTeamMember({
+    teamId,
+    tmbId: memberId
+  });
 
-    await removeUser(memberId);
-
-    jsonRes(res, {});
-  } catch (err) {
-    jsonRes(res, {
-      code: 500,
-      error: err
-    });
+  if (member.permission.hasManagePer) {
+    await authMemberPermission({ teamId, tmbId, permission: OwnerPermissionVal });
+  } else {
+    await authMemberPermission({ teamId, tmbId, permission: ManagePermissionVal });
   }
+
+  await removeUser({
+    teamId,
+    memberId
+  });
+
+  jsonRes(res, {});
 }
+
+export default NextAPI(handler);

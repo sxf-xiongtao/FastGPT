@@ -11,7 +11,7 @@ import {
   notLeaveStatus
 } from '@fastgpt/global/support/user/team/constant';
 import {
-  TeamItemType,
+  TeamTmbItemType,
   TeamMemberItemType,
   TeamMemberSchema
 } from '@fastgpt/global/support/user/team/type';
@@ -25,19 +25,21 @@ import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
 import { ClientSession } from '@fastgpt/service/common/mongo';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { initTeamStandardPlan2Free } from '@fastgpt/service/support/wallet/sub/utils';
-import { MongoResourcePermission } from '@fastgpt/service/support/permission/resourcePermission/schema';
-import { ResourceTypeEnum } from '@fastgpt/global/support/permission/constant';
-import {
-  constructPermission,
-  NullPermission,
-  PermissionList
-} from '@fastgpt/service/support/permission/resourcePermission/permisson';
-import { OwnerPermission } from '../../permission/constants';
-
-const TeamDefaultPermission = constructPermission([PermissionList['Read']]).value; // 0b100, read only, 4
+import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
+import { PerResourceTypeEnum } from '@fastgpt/global/support/permission/constant';
+import { TeamPermission } from '@fastgpt/global/support/permission/user/controller';
+import { TeamDefaultPermissionVal } from '@fastgpt/global/support/permission/user/constant';
+import { getResourcePermission } from '@fastgpt/service/support/permission/controller';
 
 /* -------- format --------- */
-export function teamMemberSchema2TeamItemType(data: TeamMemberWithTeamAndUserSchema): TeamItemType {
+export async function teamMemberSchema2TeamItemType(
+  data: TeamMemberWithTeamAndUserSchema
+): Promise<TeamTmbItemType> {
+  const per = await getResourcePermission({
+    resourceType: PerResourceTypeEnum.team,
+    teamId: data.teamId._id,
+    tmbId: data._id
+  });
   return {
     userId: String(data.userId._id),
     teamId: String(data.teamId._id),
@@ -50,9 +52,11 @@ export function teamMemberSchema2TeamItemType(data: TeamMemberWithTeamAndUserSch
     role: data.role,
     status: data.status,
     defaultTeam: data.defaultTeam,
-    canWrite: data.role !== TeamMemberRoleEnum.visitor,
     lafAccount: data.teamId.lafAccount,
-    defaultPermission: data.teamId.defaultPermission
+    permission: new TeamPermission({
+      per: per?.permission ?? data.teamId.defaultPermission ?? TeamDefaultPermissionVal,
+      isOwner: data.role === TeamMemberRoleEnum.owner
+    })
   };
 }
 
@@ -63,7 +67,7 @@ export async function createTeam({
   avatar,
   defaultTeam = false,
   session
-}: CreateTeamProps & { ownerId: string; session?: ClientSession }) {
+}: CreateTeamProps & { ownerId: string; session?: ClientSession }): Promise<TeamTmbItemType> {
   try {
     const [team] = await MongoTeam.create(
       [
@@ -71,7 +75,7 @@ export async function createTeam({
           ownerId,
           name,
           avatar,
-          defaultPermission: TeamDefaultPermission
+          defaultPermission: TeamDefaultPermissionVal
         }
       ],
       { session }
@@ -109,8 +113,10 @@ export async function createTeam({
       role: tmb.role,
       status: tmb.status,
       defaultTeam: tmb.defaultTeam,
-      canWrite: tmb.role !== TeamMemberRoleEnum.visitor,
-      defaultPermission: team.defaultPermission
+      permission: new TeamPermission({
+        per: team.defaultPermission,
+        isOwner: true
+      })
     };
   } catch (error) {
     return Promise.reject(error);
@@ -123,7 +129,7 @@ export async function updateTeam({
   avatar,
   teamDomain,
   lafAccount
-}: UpdateTeamProps) {
+}: UpdateTeamProps & { teamId: string }) {
   await MongoTeam.findByIdAndUpdate(teamId, {
     name,
     avatar,
@@ -137,14 +143,14 @@ export async function getUserTeams(data: {
   tmbId?: string;
   status?: TeamMemberSchema['status'];
   role?: TeamMemberSchema['role'];
-}): Promise<TeamItemType[]> {
+}): Promise<TeamTmbItemType[]> {
   if (!data.userId && !data.tmbId) {
     return Promise.reject('userId or tmbId is required');
   }
   const members = (await MongoTeamMember.find(data)
     .sort({ defaultTeam: -1 })
     .populate('teamId userId')) as TeamMemberWithTeamAndUserSchema[];
-  return members.map(teamMemberSchema2TeamItemType);
+  return await Promise.all(members.map(teamMemberSchema2TeamItemType));
 }
 
 /* ----------- get team ---------- */
@@ -165,7 +171,7 @@ export async function getTeamByTmbId(tmbId: string) {
 export async function getAndCreateUserDefaultTeam(
   userId: string,
   session?: ClientSession
-): Promise<TeamItemType> {
+): Promise<TeamTmbItemType> {
   const tmb = (await MongoTeamMember.findOne({
     userId,
     defaultTeam: true
@@ -199,18 +205,25 @@ export async function getUserTeamOrDefaultTeam(tmbId?: string, userId?: string) 
 // @param teamId: the objectId of team
 // @return a object whose type is [TeamMemberItemType]
 export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType[]> {
-  const team = await MongoTeam.findById(teamId); /*  as TeamItemType; */
-
-  const permissions = await MongoResourcePermission.find({
-    teamId: teamId,
-    resourceType: ResourceTypeEnum.team
-  });
-  const members = (await MongoTeamMember.find({
-    teamId,
-    status: notLeaveStatus
-  }).populate('userId')) as TeamMemberWithUserSchema[];
+  const [team, permissions, members] = await Promise.all([
+    MongoTeam.findById(teamId),
+    MongoResourcePermission.find({
+      teamId: teamId,
+      resourceType: PerResourceTypeEnum.team
+    }),
+    (await MongoTeamMember.find({
+      teamId,
+      status: notLeaveStatus
+    }).populate('userId')) as TeamMemberWithUserSchema[]
+  ]);
 
   return members.map((member) => {
+    const isOwner = member.role === TeamMemberRoleEnum.owner;
+    const per =
+      permissions.find((p) => String(p.tmbId) === String(member._id))?.permission ??
+      team?.defaultPermission ??
+      TeamDefaultPermissionVal;
+
     return {
       userId: member.userId._id,
       tmbId: member._id,
@@ -219,11 +232,10 @@ export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType
       avatar: member.userId.avatar,
       role: member.role,
       status: member.status,
-      permission:
-        team?.ownerId.toString() === member.userId._id.toString()
-          ? OwnerPermission // owner get all permission
-          : permissions.find((p) => p.tmbId.toString() === member._id.toString())?.permission ||
-            team!.defaultPermission
+      permission: new TeamPermission({
+        per,
+        isOwner
+      })
     };
   });
 }
@@ -231,47 +243,33 @@ export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType
 // get the member of a team
 // @param tmbId: the objectId of team member
 // @return a object whose type is [TeamMemberItemType]
-export async function getTeamMember(tmbId: string): Promise<TeamMemberItemType> {
-  const member = (await MongoTeamMember.findById(tmbId).populate(
-    'userId'
-  )) as TeamMemberWithUserSchema;
+export async function getTeamMember({
+  teamId,
+  tmbId
+}: {
+  teamId: string;
+  tmbId: string;
+}): Promise<TeamMemberItemType> {
+  const member = (await MongoTeamMember.findOne({
+    teamId,
+    _id: tmbId
+  }).populate('userId')) as TeamMemberWithUserSchema;
 
-  let permission = NullPermission;
+  if (!member) {
+    return Promise.reject('member not exist');
+  }
+
   const team = await MongoTeam.findById(member.teamId);
-  if (team?.ownerId.toString() == member.userId._id.toString()) {
-    // check if the owner
-    permission = OwnerPermission; // owner get all permission
-  } else {
-    const resourcePermission = await MongoResourcePermission.findOne({
-      tmbId,
-      resourceType: ResourceTypeEnum.team
-    });
 
-    if (!resourcePermission || !resourcePermission.permission) {
-      // there is not resourcePermission
-      // use the defaultPermission
-      permission = team?.defaultPermission ?? TeamDefaultPermission;
-    } else {
-      permission = resourcePermission.permission;
-    }
+  if (!team) {
+    return Promise.reject('team not exist');
   }
-  if (team?.ownerId.toString() == member.userId._id.toString()) {
-    // check if the owner
-    permission = OwnerPermission; // owner get all permission
-  } else {
-    const resourcePermission = await MongoResourcePermission.findOne({
-      tmbId,
-      resourceType: ResourceTypeEnum.team
-    });
 
-    if (!resourcePermission || !resourcePermission.permission) {
-      // there is not resourcePermission
-      // use the defaultPermission
-      permission = team?.defaultPermission ?? TeamDefaultPermission;
-    } else {
-      permission = resourcePermission.permission;
-    }
-  }
+  const per = await getResourcePermission({
+    resourceType: PerResourceTypeEnum.team,
+    teamId: member.teamId,
+    tmbId: member._id
+  });
 
   return {
     userId: member.userId._id,
@@ -281,15 +279,22 @@ export async function getTeamMember(tmbId: string): Promise<TeamMemberItemType> 
     avatar: member.userId.avatar,
     role: member.role,
     status: member.status,
-    permission: permission
+    permission: new TeamPermission({
+      per: per?.permission ?? team.defaultPermission ?? TeamDefaultPermissionVal,
+      isOwner: member.role === TeamMemberRoleEnum.owner
+    })
   };
 }
 
-export async function removeUser(memberId: string) {
-  const tmb = await MongoTeamMember.findById(memberId);
+export async function removeUser({ teamId, memberId }: { teamId: string; memberId: string }) {
+  const tmb = await MongoTeamMember.findOne({
+    teamId,
+    _id: memberId
+  });
   if (!tmb) {
     return Promise.reject('member not exist');
   }
+
   const ownerTmb = await MongoTeamMember.findOne({
     teamId: tmb.teamId,
     role: TeamMemberRoleEnum.owner

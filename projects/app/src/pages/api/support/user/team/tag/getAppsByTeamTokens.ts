@@ -7,6 +7,7 @@ import { authTokenFromTeamDomain } from '@/service/support/user/team/tagControll
 import { AuthTeamTagTokenProps } from '@fastgpt/global/support/user/team/tag';
 import { AppListItemType } from '@fastgpt/global/core/app/type';
 import { PermissionTypeEnum } from '@fastgpt/global/support/permission/constant';
+import { AppDefaultPermission } from '@fastgpt/global/support/permission/app/constant';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -36,6 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         avatar: app.avatar,
         intro: app.intro,
         isOwner: false,
+        defaultPermission: AppDefaultPermission,
         permission: PermissionTypeEnum.public
       }))
     });
