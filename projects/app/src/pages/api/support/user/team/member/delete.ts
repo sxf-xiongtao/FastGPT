@@ -11,7 +11,7 @@ import {
 import { NextAPI } from '@/service/middleware/entry';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { memberId } = req.query as DelMemberProps;
+  const { tmbId: memberId } = req.query as DelMemberProps;
   const { teamId, tmbId } = await authCert({ req, authToken: true });
 
   // get member permission

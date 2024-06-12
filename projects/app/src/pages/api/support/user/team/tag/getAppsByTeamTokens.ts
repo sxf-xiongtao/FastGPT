@@ -6,8 +6,9 @@ import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { authTokenFromTeamDomain } from '@/service/support/user/team/tagController';
 import { AuthTeamTagTokenProps } from '@fastgpt/global/support/user/team/tag';
 import { AppListItemType } from '@fastgpt/global/core/app/type';
-import { PermissionTypeEnum } from '@fastgpt/global/support/permission/constant';
-import { AppDefaultPermission } from '@fastgpt/global/support/permission/app/constant';
+import { AppDefaultPermissionVal } from '@fastgpt/global/support/permission/app/constant';
+import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
+import { AppPermission } from '@fastgpt/global/support/permission/app/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -37,8 +38,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         avatar: app.avatar,
         intro: app.intro,
         isOwner: false,
-        defaultPermission: AppDefaultPermission,
-        permission: PermissionTypeEnum.public
+        defaultPermission: AppDefaultPermissionVal,
+        type: app.type,
+        permission: new AppPermission({ per: ReadPermissionVal })
       }))
     });
   } catch (err) {

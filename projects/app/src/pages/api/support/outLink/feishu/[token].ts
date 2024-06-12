@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { connectToDatabase } from '@/service/mongo';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { authOutLinkValid } from '@fastgpt/service/support/permission/auth/outLink';
 // import {
 //   setMsg,
 //   decryptAES,

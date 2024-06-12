@@ -8,7 +8,7 @@ import {
 } from '@fastgpt/global/support/permission/constant';
 import { UpdateAppCollaboratorBody } from '@fastgpt/global/core/app/collaborator';
 import { AppPermission } from '@fastgpt/global/support/permission/app/controller';
-import { updateResourcePermission } from '@fastgpt/service/support/permission/controller';
+import { updateResourcePermission } from '@/service/support/permission/controller';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   // Authorization

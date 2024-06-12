@@ -1,6 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { jsonRes } from '@fastgpt/service/common/response';
-import { connectToDatabase } from '@/service/mongo';
 import { authUserExistTeam } from '@/service/support/user/team/controller';
 import type {
   InviteMemberProps,
@@ -10,100 +8,102 @@ import { TeamMemberStatusEnum } from '@fastgpt/global/support/user/team/constant
 import { authUserExist } from '@fastgpt/service/support/user/controller';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { checkTeamMaxMembersPermission } from '@/service/support/permission/teamLimit';
-import { ManagePermissionVal } from '@fastgpt/global/support/permission/constant';
+import {
+  ManagePermissionVal,
+  OwnerPermissionVal,
+  PerResourceTypeEnum
+} from '@fastgpt/global/support/permission/constant';
 import { authMember } from '@/service/support/permission/team/auth';
+import { NextAPI } from '@/service/middleware/entry';
+import { ApiRequestProps } from '@fastgpt/service/type/next';
+import { TeamPermission } from '@fastgpt/global/support/permission/user/controller';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { updateResourcePermission } from '@/service/support/permission/controller';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    await connectToDatabase();
-    const { usernames, role } = req.body as InviteMemberProps;
+async function handler(
+  req: ApiRequestProps<InviteMemberProps>,
+  res: NextApiResponse
+): Promise<InviteMemberResponse> {
+  const { usernames, permission } = req.body as InviteMemberProps;
 
-    // is manager
-    const { teamId } = await authMember({ req, authToken: true, per: ManagePermissionVal });
+  // is manager
+  const Per = new TeamPermission({ per: permission });
 
-    let userMap: InviteMemberResponse = {
-      invite: [],
-      inValid: [],
-      inTeam: []
-    };
+  const { teamId } = await (() => {
+    if (Per.hasManagePer) return authMember({ req, authToken: true, per: OwnerPermissionVal });
+    return authMember({ req, authToken: true, per: ManagePermissionVal });
+  })();
 
-    const leaveMembers: {
-      username: string;
-      userId: string;
-    }[] = [];
+  let userMap: InviteMemberResponse = {
+    invite: [],
+    inValid: [],
+    inTeam: []
+  };
 
-    // auth username valid
-    for await (const username of usernames) {
-      const user = await authUserExist({ username });
-      if (!user || username === 'root') {
-        userMap.inValid.push({
-          username,
-          userId: ''
-        });
-        continue;
-      }
-
-      const tmb = await authUserExistTeam({ userId: user._id, teamId });
-      if (tmb) {
-        userMap.inTeam.push({
-          username,
-          userId: user._id
-        });
-        continue;
-      }
-
-      // auth user leave
-      const leaveTmb = await MongoTeamMember.findOne({
-        userId: user._id,
-        teamId,
-        status: TeamMemberStatusEnum.leave
+  // auth username valid
+  for await (const username of usernames) {
+    const user = await authUserExist({ username });
+    if (!user || username === 'root') {
+      userMap.inValid.push({
+        username,
+        userId: ''
       });
-      if (leaveTmb) {
-        leaveTmb.status = TeamMemberStatusEnum.waiting;
-        leaveTmb.role = role;
+      continue;
+    }
 
-        await checkTeamMaxMembersPermission(teamId, 1);
-
-        await leaveTmb.save();
-        leaveMembers.push({
-          username,
-          userId: user._id
-        });
-        continue;
-      }
-
-      userMap.invite.push({
+    const tmb = await authUserExistTeam({ userId: user._id, teamId });
+    if (tmb) {
+      userMap.inTeam.push({
         username,
         userId: user._id
       });
+      continue;
     }
 
-    // insert teamMember and send inform
-    if (userMap.invite.length > 0) {
-      await checkTeamMaxMembersPermission(teamId, userMap.invite.length);
-
-      await MongoTeamMember.insertMany(
-        userMap.invite.map((user) => {
-          return {
-            userId: user.userId,
-            teamId,
-            name: user.username.slice(0, 5),
-            role: role,
-            status: TeamMemberStatusEnum.waiting
-          };
-        })
-      );
-    }
-
-    userMap.invite = userMap.invite.concat(leaveMembers);
-
-    jsonRes(res, {
-      data: userMap
-    });
-  } catch (err) {
-    jsonRes(res, {
-      code: 500,
-      error: err
+    // invite
+    userMap.invite.push({
+      username,
+      userId: user._id
     });
   }
+
+  await checkTeamMaxMembersPermission(teamId, userMap.invite.length);
+
+  if (userMap.invite.length > 0) {
+    await mongoSessionRun(async (session) => {
+      // insert teamMember and send inform
+      const result = await Promise.all(
+        userMap.invite.map((user) =>
+          MongoTeamMember.findOneAndUpdate(
+            {
+              userId: user.userId,
+              teamId
+            },
+            {
+              name: user.username.slice(0, 10),
+              role: 'visitor',
+              status: TeamMemberStatusEnum.waiting
+            },
+            {
+              session,
+              upsert: true
+            }
+          )
+        )
+      );
+
+      // update permission
+      await updateResourcePermission({
+        resourceType: PerResourceTypeEnum.team,
+        teamId,
+        tmbIdList: result.map((r) => r?._id).filter(Boolean) as string[],
+        permission,
+        session
+      });
+    });
+  }
+
+  return userMap;
 }
+
+export default NextAPI(handler);

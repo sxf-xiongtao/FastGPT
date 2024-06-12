@@ -32,14 +32,7 @@ async function handler(
     tmbId,
     resourceType: PerResourceTypeEnum.team
   });
-  console.log(
-    {
-      teamId,
-      tmbId,
-      resourceType: PerResourceTypeEnum.team
-    },
-    delRes
-  );
+
   return {};
 }
 

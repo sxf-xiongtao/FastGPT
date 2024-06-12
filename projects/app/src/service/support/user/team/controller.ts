@@ -302,40 +302,51 @@ export async function removeUser({ teamId, memberId }: { teamId: string; memberI
   if (!ownerTmb) {
     return Promise.reject('owner not exist');
   }
+
   const memberTmbId = String(memberId);
   const teamOwnerTmbId = String(ownerTmb._id);
 
   // update shareLink and openapi tmbId
-  await Promise.all([
-    MongoOpenApi.updateMany(
+  await mongoSessionRun(async (session) => {
+    await MongoOpenApi.updateMany(
       {
         tmbId: memberTmbId
       },
       {
         tmbId: teamOwnerTmbId
-      }
-    ),
-    MongoOutLink.updateMany(
+      },
+      { session }
+    );
+    await MongoOutLink.updateMany(
       {
         tmbId: memberTmbId
       },
       {
         tmbId: teamOwnerTmbId
-      }
-    )
-  ]);
+      },
+      { session }
+    );
 
-  // update status is leave
-  await MongoTeamMember.findOneAndUpdate(
-    {
-      _id: memberTmbId,
-      teamId: tmb.teamId,
-      role: { $ne: TeamMemberRoleEnum.owner }
-    },
-    {
-      status: TeamMemberStatusEnum.leave
-    }
-  );
+    // delete permission
+    await MongoResourcePermission.deleteMany({
+      resourceType: { $exists: true },
+      teamId,
+      tmbId: memberTmbId
+    });
+
+    // update status is leave
+    await MongoTeamMember.findOneAndUpdate(
+      {
+        _id: memberTmbId,
+        teamId: tmb.teamId,
+        role: { $ne: TeamMemberRoleEnum.owner }
+      },
+      {
+        status: TeamMemberStatusEnum.leave
+      },
+      { session }
+    );
+  });
 }
 
 /* ----------------- auth ----------------- */

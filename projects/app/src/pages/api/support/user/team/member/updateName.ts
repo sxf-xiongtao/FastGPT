@@ -1,6 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { jsonRes } from '@fastgpt/service/common/response';
-import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { NextAPI } from '@/service/middleware/entry';

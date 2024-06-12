@@ -1,23 +1,50 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { UpdateTeamMemberPermissionProps } from '@fastgpt/global/support/user/team/controller';
 import {
+  ManagePermissionVal,
   OwnerPermissionVal,
   PerResourceTypeEnum
 } from '@fastgpt/global/support/permission/constant';
 import { NextAPI } from '@/service/middleware/entry';
-import { authMember } from '@/service/support/permission/team/auth';
-import { updateResourcePermission } from '@fastgpt/service/support/permission/controller';
+import { authMemberPermission } from '@/service/support/permission/team/auth';
+import { updateResourcePermission } from '@/service/support/permission/controller';
+import { authCert } from '@fastgpt/service/support/permission/auth/common';
+import { TeamPermission } from '@fastgpt/global/support/permission/user/controller';
+import { UpdateClbPermissionProps } from '@fastgpt/global/support/permission/collaborator';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
+import { TeamMemberRoleEnum } from '@fastgpt/global/support/user/team/constant';
 
 // update permission of team member
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { memberIds, permission } = req.body as UpdateTeamMemberPermissionProps;
+  const { tmbIds, permission } = req.body as UpdateClbPermissionProps;
 
-  const { teamId } = await authMember({ req, authToken: true, per: OwnerPermissionVal });
+  const { teamId, tmbId } = await authCert({ req, authToken: true });
+
+  const Per = new TeamPermission({ per: permission });
+
+  await authMemberPermission({
+    teamId,
+    tmbId,
+    permission: Per.hasManagePer ? OwnerPermissionVal : ManagePermissionVal
+  });
+
+  // 临时代码，对齐 role 权限
+  for await (const memberId of tmbIds) {
+    await MongoTeamMember.findOneAndUpdate(
+      {
+        _id: memberId,
+        teamId,
+        role: { $ne: TeamMemberRoleEnum.owner }
+      },
+      {
+        role: Per.hasManagePer ? TeamMemberRoleEnum.admin : TeamMemberRoleEnum.visitor
+      }
+    );
+  }
 
   return updateResourcePermission({
     resourceType: PerResourceTypeEnum.team,
     teamId,
-    tmbIdList: memberIds,
+    tmbIdList: tmbIds,
     permission
   });
 }
