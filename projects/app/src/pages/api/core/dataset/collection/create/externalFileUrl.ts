@@ -1,5 +1,4 @@
-import type { NextApiResponse } from 'next';
-import { authDataset } from '@fastgpt/service/support/permission/auth/dataset';
+import { authDataset } from '@fastgpt/service/support/permission/dataset/auth';
 import type { ExternalFileCreateDatasetCollectionParams } from '@fastgpt/global/core/dataset/api';
 import { createOneCollection } from '@fastgpt/service/core/dataset/collection/controller';
 import {
@@ -19,11 +18,9 @@ import { getNanoid, hashStr } from '@fastgpt/global/common/string/tools';
 import { rawText2Chunks, readDatasetSourceRawText } from '@fastgpt/service/core/dataset/read';
 import { NextAPI } from '@/service/middleware/entry';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
+import { WritePermissionVal } from '@fastgpt/global/support/permission/constant';
 
-async function handler(
-  req: ApiRequestProps<ExternalFileCreateDatasetCollectionParams>,
-  res: NextApiResponse<any>
-): Promise<{
+async function handler(req: ApiRequestProps<ExternalFileCreateDatasetCollectionParams>): Promise<{
   collectionId: string;
   insertLen: number;
 }> {
@@ -42,7 +39,7 @@ async function handler(
     req,
     authToken: true,
     authApiKey: true,
-    per: 'w',
+    per: WritePermissionVal,
     datasetId: body.datasetId
   });
 

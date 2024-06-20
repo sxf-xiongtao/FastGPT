@@ -4,7 +4,7 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { uploadFile } from '@fastgpt/service/common/file/gridfs/controller';
 import { getUploadModel } from '@fastgpt/service/common/file/multer';
-import { authDataset } from '@fastgpt/service/support/permission/auth/dataset';
+import { authDataset } from '@fastgpt/service/support/permission/dataset/auth';
 import { FileCreateDatasetCollectionParams } from '@fastgpt/global/core/dataset/api';
 import { removeFilesByPaths } from '@fastgpt/service/common/file/utils';
 import { createOneCollection } from '@fastgpt/service/core/dataset/collection/controller';
@@ -24,6 +24,7 @@ import { getDatasetModel, getVectorModel } from '@fastgpt/service/core/ai/model'
 import { BucketNameEnum } from '@fastgpt/global/common/file/constants';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { MongoImage } from '@fastgpt/service/common/file/image/schema';
+import { WritePermissionVal } from '@fastgpt/global/support/permission/constant';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   /**
@@ -51,7 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const { teamId, tmbId, dataset } = await authDataset({
       req,
       authApiKey: true,
-      per: 'w',
+      per: WritePermissionVal,
       datasetId: data.datasetId
     });
 

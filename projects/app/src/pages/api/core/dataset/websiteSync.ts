@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
-import { authDataset } from '@fastgpt/service/support/permission/auth/dataset';
+import { authDataset } from '@fastgpt/service/support/permission/dataset/auth';
 import { crawlWebsite, type CrawlDataItemType } from '@/service/common/crawler';
 import { MongoDatasetCollection } from '@fastgpt/service/core/dataset/collection/schema';
 import {
@@ -20,6 +20,7 @@ import { splitText2Chunks } from '@fastgpt/global/common/string/textSplitter';
 import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
 import { checkTeamWebSyncPermission } from '@/service/support/permission/teamLimit';
 import { MongoBill } from '@/service/support/wallet/bill/schema';
+import { WritePermissionVal } from '@fastgpt/global/support/permission/constant';
 
 // config
 const maxCrawlPage = 200;
@@ -34,7 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       datasetId,
       req,
       authToken: true,
-      per: 'w'
+      per: WritePermissionVal
     });
 
     if (!dataset?.websiteConfig?.url) {
