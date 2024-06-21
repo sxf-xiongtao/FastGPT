@@ -72,31 +72,33 @@ async function handler(
   if (userMap.invite.length > 0) {
     await mongoSessionRun(async (session) => {
       // insert teamMember and send inform
-      const result = await Promise.all(
-        userMap.invite.map((user) =>
-          MongoTeamMember.findOneAndUpdate(
-            {
-              userId: user.userId,
-              teamId
-            },
-            {
-              name: user.username.slice(0, 10),
-              role: 'visitor',
-              status: TeamMemberStatusEnum.waiting
-            },
-            {
-              session,
-              upsert: true
-            }
-          )
-        )
-      );
+      const tmbIdList: string[] = [];
+      for await (const user of userMap.invite) {
+        const tmb = await MongoTeamMember.findOneAndUpdate(
+          {
+            userId: user.userId,
+            teamId
+          },
+          {
+            name: user.username.slice(0, 10),
+            role: 'visitor',
+            status: TeamMemberStatusEnum.waiting
+          },
+          {
+            session,
+            upsert: true
+          }
+        );
+        if (tmb) {
+          tmbIdList.push(tmb._id);
+        }
+      }
 
       // update permission
       await updateResourcePermission({
         resourceType: PerResourceTypeEnum.team,
         teamId,
-        tmbIdList: result.map((r) => r?._id).filter(Boolean) as string[],
+        tmbIdList,
         permission,
         session
       });

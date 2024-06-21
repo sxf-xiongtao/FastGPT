@@ -9,6 +9,7 @@ import { AppListItemType } from '@fastgpt/global/core/app/type';
 import { AppDefaultPermissionVal } from '@fastgpt/global/support/permission/app/constant';
 import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
 import { AppPermission } from '@fastgpt/global/support/permission/app/controller';
+import { AppTypeEnum } from '@fastgpt/global/core/app/constants';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -25,12 +26,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { tags } = userInfo;
 
-    const query = {
-      teamId: teamId,
+    const apps = await MongoApp.find({
+      teamId,
+      type: { $in: [AppTypeEnum.simple, AppTypeEnum.workflow] },
       teamTags: { $in: tags }
-    };
+    })
+      .sort({
+        updateTime: -1
+      })
+      .lean();
 
-    const apps = await MongoApp.find(query);
     jsonRes<AppListItemType[]>(res, {
       data: apps.map((app) => ({
         _id: app._id,

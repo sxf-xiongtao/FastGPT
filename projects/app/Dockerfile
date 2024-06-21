@@ -25,7 +25,8 @@ WORKDIR /app
 ARG proxy
 
 # copy common node_modules and one project node_modules
-COPY package.json pnpm-workspace.yaml .npmrc ./
+COPY package.json pnpm-workspace.yaml .npmrc./
+COPY ./FastGPT/tsconfig.json ./FastGPT/tsconfig.json
 COPY --from=mainDeps /app/FastGPT/packages ./FastGPT/packages
 COPY --from=mainDeps /app/node_modules ./node_modules
 COPY ./projects/app ./projects/app
