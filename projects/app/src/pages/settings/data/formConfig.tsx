@@ -446,3 +446,7 @@ export const formConfig: FormConfig = {
     }
   }
 };
+
+export default function Dom() {
+  return <></>;
+}

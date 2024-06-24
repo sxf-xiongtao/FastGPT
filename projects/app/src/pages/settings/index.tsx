@@ -130,14 +130,14 @@ export const Settings = () => {
 
   return (
     <Flex h={'100%'} gap={4}>
-      <Box overflowY={'auto'} flex={3} onScroll={handleScroll}>
+      <Box overflowY={'auto'} flex={'1 0 0'} onScroll={handleScroll}>
         {firstLevels.map((firstLevel) => {
           const secondLevels: formLevel[] = Object.values(firstLevel.properties);
           return (
             <Box
               key={firstLevel.title}
               id={firstLevel.title}
-              border={'1px solid #E2E8F0'}
+              border={'base'}
               boxShadow="md"
               mb={10}
               mr={4}
@@ -145,7 +145,9 @@ export const Settings = () => {
               rounded="md"
               bg="white"
             >
-              <Box className="text-2xl text-[#5283ff] font-semibold pb-2">{firstLevel.title}</Box>
+              <Box fontSize={'xl'} color={'primary.700'} fontWeight={'bold'}>
+                {firstLevel.title}
+              </Box>
               {secondLevels.map((secondLevel) => {
                 return (
                   <Box key={secondLevel.title} className="mt-4">
@@ -213,13 +215,19 @@ export const Settings = () => {
         })}
       </Box>
       <Flex
+        maxW={'200px'}
         flexDirection={'column'}
-        flex={1}
         position={isMobile ? 'absolute' : 'relative'}
         bottom={0}
         right={0}
+        gap={4}
       >
-        <Box flex={'1 0 0'} className="bg-white w-full pr-6 pt-8 pb-12" hidden={isMobile}>
+        <Box
+          flex={'1 0 0'}
+          overflowY={'auto'}
+          className="bg-white w-full pr-6 pt-8 pb-12"
+          hidden={isMobile}
+        >
           <ul className="flex flex-col space-y-4 text-lg">
             {titles.map((title: titleType) => (
               <Box key={title.mainTitle}>
@@ -232,7 +240,7 @@ export const Settings = () => {
                   onClick={() => {
                     const anchor = document.getElementById(title.mainTitle);
                     if (anchor) {
-                      anchor.scrollIntoView({ behavior: 'instant', block: 'start' });
+                      anchor.scrollIntoView({ behavior: 'auto', block: 'start' });
                     }
                   }}
                 >
@@ -249,7 +257,7 @@ export const Settings = () => {
                     onClick={() => {
                       const anchor = document.getElementById(subTitle);
                       if (anchor) {
-                        anchor.scrollIntoView({ behavior: 'instant', block: 'start' });
+                        anchor.scrollIntoView({ behavior: 'auto', block: 'start' });
                       }
                     }}
                   >
@@ -260,7 +268,7 @@ export const Settings = () => {
             ))}
           </ul>
         </Box>
-        <Box className="w-full px-6 py-4 flex-col flex">
+        <Box className="w-full px-6 flex-col flex">
           <ImportModal value={rawData} setFormData={reset} setRawData={setRawData}>
             <Button variant={'whiteBase'} mb={3} isLoading={isLoading}>
               配置文件

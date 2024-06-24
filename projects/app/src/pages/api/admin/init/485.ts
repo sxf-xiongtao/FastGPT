@@ -5,13 +5,13 @@ import { NextAPI } from '@/service/middleware/entry';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { TeamMemberSchema } from '@fastgpt/global/support/user/team/type';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
-import { MongoApp } from '@fastgpt/service/core/app/schema';
 import { updateResourcePermission } from '@/service/support/permission/controller';
 import {
   ManagePermissionVal,
   PerResourceTypeEnum,
   PermissionTypeEnum
 } from '@fastgpt/global/support/permission/constant';
+import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 
 /* 初始化 role=admin 的用户，给他们都添加app的管理员权限和team的管理权限 */
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -43,8 +43,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 export default NextAPI(handler);
 
 async function insertPer(admin: TeamMemberSchema) {
-  // 获取 team 下所有 app
-  const apps = await MongoApp.find(
+  // 获取 team 下所有 dataset
+  const datasets = await MongoDataset.find(
     {
       teamId: admin.teamId,
       permission: PermissionTypeEnum.public
@@ -52,34 +52,23 @@ async function insertPer(admin: TeamMemberSchema) {
     '_id'
   );
 
+  console.log('total public dataset', datasets.length);
+
   await mongoSessionRun(async (session) => {
     // 插入 app 权限
-    for await (const app of apps) {
+    for await (const dataset of datasets) {
       try {
         await updateResourcePermission({
-          resourceType: PerResourceTypeEnum.app,
+          resourceType: PerResourceTypeEnum.dataset,
           teamId: admin.teamId,
           tmbIdList: [admin._id],
-          resourceId: app._id,
+          resourceId: dataset._id,
           permission: ManagePermissionVal,
           session
         });
       } catch (error) {
         console.log(error);
       }
-    }
-
-    // 插入 team manage 权限
-    try {
-      await updateResourcePermission({
-        resourceType: PerResourceTypeEnum.team,
-        teamId: admin.teamId,
-        tmbIdList: [admin._id],
-        permission: ManagePermissionVal,
-        session
-      });
-    } catch (error) {
-      console.log(error);
     }
   });
 }

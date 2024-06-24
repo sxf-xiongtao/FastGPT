@@ -39,6 +39,9 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
         const team = await MongoTeam.findOne({
           _id: plan.teamId
         });
+
+        if (!team) return Promise.reject('团队不存在');
+
         const owner = await MongoUser.findOne({
           _id: team.ownerId
         });

@@ -39,9 +39,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     jsonRes<AppListItemType[]>(res, {
       data: apps.map((app) => ({
         _id: app._id,
+        tmbId: app.tmbId,
         name: app.name,
         avatar: app.avatar,
         intro: app.intro,
+        updateTime: app.updateTime,
         isOwner: false,
         defaultPermission: AppDefaultPermissionVal,
         type: app.type,

@@ -124,6 +124,8 @@ const FormField = ({
       </Box>
     );
   }
+
+  return <></>;
 };
 
 export default FormField;
