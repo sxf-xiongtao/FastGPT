@@ -12,19 +12,21 @@ import {
   HStack,
   InputGroup,
   Input,
-  InputLeftElement
+  InputLeftElement,
+  useMediaQuery
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import DetailTeamModal from './components/DetailTeamModal';
-import { getTeams } from '@/web/admin/teams/api';
 import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
 import EditTeamModal from './components/EditTeamModal';
+import { getTeams } from '@/web/admin/users/api';
 
 const TeamTable = () => {
   const [search, setSearch] = useState<string>();
   const elementRef = useRef<HTMLDivElement>(null);
+  const [isMobile] = useMediaQuery('(max-width: 768px)');
 
   const {
     data: teams,
@@ -49,15 +51,15 @@ const TeamTable = () => {
 
   return (
     <Box className="pt-3 h-full flex flex-col">
-      <HStack px={8}>
-        <Box className="text-2xl font-bold text-[#405169]">团队列表</Box>
+      <HStack px={!isMobile ? 8 : 0} pb={!isMobile ? 0 : 4}>
+        {!isMobile && <Box className="text-2xl font-bold text-[#405169]">团队列表</Box>}
         <Box className="flex-grow"></Box>
         <InputGroup w={'350px'}>
           <InputLeftElement h={'full'}>
             <MyIcon name="common/searchLight" w={4} color={'myGray.400'} />
           </InputLeftElement>
           <Input
-            placeholder="请输入团队名或用户名，回车搜索"
+            placeholder="请输入用户名，回车搜索"
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 setTeams([]);
@@ -83,7 +85,7 @@ const TeamTable = () => {
               <Thead>
                 <Tr>
                   <Th>#</Th>
-                  <Th>团队id</Th>
+                  {/* <Th>团队id</Th> */}
                   <Th>团队名</Th>
                   <Th>用户名</Th>
                   <Th>余额</Th>
@@ -95,7 +97,7 @@ const TeamTable = () => {
                 {teams.map((item, i) => (
                   <Tr key={i}>
                     <Td>{i + 1}</Td>
-                    <Td>{item.id}</Td>
+                    {/* <Td>{item.id}</Td> */}
                     <Td>{item.name}</Td>
                     <Td>{item.ownerName}</Td>
                     <Td>{formatStorePrice2Read(item.balance, 100000)}元</Td>

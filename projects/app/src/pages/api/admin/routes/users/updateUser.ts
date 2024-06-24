@@ -9,9 +9,10 @@ export default async function updateUser(req: NextApiRequest, res: NextApiRespon
     await connectToDatabase();
     await adminCert({ req, authToken: true });
 
-    let { _id: id, password, status } = req.body;
+    let { _id: id, password, status, username } = req.body;
 
     const result = await MongoUser.findByIdAndUpdate(id, {
+      ...(username && { username }),
       ...(password && { password }),
       ...(status && { status })
     });

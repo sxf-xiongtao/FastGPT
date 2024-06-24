@@ -14,7 +14,8 @@ import {
   HStack,
   InputGroup,
   Input,
-  InputLeftElement
+  InputLeftElement,
+  useMediaQuery
 } from '@chakra-ui/react';
 import type { BillSchemaType } from '@fastgpt/global/support/wallet/bill/type.d';
 import dayjs from 'dayjs';
@@ -78,7 +79,7 @@ const subModeMap = {
   }
 };
 
-const standardSubLevelMap = {
+export const standardSubLevelMap = {
   [StandardSubLevelEnum.free]: {
     label: '免费'
   },
@@ -110,6 +111,7 @@ const BillTable = () => {
   const [username, setUsername] = useState<string>();
   const [billDetail, setBillDetail] = useState<BillSchemaType>();
   const elementRef = useRef<HTMLDivElement>(null);
+  const [isMobile] = useMediaQuery('(max-width: 768px)');
 
   const {
     data: bills,
@@ -136,8 +138,8 @@ const BillTable = () => {
 
   return (
     <Box className="pb-4 pt-3 h-full flex flex-col">
-      <HStack px={8}>
-        <Box className="text-2xl font-bold text-[#405169]">账单管理</Box>
+      <HStack px={!isMobile ? 8 : 0} pb={!isMobile ? 0 : 4}>
+        {!isMobile && <Box className="text-2xl font-bold text-[#405169]">账单管理</Box>}
         <Box className="flex-grow"></Box>
         <InputGroup w={350}>
           <InputLeftElement h={'full'}>

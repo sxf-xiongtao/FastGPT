@@ -67,6 +67,18 @@ export default function UserEditModal(props: { data: any; getData: any }) {
       <MyModal isOpen={isOpen} onClose={onClose} title={'编辑用户'} maxW={['90vw', '700px']}>
         <ModalBody>
           <FormControl className="mt-4">
+            <FormLabel htmlFor="username" className="!font-bold text-grayModern-700">
+              用户名
+            </FormLabel>
+            <Input
+              {...register('username')}
+              className="!text-xl"
+              id="username"
+              variant="outline"
+              placeholder=""
+            />
+          </FormControl>
+          <FormControl className="mt-4">
             <FormLabel htmlFor="password" className="!font-bold text-grayModern-700">
               密码
             </FormLabel>

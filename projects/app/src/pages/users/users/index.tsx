@@ -14,7 +14,8 @@ import {
   HStack,
   InputGroup,
   Input,
-  InputLeftElement
+  InputLeftElement,
+  useMediaQuery
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import MyIcon from '@fastgpt/web/components/common/Icon';
@@ -29,6 +30,7 @@ const UserTable = () => {
   const [username, setUsername] = useState<string>();
   const [userDetail, setUserDetail] = useState();
   const elementRef = useRef<HTMLDivElement>(null);
+  const [isMobile] = useMediaQuery('(max-width: 768px)');
 
   const {
     data: users,
@@ -53,8 +55,8 @@ const UserTable = () => {
 
   return (
     <Box className="pt-3 h-full flex flex-col">
-      <HStack px={8}>
-        <Box className="text-2xl font-bold text-[#405169]">用户信息</Box>
+      <HStack px={!isMobile ? 8 : 0} pb={!isMobile ? 0 : 4}>
+        {!isMobile && <Box className="text-2xl font-bold text-[#405169]">用户信息</Box>}
         <Box className="flex-grow"></Box>
         <UserAddModal
           data={{}}

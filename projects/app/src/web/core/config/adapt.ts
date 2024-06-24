@@ -1,7 +1,4 @@
 import { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
-import CustomImage from '@/pages/settings/components/Customization/CustomImage';
-import CustomJsonEditor from '@/pages/settings/components/Customization/CustomJsonEditor';
-import CustomTextarea from '@/pages/settings/components/Customization/CustomTextArea';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
 import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 
@@ -20,6 +17,7 @@ export function formatConfigStore2FormSchema({
     whisperModel
   } = fastgpt || { feConfigs: {}, systemEnv: {} };
 
+  // 初始化配置
   const {
     show_emptyChat = false,
     show_team_chat = false,
@@ -54,29 +52,31 @@ export function formatConfigStore2FormSchema({
   } = systemEnv || {};
 
   return {
-    fastgpt: {
+    siteSettings: {
       feConfigs: {
-        switches: {
-          show_emptyChat,
-          show_team_chat,
-          show_git,
-          show_openai_account,
-          show_promotion
-        },
-        images: { favicon },
-        concatMd,
+        show_emptyChat,
+        show_team_chat,
+        show_git,
+        show_openai_account,
+        show_promotion,
+        favicon,
         docUrl,
         chatbotUrl,
         openAPIDocUrl,
         systemTitle,
-        limit,
         customApiDomain,
         customSharePageDomain,
-        scripts: JSON.stringify(scripts, null, 2),
         uploadFileMaxAmount,
         uploadFileMaxSize,
         lafEnv,
         ...feConfigsProps
+      },
+      concatMd,
+      scripts: JSON.stringify(scripts, null, 2),
+      limit,
+      censor: {
+        BAIDU_TEXT_CENSOR_CLIENTID: fastgptPro?.censor?.BAIDU_TEXT_CENSOR_CLIENTID || '',
+        BAIDU_TEXT_CENSOR_CLIENTSECRET: fastgptPro?.censor?.BAIDU_TEXT_CENSOR_CLIENTSECRET || ''
       },
       systemEnv: {
         openapiPrefix,
@@ -84,7 +84,47 @@ export function formatConfigStore2FormSchema({
         qaMaxProcess,
         pgHNSWEfSearch,
         ...systemEnvProps
+      }
+    },
+    modelSettings: {
+      llmModels: JSON.stringify(llmModels, null, 2),
+      vectorModels: JSON.stringify(vectorModels, null, 2),
+      reRankModels: JSON.stringify(reRankModels, null, 2),
+      audioSpeechModels: JSON.stringify(audioSpeechModels, null, 2),
+      whisperModel: JSON.stringify(whisperModel, null, 2)
+    },
+    loginSettings: {
+      googleV3Ver: {
+        clientKey: fastgpt?.feConfigs?.googleClientVerKey || '',
+        serviceKey: fastgptPro?.auth?.googleServiceVerKey || ''
       },
+      github: {
+        clientId: fastgptPro?.auth?.github?.clientId || '',
+        secret: fastgptPro?.auth?.github?.secret || ''
+      },
+      google: {
+        clientId: fastgptPro?.auth?.google?.clientId || '',
+        secret: fastgptPro?.auth?.google?.secret || ''
+      },
+      email: {
+        smtp: fastgptPro?.auth?.email?.smtp || '',
+        user: fastgptPro?.auth?.email?.user || '',
+        pass: fastgptPro?.auth?.email?.pass || ''
+      },
+      phone: {
+        SNED_PHONE_ACCESSKEYID: fastgptPro?.auth?.phone?.SNED_PHONE_ACCESSKEYID || '',
+        SNED_PHONE_ACCESSSECRET: fastgptPro?.auth?.phone?.SNED_PHONE_ACCESSSECRET || '',
+        SNED_PHONE_SIGNNAME: fastgptPro?.auth?.phone?.SNED_PHONE_SIGNNAME || '',
+        SNED_PHONE_TEMPLATE: fastgptPro?.auth?.phone?.SNED_PHONE_TEMPLATE || ''
+      },
+      wechat: {
+        appID: fastgptPro?.auth?.wechat?.appID || '',
+        appSecret: fastgptPro?.auth?.wechat?.appSecret || ''
+      },
+      fastLogin: JSON.stringify(fastgptPro.fastLogin || {}, null, 2)
+    },
+    paySettings: {
+      wx: fastgptPro?.pay?.wx || {},
       subPlans: {
         // @ts-ignore
         standard: JSON.stringify(subPlans[SubTypeEnum.standard], null, 2) || '{}',
@@ -92,122 +132,41 @@ export function formatConfigStore2FormSchema({
         extraDatasetSizePrice: subPlans[SubTypeEnum.extraDatasetSize]?.price || 0,
         // @ts-ignore
         extraPointsPrice: subPlans[SubTypeEnum.extraPoints]?.price || 0
-      },
-      models: {
-        llmModels: JSON.stringify(llmModels, null, 2),
-        vectorModels: JSON.stringify(vectorModels, null, 2),
-        reRankModels: JSON.stringify(reRankModels, null, 2),
-        audioSpeechModels: JSON.stringify(audioSpeechModels, null, 2),
-        whisperModel: JSON.stringify(whisperModel, null, 2)
       }
-    },
-    fastgptPro: {
-      ...fastgptPro,
-      censor: {
-        BAIDU_TEXT_CENSOR_CLIENTID: fastgptPro?.censor?.BAIDU_TEXT_CENSOR_CLIENTID || '',
-        BAIDU_TEXT_CENSOR_CLIENTSECRET: fastgptPro?.censor?.BAIDU_TEXT_CENSOR_CLIENTSECRET || ''
-      },
-      pay: {
-        wx: {
-          WX_APPID: fastgptPro?.pay?.wx?.WX_APPID || '',
-          WX_MCHID: fastgptPro?.pay?.wx?.WX_MCHID || '',
-          WX_SERIAL_NO: fastgptPro?.pay?.wx?.WX_SERIAL_NO || '',
-          WX_V3_CODE: fastgptPro?.pay?.wx?.WX_V3_CODE || '',
-          WX_NOTIFY_URL: fastgptPro?.pay?.wx?.WX_NOTIFY_URL || '',
-          WX_PRIVATE_KEY: fastgptPro?.pay?.wx?.WX_PRIVATE_KEY || ''
-        }
-      },
-      auth: {
-        googleV3Ver: {
-          clientKey: fastgpt?.feConfigs?.googleClientVerKey || '',
-          serviceKey: fastgptPro?.auth?.googleServiceVerKey || ''
-        },
-        github: {
-          clientId: fastgptPro?.auth?.github?.clientId || '',
-          secret: fastgptPro?.auth?.github?.secret || ''
-        },
-        google: {
-          clientId: fastgptPro?.auth?.google?.clientId || '',
-          secret: fastgptPro?.auth?.google?.secret || ''
-        },
-        email: {
-          smtp: fastgptPro?.auth?.email?.smtp || '',
-          user: fastgptPro?.auth?.email?.user || '',
-          pass: fastgptPro?.auth?.email?.pass || ''
-        },
-        phone: {
-          SNED_PHONE_ACCESSKEYID: fastgptPro?.auth?.phone?.SNED_PHONE_ACCESSKEYID || '',
-          SNED_PHONE_ACCESSSECRET: fastgptPro?.auth?.phone?.SNED_PHONE_ACCESSSECRET || '',
-          SNED_PHONE_SIGNNAME: fastgptPro?.auth?.phone?.SNED_PHONE_SIGNNAME || '',
-          SNED_PHONE_TEMPLATE: fastgptPro?.auth?.phone?.SNED_PHONE_TEMPLATE || ''
-        },
-        wechat: {
-          appID: fastgptPro?.auth?.wechat?.appID || '',
-          appSecret: fastgptPro?.auth?.wechat?.appSecret || ''
-        }
-      },
-      fastLogin: JSON.stringify(fastgptPro.fastLogin || {}, null, 2)
     }
   };
 }
 
 export function formatFormData2ConfigStore({
-  fastgpt: {
-    feConfigs: {
-      switches,
-      images,
-      concatMd,
-      docUrl,
-      chatbotUrl,
-      openAPIDocUrl,
-      systemTitle,
-      limit,
-      customApiDomain,
-      customSharePageDomain,
-      scripts,
-      uploadFileMaxAmount,
-      uploadFileMaxSize,
-      lafEnv
-    },
-    systemEnv,
-    subPlans,
-    models
-  },
-  fastgptPro
+  siteSettings,
+  modelSettings,
+  loginSettings,
+  paySettings
 }: ConfigFormType): ConfigStoreType {
-  // format models
-  const formatModels: Record<string, any> = {};
-  for (const key in models) {
-    // @ts-ignore
-    formatModels[key] = models[key] ? JSON.parse(models[key]) : undefined;
-  }
-  // format feConfigs
-  const formatFeConfig: ConfigStoreType['fastgpt']['feConfigs'] = {
-    ...switches,
-    ...images,
+  const { feConfigs, systemEnv, concatMd, scripts, limit, censor } = siteSettings;
+  const { llmModels, vectorModels, reRankModels, audioSpeechModels, whisperModel } = modelSettings;
+  const { email, phone, github, wechat, google, googleV3Ver, fastLogin } = loginSettings;
+  const { wx, subPlans } = paySettings;
+
+  const formatFeConfig = {
+    ...feConfigs,
     concatMd,
-    docUrl,
-    chatbotUrl,
-    openAPIDocUrl,
-    systemTitle,
-    limit,
-    customApiDomain,
-    customSharePageDomain,
-    // auto set field
-    show_pay: !!fastgptPro.pay?.wx?.WX_APPID,
-    show_register: !!(fastgptPro.auth?.email?.smtp || fastgptPro.auth?.phone.SNED_PHONE_TEMPLATE),
-    oauth: {
-      github: fastgptPro.auth?.github?.clientId,
-      google: fastgptPro.auth?.google?.clientId,
-      wechat: fastgptPro.auth?.wechat?.appID
-    },
-    show_phoneLogin: !!fastgptPro.auth?.phone.SNED_PHONE_TEMPLATE,
-    show_emailLogin: !!fastgptPro.auth?.email?.smtp,
-    googleClientVerKey: fastgptPro.auth?.googleV3Ver.clientKey,
     scripts: scripts ? JSON.parse(scripts) : [],
-    uploadFileMaxAmount,
-    uploadFileMaxSize,
-    lafEnv
+    limit,
+    oauth: {
+      github: github?.clientId,
+      google: googleV3Ver?.clientId,
+      wechat: wechat?.appID
+    }
+  };
+
+  const formatLoginSettings = {
+    email,
+    phone,
+    github,
+    wechat,
+    googleServiceVerKey: googleV3Ver.serviceKey,
+    google
   };
 
   const standardSubPlanJson = (() => {
@@ -218,30 +177,7 @@ export function formatFormData2ConfigStore({
     }
   })();
 
-  // format fastgptPro
-  const fastgptProConfig: ConfigStoreType['fastgptPro'] = {
-    ...fastgptPro,
-    auth: {
-      github: fastgptPro.auth?.github,
-      google: fastgptPro.auth?.google,
-      email: fastgptPro.auth?.email,
-      phone: fastgptPro.auth?.phone,
-      googleServiceVerKey: fastgptPro.auth.googleV3Ver.serviceKey,
-      wechat: fastgptPro.auth?.wechat
-    },
-    censor: fastgptPro.censor,
-    pay: fastgptPro.pay,
-    fastLogin: (() => {
-      try {
-        return JSON.parse(fastgptPro.fastLogin);
-      } catch (error) {
-        return {};
-      }
-    })()
-  };
-
   return {
-    // @ts-ignore
     [SystemConfigsTypeEnum.fastgpt]: {
       feConfigs: formatFeConfig,
       systemEnv,
@@ -254,66 +190,25 @@ export function formatFormData2ConfigStore({
           price: subPlans.extraPointsPrice || 0
         }
       },
-      ...formatModels
+      llmModels: JSON.parse(llmModels),
+      vectorModels: JSON.parse(vectorModels),
+      reRankModels: JSON.parse(reRankModels),
+      audioSpeechModels: JSON.parse(audioSpeechModels),
+      whisperModel: JSON.parse(whisperModel)
     },
-    [SystemConfigsTypeEnum.fastgptPro]: fastgptProConfig
+    [SystemConfigsTypeEnum.fastgptPro]: {
+      auth: formatLoginSettings,
+      censor,
+      fastLogin: (() => {
+        try {
+          return JSON.parse(fastLogin);
+        } catch (error) {
+          return {};
+        }
+      })(),
+      pay: {
+        wx
+      }
+    }
   };
-}
-
-export function formConfig2uiSchema(formConfig: any) {
-  let uiSchema: any = {};
-
-  for (let key in formConfig.properties) {
-    if (formConfig.properties[key].type === 'object' || !formConfig.properties[key].type) {
-      uiSchema[key] = formConfig2uiSchema(formConfig.properties[key]);
-    } else {
-      let defaultValue = formConfig.properties[key].defaultValue;
-      switch (formConfig.properties[key].type) {
-        case 'number':
-          uiSchema[key] = { 'ui:emptyValue': defaultValue !== undefined ? defaultValue : 0 };
-          break;
-        case 'image':
-          uiSchema[key] = {
-            'ui:emptyValue': defaultValue !== undefined ? defaultValue : '',
-            'ui:widget': CustomImage
-          };
-          break;
-        case 'textarea':
-          uiSchema[key] = {
-            'ui:emptyValue': defaultValue !== undefined ? defaultValue : '',
-            'ui:widget': CustomTextarea
-          };
-          break;
-        case 'json':
-          uiSchema[key] = {
-            'ui:emptyValue': defaultValue !== undefined ? defaultValue : '',
-            'ui:widget': CustomJsonEditor
-          };
-          break;
-        default:
-          uiSchema[key] = { 'ui:emptyValue': defaultValue !== undefined ? defaultValue : '' };
-      }
-    }
-  }
-
-  return uiSchema;
-}
-
-export function formatFormConfig(formConfig: any) {
-  let formattedConfig = { ...formConfig };
-
-  for (let key in formattedConfig.properties) {
-    if (
-      formattedConfig.properties[key].type === 'object' ||
-      !formattedConfig.properties[key].type
-    ) {
-      formattedConfig.properties[key] = formatFormConfig(formattedConfig.properties[key]);
-    } else {
-      if (['image', 'json', 'textarea'].includes(formattedConfig.properties[key].type)) {
-        formattedConfig.properties[key].type = 'string';
-      }
-    }
-  }
-
-  return formattedConfig;
 }

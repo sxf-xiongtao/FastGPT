@@ -9,31 +9,28 @@ export type ConfigStoreType = {
 };
 
 export type ConfigFormType = {
-  [SystemConfigsTypeEnum.fastgpt]: {
+  siteSettings: {
     feConfigs: {
-      switches: {
-        show_emptyChat: boolean;
-        show_team_chat: boolean;
-        show_git: boolean;
-        show_openai_account: boolean;
-        show_promotion: boolean;
-      };
-      images: {
-        favicon: string;
-      };
-      concatMd: string;
+      show_emptyChat: boolean;
+      show_team_chat: boolean;
+      show_git: boolean;
+      show_openai_account: boolean;
+      show_promotion: boolean;
+      favicon: string;
       docUrl: string;
       chatbotUrl: string;
       openAPIDocUrl: string;
       systemTitle: string;
       customApiDomain: string;
       customSharePageDomain: string;
-      limit?: FastGPTConfigFileType['feConfigs']['limit'];
-      scripts?: string;
       uploadFileMaxAmount: number;
       uploadFileMaxSize: number;
       lafEnv?: string;
     };
+    concatMd: string;
+    scripts?: string;
+    limit?: FastGPTConfigFileType['feConfigs']['limit'];
+    censor?: SystemConfigType['censor'];
     systemEnv: {
       openapiPrefix: string;
       vectorMaxProcess: number;
@@ -41,33 +38,29 @@ export type ConfigFormType = {
       pgHNSWEfSearch: number;
       tokenWorkers: number;
     };
+  };
+  modelSettings: {
+    llmModels: string;
+    vectorModels: string;
+    reRankModels: string;
+    audioSpeechModels: string;
+    whisperModel: string;
+  };
+  loginSettings: {
+    email: SystemConfigType['auth']['email'];
+    phone: SystemConfigType['auth']['phone'];
+    github: SystemConfigType['auth']['github'];
+    wechat: SystemConfigType['auth']['wechat'];
+    google: SystemConfigType['auth']['google'];
+    googleV3Ver: SystemConfigType['auth']['googleServiceVerKey'];
+    fastLogin: string;
+  };
+  paySettings: {
+    wx: SystemConfigType['pay']['wx'];
     subPlans: {
-      standard: string;
+      [SubTypeEnum.standard]: string;
       extraDatasetSizePrice: number;
       extraPointsPrice: number;
     };
-    models: {
-      llmModels: string;
-      vectorModels: string;
-      reRankModels: string;
-      audioSpeechModels: string;
-      whisperModel: string;
-    };
-  };
-  [SystemConfigsTypeEnum.fastgptPro]: {
-    censor: SystemConfigType['censor'];
-    auth: {
-      googleV3Ver: {
-        clientKey: string;
-        serviceKey: string;
-      };
-      github: SystemConfigType['auth']['github'];
-      google: SystemConfigType['auth']['google'];
-      email: SystemConfigType['auth']['email'];
-      phone: SystemConfigType['auth']['phone'];
-      wechat: SystemConfigType['auth']['wechat'];
-    };
-    pay: SystemConfigType['pay'];
-    fastLogin: string;
   };
 };

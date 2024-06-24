@@ -1,47 +1,47 @@
-import React, { useState, useRef } from 'react';
-import validator from '@rjsf/validator-ajv8';
-import Form from '@rjsf/core';
-import { Box, Button, Center, Flex, Spinner } from '@chakra-ui/react';
+import React, { useState, useEffect } from 'react';
+import { Box, Button, Flex, useMediaQuery } from '@chakra-ui/react';
 import { useToast } from '@fastgpt/web/hooks/useToast';
-import CustomCheckbox from './components/Customization/CustomCheckbox';
-import DescriptionFieldTemplate from './components/Customization/DescriptionFieldTemplate';
-import { GET, POST } from '@/service/common/request';
-import TitleFieldTemplate from './components/Customization/TitleFieldTemplate';
-import { extractThirdLevelTitles } from '@/web/core/config/utils';
+import { POST } from '@/service/common/request';
 import { throttle } from '@/utils/tools';
-import {
-  formConfig2uiSchema,
-  formatConfigStore2FormSchema,
-  formatFormConfig,
-  formatFormData2ConfigStore
-} from '@/web/core/config/adapt';
+import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';
 import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
 import { useQuery } from '@tanstack/react-query';
-import { getInitFormConfig, getInitFormData } from '@/web/core/config/api';
+import { getInitFormData } from '@/web/core/config/api';
 import ImportModal from './components/ImportModal';
-import { RJSFSchema } from '@rjsf/utils';
+import FormField from './components/FormField';
+import { Controller, useForm } from 'react-hook-form';
+import { formConfig } from './data/formConfig';
+import FormLabel from './components/FormLabel';
 
-const widgets = {
-  CheckboxWidget: CustomCheckbox
-};
+interface formLevel {
+  key: string;
+  title: string;
+  type: string;
+  properties?: any;
+  description?: string;
+}
+
+interface titleType {
+  mainTitle: string;
+  subTitles: string[];
+}
 
 export const Settings = () => {
   const [rawData, setRawData] = useState<any>({});
-  const [formData, setFormData] = useState<ConfigFormType>();
   const [isLoading, setIsLoading] = useState(false);
-  const [schemaConfig, setSchemaConfig] = useState({});
-  const [uiSchema, setUiSchema] = useState({});
-  const [titles, setTitles] = useState<string[]>([]);
+  const [titles, setTitles] = useState<Array<titleType>>([]);
   const [activeTitle, setActiveTitle] = useState('');
-  const [isSchemaLoading, setIsSchemaLoading] = useState(true);
+  const [isMobile] = useMediaQuery('(max-width: 768px)');
+
   const { toast } = useToast();
-  const submitButtonRef = useRef<HTMLButtonElement>(null);
+
+  const { reset, control, handleSubmit, setValue } = useForm();
 
   useQuery(['getInitFormData'], () => getInitFormData(), {
     onSuccess: (data: ConfigStoreType) => {
       setRawData(data);
       const aggregatedConfigs: ConfigFormType = formatConfigStore2FormSchema(data);
-      setFormData(aggregatedConfigs);
+      reset(aggregatedConfigs);
     },
     onError: () => {
       toast({
@@ -51,30 +51,11 @@ export const Settings = () => {
     }
   });
 
-  useQuery(['getInitFormConfig'], () => getInitFormConfig(), {
-    onSuccess: (data: RJSFSchema) => {
-      setUiSchema(formConfig2uiSchema(data));
-      setSchemaConfig(formatFormConfig(data));
-      setTitles(extractThirdLevelTitles(data));
-      setIsSchemaLoading(false);
-    },
-    onError: () => {
-      toast({
-        title: '初始化配置失败',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-        position: 'top'
-      });
-    }
-  });
-
-  const onSubmit = async ({ formData }: any) => {
+  const onSubmit = async (data: any) => {
     setIsLoading(true);
     try {
-      const data = formatFormData2ConfigStore(formData);
-
-      await POST('/admin/routes/settings/updateConfig', data);
+      const formData = formatFormData2ConfigStore(data);
+      await POST('/admin/routes/settings/updateConfig', formData);
 
       toast({
         title: '配置保存成功',
@@ -98,80 +79,194 @@ export const Settings = () => {
     }
   };
 
-  const handleClick = () => {
-    if (submitButtonRef.current) {
-      submitButtonRef.current.click();
-    }
-  };
-
   const handleScroll = throttle(() => {
-    titles.forEach((title) => {
+    const allTitles = titles
+      .map((title) => title.mainTitle)
+      .concat(
+        titles.reduce((acc: string[], cur: titleType) => {
+          return acc.concat(cur.subTitles);
+        }, [])
+      );
+
+    let firstVisibleTitle: any = null;
+
+    allTitles.forEach((title: string) => {
       const element = document.getElementById(title);
       if (!element) return;
       const rect = element.getBoundingClientRect();
-      if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
-        setActiveTitle(title);
-        return;
+      if (rect.top <= window.innerHeight && rect.bottom >= 0) {
+        if (!firstVisibleTitle || rect.top < firstVisibleTitle.getBoundingClientRect().top) {
+          firstVisibleTitle = element;
+        }
       }
     });
+
+    if (firstVisibleTitle) {
+      setActiveTitle(firstVisibleTitle.id);
+    }
   }, 100);
+
+  const firstLevels = Object.values(formConfig);
+
+  useEffect(() => {
+    const topLevelKeys = Object.keys(formConfig);
+
+    const secondLevelTitles: { [key: string]: string[] } = {};
+    for (const key in formConfig) {
+      const properties = formConfig[key].properties;
+      const secondLevelTitlesArr = Object.keys(properties).map(
+        (propKey) => properties[propKey].title
+      );
+      secondLevelTitles[key] = secondLevelTitlesArr;
+    }
+
+    const formattedOutput = topLevelKeys.map((title) => {
+      return { mainTitle: formConfig[title].title, subTitles: secondLevelTitles[title] };
+    });
+
+    setTitles(formattedOutput);
+    setActiveTitle(formattedOutput[0].mainTitle);
+  }, []);
 
   return (
     <Flex h={'100%'} gap={4}>
       <Box overflowY={'auto'} flex={3} onScroll={handleScroll}>
-        {(isSchemaLoading || isLoading) && (
-          <Center className="h-full text-gray-500">
-            <Spinner size={'lg'} />
-          </Center>
-        )}
-        {!!formData && (
-          <Form
-            schema={schemaConfig}
-            onSubmit={onSubmit}
-            uiSchema={uiSchema}
-            formData={formData}
-            validator={validator}
-            widgets={widgets}
-            templates={{
-              DescriptionFieldTemplate,
-              TitleFieldTemplate
-            }}
-            onChange={({ formData }) => setFormData(formData)}
-          >
-            <Button ref={submitButtonRef} type="submit" className="!hidden"></Button>
-          </Form>
-        )}
+        {firstLevels.map((firstLevel) => {
+          const secondLevels: formLevel[] = Object.values(firstLevel.properties);
+          return (
+            <Box
+              key={firstLevel.title}
+              id={firstLevel.title}
+              border={'1px solid #E2E8F0'}
+              boxShadow="md"
+              mb={10}
+              mr={4}
+              p="6"
+              rounded="md"
+              bg="white"
+            >
+              <Box className="text-2xl text-[#5283ff] font-semibold pb-2">{firstLevel.title}</Box>
+              {secondLevels.map((secondLevel) => {
+                return (
+                  <Box key={secondLevel.title} className="mt-4">
+                    {!!secondLevel.properties ? (
+                      <Box>
+                        <FormLabel
+                          title={secondLevel.title}
+                          description={secondLevel.description || ''}
+                          level={2}
+                        />
+                        <Box className="flex flex-wrap">
+                          {Object.values(secondLevel.properties).map((thirdLevel) => {
+                            const thirdLevelTyped = thirdLevel as formLevel;
+                            return (
+                              <Box
+                                key={thirdLevelTyped.title}
+                                className={
+                                  thirdLevelTyped.type === 'boolean' ? 'mt-4 w-1/2' : 'mt-4 w-full'
+                                }
+                              >
+                                <Controller
+                                  control={control}
+                                  name={thirdLevelTyped.key}
+                                  render={({ field: { onChange, onBlur, value, ref } }) => (
+                                    <FormField
+                                      type={thirdLevelTyped.type}
+                                      title={thirdLevelTyped.title}
+                                      description={thirdLevelTyped.description || ''}
+                                      value={value}
+                                      onChange={(value) => {
+                                        console.log(thirdLevelTyped.key, value);
+                                        onChange(value);
+                                        setValue(thirdLevelTyped.key, value);
+                                      }}
+                                      level={3}
+                                    />
+                                  )}
+                                />
+                              </Box>
+                            );
+                          })}
+                        </Box>
+                      </Box>
+                    ) : (
+                      <Controller
+                        control={control}
+                        name={secondLevel.key}
+                        render={({ field: { onChange, onBlur, value, ref } }) => (
+                          <FormField
+                            type={secondLevel.type}
+                            title={secondLevel.title}
+                            description={secondLevel.description || ''}
+                            value={value}
+                            onChange={onChange}
+                            level={2}
+                          />
+                        )}
+                      />
+                    )}
+                  </Box>
+                );
+              })}
+            </Box>
+          );
+        })}
       </Box>
-      <Flex flexDirection={'column'} flex={1}>
-        <Box flex={'1 0 0'} className="bg-white w-full pr-6 pt-8 pb-12">
+      <Flex
+        flexDirection={'column'}
+        flex={1}
+        position={isMobile ? 'absolute' : 'relative'}
+        bottom={0}
+        right={0}
+      >
+        <Box flex={'1 0 0'} className="bg-white w-full pr-6 pt-8 pb-12" hidden={isMobile}>
           <ul className="flex flex-col space-y-4 text-lg">
-            {titles.map((title) => (
-              <li
-                key={title}
-                className={
-                  activeTitle === title
-                    ? 'pl-4 text-blue-500 cursor-pointer border-l-4 border-blue-500'
-                    : 'pl-4 border-l-4 border-transparent text-gray-500 hover:text-blue-500 cursor-pointer'
-                }
-                onClick={() => {
-                  const anchor = document.getElementById(title);
-                  if (anchor) {
-                    anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            {titles.map((title: titleType) => (
+              <Box key={title.mainTitle}>
+                <li
+                  className={
+                    activeTitle === title.mainTitle
+                      ? 'pl-4 text-blue-500 cursor-pointer border-l-4 border-blue-500'
+                      : 'pl-4 border-l-4 border-transparent text-gray-500 hover:text-blue-500 cursor-pointer'
                   }
-                }}
-              >
-                {title}
-              </li>
+                  onClick={() => {
+                    const anchor = document.getElementById(title.mainTitle);
+                    if (anchor) {
+                      anchor.scrollIntoView({ behavior: 'instant', block: 'start' });
+                    }
+                  }}
+                >
+                  {title.mainTitle}
+                </li>
+                {title?.subTitles.map((subTitle: string) => (
+                  <li
+                    key={subTitle}
+                    className={
+                      activeTitle === subTitle
+                        ? 'pl-8 text-blue-500 cursor-pointer border-l-4 border-blue-500 text-sm'
+                        : 'pl-8 border-l-4 border-transparent text-gray-500 hover:text-blue-500 cursor-pointer text-sm'
+                    }
+                    onClick={() => {
+                      const anchor = document.getElementById(subTitle);
+                      if (anchor) {
+                        anchor.scrollIntoView({ behavior: 'instant', block: 'start' });
+                      }
+                    }}
+                  >
+                    {subTitle}
+                  </li>
+                ))}
+              </Box>
             ))}
           </ul>
         </Box>
-        <Box className="bg-white w-full px-6 py-4 flex-col flex">
-          <ImportModal value={rawData} setFormData={setFormData} setRawData={setRawData}>
-            <Button variant={'whiteBase'} mb={3} isLoading={isLoading || isSchemaLoading}>
+        <Box className="w-full px-6 py-4 flex-col flex">
+          <ImportModal value={rawData} setFormData={reset} setRawData={setRawData}>
+            <Button variant={'whiteBase'} mb={3} isLoading={isLoading}>
               配置文件
             </Button>
           </ImportModal>
-          <Button onClick={handleClick} isLoading={isLoading || isSchemaLoading}>
+          <Button onClick={handleSubmit(onSubmit)} isLoading={isLoading}>
             保存
           </Button>
         </Box>

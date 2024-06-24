@@ -71,7 +71,6 @@ COPY --from=mainDeps /app/node_modules/@zilliz/milvus2-sdk-node ./node_modules/@
 # copy package.json to version file
 COPY --from=builder /app/projects/app/package.json ./package.json 
 # copy config
-COPY ./projects/app/data/formConfig.json /app/data/formConfig.json
 COPY ./projects/app/data/config.json /app/data/config.json
 
 
