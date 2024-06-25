@@ -226,12 +226,14 @@ export const formConfig: FormConfig = {
     properties: {
       llmModels: {
         key: 'modelSettings.llmModels',
-        title: 'LLM大语言模型（用于对话、分类、内容提取等）',
+        title: 'LLM大语言模型',
+        description: '用于对话、分类、内容提取等',
         type: 'json'
       },
       vectorModels: {
         key: 'modelSettings.vectorModels',
-        title: '向量模型（知识库索引）',
+        title: '向量模型',
+        description: '用于知识库的索引',
         type: 'json'
       },
       reRankModels: { key: 'modelSettings.reRankModels', title: '重排模型', type: 'json' },
@@ -248,20 +250,22 @@ export const formConfig: FormConfig = {
     title: '通知 & 登录配置',
     type: 'object',
     properties: {
-      googleV3Ver: {
-        key: 'loginSettings.googleV3Ver',
+      google: {
         type: 'object',
-        title: '谷歌V3安全校验',
+        title: '谷歌登录配置',
+        key: 'loginSettings.google',
         properties: {
-          clientKey: {
-            key: 'loginSettings.googleV3Ver.clientKey',
+          clientId: {
+            key: 'loginSettings.google.clientId',
             type: 'string',
-            title: '客户端Key'
+            title: 'Google Client ID',
+            description:
+              '![](https://oss.laf.dev/lk63dw-fastgpt/google_service_ver_key_1.png)\n![](https://oss.laf.dev/lk63dw-fastgpt/google_service_ver_key_2.png)\nhttps://www.google.com/recaptcha/about/\nclientId: \nserviceId:\n每月有免费额度，基本够用'
           },
-          serviceKey: {
-            key: 'loginSettings.googleV3Ver.serviceKey',
+          secret: {
+            key: 'loginSettings.google.secret',
             type: 'string',
-            title: '服务端Key'
+            title: 'Google Secret'
           }
         }
       },
@@ -344,7 +348,7 @@ export const formConfig: FormConfig = {
       wechat: {
         key: 'loginSettings.wechat',
         type: 'object',
-        title: '微信服务号登录配置',
+        title: '微信服务号登录',
         properties: {
           appID: {
             key: 'loginSettings.wechat.appID',
@@ -358,6 +362,23 @@ export const formConfig: FormConfig = {
             type: 'string',
             title: 'AppSecret',
             description: '服务号的 Secret'
+          }
+        }
+      },
+      googleV3Ver: {
+        key: 'loginSettings.googleV3Ver',
+        type: 'object',
+        title: '谷歌V3安全校验',
+        properties: {
+          clientKey: {
+            key: 'loginSettings.googleV3Ver.clientKey',
+            type: 'string',
+            title: '客户端Key'
+          },
+          serviceKey: {
+            key: 'loginSettings.googleV3Ver.serviceKey',
+            type: 'string',
+            title: '服务端Key'
           }
         }
       },

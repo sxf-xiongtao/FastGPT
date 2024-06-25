@@ -55,21 +55,6 @@ const billTypeMap = {
   }
 };
 
-const billStatusMap = {
-  [BillStatusEnum.SUCCESS]: {
-    label: '成功'
-  },
-  [BillStatusEnum.REFUND]: {
-    label: '退款'
-  },
-  [BillStatusEnum.NOTPAY]: {
-    label: '未支付'
-  },
-  [BillStatusEnum.CLOSED]: {
-    label: '关闭'
-  }
-};
-
 const subModeMap = {
   [SubModeEnum.month]: {
     label: '按月'
@@ -124,6 +109,7 @@ const BillTable = () => {
     pageSize: 20,
     params: {
       type: billType,
+      status: BillStatusEnum.SUCCESS,
       username
     },
     type: 'scroll',
@@ -186,7 +172,6 @@ const BillTable = () => {
                   </Th>
                   <Th>时间</Th>
                   <Th>金额</Th>
-                  <Th>状态</Th>
                   <Th></Th>
                 </Tr>
               </Thead>
@@ -201,7 +186,6 @@ const BillTable = () => {
                       {item.createTime ? dayjs(item.createTime).format('YYYY/MM/DD HH:mm:ss') : '-'}
                     </Td>
                     <Td>{formatStorePrice2Read(item.price)}元</Td>
-                    <Td>{billStatusMap[item.status]?.label}</Td>
                     <Td>
                       <Button variant={'whiteBase'} size={'sm'} onClick={() => setBillDetail(item)}>
                         详情
@@ -254,10 +238,6 @@ function BillDetailModal({ bill, onClose }: { bill: BillSchemaType; onClose: () 
         <Flex alignItems={'center'} pb={4}>
           <Box flex={'0 0 120px'}>生成时间:</Box>
           <Box>{dayjs(bill.createTime).format('YYYY/MM/DD HH:mm:ss')}</Box>
-        </Flex>
-        <Flex alignItems={'center'} pb={4}>
-          <Box flex={'0 0 120px'}>状态:</Box>
-          <Box>{billStatusMap[bill.status]?.label}</Box>
         </Flex>
         {!!bill.metadata?.payWay && (
           <Flex alignItems={'center'} pb={4}>

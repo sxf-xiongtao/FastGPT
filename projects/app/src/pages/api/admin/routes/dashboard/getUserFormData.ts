@@ -7,7 +7,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 const day = 60;
 
-export default async function getUserFormData(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
     await adminCert({ req, authToken: true });

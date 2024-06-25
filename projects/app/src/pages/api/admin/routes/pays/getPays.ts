@@ -4,10 +4,10 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { MongoBill } from '@/service/support/wallet/bill/schema';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
+import { BillStatusEnum, BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 
-export default async function getPays(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
     await adminCert({ req, authToken: true });
@@ -16,11 +16,13 @@ export default async function getPays(req: NextApiRequest, res: NextApiResponse)
       pageNum = 1,
       pageSize = 20,
       type,
+      status,
       username
     } = req.body as {
       pageNum: number;
       pageSize: number;
       type?: `${BillTypeEnum}`;
+      status?: `${BillStatusEnum}`;
       username: string;
     };
 
@@ -33,6 +35,7 @@ export default async function getPays(req: NextApiRequest, res: NextApiResponse)
     const match = {
       status: { $ne: 'CLOSED' },
       ...(type && { type }),
+      ...(status && { status }),
       tmbId: { $in: tmbIds }
     };
 

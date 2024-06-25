@@ -6,7 +6,7 @@ import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
 
-export default async function getTeams(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
     await adminCert({ req, authToken: true });

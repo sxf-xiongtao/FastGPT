@@ -5,8 +5,9 @@ import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 
-export default async function getTeams(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
     await adminCert({ req, authToken: true });
@@ -43,17 +44,21 @@ export default async function getTeams(req: NextApiRequest, res: NextApiResponse
         if (!team) return Promise.reject('团队不存在');
 
         const owner = await MongoUser.findOne({
-          _id: team.ownerId
+          _id: team?.ownerId
         });
 
         return {
           id: plan._id,
-          planLevel: plan.currentSubLevel,
+          type: plan.type,
+          price: plan.price / PRICE_SCALE,
+          level: plan.currentSubLevel,
           totalPoints: plan.totalPoints,
           surplusPoints: plan.surplusPoints,
+          extraDatasetSize: plan.currentExtraDatasetSize,
           startTime: plan.startTime,
           expiredTime: plan.expiredTime,
-          teamName: team.name,
+          teamName: team?.name,
+          teamId: plan.teamId,
           userName: owner?.username
         };
       })

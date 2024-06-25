@@ -9,7 +9,7 @@ export const isValidObjectIdString = (str: string) => {
   return mongoose.Types.ObjectId.isValid(str);
 };
 
-export default async function getUsers(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
     await adminCert({ req, authToken: true });

@@ -6,7 +6,7 @@ import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-export default async function getUsers(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
     await adminCert({ req, authToken: true });

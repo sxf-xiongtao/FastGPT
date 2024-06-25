@@ -20,12 +20,16 @@ import MyIcon from '@fastgpt/web/components/common/Icon';
 import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import { getPlans } from '@/web/admin/users/api';
 import { standardSubLevelMap } from '../pays';
-import { StandardSubLevelEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import PlanAddModal from './components/PlanAddModal';
+import PlanEditModal from './components/PlanEditModal';
 
 type PlanType = {
+  teamId: string;
   teamName: string;
   userName: string;
-  planLevel: `${StandardSubLevelEnum}`;
+  type: `${SubTypeEnum}`;
+  level: `${StandardSubLevelEnum}`;
   createTime: string;
   expiredTime: string;
   startTime: string;
@@ -64,6 +68,15 @@ const PlanTable = () => {
       <HStack px={!isMobile ? 8 : 0} pb={!isMobile ? 0 : 4}>
         {!isMobile && <Box className="text-2xl font-bold text-[#405169]">套餐管理</Box>}
         <Box className="flex-grow"></Box>
+        <PlanAddModal
+          data={{
+            type: SubTypeEnum.extraDatasetSize
+          }}
+          updateData={() => {
+            setPlans([]);
+            getData(1);
+          }}
+        />
         <InputGroup w={'350px'}>
           <InputLeftElement h={'full'}>
             <MyIcon name="common/searchLight" w={4} color={'myGray.400'} />
@@ -94,38 +107,51 @@ const PlanTable = () => {
             <Table>
               <Thead>
                 <Tr>
-                  <Th>#</Th>
+                  <Th>团队id</Th>
                   <Th>团队名</Th>
                   <Th>用户名</Th>
                   <Th>订阅套餐</Th>
                   <Th>积分</Th>
-                  <Th>开始时间</Th>
-                  <Th>结束时间</Th>
+                  <Th>起止时间</Th>
                   <Th></Th>
                 </Tr>
               </Thead>
               <Tbody fontSize={'sm'}>
                 {plans.map((item, i) => (
                   <Tr key={i}>
-                    <Td>{i + 1}</Td>
+                    <Td>{item.teamId}</Td>
                     <Td>{item.teamName}</Td>
                     <Td>{item.userName}</Td>
-                    <Td>{standardSubLevelMap[item.planLevel]?.label}</Td>
+                    <Td>
+                      {item.type === SubTypeEnum.standard
+                        ? `${standardSubLevelMap[item.level]?.label}版`
+                        : item.type === SubTypeEnum.extraDatasetSize
+                          ? '额外知识库'
+                          : 'AI 积分套餐'}
+                    </Td>
                     <Td>
                       {item.totalPoints
                         ? `${Math.round(item.totalPoints - item.surplusPoints)} / ${item.totalPoints}`
                         : '-'}
                     </Td>
                     <Td>
-                      {item.startTime ? dayjs(item.startTime).format('YYYY/MM/DD HH:mm:ss') : '-'}
+                      <Box>
+                        {item.startTime ? dayjs(item.startTime).format('YYYY/MM/DD HH:mm:ss') : '-'}
+                      </Box>
+                      <Box>
+                        {item.expiredTime
+                          ? dayjs(item.expiredTime).format('YYYY/MM/DD HH:mm:ss')
+                          : '-'}
+                      </Box>
                     </Td>
                     <Td>
-                      {item.expiredTime
-                        ? dayjs(item.expiredTime).format('YYYY/MM/DD HH:mm:ss')
-                        : '-'}
-                    </Td>
-                    <Td>
-                      <Box className="space-x-2"></Box>
+                      <PlanEditModal
+                        data={item}
+                        getData={() => {
+                          setPlans([]);
+                          getData(1);
+                        }}
+                      />
                     </Td>
                   </Tr>
                 ))}

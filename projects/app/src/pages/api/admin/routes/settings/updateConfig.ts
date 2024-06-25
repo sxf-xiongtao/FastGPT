@@ -8,7 +8,7 @@ import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/cons
 import { addMonths } from 'date-fns';
 import { initFastGPTConfig } from '@fastgpt/service/common/system/tools';
 
-export default async function updateConfig(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { fastgpt, fastgptPro } = req.body as ConfigStoreType;
     await connectToDatabase();

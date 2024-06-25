@@ -135,10 +135,11 @@ export default function SideBar({ showTitle }: { showTitle?: boolean }) {
               alignItems={'center'}
               key={item.activeLink}
               {...itemStyles}
-              {...(item.activeLink === router.pathname
+              {...(item.activeLink === router.pathname ||
+              item.subItems?.some((i) => i.activeLink === router.pathname)
                 ? {
                     color: 'white !important',
-                    bg: 'primary.600 !important'
+                    bg: 'primary.500 !important'
                   }
                 : {
                     color: 'myGray.500',
@@ -173,7 +174,7 @@ export default function SideBar({ showTitle }: { showTitle?: boolean }) {
                     {...(subItem.activeLink === router.pathname
                       ? {
                           color: 'white !important',
-                          bg: 'primary.600 !important'
+                          bg: 'primary.500 !important'
                         }
                       : {
                           color: 'myGray.500',
@@ -186,7 +187,8 @@ export default function SideBar({ showTitle }: { showTitle?: boolean }) {
                     onClick={() => handleSubItemClick(subItem)}
                   >
                     <Flex>
-                      <Box ml={6} fontSize={'14px'}>
+                      <MyIcon name={subItem.icon as any} w={'14px'} />
+                      <Box ml={2} fontSize={'14px'}>
                         {subItem.name}
                       </Box>
                     </Flex>

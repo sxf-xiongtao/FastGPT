@@ -80,25 +80,23 @@ export const Settings = () => {
   };
 
   const handleScroll = throttle(() => {
-    const allTitles = titles
-      .map((title) => title.mainTitle)
-      .concat(
-        titles.reduce((acc: string[], cur: titleType) => {
-          return acc.concat(cur.subTitles);
-        }, [])
-      );
-
     let firstVisibleTitle: any = null;
 
-    allTitles.forEach((title: string) => {
-      const element = document.getElementById(title);
-      if (!element) return;
-      const rect = element.getBoundingClientRect();
-      if (rect.top <= window.innerHeight && rect.bottom >= 0) {
-        if (!firstVisibleTitle || rect.top < firstVisibleTitle.getBoundingClientRect().top) {
-          firstVisibleTitle = element;
+    titles.forEach((title: titleType) => {
+      title.subTitles.forEach((subTitle: string) => {
+        const subTitleElement = document.getElementById(subTitle);
+        if (!subTitleElement) return;
+
+        const subTitleRect = subTitleElement.getBoundingClientRect();
+        if (subTitleRect.top <= window.innerHeight && subTitleRect.bottom >= 0) {
+          if (
+            !firstVisibleTitle ||
+            subTitleRect.top < firstVisibleTitle.getBoundingClientRect().top
+          ) {
+            firstVisibleTitle = subTitleElement;
+          }
         }
-      }
+      });
     });
 
     if (firstVisibleTitle) {
@@ -225,17 +223,17 @@ export const Settings = () => {
         <Box
           flex={'1 0 0'}
           overflowY={'auto'}
-          className="bg-white w-full pr-6 pt-8 pb-12"
+          className="bg-white w-full pr-6 pt-8"
           hidden={isMobile}
         >
-          <ul className="flex flex-col space-y-4 text-lg">
+          <ul className="flex flex-col text-lg">
             {titles.map((title: titleType) => (
               <Box key={title.mainTitle}>
                 <li
                   className={
                     activeTitle === title.mainTitle
-                      ? 'pl-4 text-blue-500 cursor-pointer border-l-4 border-blue-500'
-                      : 'pl-4 border-l-4 border-transparent text-gray-500 hover:text-blue-500 cursor-pointer'
+                      ? 'pl-4 text-blue-500 cursor-pointer border-l-4 border-blue-500 text-base'
+                      : 'pl-4 border-l-4 border-transparent text-gray-500 hover:text-blue-500 cursor-pointer text-base'
                   }
                   onClick={() => {
                     const anchor = document.getElementById(title.mainTitle);
@@ -251,8 +249,8 @@ export const Settings = () => {
                     key={subTitle}
                     className={
                       activeTitle === subTitle
-                        ? 'pl-8 text-blue-500 cursor-pointer border-l-4 border-blue-500 text-sm'
-                        : 'pl-8 border-l-4 border-transparent text-gray-500 hover:text-blue-500 cursor-pointer text-sm'
+                        ? 'pl-8 text-blue-500 cursor-pointer border-l-4 border-blue-500 text-base'
+                        : 'pl-8 border-l-4 border-transparent text-gray-500 hover:text-blue-500 cursor-pointer text-base'
                     }
                     onClick={() => {
                       const anchor = document.getElementById(subTitle);

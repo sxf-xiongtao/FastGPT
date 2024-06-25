@@ -5,7 +5,7 @@ import { MongoChatItem } from '@fastgpt/service/core/chat/chatItemSchema';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { getDashboardDataStartTime } from '@/service/admin/common/dashboard/utils';
 
-export default async function getChatFormData(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
     await adminCert({ req, authToken: true });

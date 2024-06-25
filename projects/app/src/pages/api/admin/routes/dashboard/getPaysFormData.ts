@@ -6,7 +6,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getDashboardDataStartTime } from '@/service/admin/common/dashboard/utils';
 import { BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
 
-export default async function getPaysFormData(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
     await adminCert({ req, authToken: true });
