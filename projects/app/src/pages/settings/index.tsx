@@ -11,7 +11,8 @@ import ImportModal from './components/ImportModal';
 import FormField from './components/FormField';
 import { Controller, useForm } from 'react-hook-form';
 import { formConfig } from './data/formConfig';
-import FormLabel from './components/FormLabel';
+import BoxCard from '@/components/common/BoxContainer/Card';
+import MyTag from '@fastgpt/web/components/common/Tag/index';
 
 interface formLevel {
   key: string;
@@ -135,36 +136,55 @@ export const Settings = () => {
             <Box
               key={firstLevel.title}
               id={firstLevel.title}
-              border={'base'}
-              boxShadow="md"
               mb={10}
-              mr={4}
-              p="6"
-              rounded="md"
-              bg="white"
+              border={'base'}
+              borderRadius={'lg'}
+              boxShadow={'3'}
+              bg={'white'}
+              overflow={'hidden'}
             >
-              <Box fontSize={'xl'} color={'primary.700'} fontWeight={'bold'}>
+              <Box
+                fontSize={'lg'}
+                color={'myGray.900'}
+                fontWeight={'bold'}
+                bg={'myGray.100'}
+                px={4}
+                py={2}
+              >
                 {firstLevel.title}
               </Box>
               {secondLevels.map((secondLevel) => {
                 return (
-                  <Box key={secondLevel.title} className="mt-4">
+                  <Box
+                    key={secondLevel.title}
+                    px={6}
+                    py={6}
+                    _notLast={{
+                      borderBottomWidth: '1.5px',
+                      borderBottomColor: 'myGray.200'
+                    }}
+                  >
                     {!!secondLevel.properties ? (
                       <Box>
-                        <FormLabel
-                          title={secondLevel.title}
-                          description={secondLevel.description || ''}
-                          level={2}
-                        />
-                        <Box className="flex flex-wrap">
+                        <Flex id={secondLevel.title} color={'primary.600'} mb={5}>
+                          <MyTag fontSize={'md'} type="borderFill">
+                            {secondLevel.title}
+                          </MyTag>
+                        </Flex>
+                        <Flex pl={2} flexWrap={'wrap'}>
                           {Object.values(secondLevel.properties).map((thirdLevel) => {
                             const thirdLevelTyped = thirdLevel as formLevel;
                             return (
                               <Box
                                 key={thirdLevelTyped.title}
-                                className={
-                                  thirdLevelTyped.type === 'boolean' ? 'mt-4 w-1/2' : 'mt-4 w-full'
-                                }
+                                {...(thirdLevelTyped.type === 'boolean'
+                                  ? {
+                                      w: '50%'
+                                    }
+                                  : {
+                                      w: '100%',
+                                      _notFirst: { mt: 5 }
+                                    })}
                               >
                                 <Controller
                                   control={control}
@@ -187,7 +207,7 @@ export const Settings = () => {
                               </Box>
                             );
                           })}
-                        </Box>
+                        </Flex>
                       </Box>
                     ) : (
                       <Controller
@@ -212,67 +232,90 @@ export const Settings = () => {
           );
         })}
       </Box>
+      {/* 目录 */}
       <Flex
-        maxW={'200px'}
+        flex={'0 0 200px'}
         flexDirection={'column'}
         position={isMobile ? 'absolute' : 'relative'}
-        bottom={0}
-        right={0}
         gap={4}
       >
-        <Box
+        <BoxCard
           flex={'1 0 0'}
-          overflowY={'auto'}
-          className="bg-white w-full pr-6 pt-8"
-          hidden={isMobile}
+          overflow={'overlay'}
+          display={['none', 'block']}
+          userSelect={'none'}
+          px={4}
+          py={4}
         >
-          <ul className="flex flex-col text-lg">
+          <Box>
             {titles.map((title: titleType) => (
               <Box key={title.mainTitle}>
-                <li
-                  className={
-                    activeTitle === title.mainTitle
-                      ? 'pl-4 text-blue-500 cursor-pointer border-l-4 border-blue-500 text-base'
-                      : 'pl-4 border-l-4 border-transparent text-gray-500 hover:text-blue-500 cursor-pointer text-base'
-                  }
-                  onClick={() => {
-                    const anchor = document.getElementById(title.mainTitle);
-                    if (anchor) {
-                      anchor.scrollIntoView({ behavior: 'auto', block: 'start' });
-                    }
-                  }}
+                <Box
+                  {...(activeTitle === title.mainTitle
+                    ? {
+                        bg: 'primary.600',
+                        color: 'white'
+                      }
+                    : {
+                        _hover: {
+                          color: 'primary.600'
+                        },
+                        onClick: () => {
+                          const anchor = document.getElementById(title.mainTitle);
+                          if (anchor) {
+                            anchor.scrollIntoView({ behavior: 'auto', block: 'start' });
+                          }
+                        }
+                      })}
+                  py={1}
+                  px={2}
+                  borderRadius={'md'}
+                  cursor={'pointer'}
                 >
                   {title.mainTitle}
-                </li>
-                {title?.subTitles.map((subTitle: string) => (
-                  <li
-                    key={subTitle}
-                    className={
-                      activeTitle === subTitle
-                        ? 'pl-8 text-blue-500 cursor-pointer border-l-4 border-blue-500 text-base'
-                        : 'pl-8 border-l-4 border-transparent text-gray-500 hover:text-blue-500 cursor-pointer text-base'
-                    }
-                    onClick={() => {
-                      const anchor = document.getElementById(subTitle);
-                      if (anchor) {
-                        anchor.scrollIntoView({ behavior: 'auto', block: 'start' });
-                      }
-                    }}
-                  >
-                    {subTitle}
-                  </li>
-                ))}
+                </Box>
+                <Box ml={3} fontSize={'sm'}>
+                  {title?.subTitles.map((subTitle: string) => (
+                    <Box
+                      key={subTitle}
+                      {...(activeTitle === subTitle
+                        ? {
+                            bg: 'primary.600',
+                            color: 'white'
+                          }
+                        : {
+                            _hover: {
+                              color: 'primary.600'
+                            },
+                            onClick: () => {
+                              const anchor = document.getElementById(subTitle);
+                              if (anchor) {
+                                anchor.scrollIntoView({ behavior: 'auto', block: 'start' });
+                              }
+                            }
+                          })}
+                      py={1}
+                      px={2}
+                      borderRadius={'md'}
+                      cursor={'pointer'}
+                    >
+                      {subTitle}
+                    </Box>
+                  ))}
+                </Box>
               </Box>
             ))}
-          </ul>
-        </Box>
-        <Box className="w-full px-6 flex-col flex">
-          <ImportModal value={rawData} setFormData={reset} setRawData={setRawData}>
-            <Button variant={'whiteBase'} mb={3} isLoading={isLoading}>
-              配置文件
-            </Button>
-          </ImportModal>
-          <Button onClick={handleSubmit(onSubmit)} isLoading={isLoading}>
+          </Box>
+        </BoxCard>
+        <Box w={'100%'}>
+          <Box>
+            <ImportModal value={rawData} setFormData={reset} setRawData={setRawData}>
+              <Button variant={'whiteBase'} mb={3} w={'100%'} isLoading={isLoading}>
+                配置文件
+              </Button>
+            </ImportModal>
+          </Box>
+          <Button onClick={handleSubmit(onSubmit)} w={'100%'} isLoading={isLoading}>
             保存
           </Button>
         </Box>

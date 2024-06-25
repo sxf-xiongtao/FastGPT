@@ -1,10 +1,10 @@
 import { useRouter } from 'next/router';
-import { Box, BoxProps, Flex, LinkProps } from '@chakra-ui/react';
+import { Box, BoxProps, Flex, HStack, LinkProps } from '@chakra-ui/react';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-export default function SideBar({ showTitle }: { showTitle?: boolean }) {
+export default function Navbar() {
   const router = useRouter();
   const [expandItems, setExpandItems] = useState<string[]>([]);
 
@@ -71,20 +71,15 @@ export default function SideBar({ showTitle }: { showTitle?: boolean }) {
   ];
 
   const itemStyles: BoxProps & LinkProps = {
+    py: 3,
     mb: 2,
-    px: 10,
-    py: 4,
+    pl: 6,
+    pr: 3,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     cursor: 'pointer',
     borderRadius: 'md'
-  };
-  const hoverStyle: LinkProps = {
-    _hover: {
-      bg: 'myGray.05',
-      color: 'primary.600'
-    }
   };
 
   const handleItemClick = (item: any) => {
@@ -103,31 +98,8 @@ export default function SideBar({ showTitle }: { showTitle?: boolean }) {
     router.push(subItem.activeLink);
   };
 
-  useEffect(() => {
-    const currentPath = window.location.pathname;
-    const activeItem = LIST.find((item) => currentPath.startsWith(item.activeLink));
-    if (activeItem && activeItem.subItems) {
-      setExpandItems([activeItem.activeLink]);
-    } else {
-      setExpandItems([]);
-    }
-  }, []);
-
   return (
-    <Box
-      px={3}
-      bg={'white'}
-      borderRight={'1px'}
-      borderRightColor={'borderColor.base'}
-      overflow={'auto'}
-    >
-      {showTitle ? (
-        <Box textAlign={'center'} fontSize={'2xl'} color={'primary.600'} fontWeight={'bold'} py={4}>
-          Admin
-        </Box>
-      ) : (
-        <Box py={1}></Box>
-      )}
+    <>
       {LIST.map((item) => {
         return (
           <Box key={item.activeLink}>
@@ -135,70 +107,66 @@ export default function SideBar({ showTitle }: { showTitle?: boolean }) {
               alignItems={'center'}
               key={item.activeLink}
               {...itemStyles}
-              {...(item.activeLink === router.pathname ||
-              item.subItems?.some((i) => i.activeLink === router.pathname)
+              {...(router.pathname.startsWith(item.activeLink)
                 ? {
-                    color: 'white !important',
-                    bg: 'primary.500 !important'
+                    color: 'primary.600'
                   }
                 : {
-                    color: 'myGray.500',
-                    bg: 'transparent',
                     _hover: {
                       bg: 'rgba(255,255,255,0.9)'
                     }
                   })}
-              _hover={hoverStyle}
               onClick={() => handleItemClick(item)}
             >
-              <Flex w={'full'} alignItems={'center'} justifyContent={'space-between'}>
+              <HStack spacing={3} justifyContent={'space-between'}>
                 <Flex>
                   <MyIcon name={item.icon as any} w={'16px'} mr={2} />
                   <Box>{item.name}</Box>
                 </Flex>
                 {item.subItems ? (
                   expandItems.includes(item.activeLink) ? (
-                    <ChevronUpIcon ml={6} />
+                    <ChevronUpIcon fontSize={'1.5rem'} />
                   ) : (
-                    <ChevronDownIcon ml={6} />
+                    <ChevronDownIcon fontSize={'1.5rem'} />
                   )
                 ) : null}
-              </Flex>
+              </HStack>
             </Flex>
-            {item.subItems && expandItems.includes(item.activeLink) && (
-              <Box>
-                {item.subItems.map((subItem) => (
-                  <Flex
-                    key={subItem.activeLink}
-                    {...itemStyles}
-                    {...(subItem.activeLink === router.pathname
-                      ? {
-                          color: 'white !important',
-                          bg: 'primary.500 !important'
-                        }
-                      : {
-                          color: 'myGray.500',
-                          bg: 'transparent',
-                          _hover: {
-                            bg: 'rgba(255,255,255,0.9)'
+            {item.subItems &&
+              (expandItems.includes(item.activeLink) ||
+                router.pathname.startsWith(item.activeLink)) && (
+                <Box ml={4}>
+                  {item.subItems.map((subItem) => (
+                    <Flex
+                      key={subItem.activeLink}
+                      {...itemStyles}
+                      {...(router.pathname.startsWith(subItem.activeLink)
+                        ? {
+                            color: 'primary.600',
+                            boxShadow:
+                              '0px 0px 1px 0px rgba(19, 51, 107, 0.08), 0px 4px 4px 0px rgba(19, 51, 107, 0.05)',
+                            bg: 'white'
                           }
-                        })}
-                    _hover={hoverStyle}
-                    onClick={() => handleSubItemClick(subItem)}
-                  >
-                    <Flex>
-                      <MyIcon name={subItem.icon as any} w={'14px'} />
-                      <Box ml={2} fontSize={'14px'}>
-                        {subItem.name}
-                      </Box>
+                        : {
+                            _hover: {
+                              bg: 'rgba(255,255,255,0.9)'
+                            }
+                          })}
+                      onClick={() => handleSubItemClick(subItem)}
+                    >
+                      <Flex>
+                        <MyIcon name={subItem.icon as any} w={'14px'} />
+                        <Box ml={2} fontSize={'14px'}>
+                          {subItem.name}
+                        </Box>
+                      </Flex>
                     </Flex>
-                  </Flex>
-                ))}
-              </Box>
-            )}
+                  ))}
+                </Box>
+              )}
           </Box>
         );
       })}
-    </Box>
+    </>
   );
 }

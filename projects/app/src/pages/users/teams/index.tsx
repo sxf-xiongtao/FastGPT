@@ -22,6 +22,7 @@ import DetailTeamModal from './components/DetailTeamModal';
 import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
 import EditTeamModal from './components/EditTeamModal';
 import { getTeams } from '@/web/admin/users/api';
+import BoxCard from '@/components/common/BoxContainer/Card';
 
 const TeamTable = () => {
   const [search, setSearch] = useState<string>();
@@ -50,7 +51,7 @@ const TeamTable = () => {
   }, [getData]);
 
   return (
-    <Box className="pt-3 h-full flex flex-col">
+    <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
       <HStack px={!isMobile ? 8 : 0} pb={!isMobile ? 0 : 4}>
         {!isMobile && <Box className="text-2xl font-bold text-[#405169]">团队列表</Box>}
         <Box className="flex-grow"></Box>
@@ -136,7 +137,7 @@ const TeamTable = () => {
           </TableContainer>
         </ScrollData>
       </Box>
-    </Box>
+    </BoxCard>
   );
 };
 

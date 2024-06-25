@@ -383,9 +383,16 @@ export const formConfig: FormConfig = {
         }
       },
       fastLogin: {
-        key: 'loginSettings.fastLogin',
+        key: 'fastlogin',
+        type: 'object',
         title: '快速登录(可选)',
-        type: 'json'
+        properties: {
+          fastlogin: {
+            key: 'loginSettings.fastLogin',
+            title: '',
+            type: 'json'
+          }
+        }
       }
     }
   },

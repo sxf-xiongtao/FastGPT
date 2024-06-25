@@ -27,7 +27,7 @@ const FormField = ({
   if (type === 'boolean') {
     return (
       <Box className="flex items-center w-[70%] justify-between pb-8 flex-0">
-        <FormLabel title={title} description={description} level={level} />
+        <FormLabel title={title} description={description} />
         <Switch
           className="ml-4"
           isChecked={value}
@@ -41,7 +41,7 @@ const FormField = ({
   if (type === 'string') {
     return (
       <Box>
-        <FormLabel title={title} description={description} level={level} />
+        <FormLabel title={title} description={description} />
 
         <Input defaultValue={value} onChange={(e) => onChange(e.target.value)} />
       </Box>
@@ -50,7 +50,7 @@ const FormField = ({
   if (type === 'number') {
     return (
       <Box>
-        <FormLabel title={title} description={description} level={level} />
+        <FormLabel title={title} description={description} />
         <Input defaultValue={value} onChange={(e) => onChange(Number(e.target.value))} />
       </Box>
     );
@@ -58,7 +58,7 @@ const FormField = ({
   if (type === 'image') {
     return (
       <Box className="mt-4 mb-8">
-        <FormLabel title={title} description={description} level={level} />
+        <FormLabel title={title} description={description} />
         <Input
           type="file"
           className="hidden"
@@ -100,7 +100,7 @@ const FormField = ({
   if (type === 'textarea') {
     return (
       <Box>
-        <FormLabel title={title} description={description} level={level} />
+        <FormLabel title={title} description={description} />
         <Box className="w-[88%]" mb={3}>
           <Textarea
             variant="outline"
@@ -117,8 +117,8 @@ const FormField = ({
   if (type === 'json') {
     return (
       <Box>
-        <FormLabel title={title} description={description} level={level} />
-        <Box className="mt-4 mb-8 w-[88%]">
+        <FormLabel title={title} description={description} />
+        <Box className="mb-8" w={'100%'}>
           <JsonEditor value={value} onChange={onChange} defaultHeight={250} resize />
         </Box>
       </Box>

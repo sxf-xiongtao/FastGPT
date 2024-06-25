@@ -1,42 +1,28 @@
-import { Box } from '@chakra-ui/react';
+import { Box, Flex, HStack } from '@chakra-ui/react';
 import MarkDownModal from '../MarkDownModal/MarkDownModal';
+import QuestionTip from '@fastgpt/web/components/common/MyTooltip/QuestionTip';
 
-const Description: React.FC<any> = (props) => {
-  const { description } = props;
+const Description: React.FC<any> = ({ description }: { description?: string }) => {
   if (!description) {
-    return <Box className="mt-2"></Box>;
-  } else if ((description as string).length < 20) {
-    return <Box className="mb-2 text-sm text-gray-400">{description}</Box>;
+    return null;
   } else {
     return (
-      <MarkDownModal source={description as string}>
-        <Box className="mb-2 text-sm text-gray-400 cursor-pointer w-20 hover:underline">
-          {`查看详情 >>`}
-        </Box>
+      <MarkDownModal source={description}>
+        <QuestionTip label={`${description}\n\n点击查看详情`} />
       </MarkDownModal>
     );
   }
 };
 
-const FormLabel = ({
-  title,
-  description,
-  level
-}: {
-  title: string;
-  description: string;
-  level: number;
-}) => {
+const FormLabel = ({ title, description }: { title: string; description: string }) => {
+  if (!title) return null;
   return (
-    <>
-      <Box
-        id={title}
-        className={level === 2 ? 'text-xl text-blue-500 pt-2' : 'text-md h-full items-center flex'}
-      >
+    <HStack mb={2}>
+      <Box id={title} color={'myGray.900'}>
         {title}
       </Box>
       <Description description={description} />
-    </>
+    </HStack>
   );
 };
 

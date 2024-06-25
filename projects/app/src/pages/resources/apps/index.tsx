@@ -17,6 +17,7 @@ import MyIcon from '@fastgpt/web/components/common/Icon';
 import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import { getApps } from '@/web/admin/apps/api';
 import MyModal from '@/components/common/MyModal';
+import BoxCard from '@/components/common/BoxContainer/Card';
 
 const AppTable = () => {
   const [appDetail, setAppDetail] = useState();
@@ -40,7 +41,7 @@ const AppTable = () => {
   }, [getData]);
 
   return (
-    <Box className="pb-4 pt-3 h-full flex flex-col">
+    <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
       <HStack px={8}>
         <Box className="text-2xl font-bold text-[#405169]">应用列表</Box>
         <Box className="flex-grow"></Box>
@@ -99,7 +100,7 @@ const AppTable = () => {
 
         {!!appDetail && <AppDetailModal app={appDetail} onClose={() => setAppDetail(undefined)} />}
       </Box>
-    </Box>
+    </BoxCard>
   );
 };
 

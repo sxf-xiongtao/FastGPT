@@ -23,6 +23,7 @@ import { standardSubLevelMap } from '../pays';
 import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import PlanAddModal from './components/PlanAddModal';
 import PlanEditModal from './components/PlanEditModal';
+import BoxCard from '@/components/common/BoxContainer/Card';
 
 type PlanType = {
   teamId: string;
@@ -64,7 +65,7 @@ const PlanTable = () => {
   }, [getData]);
 
   return (
-    <Box className="pt-3 h-full flex flex-col">
+    <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
       <HStack px={!isMobile ? 8 : 0} pb={!isMobile ? 0 : 4}>
         {!isMobile && <Box className="text-2xl font-bold text-[#405169]">套餐管理</Box>}
         <Box className="flex-grow"></Box>
@@ -173,7 +174,7 @@ const PlanTable = () => {
           </TableContainer>
         </ScrollData>
       </Box>
-    </Box>
+    </BoxCard>
   );
 };
 

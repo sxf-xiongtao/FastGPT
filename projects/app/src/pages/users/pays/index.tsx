@@ -31,6 +31,7 @@ import MySelect from '@fastgpt/web/components/common/MySelect';
 import MyModal from '@fastgpt/web/components/common/MyModal';
 import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import { getPays } from '@/web/admin/pays/api';
+import BoxCard from '@/components/common/BoxContainer/Card';
 
 const billTypeList = [
   { label: '全部', value: '' },
@@ -123,9 +124,9 @@ const BillTable = () => {
   }, [billType, getData, setBills]);
 
   return (
-    <Box className="pb-4 pt-3 h-full flex flex-col">
+    <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
       <HStack px={!isMobile ? 8 : 0} pb={!isMobile ? 0 : 4}>
-        {!isMobile && <Box className="text-2xl font-bold text-[#405169]">账单管理</Box>}
+        {!isMobile && <Box className="text-2xl font-bold text-[#405169]">支付记录</Box>}
         <Box className="flex-grow"></Box>
         <InputGroup w={350}>
           <InputLeftElement h={'full'}>
@@ -215,7 +216,7 @@ const BillTable = () => {
           <BillDetailModal bill={billDetail} onClose={() => setBillDetail(undefined)} />
         )}
       </Box>
-    </Box>
+    </BoxCard>
   );
 };
 

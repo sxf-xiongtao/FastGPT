@@ -14,6 +14,7 @@ import {
 import Icons from '@/components/Icons';
 import { GET } from '@/service/common/request';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
+import BoxCard from '@/components/common/BoxContainer/Card';
 
 type fetchChatData = {
   count: number;
@@ -77,7 +78,7 @@ export default function DashBoard() {
   }, []);
 
   return (
-    <>
+    <BoxCard>
       <Box>
         <Box className="w-full text-[20px] font-normal text-[#405169] mb-2">信息总览</Box>
         <Divider />
@@ -110,7 +111,7 @@ export default function DashBoard() {
         <span className="w-full text-[20px] font-normal text-[#405169] mb-2">趋势图</span>
         <UserChart data={chartData} />
       </Box>
-    </>
+    </BoxCard>
   );
 }
 

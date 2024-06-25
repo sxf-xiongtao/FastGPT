@@ -25,6 +25,7 @@ import { getUsers } from '@/web/admin/users/api';
 import UserEditModal from './components/UserEditModal';
 import { UserModelSchema } from '@fastgpt/global/support/user/type';
 import UserAddModal from './components/UserAddModal';
+import BoxCard from '@/components/common/BoxContainer/Card';
 
 const UserTable = () => {
   const [username, setUsername] = useState<string>();
@@ -54,7 +55,7 @@ const UserTable = () => {
   }, [getData]);
 
   return (
-    <Box className="pt-3 h-full flex flex-col">
+    <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
       <HStack px={!isMobile ? 8 : 0} pb={!isMobile ? 0 : 4}>
         {!isMobile && <Box className="text-2xl font-bold text-[#405169]">用户信息</Box>}
         <Box className="flex-grow"></Box>
@@ -152,7 +153,7 @@ const UserTable = () => {
           <UserDetailModal user={userDetail} onClose={() => setUserDetail(undefined)} />
         )}
       </Box>
-    </Box>
+    </BoxCard>
   );
 };
 

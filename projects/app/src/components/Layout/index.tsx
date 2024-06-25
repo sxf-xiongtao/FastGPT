@@ -8,16 +8,28 @@ import {
   PopoverTrigger,
   useMediaQuery
 } from '@chakra-ui/react';
-import SlideBar from './SlideBar';
+import Navbar from './Navbar';
 import MyIcon from '@fastgpt/web/components/common/Icon';
+import { useSystem } from '@fastgpt/web/hooks/useSystem';
 
 const Layout = ({ children }: { children: JSX.Element }) => {
-  const [isMobile] = useMediaQuery('(max-width: 768px)');
+  const { isPc } = useSystem();
 
   return (
-    <Flex h={'100%'} bg={'myGray.50'} flexDirection={isMobile ? 'column' : 'row'}>
-      {!isMobile ? (
-        <SlideBar showTitle />
+    <Flex h={'100%'} bg={'myGray.100'} flexDirection={['column', 'row']}>
+      {isPc ? (
+        <Box px={3}>
+          <Box
+            textAlign={'center'}
+            fontSize={'2xl'}
+            color={'primary.600'}
+            fontWeight={'bold'}
+            py={4}
+          >
+            Admin
+          </Box>
+          <Navbar />
+        </Box>
       ) : (
         <Flex justifyContent={'space-between'} alignItems={'center'} px={8}>
           <Box
@@ -36,15 +48,13 @@ const Layout = ({ children }: { children: JSX.Element }) => {
               </Button>
             </PopoverTrigger>
             <PopoverContent>
-              <SlideBar />
+              <Navbar />
             </PopoverContent>
           </Popover>
         </Flex>
       )}
-      <Box flex={'1 0 0'} h={'100%'} overflow={'auto'}>
-        <Box h={'100%'} overflow={'overlay'} bg={'white'} py={5} px={8}>
-          {children}
-        </Box>
+      <Box flex={'1 0 0'} h={'100%'} overflow={'auto'} py={[4, 6]} pl={[3, 3]} pr={[3, 6]}>
+        {children}
       </Box>
     </Flex>
   );

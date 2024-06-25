@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Input, Textarea } from '@chakra-ui/react';
+import { Box, Button, Flex, HStack, Input, Textarea } from '@chakra-ui/react';
 import React from 'react';
 import { useConfirm } from '@fastgpt/web/hooks/useConfirm';
 import { useRequest } from '@fastgpt/web/hooks/useRequest';
@@ -13,6 +13,7 @@ import { SendInformProps } from '@fastgpt/global/support/user/inform/type';
 import { useQuery } from '@tanstack/react-query';
 import MySelect from '@fastgpt/web/components/common/MySelect';
 import { InformLevelEnum } from '@fastgpt/global/support/user/inform/constants';
+import BoxCard from '@/components/common/BoxContainer/Card';
 
 const InformSetting = () => {
   const { ConfirmModal: ConfirmSettingSystemModal, openConfirm: onOpenConfirmSystemModal } =
@@ -72,9 +73,9 @@ const InformSetting = () => {
   });
 
   return (
-    <Box>
-      <Box>
-        <Flex alignItems={'flex-start'}>
+    <>
+      <BoxCard>
+        <HStack>
           <Box fontSize={'2xl'}>系统公告配置</Box>
           <Button
             variant={'whitePrimary'}
@@ -87,15 +88,15 @@ const InformSetting = () => {
           >
             保存
           </Button>
-        </Flex>
+        </HStack>
         <Box py={2}>
           设置该内容，会在用户登录系统后，通过弹窗形式进行强提示。用户关闭后，下次不再提示。只能设置1个该类型通知。支持
           markdown 个格式。
         </Box>
         <Textarea rows={10} {...registerSystemMsgModal('content', {})} />
-      </Box>
-      <Box mt={8}>
-        <Flex alignItems={'flex-start'}>
+      </BoxCard>
+      <BoxCard mt={8}>
+        <HStack>
           <Box fontSize={'2xl'}>发送系统通知</Box>
           <Button
             variant={'whitePrimary'}
@@ -108,7 +109,7 @@ const InformSetting = () => {
           >
             确认发送
           </Button>
-        </Flex>
+        </HStack>
         <Box py={2}>为所有用户发送一个通知，不同等级通知，会有不同提示。</Box>
         <Flex alignItems={'center'}>
           <Box flex={'0 0 100px'} mr={2}>
@@ -143,10 +144,10 @@ const InformSetting = () => {
             required: true
           })}
         />
-      </Box>
+      </BoxCard>
       <ConfirmSendSystemMsg />
       <ConfirmSettingSystemModal />
-    </Box>
+    </>
   );
 };
 

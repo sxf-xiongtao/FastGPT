@@ -237,7 +237,7 @@ importers:
         version: 2.1.1(@chakra-ui/system@2.6.1(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@chakra-ui/next-js':
         specifier: 2.1.5
-        version: 2.1.5(@chakra-ui/react@2.8.1(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(framer-motion@9.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(next@14.2.3(@babel/core@7.24.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.58.3))(react@18.3.1)
+        version: 2.1.5(@chakra-ui/react@2.8.1(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(framer-motion@9.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(next@14.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.58.3))(react@18.3.1)
       '@chakra-ui/react':
         specifier: 2.8.1
         version: 2.8.1(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(framer-motion@9.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -350,21 +350,12 @@ importers:
       '@alicloud/tea-util':
         specifier: ^1.4.7
         version: 1.4.7
-      '@chakra-ui/anatomy':
-        specifier: 2.2.1
-        version: 2.2.1
       '@chakra-ui/icons':
         specifier: 2.1.1
         version: 2.1.1(@chakra-ui/system@2.6.1(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(react@18.3.1))(react@18.3.1))(react@18.3.1)
-      '@chakra-ui/next-js':
-        specifier: 2.1.5
-        version: 2.1.5(@chakra-ui/react@2.8.1(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(framer-motion@9.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(next@14.2.3(@babel/core@7.24.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.58.3))(react@18.3.1)
       '@chakra-ui/react':
         specifier: 2.8.1
         version: 2.8.1(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(framer-motion@9.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@chakra-ui/styled-system':
-        specifier: 2.9.1
-        version: 2.9.1
       '@chakra-ui/system':
         specifier: 2.6.1
         version: 2.6.1(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(react@18.3.1))(react@18.3.1)
@@ -383,12 +374,6 @@ importers:
       '@fastgpt/web':
         specifier: workspace:*
         version: link:../../FastGPT/packages/web
-      '@mozilla/readability':
-        specifier: ^0.4.4
-        version: 0.4.4
-      '@node-rs/jieba':
-        specifier: 1.10.0
-        version: 1.10.0
       '@peculiar/x509':
         specifier: ^1.9.5
         version: 1.9.5
@@ -404,15 +389,15 @@ importers:
       assert:
         specifier: ^2.0.0
         version: 2.0.0
+      autoprefixer:
+        specifier: ^10.4.19
+        version: 10.4.19(postcss@8.4.31)
       axios:
         specifier: ^1.3.3
         version: 1.5.1
       clsx:
         specifier: ^1.2.1
         version: 1.2.1
-      cookie:
-        specifier: ^0.5.0
-        version: 0.5.0
       crawlee:
         specifier: ^3.6.2
         version: 3.6.2(canvas@2.11.2)
@@ -422,24 +407,12 @@ importers:
       dayjs:
         specifier: ^1.11.8
         version: 1.11.8
-      immer:
-        specifier: ^9.0.19
-        version: 9.0.19
-      js-cookie:
-        specifier: ^3.0.5
-        version: 3.0.5
       jsonwebtoken:
         specifier: ^9.0.0
         version: 9.0.2
       jsrsasign:
         specifier: ^10.8.6
         version: 10.8.6
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
-      multer:
-        specifier: 1.4.5-lts.1
-        version: 1.4.5-lts.1
       nanoid:
         specifier: ^4.0.1
         version: 4.0.1
@@ -494,34 +467,13 @@ importers:
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
-      zustand:
-        specifier: ^4.3.8
-        version: 4.3.8(immer@9.0.19)(react@18.3.1)
     devDependencies:
       '@svgr/webpack':
         specifier: ^6.5.1
         version: 6.5.1
-      '@types/cookie':
-        specifier: ^0.5.1
-        version: 0.5.2
-      '@types/formidable':
-        specifier: ^2.0.5
-        version: 2.0.5
-      '@types/js-cookie':
-        specifier: ^3.0.3
-        version: 3.0.3
       '@types/jsonwebtoken':
         specifier: ^9.0.1
         version: 9.0.3
-      '@types/jsrsasign':
-        specifier: ^10.5.8
-        version: 10.5.8
-      '@types/lodash':
-        specifier: ^4.14.191
-        version: 4.14.191
-      '@types/multer':
-        specifier: ^1.4.11
-        version: 1.4.11
       '@types/node':
         specifier: ^20.14.2
         version: 20.14.2
@@ -534,18 +486,12 @@ importers:
       '@types/react':
         specifier: 18.3.0
         version: 18.3.0
-      '@types/react-dom':
-        specifier: 18.3.0
-        version: 18.3.0
       '@types/request-ip':
         specifier: ^0.0.38
         version: 0.0.38
       '@types/xml2js':
         specifier: ^0.4.14
         version: 0.4.14
-      autoprefixer:
-        specifier: ^10.4.16
-        version: 10.4.16(postcss@8.4.31)
       eslint:
         specifier: 8.34.0
         version: 8.34.0
@@ -561,9 +507,6 @@ importers:
       nextjs-node-loader:
         specifier: ^1.1.5
         version: 1.1.5(webpack@5.91.0)
-      postcss:
-        specifier: ^8.4.31
-        version: 8.4.31
       react-i18next:
         specifier: 13.5.0
         version: 13.5.0(i18next@23.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2270,10 +2213,6 @@ packages:
   '@motionone/utils@10.17.0':
     resolution: {integrity: sha512-bGwrki4896apMWIj9yp5rAS2m0xyhxblg6gTB/leWDPt+pb410W8lYWsxyurX+DH+gO1zsQsfx2su/c1/LtTpg==}
 
-  '@mozilla/readability@0.4.4':
-    resolution: {integrity: sha512-MCgZyANpJ6msfvVMi6+A0UAsvZj//4OHREYUB9f2087uXHVoU+H+SWhuihvb1beKpM323bReQPRio0WNk2+V6g==}
-    engines: {node: '>=14.0.0'}
-
   '@napi-rs/wasm-runtime@0.1.2':
     resolution: {integrity: sha512-8JuczewTFIZ/XIjHQ+YlQUydHvlKx2hkcxtuGwh+t/t5zWyZct6YG4+xjHcq8xyc/e7FmFwf42Zj2YgICwmlvA==}
 
@@ -2719,9 +2658,6 @@ packages:
   '@types/express@4.17.17':
     resolution: {integrity: sha512-Q4FmmuLGBG58btUnfS1c1r/NQdlp3DMfGDGig8WhfpA2YRUtEkxAjkZb0yvplJGYdF1fsQ81iMDcH24sSCNC/Q==}
 
-  '@types/formidable@2.0.5':
-    resolution: {integrity: sha512-uvMcdn/KK3maPOaVUAc3HEYbCEhjaGFwww4EsX6IJfWIJ1tzHtDHczuImH3GKdusPnAAmzB07St90uabZeCKPA==}
-
   '@types/hast@3.0.4':
     resolution: {integrity: sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ==}
 
@@ -2733,9 +2669,6 @@ packages:
 
   '@types/http-errors@2.0.4':
     resolution: {integrity: sha512-D0CFMMtydbJAegzOyHjtiKPLlvnm3iTZyZRSZoLq2mRhDdmLfIWOCYPfQJ4cu2erKghU++QvjcUjp/5h7hESpA==}
-
-  '@types/js-cookie@3.0.3':
-    resolution: {integrity: sha512-Xe7IImK09HP1sv2M/aI+48a20VX+TdRJucfq4vfRVy6nWN8PYPOEnlMRSgxJAgYQIXJVL8dZ4/ilAM7dWNaOww==}
 
   '@types/js-yaml@4.0.9':
     resolution: {integrity: sha512-k4MGaQl5TGo/iipqb2UDG2UwjXziSWkh0uysQelTlJpX1qGlpUZYm8PnO4DxG1qBomtJUdYJ6qR6xdIah10JLg==}
@@ -2751,9 +2684,6 @@ packages:
 
   '@types/jsonwebtoken@9.0.3':
     resolution: {integrity: sha512-b0jGiOgHtZ2jqdPgPnP6WLCXZk1T8p06A/vPGzUvxpFGgKMbjXJDjC5m52ErqBnIuWZFgGoIJyRdeG5AyreJjA==}
-
-  '@types/jsrsasign@10.5.8':
-    resolution: {integrity: sha512-1oZ3TbarAhKtKUpyrCIqXpbx3ZAfoSulleJs6/UzzyYty0ut+kjRX7zHLAaHwVIuw8CBjIymwW4J2LK944HoHQ==}
 
   '@types/katex@0.16.7':
     resolution: {integrity: sha512-HMwFiRujE5PjrgwHQ25+bsLJgowjGjm5Z8FVSf0N6PwgJrwxH0QxzHYDcKsTfV3wva0vzrpqMTJS2jXPr5BMEQ==}
@@ -3161,8 +3091,8 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  autoprefixer@10.4.16:
-    resolution: {integrity: sha512-7vd3UC6xKp0HLfua5IjZlcXvGAGy7cBAXTg2lyQ/8WpNhd6SiZ8Be+xm3FyBSYJx5GKcpRCzBh7RH4/0dnY+uQ==}
+  autoprefixer@10.4.19:
+    resolution: {integrity: sha512-BaENR2+zBZ8xXhM4pUaKUxlVdxZ0EZhjvbopwnXmxRUfqDmwSpC2lAi/QXvx7NRdPCo1WKEcEF6mV64si1z4Ew==}
     engines: {node: ^10 || ^12 || >=14}
     hasBin: true
     peerDependencies:
@@ -4553,9 +4483,6 @@ packages:
   immediate@3.0.6:
     resolution: {integrity: sha512-XXOFtyqDjNDAQxVfYxuF7g9Il/IbWmmlQg2MYKOH8ExIT1qg6xc4zyS3HaEEATgs1btfzxq15ciUiY7gjSXRGQ==}
 
-  immer@9.0.19:
-    resolution: {integrity: sha512-eY+Y0qcsB4TZKwgQzLaE/lqYMlKhv5J9dyd2RhhtGhNo2njPXDqU9XPfcNfa3MIDsdtZt5KlkIsirlo4dHsWdQ==}
-
   immutable@4.3.5:
     resolution: {integrity: sha512-8eabxkth9gZatlwl5TBuJnCsoTADlL6ftEr7A4qgdaTsPyreilDSnUk57SO+jfKcNtxPa22U5KK6DSeAYhpBJw==}
 
@@ -4825,10 +4752,6 @@ packages:
 
   js-cookie@2.2.1:
     resolution: {integrity: sha512-HvdH2LzI/EAZcUwA8+0nKNtWHqS+ZmijLA30RwZA0bo7ToCckjK5MkGhjED9KoRcXO6BaGI3I9UIzSA1FKFPOQ==}
-
-  js-cookie@3.0.5:
-    resolution: {integrity: sha512-cEiJEAEoIbWfCZYKWhVwFuvPX1gETRYPw6LlaTKoxD3s2AkXzkCjnp6h0V77ozyqj0jakteJ4YqDJT830+lVGw==}
-    engines: {node: '>=14'}
 
   js-sdsl@4.4.2:
     resolution: {integrity: sha512-dwXFwByc/ajSV6m5bcKAPwe4yDDF6D614pxmIi5odytzxRlwqF6nwoiCek80Ixc7Cvma5awClxrzFtxCQvcM8w==}
@@ -7119,18 +7042,6 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  zustand@4.3.8:
-    resolution: {integrity: sha512-4h28KCkHg5ii/wcFFJ5Fp+k1J3gJoasaIbppdgZFO4BPJnsNxL0mQXBSFgOgAdCdBj35aDTPvdAJReTMntFPGg==}
-    engines: {node: '>=12.7.0'}
-    peerDependencies:
-      immer: '>=9.0'
-      react: 18.3.1
-    peerDependenciesMeta:
-      immer:
-        optional: true
-      react:
-        optional: true
-
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
@@ -8299,7 +8210,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/react'
 
-  '@chakra-ui/next-js@2.1.5(@chakra-ui/react@2.8.1(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(framer-motion@9.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(next@14.2.3(@babel/core@7.24.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.58.3))(react@18.3.1)':
+  '@chakra-ui/next-js@2.1.5(@chakra-ui/react@2.8.1(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(framer-motion@9.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(next@14.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.58.3))(react@18.3.1)':
     dependencies:
       '@chakra-ui/react': 2.8.1(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(framer-motion@9.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@emotion/cache': 11.11.0
@@ -9416,8 +9327,6 @@ snapshots:
       hey-listen: 1.0.8
       tslib: 2.6.2
 
-  '@mozilla/readability@0.4.4': {}
-
   '@napi-rs/wasm-runtime@0.1.2':
     dependencies:
       '@emnapi/core': 1.1.0
@@ -9869,10 +9778,6 @@ snapshots:
       '@types/qs': 6.9.14
       '@types/serve-static': 1.15.5
 
-  '@types/formidable@2.0.5':
-    dependencies:
-      '@types/node': 20.14.2
-
   '@types/hast@3.0.4':
     dependencies:
       '@types/unist': 3.0.2
@@ -9885,8 +9790,6 @@ snapshots:
   '@types/http-cache-semantics@4.0.4': {}
 
   '@types/http-errors@2.0.4': {}
-
-  '@types/js-cookie@3.0.3': {}
 
   '@types/js-yaml@4.0.9': {}
 
@@ -9903,8 +9806,6 @@ snapshots:
   '@types/jsonwebtoken@9.0.3':
     dependencies:
       '@types/node': 20.14.2
-
-  '@types/jsrsasign@10.5.8': {}
 
   '@types/katex@0.16.7': {}
 
@@ -10391,7 +10292,7 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  autoprefixer@10.4.16(postcss@8.4.31):
+  autoprefixer@10.4.19(postcss@8.4.31):
     dependencies:
       browserslist: 4.23.0
       caniuse-lite: 1.0.30001600
@@ -12070,8 +11971,6 @@ snapshots:
 
   immediate@3.0.6: {}
 
-  immer@9.0.19: {}
-
   immutable@4.3.5: {}
 
   import-fresh@3.3.0:
@@ -12334,8 +12233,6 @@ snapshots:
   jquery@3.7.1: {}
 
   js-cookie@2.2.1: {}
-
-  js-cookie@3.0.5: {}
 
   js-sdsl@4.4.2: {}
 
@@ -15026,12 +14923,5 @@ snapshots:
   ylru@1.3.2: {}
 
   yocto-queue@0.1.0: {}
-
-  zustand@4.3.8(immer@9.0.19)(react@18.3.1):
-    dependencies:
-      use-sync-external-store: 1.2.0(react@18.3.1)
-    optionalDependencies:
-      immer: 9.0.19
-      react: 18.3.1
 
   zwitch@2.0.4: {}

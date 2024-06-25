@@ -16,6 +16,7 @@ import MyIcon from '@fastgpt/web/components/common/Icon';
 import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import MyModal from '@/components/common/MyModal';
 import { getDatasets } from '@/web/admin/datasets/api';
+import BoxCard from '@/components/common/BoxContainer/Card';
 
 const DatasetTable = () => {
   const [appDetail, setAppDetail] = useState();
@@ -38,7 +39,7 @@ const DatasetTable = () => {
   }, [getData]);
 
   return (
-    <Box className="pb-4 pt-3 h-full flex flex-col">
+    <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
       <HStack px={8}>
         <Box className="text-2xl font-bold text-[#405169]">知识库列表</Box>
         <Box className="flex-grow"></Box>
@@ -91,7 +92,7 @@ const DatasetTable = () => {
 
         {!!appDetail && <AppDetailModal app={appDetail} onClose={() => setAppDetail(undefined)} />}
       </Box>
-    </Box>
+    </BoxCard>
   );
 };
 
