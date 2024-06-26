@@ -4,9 +4,25 @@ import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
-import { NextApiRequest, NextApiResponse } from 'next';
+import { ApiRequestProps } from '@fastgpt/service/type/next';
+import { NextApiResponse } from 'next';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export type UpdatePlanBody = {
+  id: string;
+  type: `${SubTypeEnum}`;
+  startTime: string;
+  expiredTime: string;
+  price: number;
+  totalPoints?: number;
+  surplusPoints?: number;
+  extraDatasetSize?: number;
+  level?: number;
+};
+
+export default async function handler(
+  req: ApiRequestProps<UpdatePlanBody>,
+  res: NextApiResponse<any>
+) {
   try {
     await connectToDatabase();
     await adminCert({ req, authToken: true });
@@ -21,17 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       surplusPoints,
       extraDatasetSize,
       level
-    } = req.body as {
-      id: string;
-      type: `${SubTypeEnum}`;
-      startTime: Date;
-      expiredTime: Date;
-      price: number;
-      totalPoints?: number;
-      surplusPoints?: number;
-      extraDatasetSize?: number;
-      level?: number;
-    };
+    } = req.body;
 
     const sub = await MongoTeamSub.findById(id);
     if (!sub) {

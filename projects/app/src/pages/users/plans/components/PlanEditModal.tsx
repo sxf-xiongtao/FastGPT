@@ -14,15 +14,7 @@ import { useToast } from '@fastgpt/web/hooks/useToast';
 import MyModal from '@/components/common/MyModal';
 import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import MySelect from '@fastgpt/web/components/common/MySelect';
-
-type TFormData = {
-  startTime: string; // 开始时间
-  expiredTime: string; // 结束时间
-  price: number; // 价格
-  extraDatasetSize: number; // 额外知识库容量
-  totalPoints: number; // 总积分
-  surplusPoints: number; // 剩余积分
-};
+import { PlanType } from '@/pages/users/plans';
 
 function transformDate(date: string) {
   const initialDate = new Date(date);
@@ -35,9 +27,13 @@ function transformDate(date: string) {
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
-export default function PlanEditModal(props: { data: any; getData: any }) {
+export default function PlanEditModal(props: {
+  data: PlanType;
+  getData: any;
+  subType: `${SubTypeEnum}`;
+}) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data, getData } = props;
+  const { data, getData, subType } = props;
   const { toast } = useToast();
 
   const {
@@ -50,7 +46,7 @@ export default function PlanEditModal(props: { data: any; getData: any }) {
     defaultValues: data
   });
 
-  const onSubmit = async (formData: TFormData) => {
+  const onSubmit = async (formData: PlanType) => {
     try {
       const startTimeISO = new Date(formData.startTime).toISOString();
       const expiredTimeISO = new Date(formData.expiredTime).toISOString();
@@ -146,7 +142,7 @@ export default function PlanEditModal(props: { data: any; getData: any }) {
               type="number"
             />
           </FormControl>
-          {data.type === SubTypeEnum.standard && (
+          {subType === SubTypeEnum.standard && (
             <>
               <FormControl className="mt-4">
                 <FormLabel htmlFor="level" className="!font-bold text-grayModern-700">
@@ -175,7 +171,7 @@ export default function PlanEditModal(props: { data: any; getData: any }) {
               </FormControl>
             </>
           )}
-          {data.type === SubTypeEnum.extraDatasetSize ? (
+          {subType === SubTypeEnum.extraDatasetSize ? (
             <FormControl className="mt-4">
               <FormLabel htmlFor="extraDatasetSize" className="!font-bold text-grayModern-700">
                 额外知识库容量

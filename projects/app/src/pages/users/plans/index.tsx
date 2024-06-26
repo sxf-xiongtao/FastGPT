@@ -25,7 +25,7 @@ import PlanAddModal from './components/PlanAddModal';
 import PlanEditModal from './components/PlanEditModal';
 import BoxCard from '@/components/common/BoxContainer/Card';
 
-type PlanType = {
+export type PlanType = {
   teamId: string;
   teamName: string;
   userName: string;
@@ -36,6 +36,8 @@ type PlanType = {
   startTime: string;
   totalPoints: number;
   surplusPoints: number;
+  price: number;
+  extraDatasetSize: number;
 };
 
 const PlanTable = () => {
@@ -148,6 +150,7 @@ const PlanTable = () => {
                     <Td>
                       <PlanEditModal
                         data={item}
+                        subType={item.type}
                         getData={() => {
                           setPlans([]);
                           getData(1);
@@ -167,7 +170,7 @@ const PlanTable = () => {
               >
                 <MyIcon name="empty" w={'48px'} h={'48px'} color={'transparent'} />
                 <Box mt={2} color={'myGray.500'}>
-                  无团队记录～
+                  无套餐记录～
                 </Box>
               </Flex>
             )}
