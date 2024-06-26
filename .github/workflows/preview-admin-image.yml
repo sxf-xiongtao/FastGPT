@@ -1,4 +1,4 @@
-name: Build fastgpt-plus images and copy image to docker hub
+name: Preview fastgpt-admin in pr
 on:
   pull_request_target:
     paths:
