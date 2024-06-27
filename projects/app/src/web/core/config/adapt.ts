@@ -74,10 +74,6 @@ export function formatConfigStore2FormSchema({
       concatMd,
       scripts: JSON.stringify(scripts, null, 2),
       limit,
-      censor: {
-        BAIDU_TEXT_CENSOR_CLIENTID: fastgptPro?.censor?.BAIDU_TEXT_CENSOR_CLIENTID || '',
-        BAIDU_TEXT_CENSOR_CLIENTSECRET: fastgptPro?.censor?.BAIDU_TEXT_CENSOR_CLIENTSECRET || ''
-      },
       systemEnv: {
         openapiPrefix,
         vectorMaxProcess,
@@ -94,10 +90,6 @@ export function formatConfigStore2FormSchema({
       whisperModel: JSON.stringify(whisperModel, null, 2)
     },
     loginSettings: {
-      googleV3Ver: {
-        clientKey: fastgpt?.feConfigs?.googleClientVerKey || '',
-        serviceKey: fastgptPro?.auth?.googleServiceVerKey || ''
-      },
       github: {
         clientId: fastgptPro?.auth?.github?.clientId || '',
         secret: fastgptPro?.auth?.github?.secret || ''
@@ -133,6 +125,16 @@ export function formatConfigStore2FormSchema({
         // @ts-ignore
         extraPointsPrice: subPlans[SubTypeEnum.extraPoints]?.price || 0
       }
+    },
+    securitySettings: {
+      censor: {
+        BAIDU_TEXT_CENSOR_CLIENTID: fastgptPro?.censor?.BAIDU_TEXT_CENSOR_CLIENTID || '',
+        BAIDU_TEXT_CENSOR_CLIENTSECRET: fastgptPro?.censor?.BAIDU_TEXT_CENSOR_CLIENTSECRET || ''
+      },
+      googleV3Ver: {
+        clientKey: fastgpt?.feConfigs?.googleClientVerKey || '',
+        serviceKey: fastgptPro?.auth?.googleServiceVerKey || ''
+      }
     }
   };
 }
@@ -141,11 +143,13 @@ export function formatFormData2ConfigStore({
   siteSettings,
   modelSettings,
   loginSettings,
-  paySettings
+  paySettings,
+  securitySettings
 }: ConfigFormType): ConfigStoreType {
-  const { feConfigs, systemEnv, concatMd, scripts, limit, censor } = siteSettings;
+  const { feConfigs, systemEnv, concatMd, scripts, limit } = siteSettings;
   const { llmModels, vectorModels, reRankModels, audioSpeechModels, whisperModel } = modelSettings;
-  const { email, phone, github, wechat, google, googleV3Ver, fastLogin } = loginSettings;
+  const { email, phone, github, wechat, google, fastLogin } = loginSettings;
+  const { censor, googleV3Ver } = securitySettings;
   const { wx, subPlans } = paySettings;
 
   const formatFeConfig = {
@@ -155,7 +159,7 @@ export function formatFormData2ConfigStore({
     limit,
     oauth: {
       github: github?.clientId,
-      google: googleV3Ver?.clientId,
+      google: google?.clientId,
       wechat: wechat?.appID
     }
   };
@@ -165,7 +169,6 @@ export function formatFormData2ConfigStore({
     phone,
     github,
     wechat,
-    googleServiceVerKey: googleV3Ver.serviceKey,
     google
   };
 

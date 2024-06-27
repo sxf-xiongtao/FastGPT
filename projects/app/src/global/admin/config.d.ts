@@ -30,7 +30,6 @@ export type ConfigFormType = {
     concatMd: string;
     scripts?: string;
     limit?: FastGPTConfigFileType['feConfigs']['limit'];
-    censor?: SystemConfigType['censor'];
     systemEnv: {
       openapiPrefix: string;
       vectorMaxProcess: number;
@@ -52,7 +51,6 @@ export type ConfigFormType = {
     github: SystemConfigType['auth']['github'];
     wechat: SystemConfigType['auth']['wechat'];
     google: SystemConfigType['auth']['google'];
-    googleV3Ver: SystemConfigType['auth']['googleServiceVerKey'];
     fastLogin: string;
   };
   paySettings: {
@@ -62,5 +60,9 @@ export type ConfigFormType = {
       extraDatasetSizePrice: number;
       extraPointsPrice: number;
     };
+  };
+  securitySettings: {
+    censor?: SystemConfigType['censor'];
+    googleV3Ver: SystemConfigType['auth']['googleServiceVerKey'];
   };
 };

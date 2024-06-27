@@ -238,9 +238,7 @@ export const formConfig: FormConfig = {
           clientId: {
             key: 'loginSettings.google.clientId',
             type: 'string',
-            title: 'Google Client ID',
-            description:
-              '![](https://oss.laf.dev/lk63dw-fastgpt/google_service_ver_key_1.png)\n![](https://oss.laf.dev/lk63dw-fastgpt/google_service_ver_key_2.png)\nhttps://www.google.com/recaptcha/about/\nclientId: \nserviceId:\n每月有免费额度，基本够用'
+            title: 'Google Client ID'
           },
           secret: {
             key: 'loginSettings.google.secret',
@@ -442,36 +440,38 @@ export const formConfig: FormConfig = {
     type: 'object',
     properties: {
       censor: {
-        key: 'siteSettings.censor',
+        key: 'securitySettings.censor',
         type: 'object',
         title: '内容审查',
         properties: {
           BAIDU_TEXT_CENSOR_CLIENTID: {
-            key: 'siteSettings.censor.BAIDU_TEXT_CENSOR_CLIENTID',
+            key: 'securitySettings.censor.BAIDU_TEXT_CENSOR_CLIENTID',
             type: 'string',
             title: '百度安全 id',
             description:
               '![](https://oss.laf.dev/lk63dw-fastgpt/baidu_censor.png)\nhttps://console.bce.baidu.com/ai/?_=1693133074333#/ai/antiporn/overview/index 注册百度安全校验账号，并创建对应应用。提供应用的 id 和 secret'
           },
           BAIDU_TEXT_CENSOR_CLIENTSECRET: {
-            key: 'siteSettings.censor.BAIDU_TEXT_CENSOR_CLIENTSECRET',
+            key: 'securitySettings.censor.BAIDU_TEXT_CENSOR_CLIENTSECRET',
             type: 'string',
             title: '百度安全 secret'
           }
         }
       },
       googleV3Ver: {
-        key: 'loginSettings.googleV3Ver',
+        key: 'securitySettings.googleV3Ver',
         type: 'object',
         title: '谷歌V3安全校验',
         properties: {
           clientKey: {
-            key: 'loginSettings.googleV3Ver.clientKey',
+            key: 'securitySettings.googleV3Ver.clientKey',
             type: 'string',
-            title: '客户端Key'
+            title: '客户端Key',
+            description:
+              '![](https://oss.laf.dev/lk63dw-fastgpt/google_service_ver_key_1.png)\n![](https://oss.laf.dev/lk63dw-fastgpt/google_service_ver_key_2.png)\nhttps://www.google.com/recaptcha/about/\nclientId: \nserviceId:\n每月有免费额度，基本够用'
           },
           serviceKey: {
-            key: 'loginSettings.googleV3Ver.serviceKey',
+            key: 'securitySettings.googleV3Ver.serviceKey',
             type: 'string',
             title: '服务端Key'
           }
