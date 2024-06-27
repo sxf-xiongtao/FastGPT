@@ -49,7 +49,12 @@ export async function createUserByUsername({
       { session }
     );
 
-    const team = await getAndCreateUserDefaultTeam(user._id, session);
+    const team = await getAndCreateUserDefaultTeam({
+      ownerId: user._id,
+      teamName: `${username.slice(0, 5)}的团队`,
+      teamAvatar: avatar,
+      session
+    });
     return {
       user,
       team

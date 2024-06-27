@@ -30,6 +30,7 @@ import { PerResourceTypeEnum } from '@fastgpt/global/support/permission/constant
 import { TeamPermission } from '@fastgpt/global/support/permission/user/controller';
 import { TeamDefaultPermissionVal } from '@fastgpt/global/support/permission/user/constant';
 import { getResourcePermission } from '@fastgpt/service/support/permission/controller';
+import { LOGO_ICON } from '@fastgpt/global/common/system/constants';
 
 /* -------- format --------- */
 export async function teamMemberSchema2TeamItemType(
@@ -67,7 +68,7 @@ export async function createTeam({
   avatar,
   defaultTeam = false,
   session
-}: CreateTeamProps & { ownerId: string; session?: ClientSession }): Promise<TeamTmbItemType> {
+}: CreateTeamProps & { ownerId: string; session: ClientSession }): Promise<TeamTmbItemType> {
   try {
     const [team] = await MongoTeam.create(
       [
@@ -168,20 +169,27 @@ export async function getTeamByTmbId(tmbId: string) {
 }
 
 // get default team, if not exit, create one
-export async function getAndCreateUserDefaultTeam(
-  userId: string,
-  session?: ClientSession
-): Promise<TeamTmbItemType> {
+export async function getAndCreateUserDefaultTeam({
+  ownerId,
+  teamName = 'My Team',
+  teamAvatar = LOGO_ICON,
+  session
+}: {
+  ownerId: string;
+  teamName?: string;
+  teamAvatar?: string;
+  session: ClientSession;
+}): Promise<TeamTmbItemType> {
   const tmb = (await MongoTeamMember.findOne({
-    userId,
+    userId: ownerId,
     defaultTeam: true
   }).populate('teamId userId')) as TeamMemberWithTeamAndUserSchema;
 
   if (!tmb) {
     return createTeam({
-      ownerId: userId,
-      name: 'My Team',
-      avatar: '/icon/logo.svg',
+      ownerId,
+      name: teamName,
+      avatar: teamAvatar,
       defaultTeam: true,
       session
     });
@@ -194,7 +202,7 @@ export async function getUserTeamOrDefaultTeam(tmbId?: string, userId?: string) 
     return getTeamByTmbId(tmbId);
   }
   if (userId) {
-    return mongoSessionRun((session) => getAndCreateUserDefaultTeam(userId, session));
+    return mongoSessionRun((session) => getAndCreateUserDefaultTeam({ ownerId: userId, session }));
   }
 
   return Promise.reject('tmbId or userId is required');
