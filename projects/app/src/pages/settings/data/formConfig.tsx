@@ -196,26 +196,6 @@ export const formConfig: FormConfig = {
             title: '站点同步使用间隔时长(分钟)'
           }
         }
-      },
-
-      censor: {
-        key: 'siteSettings.censor',
-        type: 'object',
-        title: '内容审查',
-        properties: {
-          BAIDU_TEXT_CENSOR_CLIENTID: {
-            key: 'siteSettings.censor.BAIDU_TEXT_CENSOR_CLIENTID',
-            type: 'string',
-            title: '百度安全 id',
-            description:
-              '![](https://oss.laf.dev/lk63dw-fastgpt/baidu_censor.png)\nhttps://console.bce.baidu.com/ai/?_=1693133074333#/ai/antiporn/overview/index 注册百度安全校验账号，并创建对应应用。提供应用的 id 和 secret'
-          },
-          BAIDU_TEXT_CENSOR_CLIENTSECRET: {
-            key: 'siteSettings.censor.BAIDU_TEXT_CENSOR_CLIENTSECRET',
-            type: 'string',
-            title: '百度安全 secret'
-          }
-        }
       }
     }
   },
@@ -365,23 +345,6 @@ export const formConfig: FormConfig = {
           }
         }
       },
-      googleV3Ver: {
-        key: 'loginSettings.googleV3Ver',
-        type: 'object',
-        title: '谷歌V3安全校验',
-        properties: {
-          clientKey: {
-            key: 'loginSettings.googleV3Ver.clientKey',
-            type: 'string',
-            title: '客户端Key'
-          },
-          serviceKey: {
-            key: 'loginSettings.googleV3Ver.serviceKey',
-            type: 'string',
-            title: '服务端Key'
-          }
-        }
-      },
       fastLogin: {
         key: 'fastlogin',
         type: 'object',
@@ -468,6 +431,49 @@ export const formConfig: FormConfig = {
             key: 'paySettings.subPlans.extraPointsPrice',
             type: 'number',
             title: '额外AI积分费用（xx元/1000积分/月）'
+          }
+        }
+      }
+    }
+  },
+  securitySettings: {
+    key: 'securitySettings',
+    title: '安全设置',
+    type: 'object',
+    properties: {
+      censor: {
+        key: 'siteSettings.censor',
+        type: 'object',
+        title: '内容审查',
+        properties: {
+          BAIDU_TEXT_CENSOR_CLIENTID: {
+            key: 'siteSettings.censor.BAIDU_TEXT_CENSOR_CLIENTID',
+            type: 'string',
+            title: '百度安全 id',
+            description:
+              '![](https://oss.laf.dev/lk63dw-fastgpt/baidu_censor.png)\nhttps://console.bce.baidu.com/ai/?_=1693133074333#/ai/antiporn/overview/index 注册百度安全校验账号，并创建对应应用。提供应用的 id 和 secret'
+          },
+          BAIDU_TEXT_CENSOR_CLIENTSECRET: {
+            key: 'siteSettings.censor.BAIDU_TEXT_CENSOR_CLIENTSECRET',
+            type: 'string',
+            title: '百度安全 secret'
+          }
+        }
+      },
+      googleV3Ver: {
+        key: 'loginSettings.googleV3Ver',
+        type: 'object',
+        title: '谷歌V3安全校验',
+        properties: {
+          clientKey: {
+            key: 'loginSettings.googleV3Ver.clientKey',
+            type: 'string',
+            title: '客户端Key'
+          },
+          serviceKey: {
+            key: 'loginSettings.googleV3Ver.serviceKey',
+            type: 'string',
+            title: '服务端Key'
           }
         }
       }

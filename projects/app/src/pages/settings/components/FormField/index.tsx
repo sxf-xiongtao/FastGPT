@@ -1,4 +1,4 @@
-import { Box, Image, Input, NumberInput, Switch, Textarea } from '@chakra-ui/react';
+import { Box, Image, Input, Switch, Textarea } from '@chakra-ui/react';
 import JsonEditor from '@fastgpt/web/components/common/Textarea/JsonEditor';
 import { useRef } from 'react';
 import { useToast } from '@fastgpt/web/hooks/useToast';
@@ -42,7 +42,6 @@ const FormField = ({
     return (
       <Box>
         <FormLabel title={title} description={description} />
-
         <Input defaultValue={value} onChange={(e) => onChange(e.target.value)} />
       </Box>
     );

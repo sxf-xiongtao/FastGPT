@@ -8,7 +8,7 @@ const Description: React.FC<any> = ({ description }: { description?: string }) =
   } else {
     return (
       <MarkDownModal source={description}>
-        <QuestionTip label={`${description}\n\n点击查看详情`} />
+        <QuestionTip label={`${description}\n\n点击查看详情`} cursor={'pointer'} />
       </MarkDownModal>
     );
   }
