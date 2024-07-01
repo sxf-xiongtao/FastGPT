@@ -9,29 +9,51 @@ import {
 import { CollaboratorItemType } from '@fastgpt/global/support/permission/collaborator';
 import { ResourcePerWithTmbWithUser } from '@fastgpt/global/support/permission/type';
 import { AppPermission } from '@fastgpt/global/support/permission/app/controller';
+import { AppFolderTypeList } from '@fastgpt/global/core/app/constants';
 
 async function handler(req: NextApiRequest): Promise<CollaboratorItemType[]> {
   // Authorization
   const { appId } = req.query as { appId: string };
-  const { teamId } = await authApp({
+  const { teamId, app } = await authApp({
     req,
     authToken: true,
     appId,
     per: ReadPermissionVal
   });
 
-  const collaboratorList = (await MongoResourcePermission.find({
-    teamId,
-    resourceId: appId,
-    resourceType: PerResourceTypeEnum.app
-  }).populate({
-    path: 'tmbId',
-    select: 'name userId',
-    populate: {
-      path: 'userId',
-      select: 'avatar'
-    }
-  })) as ResourcePerWithTmbWithUser[];
+  const isFolder = AppFolderTypeList.includes(app.type);
+  const isInherit = app.inheritPermission;
+  const isRoot = !app.parentId;
+
+  let collaboratorList;
+  if (isFolder || !isInherit || isRoot) {
+    collaboratorList = (await MongoResourcePermission.find({
+      teamId,
+      resourceId: appId,
+      resourceType: PerResourceTypeEnum.app
+    }).populate({
+      path: 'tmbId',
+      select: 'name userId',
+      populate: {
+        path: 'userId',
+        select: 'avatar'
+      }
+    })) as ResourcePerWithTmbWithUser[];
+  } else {
+    // get parent folder
+    collaboratorList = (await MongoResourcePermission.find({
+      teamId,
+      resourceId: app.parentId,
+      resourceType: PerResourceTypeEnum.app
+    }).populate({
+      path: 'tmbId',
+      select: 'name userId',
+      populate: {
+        path: 'userId',
+        select: 'avatar'
+      }
+    })) as ResourcePerWithTmbWithUser[];
+  }
 
   return collaboratorList.map((item) => {
     return {
