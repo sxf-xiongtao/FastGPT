@@ -25,35 +25,36 @@ async function handler(req: NextApiRequest): Promise<CollaboratorItemType[]> {
   const isInherit = app.inheritPermission;
   const isRoot = !app.parentId;
 
-  let collaboratorList;
-  if (isFolder || !isInherit || isRoot) {
-    collaboratorList = (await MongoResourcePermission.find({
-      teamId,
-      resourceId: appId,
-      resourceType: PerResourceTypeEnum.app
-    }).populate({
-      path: 'tmbId',
-      select: 'name userId',
-      populate: {
-        path: 'userId',
-        select: 'avatar'
-      }
-    })) as ResourcePerWithTmbWithUser[];
-  } else {
-    // get parent folder
-    collaboratorList = (await MongoResourcePermission.find({
-      teamId,
-      resourceId: app.parentId,
-      resourceType: PerResourceTypeEnum.app
-    }).populate({
-      path: 'tmbId',
-      select: 'name userId',
-      populate: {
-        path: 'userId',
-        select: 'avatar'
-      }
-    })) as ResourcePerWithTmbWithUser[];
-  }
+  const collaboratorList = await (async () => {
+    if (isFolder || !isInherit || isRoot) {
+      return (await MongoResourcePermission.find({
+        teamId,
+        resourceId: appId,
+        resourceType: PerResourceTypeEnum.app
+      }).populate({
+        path: 'tmbId',
+        select: 'name userId',
+        populate: {
+          path: 'userId',
+          select: 'avatar'
+        }
+      })) as ResourcePerWithTmbWithUser[];
+    } else {
+      // get parent folder
+      return (await MongoResourcePermission.find({
+        teamId,
+        resourceId: app.parentId,
+        resourceType: PerResourceTypeEnum.app
+      }).populate({
+        path: 'tmbId',
+        select: 'name userId',
+        populate: {
+          path: 'userId',
+          select: 'avatar'
+        }
+      })) as ResourcePerWithTmbWithUser[];
+    }
+  })();
 
   return collaboratorList.map((item) => {
     return {
