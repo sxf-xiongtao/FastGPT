@@ -10,13 +10,21 @@ import { UpdateAppCollaboratorBody } from '@fastgpt/global/core/app/collaborator
 import { AppPermission } from '@fastgpt/global/support/permission/app/controller';
 import { AppFolderTypeList } from '@fastgpt/global/core/app/constants';
 import {
-  getParentCollaborators,
   syncChildrenPermission,
-  updateCollaborators
+  type UpdateCollaboratorItem
 } from '@fastgpt/service/support/permission/inheritPermission';
-import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
+import { getResourceAllClbs } from '@fastgpt/service/support/permission/controller';
 import { MongoApp } from '@fastgpt/service/core/app/schema';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { updateResourcePermission } from '@/service/support/permission/controller';
+
+/* 
+  增加或修改协作者
+  1. 继承态目录：关闭继承态，更新新的协作者，同步其子目录协作者
+  2. 继承态应用：关闭继承态，复制父级协作者，并更新新的协作者
+  3. 非继承态目录：更新新的协作者，同步其子目录协作者
+  4. 非继承态应用：更新新的协作者
+*/
 
 async function handler(req: NextApiRequest) {
   // Authorization
@@ -42,115 +50,104 @@ async function handler(req: NextApiRequest) {
     return Promise.reject('Only owner could grant manage permission');
   }
 
-  mongoSessionRun(async (session) => {
-    const isInherit = app.inheritPermission;
-    const collaborators = await (async () => {
-      if (isInherit && app.parentId) {
-        // inheritPermission and not root
-        // 1. update the App to remove the inheritPermission
+  const isFolder = AppFolderTypeList.includes(app.type);
 
-        // change the resourceId to the parent app id
-        const parentClbs = await getParentCollaborators({
-          resource: app,
+  await mongoSessionRun(async (session) => {
+    // 关闭继承态
+    if (app.inheritPermission && app.parentId) {
+      await MongoApp.updateOne(
+        { _id: appId },
+        {
+          inheritPermission: false
+        },
+        {
+          session
+        }
+      );
+    }
+
+    const { updateClbs, updateTmbIds } = await (async () => {
+      if (isFolder) {
+        // 获取当前目录的协作者，并与需要变更的协作者合并
+        const FolderClbs = await getResourceAllClbs({
+          resourceId: appId,
+          teamId,
           resourceType: PerResourceTypeEnum.app,
           session
         });
-        const clbs = parentClbs
-          .filter((item) => !tmbIds.includes(item.tmbId))
-          .map((item) => {
-            return {
-              resourceId: appId,
-              resourceType: PerResourceTypeEnum.app,
-              teamId,
-              tmbId: item.tmbId,
-              permission: item.permission
-            };
-          });
-
-        tmbIds.forEach((tmbId) => {
-          clbs.push({
-            resourceId: appId,
-            resourceType: PerResourceTypeEnum.app,
-            teamId,
+        const updateClbs = tmbIds
+          .map<UpdateCollaboratorItem>((tmbId) => ({
             tmbId,
             permission
-          });
-        });
-
-        for (const clb of clbs) {
-          await MongoResourcePermission.updateOne(
-            {
-              resourceId: clb.resourceId,
-              resourceType: clb.resourceType,
-              teamId: clb.teamId,
-              tmbId: clb.tmbId
-            },
-            {
-              permission: clb.permission
-            },
-            { upsert: true, session }
+          }))
+          .concat(
+            FolderClbs.filter((item) => !tmbIds.includes(String(item.tmbId))).map((item) => ({
+              tmbId: item.tmbId,
+              permission: tmbIds.includes(String(item.tmbId)) ? permission : item.permission
+            }))
           );
-        }
-        await MongoApp.findOneAndUpdate(
-          { _id: appId },
-          {
-            inheritPermission: false
-          },
-          {
-            session
-          }
-        );
-        return clbs;
+
+        return {
+          updateClbs,
+          updateTmbIds: tmbIds
+        };
       } else {
-        const myClbs = await MongoResourcePermission.find({
-          resourceId: appId,
-          resourceType: PerResourceTypeEnum.app,
-          teamId
-        })
-          .session(session)
-          .lean();
-
-        const clbs = myClbs
-          .filter((item) => !tmbIds.includes(String(item.tmbId)))
-          .map((item) => {
-            return {
-              resourceId: appId,
-              resourceType: PerResourceTypeEnum.app,
-              teamId,
-              tmbId: item.tmbId,
-              permission: item.permission
-            };
-          });
-
-        tmbIds.forEach((tmbId) => {
-          clbs.push({
-            resourceId: appId,
+        if (app.inheritPermission) {
+          // 获取父级的协作者， 并与需要变更的协作者合并
+          const parentClbs = await getResourceAllClbs({
+            teamId: app.teamId,
+            resourceId: app.parentId,
             resourceType: PerResourceTypeEnum.app,
-            teamId,
-            tmbId,
-            permission
+            session
           });
-        });
+          const updateClbs = tmbIds
+            .map<UpdateCollaboratorItem>((tmbId) => ({
+              tmbId,
+              permission
+            }))
+            .concat(
+              parentClbs
+                .filter((item) => !tmbIds.includes(String(item.tmbId)))
+                .map((item) => ({
+                  tmbId: item.tmbId,
+                  permission: tmbIds.includes(String(item.tmbId)) ? permission : item.permission
+                }))
+            );
 
-        await updateCollaborators({
-          resourceType: PerResourceTypeEnum.app,
-          resourceId: appId,
-          session,
-          teamId,
-          collaborators: clbs
-        });
-        return clbs;
+          return {
+            updateClbs,
+            updateTmbIds: updateClbs.map((item) => item.tmbId) // 继承态 app 是没有协作者的，这里需要全量复制
+          };
+        }
+
+        return {
+          updateClbs: [],
+          updateTmbIds: tmbIds
+        };
       }
     })();
 
-    await syncChildrenPermission({
-      resource: app,
-      resourceModel: MongoApp,
-      folderTypeList: AppFolderTypeList,
+    // 更新的协作者
+    await updateResourcePermission({
       resourceType: PerResourceTypeEnum.app,
-      collaborators,
-      session
+      resourceId: appId,
+      session,
+      teamId,
+      tmbIdList: updateTmbIds,
+      permission
     });
+
+    // 同步子目录
+    if (AppFolderTypeList.includes(app.type)) {
+      await syncChildrenPermission({
+        resource: app,
+        resourceModel: MongoApp,
+        folderTypeList: AppFolderTypeList,
+        resourceType: PerResourceTypeEnum.app,
+        collaborators: updateClbs,
+        session
+      });
+    }
   });
 }
 

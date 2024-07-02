@@ -370,13 +370,13 @@ importers:
         version: 11.11.0(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(react@18.3.1)
       '@fastgpt/global':
         specifier: workspace:*
-        version: link:../../../FastGPT/packages/global
+        version: link:../../FastGPT/packages/global
       '@fastgpt/service':
         specifier: workspace:*
-        version: link:../../../FastGPT/packages/service
+        version: link:../../FastGPT/packages/service
       '@fastgpt/web':
         specifier: workspace:*
-        version: link:../../../FastGPT/packages/web
+        version: link:../../FastGPT/packages/web
       '@peculiar/x509':
         specifier: ^1.9.5
         version: 1.9.7
@@ -2560,18 +2560,6 @@ packages:
 
   '@tanstack/query-core@4.36.1':
     resolution: {integrity: sha512-DJSilV5+ytBP1FbFcEJovv4rnnm/CokuVvrBEtW/Va9DvuJ3HksbXUJEpI0aV1KtuL4ZoO9AVE6PyNLzF7tLeA==}
-
-  '@tanstack/react-query@4.36.1':
-    resolution: {integrity: sha512-y7ySVHFyyQblPl3J3eQBWpXZkliroki3ARnBKsdJchlgt7yJLRDUcf4B8soufgiYt3pEQIkBWBx1N9/ZPIeUWw==}
-    peerDependencies:
-      react: 18.3.1
-      react-dom: 18.3.1
-      react-native: '*'
-    peerDependenciesMeta:
-      react-dom:
-        optional: true
-      react-native:
-        optional: true
 
   '@tanstack/react-table@8.17.3':
     resolution: {integrity: sha512-5gwg5SvPD3lNAXPuJJz1fOCEZYk9/GeBFH3w/hCgnfyszOIzwkwgp5I7Q4MJtn0WECp84b5STQUDdmvGi8m3nA==}
@@ -9798,14 +9786,6 @@ snapshots:
       defer-to-connect: 2.0.1
 
   '@tanstack/query-core@4.36.1': {}
-
-  '@tanstack/react-query@4.36.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@tanstack/query-core': 4.36.1
-      react: 18.3.1
-      use-sync-external-store: 1.2.2(react@18.3.1)
-    optionalDependencies:
-      react-dom: 18.3.1(react@18.3.1)
 
   '@tanstack/react-table@8.17.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:

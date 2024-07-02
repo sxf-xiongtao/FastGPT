@@ -6,112 +6,105 @@ import {
   ManagePermissionVal
 } from '@fastgpt/global/support/permission/constant';
 import { AppCollaboratorDeleteParams } from '@fastgpt/global/core/app/collaborator';
-import { AppPermission } from '@fastgpt/global/support/permission/app/controller';
 import {
-  getParentCollaborators,
   syncChildrenPermission,
-  updateCollaborators
+  syncCollaborators
 } from '@fastgpt/service/support/permission/inheritPermission';
 import { MongoApp } from '@fastgpt/service/core/app/schema';
 import { AppFolderTypeList } from '@fastgpt/global/core/app/constants';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
-import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
+import {
+  delResourcePermission,
+  getResourceAllClbs
+} from '@fastgpt/service/support/permission/controller';
+
+/* 
+  1. 继承态目录：需要将继承态关闭，删除 1 个协作者，同步其子目录协作者
+  2. 继承态应用：需要将继承态关闭，同步父的 defaultPermission, 协作者复制父目录
+  3. 非继承态目录：删除 1 个协作者，同步其子目录协作者
+  4. 非继承态应用：仅删除协作者
+*/
 
 async function handler(req: NextApiRequest) {
   // Authorization
   const { appId, tmbId } = req.query as AppCollaboratorDeleteParams;
 
-  const { teamId, permission, app } = await authApp({
+  const { teamId, app } = await authApp({
     req,
     authToken: true,
     appId,
     per: ManagePermissionVal
   });
 
-  mongoSessionRun(async (session) => {
+  await mongoSessionRun(async (session) => {
+    // 继承态：关闭继承态，修改默认权限为父级的默认权限（目录是多余同步，无所谓）
     if (app.inheritPermission) {
-      const parent = app.parentId
-        ? await MongoApp.findById(app.parentId).session(session)
-        : undefined;
+      const parent = await MongoApp.findById(app.parentId, 'defaultPermission')
+        .session(session)
+        .lean();
+
       await MongoApp.updateOne(
         { _id: appId },
-        { inheritPermission: false, defaultPermission: parent?.defaultPermission }
+        {
+          inheritPermission: false,
+          defaultPermission: parent?.defaultPermission ?? app.defaultPermission
+        }
       ).session(session);
     }
 
-    if (AppFolderTypeList.includes(app.type) || app.inheritPermission === false || !app.parentId) {
-      // is Folder
-      const clbs = await MongoResourcePermission.find({
+    // 目录
+    if (AppFolderTypeList.includes(app.type)) {
+      const folderClbs = await getResourceAllClbs({
+        teamId,
         resourceId: appId,
         resourceType: PerResourceTypeEnum.app,
-        teamId
-      })
-        .lean()
-        .session(session);
+        session
+      });
 
-      const rp = clbs.find((item) => String(item.tmbId) === tmbId);
+      await delResourcePermission({
+        resourceType: PerResourceTypeEnum.app,
+        teamId,
+        tmbId,
+        resourceId: app._id,
+        session
+      });
 
-      if (!clbs || !rp) {
-        return Promise.reject('Not Collaborator!');
-      }
-
-      if (!permission.isOwner && new AppPermission({ per: rp.permission }).hasManagePer) {
-        return Promise.reject('You can not delete a manager!');
-      }
-
-      await MongoResourcePermission.deleteOne({ _id: rp._id }).session(session);
-      clbs.splice(clbs.indexOf(rp), 1);
-
+      // 同步所有子资源协作者
       await syncChildrenPermission({
         resource: app,
         folderTypeList: AppFolderTypeList,
         resourceType: PerResourceTypeEnum.app,
         resourceModel: MongoApp,
-        collaborators: clbs,
+        collaborators: folderClbs.filter((item) => String(item.tmbId) !== tmbId),
         session
       });
-      return;
     } else {
-      // is a app
-      const parentClbs = app.parentId
-        ? await getParentCollaborators({
-            resource: app,
-            resourceType: PerResourceTypeEnum.app,
-            session
-          })
-        : undefined;
-
-      const deletedClb = parentClbs?.find((item) => String(item.tmbId) === tmbId);
-
-      console.log('parentClbs', parentClbs);
-      console.log('deletedClb', deletedClb);
-
-      if (!deletedClb) {
-        return Promise.reject('Not Collaborator!');
+      // 普通继承态应用
+      if (app.inheritPermission) {
+        // 获取父的所有协作者
+        const parentClbs = await getResourceAllClbs({
+          teamId,
+          resourceId: app.parentId,
+          resourceType: PerResourceTypeEnum.app,
+          session
+        });
+        // 同步协作者
+        syncCollaborators({
+          resourceType: PerResourceTypeEnum.app,
+          teamId,
+          resourceId: app._id,
+          collaborators: parentClbs.filter((item) => String(item.tmbId) !== tmbId),
+          session
+        });
+      } else {
+        await delResourcePermission({
+          resourceType: PerResourceTypeEnum.app,
+          teamId,
+          tmbId,
+          resourceId: app._id,
+          session
+        });
       }
-
-      if (!permission.isOwner && new AppPermission({ per: deletedClb.permission }).hasManagePer) {
-        return Promise.reject('You can not delete a manager!');
-      }
-
-      await updateCollaborators({
-        resourceId: String(app._id),
-        teamId: String(teamId),
-        resourceType: PerResourceTypeEnum.app,
-        collaborators: parentClbs!
-          .filter((item) => String(item._id) !== String(deletedClb._id))
-          .map((item) => {
-            return {
-              tmbId: item.tmbId,
-              permission: item.permission,
-              resourceType: item.resourceType,
-              teamId: item.teamId,
-              resourceId: item.resourceId
-            };
-          }),
-        session
-      });
-      // no need to sync
     }
   });
 }
