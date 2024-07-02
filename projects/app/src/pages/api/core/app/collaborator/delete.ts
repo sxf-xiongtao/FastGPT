@@ -9,7 +9,8 @@ import { AppCollaboratorDeleteParams } from '@fastgpt/global/core/app/collaborat
 import { AppPermission } from '@fastgpt/global/support/permission/app/controller';
 import {
   getParentCollaborators,
-  syncChildrenPermission
+  syncChildrenPermission,
+  updateCollaborators
 } from '@fastgpt/service/support/permission/inheritPermission';
 import { MongoApp } from '@fastgpt/service/core/app/schema';
 import { AppFolderTypeList } from '@fastgpt/global/core/app/constants';
@@ -38,7 +39,7 @@ async function handler(req: NextApiRequest) {
       ).session(session);
     }
 
-    if (AppFolderTypeList.includes(app.type)) {
+    if (AppFolderTypeList.includes(app.type) || app.inheritPermission === false || !app.parentId) {
       // is Folder
       const clbs = await MongoResourcePermission.find({
         resourceId: appId,
@@ -80,17 +81,36 @@ async function handler(req: NextApiRequest) {
           })
         : undefined;
 
-      const rp = parentClbs?.find((item) => String(item.tmbId) === tmbId);
+      const deletedClb = parentClbs?.find((item) => String(item.tmbId) === tmbId);
 
-      if (!rp) {
+      console.log('parentClbs', parentClbs);
+      console.log('deletedClb', deletedClb);
+
+      if (!deletedClb) {
         return Promise.reject('Not Collaborator!');
       }
 
-      if (!permission.isOwner && new AppPermission({ per: rp.permission }).hasManagePer) {
+      if (!permission.isOwner && new AppPermission({ per: deletedClb.permission }).hasManagePer) {
         return Promise.reject('You can not delete a manager!');
       }
 
-      await MongoResourcePermission.deleteOne({ _id: rp.tmbId }).session(session);
+      await updateCollaborators({
+        resourceId: String(app._id),
+        teamId: String(teamId),
+        resourceType: PerResourceTypeEnum.app,
+        collaborators: parentClbs!
+          .filter((item) => String(item._id) !== String(deletedClb._id))
+          .map((item) => {
+            return {
+              tmbId: item.tmbId,
+              permission: item.permission,
+              resourceType: item.resourceType,
+              teamId: item.teamId,
+              resourceId: item.resourceId
+            };
+          }),
+        session
+      });
       // no need to sync
     }
   });

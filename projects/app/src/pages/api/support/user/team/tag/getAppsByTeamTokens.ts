@@ -47,7 +47,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         isOwner: false,
         defaultPermission: AppDefaultPermissionVal,
         type: app.type,
-        permission: new AppPermission({ per: ReadPermissionVal })
+        permission: new AppPermission({ per: ReadPermissionVal }),
+        inheritPermission: app.inheritPermission
       }))
     });
   } catch (err) {

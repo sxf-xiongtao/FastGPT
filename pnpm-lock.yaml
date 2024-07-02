@@ -18,7 +18,7 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
       '@types/node':
-        specifier: ^20.14.7
+        specifier: ^20.14.2
         version: 20.14.7
       husky:
         specifier: ^8.0.3
@@ -370,13 +370,13 @@ importers:
         version: 11.11.0(@emotion/react@11.11.1(@types/react@18.3.0)(react@18.3.1))(@types/react@18.3.0)(react@18.3.1)
       '@fastgpt/global':
         specifier: workspace:*
-        version: link:../../FastGPT/packages/global
+        version: link:../../../FastGPT/packages/global
       '@fastgpt/service':
         specifier: workspace:*
-        version: link:../../FastGPT/packages/service
+        version: link:../../../FastGPT/packages/service
       '@fastgpt/web':
         specifier: workspace:*
-        version: link:../../FastGPT/packages/web
+        version: link:../../../FastGPT/packages/web
       '@peculiar/x509':
         specifier: ^1.9.5
         version: 1.9.7
