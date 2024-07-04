@@ -93,7 +93,7 @@ const billPayWayMap = {
 };
 
 const BillTable = () => {
-  const [billType, setBillType] = useState<`${BillTypeEnum}` | ''>('');
+  const [billType, setBillType] = useState<BillTypeEnum | ''>('');
   const [username, setUsername] = useState<string>();
   const [billDetail, setBillDetail] = useState<BillSchemaType>();
   const elementRef = useRef<HTMLDivElement>(null);

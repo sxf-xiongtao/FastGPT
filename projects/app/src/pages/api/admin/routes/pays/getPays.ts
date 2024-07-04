@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } = req.body as {
       pageNum: number;
       pageSize: number;
-      type?: `${BillTypeEnum}`;
+      type?: BillTypeEnum;
       status?: `${BillStatusEnum}`;
       username: string;
     };

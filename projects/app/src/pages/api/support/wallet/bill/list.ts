@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } = req.body as {
       pageNum: number;
       pageSize: number;
-      type?: `${BillTypeEnum}`;
+      type?: BillTypeEnum;
     };
     await connectToDatabase();
     const { teamId } = await authUserPer({ req, authToken: true, per: ReadPermissionVal });

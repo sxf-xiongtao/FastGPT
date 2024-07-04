@@ -26,7 +26,7 @@ export class WXPay {
   }: {
     amount: number;
     orderId: string;
-    type: `${BillTypeEnum}`;
+    type: BillTypeEnum;
   }) {
     const map = {
       [BillTypeEnum.balance]: '余额充值',
@@ -72,7 +72,7 @@ export class WXPay {
     orderId
   }: {
     amount: number;
-    type: `${BillTypeEnum}`;
+    type: BillTypeEnum;
     orderId: string;
   }) {
     // 单位: 元

@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     pageSize: number;
     dateStart: Date;
     dateEnd: Date;
-    source?: `${UsageSourceEnum}`;
+    source?: UsageSourceEnum;
     teamMemberId: string;
   };
 
