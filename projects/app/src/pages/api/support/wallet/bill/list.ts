@@ -7,6 +7,7 @@ import { BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import type { PagingData } from '@/types';
 import { BillSchemaType } from '@fastgpt/global/support/wallet/bill/type';
 import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
+import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -29,7 +30,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     };
 
     const [records, total] = await Promise.all([
-      MongoBill.find(match)
+      MongoBill.find(match, undefined, {
+        ...readFromSecondary
+      })
         .sort({ createTime: -1 })
         .skip((pageNum - 1) * pageSize)
         .limit(pageSize),

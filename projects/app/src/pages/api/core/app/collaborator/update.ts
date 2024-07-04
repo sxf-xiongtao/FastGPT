@@ -54,7 +54,7 @@ async function handler(req: NextApiRequest) {
 
   await mongoSessionRun(async (session) => {
     // 关闭继承态
-    if (app.inheritPermission && app.parentId) {
+    if (app.inheritPermission) {
       await MongoApp.updateOne(
         { _id: appId },
         {
@@ -92,7 +92,7 @@ async function handler(req: NextApiRequest) {
           updateTmbIds: tmbIds
         };
       } else {
-        if (app.inheritPermission) {
+        if (app.inheritPermission && app.parentId) {
           // 获取父级的协作者， 并与需要变更的协作者合并
           const parentClbs = await getResourceAllClbs({
             teamId: app.teamId,

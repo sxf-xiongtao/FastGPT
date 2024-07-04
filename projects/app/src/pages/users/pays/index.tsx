@@ -33,12 +33,12 @@ import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import { getPays } from '@/web/admin/pays/api';
 import BoxCard from '@/components/common/BoxContainer/Card';
 
-const billTypeList = [
-  { label: '全部', value: '' },
-  { label: '余额充值', value: 'balance' },
-  { label: '套餐订阅', value: 'standSubPlan' },
-  { label: '知识库扩容', value: 'extraDatasetSub' },
-  { label: 'AI积分套餐', value: 'extraPoints' }
+const billTypeList: { label: string; value: BillTypeEnum | 'ALL' }[] = [
+  { label: '全部', value: 'ALL' },
+  { label: '余额充值', value: BillTypeEnum.balance },
+  { label: '套餐订阅', value: BillTypeEnum.standSubPlan },
+  { label: '知识库扩容', value: BillTypeEnum.extraDatasetSub },
+  { label: 'AI积分套餐', value: BillTypeEnum.extraPoints }
 ];
 
 const billTypeMap = {
@@ -93,7 +93,7 @@ const billPayWayMap = {
 };
 
 const BillTable = () => {
-  const [billType, setBillType] = useState<BillTypeEnum | ''>('');
+  const [billType, setBillType] = useState<BillTypeEnum | 'ALL'>('ALL');
   const [username, setUsername] = useState<string>();
   const [billDetail, setBillDetail] = useState<BillSchemaType>();
   const elementRef = useRef<HTMLDivElement>(null);
@@ -161,7 +161,7 @@ const BillTable = () => {
                   <Th>#</Th>
                   <Th>用户名</Th>
                   <Th>
-                    <MySelect
+                    <MySelect<BillTypeEnum | 'ALL'>
                       list={billTypeList}
                       value={billType}
                       size={'sm'}

@@ -37,21 +37,6 @@ async function handler(req: NextApiRequest) {
   });
 
   await mongoSessionRun(async (session) => {
-    // 继承态：关闭继承态，修改默认权限为父级的默认权限（目录是多余同步，无所谓）
-    if (app.inheritPermission) {
-      const parent = await MongoApp.findById(app.parentId, 'defaultPermission')
-        .session(session)
-        .lean();
-
-      await MongoApp.updateOne(
-        { _id: appId },
-        {
-          inheritPermission: false,
-          defaultPermission: parent?.defaultPermission ?? app.defaultPermission
-        }
-      ).session(session);
-    }
-
     // 目录
     if (AppFolderTypeList.includes(app.type)) {
       const folderClbs = await getResourceAllClbs({
@@ -80,7 +65,7 @@ async function handler(req: NextApiRequest) {
       });
     } else {
       // 普通继承态应用
-      if (app.inheritPermission) {
+      if (app.inheritPermission && app.parentId) {
         // 获取父的所有协作者
         const parentClbs = await getResourceAllClbs({
           teamId,
@@ -88,8 +73,9 @@ async function handler(req: NextApiRequest) {
           resourceType: PerResourceTypeEnum.app,
           session
         });
+
         // 同步协作者
-        syncCollaborators({
+        await syncCollaborators({
           resourceType: PerResourceTypeEnum.app,
           teamId,
           resourceId: app._id,
@@ -105,6 +91,21 @@ async function handler(req: NextApiRequest) {
           session
         });
       }
+    }
+
+    // 继承态：关闭继承态，修改默认权限为父级的默认权限（目录是多余同步，无所谓）
+    if (app.inheritPermission) {
+      const parent = await MongoApp.findById(app.parentId, 'defaultPermission')
+        .session(session)
+        .lean();
+
+      await MongoApp.updateOne(
+        { _id: appId },
+        {
+          inheritPermission: false,
+          defaultPermission: parent?.defaultPermission ?? app.defaultPermission
+        }
+      ).session(session);
     }
   });
 }
