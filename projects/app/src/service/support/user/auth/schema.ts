@@ -1,4 +1,4 @@
-import { connectionMongo, type Model } from '@fastgpt/service/common/mongo';
+import { connectionMongo, getMongoModel, type Model } from '@fastgpt/service/common/mongo';
 const { Schema, model, models } = connectionMongo;
 import { UserAuthSchemaType } from '@/global/user/auth/type.d';
 import { userAuthTypeMap } from '@fastgpt/global/support/user/auth/constants';
@@ -43,5 +43,4 @@ try {
   console.log(error);
 }
 
-export const MongoUserAuth: Model<UserAuthSchemaType> =
-  models['auth_code'] || model('auth_code', UserAuthSchema);
+export const MongoUserAuth = getMongoModel<UserAuthSchemaType>('auth_code', UserAuthSchema);

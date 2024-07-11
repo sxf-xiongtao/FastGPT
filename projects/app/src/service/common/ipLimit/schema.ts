@@ -1,4 +1,4 @@
-import { connectionMongo, type Model } from '@fastgpt/service/common/mongo';
+import { connectionMongo, getMongoModel, type Model } from '@fastgpt/service/common/mongo';
 const { Schema, model, models } = connectionMongo;
 import type { IpLimitSchemaType } from './type.d';
 
@@ -21,5 +21,4 @@ const IpLimitSchema = new Schema({
   }
 });
 
-export const MongoIpLimit: Model<IpLimitSchemaType> =
-  models['ip_limit'] || model('ip_limit', IpLimitSchema);
+export const MongoIpLimit = getMongoModel<IpLimitSchemaType>('ip_limit', IpLimitSchema);

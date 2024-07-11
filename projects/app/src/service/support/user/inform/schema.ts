@@ -1,4 +1,4 @@
-import { connectionMongo, type Model } from '@fastgpt/service/common/mongo';
+import { connectionMongo, getMongoModel, type Model } from '@fastgpt/service/common/mongo';
 const { Schema, model, models } = connectionMongo;
 import type { UserInformSchema } from '@fastgpt/global/support/user/inform/type';
 import { InformLevelEnum, InformLevelMap } from '@fastgpt/global/support/user/inform/constants';
@@ -39,7 +39,4 @@ try {
   console.log(error);
 }
 
-export const MongoUserInform: Model<UserInformSchema> =
-  models['inform'] || model('inform', InformSchema);
-
-MongoUserInform.syncIndexes();
+export const MongoUserInform = getMongoModel<UserInformSchema>('inform', InformSchema);

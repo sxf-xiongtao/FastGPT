@@ -1,10 +1,11 @@
 {
     "editor.formatOnSave": true,
     "editor.mouseWheelZoom": true,
-    "prettier.prettierPath": "../node_modules/prettier",
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "prettier.prettierPath": "node_modules/prettier",
     "typescript.tsdk": "node_modules/typescript/lib",
     "i18n-ally.localesPaths": [
-        "./**/projects/**/i18n",
+        "packages/web/i18n",
     ],
     "i18n-ally.enabledParsers": ["json", "yaml", "js", "ts"],
     "i18n-ally.keystyle": "nested",
