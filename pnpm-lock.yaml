@@ -86,6 +86,10 @@ importers:
         version: 20.14.7
 
   FastGPT/packages/plugins:
+    dependencies:
+      expr-eval:
+        specifier: ^2.0.2
+        version: 2.0.2
     devDependencies:
       '@fastgpt/global':
         specifier: workspace:*
@@ -102,6 +106,9 @@ importers:
       '@fastgpt/global':
         specifier: workspace:*
         version: link:../global
+      '@fastgpt/plugins':
+        specifier: workspace:*
+        version: link:../plugins
       '@node-rs/jieba':
         specifier: 1.10.0
         version: 1.10.0
@@ -336,7 +343,7 @@ importers:
         specifier: 18.3.0
         version: 18.3.0
       '@types/react-beautiful-dnd':
-        specifier: ^13.1.8
+        specifier: ^13.1.1
         version: 13.1.8
       '@types/react-dom':
         specifier: 18.3.0
@@ -2561,6 +2568,18 @@ packages:
   '@tanstack/query-core@4.36.1':
     resolution: {integrity: sha512-DJSilV5+ytBP1FbFcEJovv4rnnm/CokuVvrBEtW/Va9DvuJ3HksbXUJEpI0aV1KtuL4ZoO9AVE6PyNLzF7tLeA==}
 
+  '@tanstack/react-query@4.36.1':
+    resolution: {integrity: sha512-y7ySVHFyyQblPl3J3eQBWpXZkliroki3ARnBKsdJchlgt7yJLRDUcf4B8soufgiYt3pEQIkBWBx1N9/ZPIeUWw==}
+    peerDependencies:
+      react: 18.3.1
+      react-dom: 18.3.1
+      react-native: '*'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+
   '@tanstack/react-table@8.17.3':
     resolution: {integrity: sha512-5gwg5SvPD3lNAXPuJJz1fOCEZYk9/GeBFH3w/hCgnfyszOIzwkwgp5I7Q4MJtn0WECp84b5STQUDdmvGi8m3nA==}
     engines: {node: '>=12'}
@@ -4063,6 +4082,9 @@ packages:
   execa@7.2.0:
     resolution: {integrity: sha512-UduyVP7TLB5IcAQl+OzLyLcS/l32W/GLg+AhHJ+ow40FOk2U3SAllPwR44v4vmdFwIWqpdwxxpQbF1n5ta9seA==}
     engines: {node: ^14.18.0 || ^16.14.0 || >=18.0.0}
+
+  expr-eval@2.0.2:
+    resolution: {integrity: sha512-4EMSHGOPSwAfBiibw3ndnP0AvjDWLsMvGOvWEZ2F96IGk0bIVdjQisOHxReSkE13mHcfbuCiXw+G4y0zv6N8Eg==}
 
   extend@3.0.2:
     resolution: {integrity: sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==}
@@ -9787,6 +9809,14 @@ snapshots:
 
   '@tanstack/query-core@4.36.1': {}
 
+  '@tanstack/react-query@4.36.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@tanstack/query-core': 4.36.1
+      react: 18.3.1
+      use-sync-external-store: 1.2.2(react@18.3.1)
+    optionalDependencies:
+      react-dom: 18.3.1(react@18.3.1)
+
   '@tanstack/react-table@8.17.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@tanstack/table-core': 8.17.3
@@ -11594,6 +11624,8 @@ snapshots:
       onetime: 6.0.0
       signal-exit: 3.0.7
       strip-final-newline: 3.0.0
+
+  expr-eval@2.0.2: {}
 
   extend@3.0.2: {}
 
