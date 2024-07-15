@@ -1,12 +1,12 @@
 # --------- install dependence -----------
-FROM node:20.13-alpine AS mainDeps
+FROM node:20.14.0-alpine AS mainDeps
 WORKDIR /app
 
 ARG proxy
 
 # if proxy exists, set proxy
 RUN [ -z "$proxy" ] || sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
-RUN apk add --no-cache libc6-compat && npm install -g pnpm@8.6.2
+RUN apk add --no-cache libc6-compat && npm install -g pnpm@9.4.0
 RUN [ -z "$proxy" ] || pnpm config set registry https://registry.npmmirror.com
 
 # copy packages and one project
@@ -19,7 +19,7 @@ RUN [ -f pnpm-lock.yaml ] || (echo "Lockfile not found." && exit 1)
 RUN pnpm i
 
 # --------- builder -----------
-FROM node:20.13-alpine AS builder
+FROM node:20.14.0-alpine AS builder
 WORKDIR /app
 
 ARG proxy
@@ -34,12 +34,12 @@ COPY --from=mainDeps /app/projects/app/node_modules ./projects/app/node_modules
 
 RUN [ -z "$proxy" ] || sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
 
-RUN apk add --no-cache libc6-compat && npm install -g pnpm@8.6.2
+RUN apk add --no-cache libc6-compat && npm install -g pnpm@9.4.0
 RUN pnpm --filter=app build
 
 
 # --------- runner -----------
-FROM node:20.13-alpine AS runner
+FROM node:20.14.0-alpine AS runner
 WORKDIR /app
 
 ARG proxy
