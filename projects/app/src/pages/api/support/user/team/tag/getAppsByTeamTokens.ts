@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const apps = await MongoApp.find({
       teamId,
-      type: { $in: [AppTypeEnum.simple, AppTypeEnum.workflow] },
+      type: { $in: [AppTypeEnum.simple, AppTypeEnum.workflow, AppTypeEnum.plugin] },
       teamTags: { $in: tags }
     })
       .sort({
