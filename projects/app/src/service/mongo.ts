@@ -15,20 +15,15 @@ export async function connectToDatabase(): Promise<void> {
       initGlobal();
     },
     afterHook: async () => {
-      try {
-        startCron();
-        reduceAiPointsTimer();
-        concatBillTimer();
+      startCron();
+      reduceAiPointsTimer();
+      concatBillTimer();
 
-        initDatasetStatus();
+      initDatasetStatus();
 
-        await Promise.all([getProInitData(), authLicense()]);
+      await Promise.all([getProInitData(), authLicense()]);
 
-        startTrainingProcess();
-      } catch (error) {
-        console.log(error);
-        return exit(1);
-      }
+      startTrainingProcess();
     }
   });
 }
