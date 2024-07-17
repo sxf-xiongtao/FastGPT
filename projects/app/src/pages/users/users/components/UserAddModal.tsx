@@ -13,7 +13,7 @@ import { POST } from '@/service/common/request';
 import { AddIcon } from '@chakra-ui/icons';
 import { hashStr } from '@fastgpt/global/common/string/tools';
 import { useToast } from '@fastgpt/web/hooks/useToast';
-import MyModal from '@/components/common/MyModal';
+import MyModal from '@fastgpt/web/components/common/MyModal';
 
 type TFormData = {
   username: string;

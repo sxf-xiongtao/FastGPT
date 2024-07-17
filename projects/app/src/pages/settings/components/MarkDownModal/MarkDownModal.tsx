@@ -8,7 +8,7 @@ import RemarkBreaks from 'remark-breaks';
 import { useDisclosure, ModalBody, ModalFooter } from '@chakra-ui/react';
 
 import styles from './index.module.scss';
-import MyModal from '@/components/common/MyModal';
+import MyModal from '@fastgpt/web/components/common/MyModal';
 
 function Image({ src }: { src?: string }) {
   return <MDImage src={src} />;

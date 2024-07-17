@@ -22,7 +22,7 @@ import {
   useReactTable
 } from '@tanstack/react-table';
 import React from 'react';
-import MyModal from '@/components/common/MyModal';
+import MyModal from '@fastgpt/web/components/common/MyModal';
 
 type TMember = {
   userName: string;

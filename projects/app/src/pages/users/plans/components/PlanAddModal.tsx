@@ -13,7 +13,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { POST } from '@/service/common/request';
 import { AddIcon } from '@chakra-ui/icons';
 import { useToast } from '@fastgpt/web/hooks/useToast';
-import MyModal from '@/components/common/MyModal';
+import MyModal from '@fastgpt/web/components/common/MyModal';
 import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import MySelect from '@fastgpt/web/components/common/MySelect';
 

@@ -140,7 +140,7 @@ export default function Pagination(props: {
         >
           {(options || [10, 20, 30]).map((data: any) => (
             <option key={data} value={data}>
-              {data} / {t('Page')}
+              {data} / 页
             </option>
           ))}
         </Select>

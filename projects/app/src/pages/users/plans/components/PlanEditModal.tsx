@@ -11,7 +11,7 @@ import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { POST } from '@/service/common/request';
 import { useToast } from '@fastgpt/web/hooks/useToast';
-import MyModal from '@/components/common/MyModal';
+import MyModal from '@fastgpt/web/components/common/MyModal';
 import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import MySelect from '@fastgpt/web/components/common/MySelect';
 import { PlanType } from '@/pages/users/plans';

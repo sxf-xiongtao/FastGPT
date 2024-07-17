@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { usePagination } from '@fastgpt/web/hooks/usePagination';
-import MyModal from '@/components/common/MyModal';
+import MyModal from '@fastgpt/web/components/common/MyModal';
 import { getDatasets } from '@/web/admin/datasets/api';
 import BoxCard from '@/components/common/BoxContainer/Card';
 

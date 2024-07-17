@@ -11,7 +11,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { POST } from '@/service/common/request';
 import { useToast } from '@fastgpt/web/hooks/useToast';
-import MyModal from '@/components/common/MyModal';
+import MyModal from '@fastgpt/web/components/common/MyModal';
 
 export default function EditTeamModal(props: { data: any; updateData: any }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
