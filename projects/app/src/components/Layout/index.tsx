@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Button,
-  Flex,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  useMediaQuery
-} from '@chakra-ui/react';
+import { Box, Button, Flex, Popover, PopoverContent, PopoverTrigger } from '@chakra-ui/react';
 import Navbar from './Navbar';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';

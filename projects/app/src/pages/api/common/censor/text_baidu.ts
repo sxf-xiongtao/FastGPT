@@ -2,45 +2,51 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import axios from 'axios';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
-import { connectToDatabase } from '@/service/mongo';
-import { getErrText } from '@/utils/tools';
+import { NextAPI } from '@/service/middleware/entry';
+import { addLog } from '@fastgpt/service/common/system/log';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    await connectToDatabase();
-
-    if (!global.systemConfig?.censor?.BAIDU_TEXT_CENSOR_CLIENTID) {
-      return jsonRes(res, {
-        data: {
-          message: 'success'
-        }
-      });
-    }
-
-    const { text } = req.body as { text: string };
-    if (!text) {
-      return jsonRes(res, {
-        message: 'SUCCESS'
-      });
-    }
-
-    await authCert({ req, authRoot: true });
-
-    const time = Date.now();
-
-    const response = await sendTextCensor(text);
-
-    console.log(`安全校验, 长度: ${text.length},时间: ${Date.now() - time}ms `);
-
-    jsonRes(res, {
-      data: response
-    });
-  } catch (error) {
-    jsonRes(res, {
-      data: getErrText(error, '内容安全校验不通过')
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (!global.systemConfig?.censor?.BAIDU_TEXT_CENSOR_CLIENTID) {
+    return jsonRes(res, {
+      data: {
+        message: 'success'
+      }
     });
   }
+  await authCert({ req, authRoot: true });
+
+  const { text } = req.body as { text: string };
+  if (!text) {
+    return jsonRes(res, {
+      message: 'SUCCESS'
+    });
+  }
+
+  const time = Date.now();
+
+  // 将字符串分成最多 7000 长度一组，多组的话，分别发出校验请求
+  const textList = (() => {
+    const list: string[] = [];
+    for (let i = 0; i < text.length; i += 7000) {
+      list.push(text.slice(i, i + 7000));
+    }
+    return list;
+  })();
+
+  const responseList = await Promise.all(textList.map(sendTextCensor));
+  const errResponse = responseList.find((item) => item.code);
+
+  const response = {
+    code: errResponse?.code,
+    message: errResponse?.message
+  };
+
+  console.log(`安全校验, 长度: ${text.length},时间: ${Date.now() - time}ms `);
+
+  return response;
 }
+
+export default NextAPI(handler);
 
 // 获取access_token
 async function getAccessToken() {
@@ -82,7 +88,7 @@ async function sendTextCensor(text: string): Promise<{
     const hitsWord = data?.data?.[0]?.hits?.[0]?.words;
 
     if (hitsWord) {
-      console.log('违规关键词', data?.data?.[0]?.hits?.[0]?.words);
+      console.log('违规关键词', hitsWord);
 
       return {
         code: 5000,
@@ -94,8 +100,7 @@ async function sendTextCensor(text: string): Promise<{
       message: 'SUCCESS'
     };
   } catch (err) {
-    console.log('百度内容安全校验异常');
-    console.log(err);
+    addLog.warn('百度内容安全校验异常', { err });
     return {
       message: '百度内容安全校验异常'
     };

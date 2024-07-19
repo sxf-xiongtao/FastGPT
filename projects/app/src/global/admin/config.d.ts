@@ -18,6 +18,7 @@ export type ConfigFormType = {
       show_promotion: boolean;
       favicon: string;
       docUrl: string;
+      systemPluginCourseUrl: string;
       chatbotUrl: string;
       openAPIDocUrl: string;
       systemTitle: string;

@@ -36,7 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .sort({ createTime: -1 })
         .skip((pageNum - 1) * pageSize)
         .limit(pageSize),
-      MongoBill.countDocuments(match)
+      MongoBill.countDocuments(match, { ...readFromSecondary })
     ]);
 
     jsonRes<PagingData<BillSchemaType>>(res, {

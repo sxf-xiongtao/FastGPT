@@ -4,6 +4,7 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoUserInform } from '@/service/support/user/inform/schema';
+import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -16,11 +17,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     };
 
     const [informs, total] = await Promise.all([
-      MongoUserInform.find({ userId })
+      MongoUserInform.find({ userId }, { ...readFromSecondary })
         .sort({ read: 1, time: -1 }) // 按照创建时间倒序排列
         .skip((pageNum - 1) * pageSize)
         .limit(pageSize),
-      MongoUserInform.countDocuments({ userId })
+      MongoUserInform.countDocuments({ userId }, { ...readFromSecondary })
     ]);
 
     jsonRes(res, {

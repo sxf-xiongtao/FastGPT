@@ -91,6 +91,11 @@ export const formConfig: FormConfig = {
             type: 'string',
             title: '文档地址（加一个 / 结尾，否则会携带子路径跳转）'
           },
+          systemPluginCourseUrl: {
+            key: 'siteSettings.feConfigs.systemPluginCourseUrl',
+            type: 'string',
+            title: '贡献插件文档地址'
+          },
           chatbotUrl: {
             key: 'siteSettings.feConfigs.chatbotUrl',
             type: 'string',

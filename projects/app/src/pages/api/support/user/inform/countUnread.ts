@@ -5,6 +5,7 @@ import { connectToDatabase } from '@/service/mongo';
 import { MongoUserInform } from '@/service/support/user/inform/schema';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { InformLevelEnum } from '@fastgpt/global/support/user/inform/constants';
+import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -17,15 +18,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { userId } = await authCert({ req, authToken: true });
 
     const [unReadCount, importantInforms] = await Promise.all([
-      MongoUserInform.countDocuments({
-        userId,
-        read: false
-      }),
-      MongoUserInform.find({
-        userId,
-        read: false,
-        level: { $ne: InformLevelEnum.common }
-      })
+      MongoUserInform.countDocuments(
+        {
+          userId,
+          read: false
+        },
+        {
+          ...readFromSecondary
+        }
+      ),
+      MongoUserInform.find(
+        {
+          userId,
+          read: false,
+          level: { $ne: InformLevelEnum.common }
+        },
+        {
+          ...readFromSecondary
+        }
+      )
         .limit(2)
         .sort({ time: -1 })
     ]);

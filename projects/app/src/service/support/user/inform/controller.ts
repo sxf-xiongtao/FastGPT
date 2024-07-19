@@ -28,10 +28,10 @@ export async function sendInform2OneUser({
   // random delay 500ms ~ 5s
   await delay(Math.random() * 4500 + 500);
   const inform = await MongoUserInform.findOne({
-    title,
-    content,
     userId: tmb.userId,
-    time: { $gte: new Date(Date.now() - 5 * 60 * 1000) }
+    time: { $gte: new Date(Date.now() - 5 * 60 * 1000) },
+    title,
+    content
   });
 
   if (inform) return;

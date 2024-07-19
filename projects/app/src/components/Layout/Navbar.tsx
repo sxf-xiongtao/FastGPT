@@ -66,7 +66,19 @@ export default function Navbar() {
     {
       activeLink: '/settings',
       name: '系统配置',
-      icon: 'common/settingLight'
+      icon: 'common/settingLight',
+      subItems: [
+        {
+          activeLink: '/settings/config',
+          name: '配置文件',
+          icon: 'common/settingLight'
+        },
+        {
+          activeLink: '/settings/systemPlugin',
+          name: '系统插件',
+          icon: 'common/navbar/pluginLight'
+        }
+      ]
     }
   ];
 

@@ -33,6 +33,7 @@ const InformSchema = new Schema({
 });
 
 try {
+  InformSchema.index({ userId: 1, read: 1 });
   InformSchema.index({ userId: 1, time: -1 });
   InformSchema.index({ time: 1 }, { expireAfterSeconds: 365 * 24 * 60 * 60 });
 } catch (error) {
