@@ -1,8 +1,10 @@
+// @ts-nocheck
 import urllib from 'urllib';
 import { KJUR, hextob64 } from 'jsrsasign';
 import x509 from '@peculiar/x509';
 import crypto from 'crypto';
 import assert from 'assert';
+
 export class Payment {
   constructor({ appid, mchid, private_key, serial_no, apiv3_private_key, notify_url } = {}) {
     assert(appid, 'appid is required');
