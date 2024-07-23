@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const { i18n } = require('./next-i18next.config');
 const path = require('path');
+const fs = require('fs');
 
 const nextConfig = {
   i18n,
@@ -49,17 +50,10 @@ const nextConfig = {
             const entries = await oldEntry(...args);
             return {
               ...entries,
-              'worker/htmlStr2Md': path.resolve(
+              ...getWorkerConfig(),
+              'worker/systemPluginRun': path.resolve(
                 process.cwd(),
-                '../../FastGPT/packages/service/worker/htmlStr2Md/index.ts'
-              ),
-              'worker/countGptMessagesTokens': path.resolve(
-                process.cwd(),
-                '../../FastGPT/packages/service/worker/tiktoken/countGptMessagesTokens.ts'
-              ),
-              'worker/readFile': path.resolve(
-                process.cwd(),
-                '../../FastGPT/packages/service/worker/file/read.ts'
+                '../../FastGPT/packages/plugins/runtime/worker.ts'
               )
             };
           }
@@ -89,3 +83,24 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+
+function getWorkerConfig() {
+  const baseUrl = path.resolve(__dirname, '../../FastGPT/packages/service/worker')
+  const result = fs.readdirSync(baseUrl);
+
+  // 获取所有的目录名
+  const folderList = result.filter((item) => {
+    return fs
+      .statSync(path.resolve(baseUrl, item))
+      .isDirectory();
+  });
+
+  const workerConfig = folderList.reduce((acc, item) => {
+    acc[`worker/${item}`] = path.resolve(
+      process.cwd(),
+      `../../FastGPT/packages/service/worker/${item}/index.ts`
+    );
+    return acc;
+  }, {});
+  return workerConfig;
+}
