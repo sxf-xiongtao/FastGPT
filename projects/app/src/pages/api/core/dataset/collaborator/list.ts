@@ -62,15 +62,17 @@ async function handler(
     }
   })();
 
-  return collaboratorList.map((item) => {
-    return {
-      tmbId: item.tmbId._id,
-      teamId: item.teamId,
-      permission: new DatasetPermission({ per: item.permission }),
-      name: item.tmbId.name,
-      avatar: item.tmbId.userId.avatar
-    };
-  });
+  return collaboratorList
+    .map((item) => {
+      return {
+        tmbId: item.tmbId._id,
+        teamId: item.teamId,
+        permission: new DatasetPermission({ per: item.permission }),
+        name: item.tmbId.name,
+        avatar: item.tmbId.userId.avatar
+      };
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export default NextAPI(handler);

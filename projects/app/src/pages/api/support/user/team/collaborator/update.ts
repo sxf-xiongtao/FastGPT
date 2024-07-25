@@ -27,20 +27,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     permission: Per.hasManagePer ? OwnerPermissionVal : ManagePermissionVal
   });
 
-  // 临时代码，对齐 role 权限
-  for await (const memberId of tmbIds) {
-    await MongoTeamMember.findOneAndUpdate(
-      {
-        _id: memberId,
-        teamId,
-        role: { $ne: TeamMemberRoleEnum.owner }
-      },
-      {
-        role: Per.hasManagePer ? TeamMemberRoleEnum.admin : TeamMemberRoleEnum.visitor
-      }
-    );
-  }
-
   return updateResourcePermission({
     resourceType: PerResourceTypeEnum.team,
     teamId,

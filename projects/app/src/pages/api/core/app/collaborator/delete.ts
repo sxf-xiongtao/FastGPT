@@ -94,7 +94,7 @@ async function handler(req: NextApiRequest) {
     }
 
     // 继承态：关闭继承态，修改默认权限为父级的默认权限（目录是多余同步，无所谓）
-    if (app.inheritPermission) {
+    if (app.inheritPermission && app.parentId) {
       const parent = await MongoApp.findById(app.parentId, 'defaultPermission')
         .session(session)
         .lean();

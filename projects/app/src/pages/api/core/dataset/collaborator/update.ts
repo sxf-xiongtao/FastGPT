@@ -46,7 +46,7 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
 
   await mongoSessionRun(async (session) => {
     // 关闭继承态
-    if (dataset.inheritPermission) {
+    if (dataset.inheritPermission && dataset.parentId) {
       await MongoDataset.updateOne(
         { _id: datasetId },
         {
@@ -102,16 +102,16 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
 
           const unchangedClbs = parentClbs.filter((item) => !tmbIds.includes(String(item.tmbId)));
 
-          for (const item of unchangedClbs) {
-            await MongoResourcePermission.create({
+          await MongoResourcePermission.create(
+            unchangedClbs.map((item) => ({
               teamId,
               resourceId: datasetId,
               resourceType: PerResourceTypeEnum.dataset,
               tmbId: item.tmbId,
-              permission: item.permission,
-              session
-            });
-          }
+              permission: item.permission
+            })),
+            { session }
+          );
 
           return {
             updateClbs,

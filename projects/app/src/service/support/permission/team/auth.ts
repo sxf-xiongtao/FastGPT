@@ -1,14 +1,15 @@
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
-import { AuthResponseType, PermissionValueType } from '@fastgpt/global/support/permission/type';
+import { PermissionValueType } from '@fastgpt/global/support/permission/type';
 import { getTeamMember } from '../../user/team/controller';
-import { AuthPropsType } from '@fastgpt/service/support/permission/type/auth.d';
 import { parseHeaderCert } from '@fastgpt/service/support/permission/controller';
 import { TeamMemberItemType } from '@fastgpt/global/support/user/team/type';
+import { AuthModeType, AuthResponseType } from '@fastgpt/service/support/permission/type';
+import { OwnerPermissionVal } from '@fastgpt/global/support/permission/constant';
 
 export const authMember = async ({
-  per,
+  per = OwnerPermissionVal,
   ...props
-}: AuthPropsType): Promise<
+}: AuthModeType): Promise<
   AuthResponseType & {
     member: TeamMemberItemType;
   }
@@ -20,9 +21,8 @@ export const authMember = async ({
 
   return {
     ...result,
-    isOwner: member.permission.isOwner,
-    canWrite: member.permission.hasManagePer,
-    member
+    member,
+    permission: member.permission
   };
 };
 // auth member permission

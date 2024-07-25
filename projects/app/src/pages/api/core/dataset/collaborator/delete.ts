@@ -7,12 +7,9 @@ import {
 import { DatasetCollaboratorDeleteParams } from '@fastgpt/global/core/dataset/collaborator';
 import {
   delResourcePermission,
-  getResourceAllClbs,
-  getResourcePermission
+  getResourceAllClbs
 } from '@fastgpt/service/support/permission/controller';
-import { DatasetPermission } from '@fastgpt/global/support/permission/dataset/controller';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
-import { on } from 'events';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { DatasetTypeEnum } from '@fastgpt/global/core/dataset/constants';
 import {
@@ -20,7 +17,6 @@ import {
   syncCollaborators
 } from '@fastgpt/service/support/permission/inheritPermission';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
-import { MongoApp } from '@fastgpt/service/core/app/schema';
 
 async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>) {
   // Authorization
@@ -77,14 +73,17 @@ async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>
       }
     }
 
-    if (dataset.inheritPermission) {
+    if (dataset.inheritPermission && dataset.parentId) {
       const parent = await MongoDataset.findById(dataset.parentId, 'defaultPermission')
         .session(session)
         .lean();
 
       await MongoDataset.updateOne(
         { _id: dataset._id },
-        { $set: { defaultPermission: parent?.defaultPermission ?? dataset.defaultPermission } }
+        {
+          inheritPermission: false,
+          defaultPermission: parent?.defaultPermission ?? dataset.defaultPermission
+        }
       ).session(session);
     }
   });

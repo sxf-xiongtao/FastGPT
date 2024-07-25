@@ -55,7 +55,7 @@ async function handler(req: NextApiRequest) {
 
   await mongoSessionRun(async (session) => {
     // 关闭继承态
-    if (app.inheritPermission) {
+    if (app.inheritPermission && app.parentId) {
       await MongoApp.updateOne(
         { _id: appId },
         {
@@ -102,6 +102,7 @@ async function handler(req: NextApiRequest) {
             session
           });
 
+          // 找到在变更 member 列表中的协作者，单独更新
           const updateClbs = parentClbs
             .filter((item) => tmbIds.includes(String(item.tmbId)))
             .map((item) => ({
@@ -111,16 +112,17 @@ async function handler(req: NextApiRequest) {
 
           const unchangedClbs = parentClbs.filter((item) => !tmbIds.includes(String(item.tmbId)));
 
-          for (const item of unchangedClbs) {
-            await MongoResourcePermission.create({
+          // 先创建未变更的协作者（内容不变）
+          await MongoResourcePermission.create(
+            unchangedClbs.map((item) => ({
               teamId,
               resourceId: appId,
               resourceType: PerResourceTypeEnum.app,
               tmbId: item.tmbId,
-              permission: item.permission,
-              session
-            });
-          }
+              permission: item.permission
+            })),
+            { session }
+          );
 
           return {
             updateClbs,
