@@ -81,7 +81,6 @@ async function handler(
           },
           {
             name: user.username.slice(0, 10),
-            role: 'visitor',
             status: TeamMemberStatusEnum.waiting
           },
           {
