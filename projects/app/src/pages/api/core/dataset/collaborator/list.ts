@@ -1,4 +1,3 @@
-import type { NextApiRequest } from 'next';
 import { NextAPI } from '@/service/middleware/entry';
 import { authDataset } from '@fastgpt/service/support/permission/dataset/auth';
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
@@ -9,29 +8,59 @@ import {
 import { CollaboratorItemType } from '@fastgpt/global/support/permission/collaborator';
 import { ResourcePerWithTmbWithUser } from '@fastgpt/global/support/permission/type';
 import { DatasetPermission } from '@fastgpt/global/support/permission/dataset/controller';
+import { ApiRequestProps } from '@fastgpt/service/type/next';
+import { DatasetTypeEnum } from '@fastgpt/global/core/dataset/constants';
 
-async function handler(req: NextApiRequest): Promise<CollaboratorItemType[]> {
+async function handler(
+  req: ApiRequestProps<
+    {},
+    {
+      datasetId: string;
+    }
+  >
+): Promise<CollaboratorItemType[]> {
   // Authorization
-  const { datasetId } = req.query as { datasetId: string };
-  const { teamId } = await authDataset({
+  const { datasetId } = req.query;
+  const { teamId, dataset } = await authDataset({
     req,
     authToken: true,
     datasetId,
     per: ReadPermissionVal
   });
 
-  const collaboratorList = (await MongoResourcePermission.find({
-    teamId,
-    resourceId: datasetId,
-    resourceType: PerResourceTypeEnum.dataset
-  }).populate({
-    path: 'tmbId',
-    select: 'name userId',
-    populate: {
-      path: 'userId',
-      select: 'avatar'
+  const isFolder = dataset.type === DatasetTypeEnum.folder;
+  const isInherit = dataset.inheritPermission;
+  const isRoot = !dataset.parentId;
+
+  const collaboratorList = await (async () => {
+    if (isFolder || !isInherit || isRoot) {
+      return (await MongoResourcePermission.find({
+        teamId,
+        resourceId: datasetId,
+        resourceType: PerResourceTypeEnum.dataset
+      }).populate({
+        path: 'tmbId',
+        select: 'name userId',
+        populate: {
+          path: 'userId',
+          select: 'avatar'
+        }
+      })) as ResourcePerWithTmbWithUser[];
+    } else {
+      return (await MongoResourcePermission.find({
+        teamId,
+        resourceId: dataset.parentId,
+        resourceType: PerResourceTypeEnum.dataset
+      }).populate({
+        path: 'tmbId',
+        select: 'name userId',
+        populate: {
+          path: 'userId',
+          select: 'avatar'
+        }
+      })) as ResourcePerWithTmbWithUser[];
     }
-  })) as ResourcePerWithTmbWithUser[];
+  })();
 
   return collaboratorList.map((item) => {
     return {

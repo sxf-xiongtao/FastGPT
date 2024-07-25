@@ -1,4 +1,3 @@
-import type { NextApiRequest } from 'next';
 import { NextAPI } from '@/service/middleware/entry';
 import { authDataset } from '@fastgpt/service/support/permission/dataset/auth';
 import {
@@ -6,36 +5,89 @@ import {
   ManagePermissionVal
 } from '@fastgpt/global/support/permission/constant';
 import { DatasetCollaboratorDeleteParams } from '@fastgpt/global/core/dataset/collaborator';
-import { getResourcePermission } from '@fastgpt/service/support/permission/controller';
+import {
+  delResourcePermission,
+  getResourceAllClbs,
+  getResourcePermission
+} from '@fastgpt/service/support/permission/controller';
 import { DatasetPermission } from '@fastgpt/global/support/permission/dataset/controller';
+import { ApiRequestProps } from '@fastgpt/service/type/next';
+import { on } from 'events';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { DatasetTypeEnum } from '@fastgpt/global/core/dataset/constants';
+import {
+  syncChildrenPermission,
+  syncCollaborators
+} from '@fastgpt/service/support/permission/inheritPermission';
+import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
+import { MongoApp } from '@fastgpt/service/core/app/schema';
 
-async function handler(req: NextApiRequest) {
+async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>) {
   // Authorization
-  const { datasetId, tmbId } = req.query as DatasetCollaboratorDeleteParams;
+  const { datasetId, tmbId } = req.query;
 
-  const { teamId, permission } = await authDataset({
+  const { teamId, dataset } = await authDataset({
     req,
     authToken: true,
     datasetId,
     per: ManagePermissionVal
   });
 
-  const rp = await getResourcePermission({
-    teamId,
-    tmbId,
-    resourceId: datasetId,
-    resourceType: PerResourceTypeEnum.dataset
+  await mongoSessionRun(async (session) => {
+    if (dataset.type == DatasetTypeEnum.folder) {
+      const folderClbs = await getResourceAllClbs({
+        teamId,
+        resourceId: datasetId,
+        resourceType: PerResourceTypeEnum.dataset,
+        session
+      });
+
+      await delResourcePermission({
+        resourceType: PerResourceTypeEnum.dataset,
+        teamId,
+        tmbId,
+        resourceId: dataset._id,
+        session
+      });
+
+      await syncChildrenPermission({
+        resource: dataset,
+        folderTypeList: [DatasetTypeEnum.folder],
+        resourceType: PerResourceTypeEnum.dataset,
+        resourceModel: MongoDataset,
+        collaborators: folderClbs.filter((clb) => String(clb.tmbId) != tmbId),
+        session
+      });
+    } else {
+      if (dataset.inheritPermission && dataset.parentId) {
+        const parentClbs = await getResourceAllClbs({
+          teamId,
+          resourceId: dataset.parentId,
+          resourceType: PerResourceTypeEnum.dataset,
+          session
+        });
+
+        await syncCollaborators({
+          teamId,
+          resourceId: datasetId,
+          resourceType: PerResourceTypeEnum.dataset,
+          session,
+          collaborators: parentClbs.filter((clb) => String(clb.tmbId) != tmbId)
+        });
+      }
+    }
+
+    if (dataset.inheritPermission) {
+      const parent = await MongoDataset.findById(dataset.parentId, 'defaultPermission')
+        .session(session)
+        .lean();
+
+      await MongoDataset.updateOne(
+        { _id: dataset._id },
+        { $set: { defaultPermission: parent?.defaultPermission ?? dataset.defaultPermission } }
+      ).session(session);
+    }
   });
-
-  if (!rp) {
-    return Promise.reject('Not Collaborator!');
-  }
-
-  if (!permission.isOwner && new DatasetPermission({ per: rp.permission }).hasManagePer) {
-    return Promise.reject('You can not delete a manager!');
-  }
-
-  return await rp.deleteOne();
 }
 
 export default NextAPI(handler);
