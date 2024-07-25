@@ -17,6 +17,7 @@ import { getResourceAllClbs } from '@fastgpt/service/support/permission/controll
 import { MongoApp } from '@fastgpt/service/core/app/schema';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { updateResourcePermission } from '@/service/support/permission/controller';
+import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
 
 /* 
   增加或修改协作者
@@ -100,19 +101,26 @@ async function handler(req: NextApiRequest) {
             resourceType: PerResourceTypeEnum.app,
             session
           });
-          const updateClbs = tmbIds
-            .map<UpdateCollaboratorItem>((tmbId) => ({
-              tmbId,
+
+          const updateClbs = parentClbs
+            .filter((item) => tmbIds.includes(String(item.tmbId)))
+            .map((item) => ({
+              ...item,
               permission
-            }))
-            .concat(
-              parentClbs
-                .filter((item) => !tmbIds.includes(String(item.tmbId)))
-                .map((item) => ({
-                  tmbId: item.tmbId,
-                  permission: tmbIds.includes(String(item.tmbId)) ? permission : item.permission
-                }))
-            );
+            }));
+
+          const unchangedClbs = parentClbs.filter((item) => !tmbIds.includes(String(item.tmbId)));
+
+          for (const item of unchangedClbs) {
+            await MongoResourcePermission.create({
+              teamId,
+              resourceId: appId,
+              resourceType: PerResourceTypeEnum.app,
+              tmbId: item.tmbId,
+              permission: item.permission,
+              session
+            });
+          }
 
           return {
             updateClbs,
