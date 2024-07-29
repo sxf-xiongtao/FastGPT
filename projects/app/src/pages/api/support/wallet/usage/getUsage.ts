@@ -3,7 +3,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
-import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
 import { addDays } from 'date-fns';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { Types } from '@fastgpt/service/common/mongo';
@@ -11,6 +10,7 @@ import { PagingData } from '@/types';
 import { UsageItemType } from '@fastgpt/global/support/wallet/usage/type';
 import { UsageSourceEnum } from '@fastgpt/global/support/wallet/usage/constants';
 import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
+import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -50,11 +50,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // get bill record and total by record
     const [bills, total] = await Promise.all([
-      MongoUsage.find(where)
+      MongoUsage.find(where, undefined, {
+        ...readFromSecondary
+      })
         .sort({ time: -1 })
         .skip((pageNum - 1) * pageSize)
         .limit(pageSize),
-      MongoUsage.countDocuments(where)
+      MongoUsage.countDocuments(where, {
+        ...readFromSecondary
+      })
     ]);
 
     jsonRes<PagingData<UsageItemType>>(res, {

@@ -33,6 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           read: false,
           level: { $ne: InformLevelEnum.common }
         },
+        undefined,
         {
           ...readFromSecondary
         }
