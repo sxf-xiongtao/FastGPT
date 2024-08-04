@@ -81,14 +81,12 @@ const checkUsageTime = async (teamId: string, expiredDay: number) => {
     const lastUsageTime = new Date(lastUsage.time);
     const expiredTime = addDays(new Date(), -expiredDay);
     const diffDay = differenceInDays(lastUsageTime, expiredTime);
-    console.log(diffDay, '===', lastUsage.teamId);
+
     if (diffDay === 7) {
-      // 7 天
       notifyOneFreeClean(teamId, 7);
     } else if (diffDay === 3) {
       notifyOneFreeClean(teamId, 3);
     } else if (diffDay === 1) {
-      // 1 天
       notifyOneFreeClean(teamId, 1);
     }
 

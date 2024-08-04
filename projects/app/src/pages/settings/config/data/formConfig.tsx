@@ -328,11 +328,6 @@ export const formConfig: FormConfig = {
             type: 'string',
             title: '订阅套餐即将过期'
           },
-          EXPORED: {
-            key: 'loginSettings.sms.EXPIRED',
-            type: 'string',
-            title: '订阅套餐已过期'
-          },
           FREE_CLEAN: {
             key: 'loginSettings.sms.FREE_CLEAN',
             type: 'string',
