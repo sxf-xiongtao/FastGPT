@@ -6,6 +6,7 @@ import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 import { MongoDatasetCollectionTags } from '@fastgpt/service/core/dataset/tag/schema';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import { replaceRegChars } from '@fastgpt/global/common/string/tools';
 
 export type GetDatasetTagsProps = PaginationProps<{
   datasetId: string;
@@ -34,7 +35,7 @@ async function handler(
     datasetId,
     ...(searchText
       ? {
-          tag: new RegExp(searchText, 'i')
+          tag: new RegExp(`${replaceRegChars(searchText)}`, 'i')
         }
       : {})
   };

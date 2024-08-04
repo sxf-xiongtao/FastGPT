@@ -26,12 +26,12 @@ async function handler(
     per: ReadPermissionVal
   });
 
-  const match = {
+  const tags = await MongoDatasetCollectionTags.find({
     teamId,
     datasetId
-  };
-
-  const tags = await MongoDatasetCollectionTags.find(match).sort({ _id: -1 }).lean();
+  })
+    .sort({ _id: -1 })
+    .lean();
 
   return {
     list: tags
