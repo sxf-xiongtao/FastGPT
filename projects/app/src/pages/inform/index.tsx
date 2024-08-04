@@ -35,7 +35,6 @@ const InformSetting = () => {
     }
   });
   const {
-    getValues,
     setValue,
     register: registerSystemInform,
     handleSubmit: handleSubmitSendSystemInform,

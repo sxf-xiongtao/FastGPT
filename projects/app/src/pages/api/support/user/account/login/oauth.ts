@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const { user, token } = await usernameLogin({
       username,
       avatar: avatarUrl,
-      email,
+      notificationAccount: email,
       inviterId
     });
 

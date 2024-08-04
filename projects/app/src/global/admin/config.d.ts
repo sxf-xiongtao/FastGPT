@@ -49,6 +49,7 @@ export type ConfigFormType = {
   loginSettings: {
     email: SystemConfigType['auth']['email'];
     phone: SystemConfigType['auth']['phone'];
+    sms: systemConfigType['auth']['sms'];
     github: SystemConfigType['auth']['github'];
     wechat: SystemConfigType['auth']['wechat'];
     google: SystemConfigType['auth']['google'];

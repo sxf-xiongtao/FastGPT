@@ -37,11 +37,21 @@ export type SystemConfigType = {
       user: string;
       pass: string;
     };
+    sms: {
+      REGISTER: string;
+      RESET_PASSWORD: string;
+      BIND_NOTIFICATION: string;
+      EXPIRE_SOON: string;
+      EXPIRED: string; // TODO: 0 day ?
+      // LACK_OF_POINTS: string; // DO not post sms, because it's expensive
+      FREE_CLEAN: string;
+      FREE_CLEANED: string;
+    };
     phone?: {
       SNED_PHONE_ACCESSKEYID: string;
       SNED_PHONE_ACCESSSECRET: string;
       SNED_PHONE_SIGNNAME: string;
-      SNED_PHONE_TEMPLATE: string;
+      // SNED_PHONE_TEMPLATE: {};
     };
     wechat?: {
       appID: string;

@@ -189,7 +189,7 @@ export const Settings = () => {
                                 <Controller
                                   control={control}
                                   name={thirdLevelTyped.key}
-                                  render={({ field: { onChange, onBlur, value, ref } }) => (
+                                  render={({ field: { onChange, value } }) => (
                                     <FormField
                                       type={thirdLevelTyped.type}
                                       title={thirdLevelTyped.title}
@@ -213,7 +213,7 @@ export const Settings = () => {
                       <Controller
                         control={control}
                         name={secondLevel.key}
-                        render={({ field: { onChange, onBlur, value, ref } }) => (
+                        render={({ field: { onChange, value } }) => (
                           <FormField
                             type={secondLevel.type}
                             title={secondLevel.title}

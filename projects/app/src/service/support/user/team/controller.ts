@@ -64,11 +64,16 @@ export async function teamMemberSchema2TeamItemType(
 /* -------------- team ------------ */
 export async function createTeam({
   ownerId,
+  notificationAccount,
   name,
   avatar,
   defaultTeam = false,
   session
-}: CreateTeamProps & { ownerId: string; session: ClientSession }): Promise<TeamTmbItemType> {
+}: CreateTeamProps & {
+  ownerId: string;
+  notificationAccount?: string;
+  session: ClientSession;
+}): Promise<TeamTmbItemType> {
   try {
     const [team] = await MongoTeam.create(
       [
@@ -76,6 +81,7 @@ export async function createTeam({
           ownerId,
           name,
           avatar,
+          notificationAccount,
           defaultPermission: TeamDefaultPermissionVal
         }
       ],
@@ -171,11 +177,13 @@ export async function getTeamByTmbId(tmbId: string) {
 // get default team, if not exit, create one
 export async function getAndCreateUserDefaultTeam({
   ownerId,
+  notificationAccount,
   teamName = 'My Team',
   teamAvatar = LOGO_ICON,
   session
 }: {
   ownerId: string;
+  notificationAccount?: string;
   teamName?: string;
   teamAvatar?: string;
   session: ClientSession;
@@ -191,6 +199,7 @@ export async function getAndCreateUserDefaultTeam({
       name: teamName,
       avatar: teamAvatar,
       defaultTeam: true,
+      notificationAccount,
       session
     });
   }

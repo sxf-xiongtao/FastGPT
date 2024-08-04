@@ -9,12 +9,12 @@ import { createJWT } from '@fastgpt/service/support/permission/controller';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { InformLevelEnum } from '@fastgpt/global/support/user/inform/constants';
 import { Types } from '@fastgpt/service/common/mongo';
+import { TeamPermission } from '@fastgpt/global/support/permission/user/controller';
 
 type UserProps = {
   username: string;
-  email?: string;
   phonePrefix?: number;
-  phone?: string;
+  notificationAccount?: string;
   avatar?: string;
   inviterId?: string;
 };
@@ -23,11 +23,10 @@ type UserProps = {
 export async function createUserByUsername({
   username,
   password,
-  email,
-  phone,
   phonePrefix,
   avatar,
-  inviterId
+  inviterId,
+  notificationAccount
 }: UserProps & {
   password: string;
 }): Promise<UserType> {
@@ -41,8 +40,6 @@ export async function createUserByUsername({
           avatar,
           password,
           inviterId: inviterId && Types.ObjectId.isValid(inviterId) ? inviterId : undefined,
-          email,
-          phone,
           phonePrefix
         }
       ],
@@ -51,6 +48,7 @@ export async function createUserByUsername({
 
     const team = await getAndCreateUserDefaultTeam({
       ownerId: user._id,
+      notificationAccount,
       teamName: `${username.slice(0, 5)}的团队`,
       teamAvatar: avatar,
       session
@@ -68,7 +66,10 @@ export async function createUserByUsername({
     timezone: user.timezone,
     promotionRate: user.promotionRate,
     openaiAccount: user.openaiAccount,
-    team: team
+    team: team,
+    permission: new TeamPermission({
+      isOwner: true
+    })
   };
 }
 
@@ -87,7 +88,8 @@ export async function getUserDetail(tmbId?: string, userId?: string): Promise<Us
     timezone: user.timezone,
     promotionRate: user.promotionRate,
     openaiAccount: user.openaiAccount,
-    team
+    team,
+    permission: team.permission
   };
 }
 
@@ -95,10 +97,8 @@ export async function getUserDetail(tmbId?: string, userId?: string): Promise<Us
 export async function usernameLogin({
   username,
   avatar,
-  email,
-  phonePrefix,
-  phone,
-  inviterId
+  inviterId,
+  notificationAccount
 }: UserProps) {
   // try to login
   const user = await MongoUser.findOne({ username }, '_id lastLoginTmbId');
@@ -109,18 +109,19 @@ export async function usernameLogin({
     const user = await createUserByUsername({
       username,
       password: hashStr(password),
-      email,
-      phonePrefix,
-      phone,
       avatar,
+      notificationAccount,
       inviterId: inviterId && Types.ObjectId.isValid(inviterId) ? inviterId : undefined
     });
     // send default password inform
     sendInform2OneUser({
       level: InformLevelEnum.common,
-      tmbId: user.team.tmbId,
-      title: '新用户注册',
-      content: `您的初始密码为: ${password}`
+      teamId: user.team.teamId,
+      templateCode: 'CUSTOM',
+      templateParam: {
+        title: '新用户注册',
+        content: `您的初始密码为: ${password}`
+      }
     });
     const token = createJWT(user);
 
@@ -128,15 +129,6 @@ export async function usernameLogin({
       user,
       token
     };
-  } else {
-    // update user
-    if (email || phone) {
-      await user.updateOne({
-        email,
-        phonePrefix,
-        phone
-      });
-    }
   }
 
   // login

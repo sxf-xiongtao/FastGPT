@@ -14,7 +14,7 @@ export function formatConfigStore2FormSchema({
     vectorModels = [],
     reRankModels = [],
     audioSpeechModels = [],
-    whisperModel
+    whisperModel = []
   } = fastgpt || { feConfigs: {}, systemEnv: {} };
 
   // 初始化配置
@@ -105,11 +105,20 @@ export function formatConfigStore2FormSchema({
         user: fastgptPro?.auth?.email?.user || '',
         pass: fastgptPro?.auth?.email?.pass || ''
       },
+      sms: {
+        REGISTER: fastgptPro?.auth?.sms?.REGISTER || '',
+        RESET_PASSWORD: fastgptPro?.auth?.sms?.RESET_PASSWORD || '',
+        BIND_NOTIFICATION: fastgptPro?.auth?.sms?.BIND_NOTIFICATION || '',
+        EXPIRE_SOON: fastgptPro?.auth?.sms?.EXPIRE_SOON || '',
+        EXPIRED: fastgptPro?.auth?.sms?.EXPIRED || '',
+        FREE_CLEAN: fastgptPro?.auth?.sms?.FREE_CLEAN || '',
+        FREE_CLEANED: fastgptPro?.auth?.sms?.FREE_CLEAN || ''
+      },
       phone: {
         SNED_PHONE_ACCESSKEYID: fastgptPro?.auth?.phone?.SNED_PHONE_ACCESSKEYID || '',
         SNED_PHONE_ACCESSSECRET: fastgptPro?.auth?.phone?.SNED_PHONE_ACCESSSECRET || '',
-        SNED_PHONE_SIGNNAME: fastgptPro?.auth?.phone?.SNED_PHONE_SIGNNAME || '',
-        SNED_PHONE_TEMPLATE: fastgptPro?.auth?.phone?.SNED_PHONE_TEMPLATE || ''
+        SNED_PHONE_SIGNNAME: fastgptPro?.auth?.phone?.SNED_PHONE_SIGNNAME || ''
+        // SNED_PHONE_TEMPLATE: fastgptPro?.auth?.phone?.SNED_PHONE_TEMPLATE || ''
       },
       wechat: {
         appID: fastgptPro?.auth?.wechat?.appID || '',
@@ -150,7 +159,7 @@ export function formatFormData2ConfigStore({
 }: ConfigFormType): ConfigStoreType {
   const { feConfigs, systemEnv, concatMd, scripts, limit } = siteSettings;
   const { llmModels, vectorModels, reRankModels, audioSpeechModels, whisperModel } = modelSettings;
-  const { email, phone, github, wechat, google, fastLogin } = loginSettings;
+  const { email, phone, github, wechat, google, fastLogin, sms } = loginSettings;
   const { censor, googleV3Ver } = securitySettings;
   const { wx, subPlans } = paySettings;
 
@@ -171,7 +180,8 @@ export function formatFormData2ConfigStore({
     phone,
     github,
     wechat,
-    google
+    google,
+    sms
   };
 
   const standardSubPlanJson = (() => {

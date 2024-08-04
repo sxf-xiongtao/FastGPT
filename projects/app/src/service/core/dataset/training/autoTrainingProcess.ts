@@ -93,7 +93,7 @@ export async function generateAutoTraining(): Promise<any> {
   addLog.info(`[Auto Training Queue] Start`);
 
   // auth balance
-  if (!(await checkTeamAiPointsAndLock(data.teamId, data.tmbId))) {
+  if (!(await checkTeamAiPointsAndLock(data.teamId))) {
     reduceQueue();
     return generateAutoTraining();
   }

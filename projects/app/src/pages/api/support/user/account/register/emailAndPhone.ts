@@ -42,9 +42,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       username,
       password,
       inviterId,
-      email: username.includes('@') ? username : undefined,
-      phonePrefix: 86, // 目前只支持国内的
-      phone: username.includes('@') ? undefined : username
+      notificationAccount: username,
+      phonePrefix: 86 // 目前只支持国内的
     });
 
     const token = createJWT(user);

@@ -1,29 +1,25 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { jsonRes } from '@fastgpt/service/common/response';
-import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
-import type { SendInform2UserProps } from '@fastgpt/global/support/user/inform/type';
+import { SendInformProps } from '@/service/support/user/inform/type';
+import { InformLevelEnum } from '@fastgpt/global/support/user/inform/constants';
 import { sendInform2OneUser } from '@/service/support/user/inform/controller';
-import { startSendInform } from '@/service/queue/sendInform';
+import { NextAPI } from '@/service/middleware/entry';
+import { SendInformTemplateCodeEnum } from '@fastgpt/global/support/user/inform/constants';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    await connectToDatabase();
-    const { tmbId, title, content, level } = req.body as SendInform2UserProps;
-    await authCert({ req, authRoot: true });
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { teamId, level, templateCode, templateParam, customLockMinutes } =
+    req.body as SendInformProps<InformLevelEnum, SendInformTemplateCodeEnum>;
+  await authCert({ req, authRoot: true });
 
-    // create one unactive inform
-    global.sendInformQueue.push(() => sendInform2OneUser({ title, content, tmbId, level }));
-    startSendInform();
-
-    jsonRes(res, {
-      message: '发送通知成功'
-    });
-  } catch (err) {
-    jsonRes(res, {
-      code: 500,
-      error: err
-    });
-  }
+  // create one unactive inform
+  return sendInform2OneUser({
+    teamId,
+    level,
+    templateCode,
+    templateParam,
+    customLockMinutes
+  });
 }
+
+export default NextAPI(handler);

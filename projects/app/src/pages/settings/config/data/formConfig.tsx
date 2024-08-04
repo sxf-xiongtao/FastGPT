@@ -280,7 +280,7 @@ export const formConfig: FormConfig = {
       phone: {
         key: 'loginSettings.phone',
         type: 'object',
-        title: '短信登录配置',
+        title: '阿里云短信配置',
         properties: {
           SNED_PHONE_ACCESSKEYID: {
             key: 'loginSettings.phone.SNED_PHONE_ACCESSKEYID',
@@ -300,12 +300,43 @@ export const formConfig: FormConfig = {
             type: 'string',
             title: '签名名称',
             description: '短信签名'
-          },
-          SNED_PHONE_TEMPLATE: {
-            key: 'loginSettings.phone.SNED_PHONE_TEMPLATE',
+          }
+        }
+      },
+      sms: {
+        key: 'loginSettings.sms',
+        type: 'object',
+        title: '阿里云短信模板CODE（SMS_xxx）',
+        properties: {
+          REGISTER: {
+            key: 'loginSettings.sms.REGISTER',
             type: 'string',
-            title: '模板CODE',
-            description: '短信签名的Code，一般是SM_xxx'
+            title: '注册账号'
+          },
+          RESET_PASSWORD: {
+            key: 'loginSettings.sms.RESET_PASSWORD',
+            type: 'string',
+            title: '重置密码'
+          },
+          BIND_NOTIFICATION: {
+            key: 'loginSettings.sms.BIND_NOTIFICATION',
+            type: 'string',
+            title: '绑定通知手机号'
+          },
+          EXPIRE_SOON: {
+            key: 'loginSettings.sms.EXPIRE_SOON',
+            type: 'string',
+            title: '订阅套餐即将过期'
+          },
+          EXPORED: {
+            key: 'loginSettings.sms.EXPIRED',
+            type: 'string',
+            title: '订阅套餐已过期'
+          },
+          FREE_CLEAN: {
+            key: 'loginSettings.sms.FREE_CLEAN',
+            type: 'string',
+            title: '免费版用户清理警告'
           }
         }
       },

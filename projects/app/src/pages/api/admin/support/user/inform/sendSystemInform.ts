@@ -1,29 +1,31 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { jsonRes } from '@fastgpt/service/common/response';
-import { connectToDatabase } from '@/service/mongo';
-import type { SendInformProps } from '@fastgpt/global/support/user/inform/type';
 import { sendInform2AllUser } from '@/service/support/user/inform/controller';
 import { adminCert } from '@/service/support/permission/adminCert';
+import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
+import { NextAPI } from '@/service/middleware/entry';
+import { InformLevelEnum } from '@fastgpt/global/support/user/inform/constants';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    await connectToDatabase();
-    const { title, content, level } = req.body as SendInformProps;
-    await adminCert({ req, authToken: true });
+export type SendSystemInformQuery = {};
+export type SendSystemInformBody = {
+  title: string;
+  content: string;
+  level: `${InformLevelEnum}`;
+};
+export type SendSystemInformResponse = {};
 
-    sendInform2AllUser({
-      title,
-      content,
-      level
-    });
+async function handler(
+  req: ApiRequestProps<SendSystemInformBody, SendSystemInformQuery>,
+  _res: ApiResponseType<any>
+): Promise<SendSystemInformResponse> {
+  await adminCert({ req, authToken: true });
 
-    jsonRes(res, {
-      message: '发送通知成功'
-    });
-  } catch (err) {
-    jsonRes(res, {
-      code: 500,
-      error: err
-    });
-  }
+  const { title, content, level } = req.body;
+  await sendInform2AllUser({
+    title,
+    content,
+    level
+  });
+
+  return {};
 }
+
+export default NextAPI(handler);
