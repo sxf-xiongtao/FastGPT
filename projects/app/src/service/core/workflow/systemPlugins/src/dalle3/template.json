@@ -89,7 +89,7 @@
             "valueType": "object",
             "canEdit": true,
             "key": "error",
-            "label": "error",
+            "label": "错误信息",
             "description": "",
             "value": ["tMvel910bnrJ", "error"]
           }

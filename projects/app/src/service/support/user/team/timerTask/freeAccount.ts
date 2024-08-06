@@ -28,7 +28,7 @@ export const checkFreeAccount = async (expiredDay: number = 30) => {
   const freePlans = await MongoTeamSub.find(
     {
       type: SubTypeEnum.standard,
-      expiredTime: { $exist: true },
+      expiredTime: { $exists: true },
       currentSubLevel: StandardSubLevelEnum.free
     },
     'teamId',
@@ -74,6 +74,7 @@ const checkUsageTime = async (teamId: string, expiredDay: number) => {
 
     if (!lastUsage) {
       console.log('Not usage team', teamId);
+      notifyOneFreeClean(teamId, 7);
       return clearFreeAccount(teamId);
     }
 

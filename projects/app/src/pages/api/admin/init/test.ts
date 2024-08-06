@@ -16,7 +16,7 @@ async function handler(
 ): Promise<testResponse> {
   await authCert({ req, authRoot: true });
 
-  notifyAllExpireSoon();
+  checkFreeAccount();
   return {};
 }
 
