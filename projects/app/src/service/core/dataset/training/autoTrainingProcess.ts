@@ -18,6 +18,7 @@ import { addMinutes } from 'date-fns';
 import { countGptMessagesTokens } from '@fastgpt/service/common/string/tiktoken/index';
 import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
 import { pushDataListToTrainingQueueByCollectionId } from '@fastgpt/service/core/dataset/training/controller';
+import { loadRequestMessages } from '../../../../../../../FastGPT/packages/service/core/chat/utils';
 
 const reduceQueue = () => {
   global.autoTrainingLen = global.autoTrainingLen > 0 ? global.autoTrainingLen - 1 : 0;
@@ -117,7 +118,7 @@ export async function generateAutoTraining(): Promise<any> {
     const chatResponse = await ai.chat.completions.create({
       model,
       temperature: 0.3,
-      messages,
+      messages: await loadRequestMessages({ messages, useVision: false }),
       stream: false
     });
     const answer = chatResponse.choices?.[0].message?.content || '';
