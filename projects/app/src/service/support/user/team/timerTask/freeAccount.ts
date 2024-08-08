@@ -19,29 +19,38 @@ import { sendInform2OneUser } from '../../inform/controller';
   3. 30天没有usage记录的
 */
 let deleteUser = 0;
-export const checkFreeAccount = async (expiredDay: number = 30) => {
+export const checkFreeAccount = async (expiredDay: number = 30, oldDateInform?: number) => {
   // 检查是否开启了订阅模式
   if (!systemUseTeamPlanning()) {
     return;
   }
 
+  const clearDay = addDays(new Date(), -expiredDay);
+
   const freePlans = await MongoTeamSub.find(
     {
       type: SubTypeEnum.standard,
-      expiredTime: { $exists: true },
+      /*  当前时间 8 月 7 日，过期时间 30 天，举例： 
+          清理时间为：7 月 7 日，获取 7 月 17 日前的数据
+          如果过期时间在 7 月 7 日之前，说明超过 1 个月没有登录过了（登录会重置套餐）
+      */
+      expiredTime: { $lte: addDays(clearDay, 10), $gte: addDays(clearDay, -5) },
       currentSubLevel: StandardSubLevelEnum.free
     },
-    'teamId',
+    'teamId expiredTime',
     { ...readFromSecondary }
   ).lean();
-  console.log('total free plan', freePlans.length);
+  console.log('Check free plan amount', freePlans.length);
 
   for await (const plan of freePlans) {
-    await checkUsageTime(plan.teamId, expiredDay);
+    await checkUsageTime(plan, clearDay, oldDateInform);
   }
 };
 
-const checkUsageTime = async (teamId: string, expiredDay: number) => {
+const checkUsageTime = async (plan: TeamSubSchema, clearDay: Date, oldDateInform?: number) => {
+  const teamId = plan.teamId;
+  const expiredTime = plan.expiredTime;
+
   try {
     // 还有订阅内容，忽略
     const extraPlan = await MongoTeamSub.findOne(
@@ -57,41 +66,17 @@ const checkUsageTime = async (teamId: string, expiredDay: number) => {
 
     if (extraPlan) return;
 
-    // 获取最新的一条使用记录
-    const lastUsage = await MongoUsage.findOne(
-      {
-        teamId
-      },
-      '_id time',
-      {
-        ...readFromSecondary
-      }
-    )
-      .sort({
-        _id: -1
-      })
-      .lean();
-
-    if (!lastUsage) {
-      console.log('Not usage team', teamId);
-      notifyOneFreeClean(teamId, 7);
-      return clearFreeAccount(teamId);
-    }
-
-    // 距离 expiredDay 还有 7 3 天，1 天 发送消息
-    const lastUsageTime = new Date(lastUsage.time);
-    const expiredTime = addDays(new Date(), -expiredDay);
-    const diffDay = differenceInDays(lastUsageTime, expiredTime);
-
+    // 距离 expiredDay 还有 7 3 1 天 发送消息
+    const diffDay = differenceInDays(expiredTime, clearDay) + 1;
     if (diffDay === 7) {
-      notifyOneFreeClean(teamId, 7);
-    } else if (diffDay === 3) {
-      notifyOneFreeClean(teamId, 3);
-    } else if (diffDay === 1) {
-      notifyOneFreeClean(teamId, 1);
+      return notifyOneFreeClean(teamId, 7);
     }
-
-    // 已经过期的
+    if (diffDay === 3) {
+      return notifyOneFreeClean(teamId, 3);
+    }
+    if (diffDay === 1) {
+      return notifyOneFreeClean(teamId, 1);
+    }
     if (diffDay < 0) {
       return clearFreeAccount(teamId);
     }
@@ -117,7 +102,7 @@ const clearFreeAccount = async (teamId: string) => {
 };
 
 const notifyOneFreeClean = (teamId: string, day: number) => {
-  sendInform2OneUser({
+  return sendInform2OneUser({
     teamId,
     templateCode: 'FREE_CLEAN',
     templateParam: {

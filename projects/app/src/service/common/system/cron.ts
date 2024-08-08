@@ -50,7 +50,7 @@ const planNotifyCron = () => {
   });
 };
 const freeAccountCron = () => {
-  setCron('10 5 * * *', async () => {
+  setCron('20 */8 * * *', async () => {
     if (
       await checkTimerLock({
         timerId: TimerIdEnum.notification,
@@ -58,7 +58,7 @@ const freeAccountCron = () => {
       })
     ) {
       addLog.info(`通知免费版用户即将清理`);
-      checkFreeAccount();
+      checkFreeAccount(30);
     }
   });
 };

@@ -1,4 +1,4 @@
-import { authIpLimit } from '@/service/common/ipLimit/tools';
+import { authFrequencyLimit } from '@/service/common/frequencyLimit/tools';
 import type {
   AuthOutLinkInitProps,
   AuthOutLinkLimitProps,
@@ -6,12 +6,52 @@ import type {
 } from '@fastgpt/global/support/outLink/api.d';
 import axios from 'axios';
 import { OutLinkErrEnum } from '@fastgpt/global/common/error/code/outLink';
+import { OutLinkSchema } from '@fastgpt/global/support/outLink/type';
+import { addMinutes } from 'date-fns';
 
 export type TokenAuthResponseType = {
   success: boolean;
   msg?: string;
   message?: string;
   data?: AuthOutLinkResponse;
+};
+
+export async function authOutLinkInit({
+  tokenUrl,
+  outLinkUid
+}: AuthOutLinkInitProps): Promise<AuthOutLinkResponse> {
+  if (!tokenUrl) return { uid: outLinkUid };
+
+  const { data } = await axios<TokenAuthResponseType>({
+    baseURL: tokenUrl,
+    url: '/shareAuth/init',
+    method: 'POST',
+    data: {
+      token: outLinkUid
+    }
+  });
+  if (data?.success !== true) {
+    return Promise.reject(data?.message || data?.msg || OutLinkErrEnum.unAuthUser);
+  }
+  return {
+    uid: data?.data?.uid || outLinkUid
+  };
+}
+
+const authIpLimit = async ({ ip, outLink }: { ip: string; outLink: OutLinkSchema }) => {
+  if (!outLink.limit || !outLink.limit.QPM) {
+    return;
+  }
+
+  try {
+    await authFrequencyLimit({
+      eventId: `${outLink._id}-${ip}`,
+      maxAmount: outLink.limit.QPM,
+      expiredTime: addMinutes(new Date(), 1)
+    });
+  } catch (error) {
+    return Promise.reject(`每分钟仅能请求 ${outLink.limit.QPM} 次~`);
+  }
 };
 
 export async function authOutLinkLimit({
@@ -63,26 +103,4 @@ export async function authOutLinkLimit({
   } catch (error) {
     return Promise.reject('身份校验失败');
   }
-}
-
-export async function authOutLinkInit({
-  tokenUrl,
-  outLinkUid
-}: AuthOutLinkInitProps): Promise<AuthOutLinkResponse> {
-  if (!tokenUrl) return { uid: outLinkUid };
-
-  const { data } = await axios<TokenAuthResponseType>({
-    baseURL: tokenUrl,
-    url: '/shareAuth/init',
-    method: 'POST',
-    data: {
-      token: outLinkUid
-    }
-  });
-  if (data?.success !== true) {
-    return Promise.reject(data?.message || data?.msg || OutLinkErrEnum.unAuthUser);
-  }
-  return {
-    uid: data?.data?.uid || outLinkUid
-  };
 }

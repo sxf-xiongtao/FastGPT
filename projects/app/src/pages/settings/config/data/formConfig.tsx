@@ -255,7 +255,7 @@ export const formConfig: FormConfig = {
       email: {
         key: 'loginSettings.email',
         type: 'object',
-        title: '邮箱登录配置',
+        title: '邮箱通知配置(注册、套餐通知)',
         properties: {
           smtp: {
             key: 'loginSettings.email.smtp',

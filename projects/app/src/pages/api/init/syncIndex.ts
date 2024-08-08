@@ -1,7 +1,6 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
-import { connectionMongo } from '@fastgpt/service/common/mongo';
 import { MongoUserInform } from '@/service/support/user/inform/schema';
 import { MongoApp } from '@fastgpt/service/core/app/schema';
 import { MongoBill } from '@/service/support/wallet/bill/schema';
@@ -18,7 +17,7 @@ import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSc
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { MongoTeamTags } from '@fastgpt/service/support/user/team/teamTagsSchema';
 import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
-import { MongoIpLimit } from '@/service/common/ipLimit/schema';
+import { MongoFrequencyLimit } from '@/service/common/frequencyLimit/schema';
 import { MongoOpenApi } from '@fastgpt/service/support/openapi/schema';
 import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
 import { MongoRawTextBuffer } from '@fastgpt/service/common/buffer/rawText/schema';
@@ -49,7 +48,7 @@ async function handler(
     MongoResourcePermission.syncIndexes();
 
     MongoUsage.syncIndexes();
-    MongoIpLimit.syncIndexes();
+    MongoFrequencyLimit.syncIndexes();
     MongoOpenApi.syncIndexes();
     MongoOutLink.syncIndexes();
     MongoRawTextBuffer.syncIndexes();

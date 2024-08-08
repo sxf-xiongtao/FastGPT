@@ -6,6 +6,7 @@ import { concatBillTimer, reduceAiPointsTimer } from './support/wallet/controlle
 import { startCron } from './common/system/cron';
 import { startTrainingProcess } from './core/dataset/training/utils';
 import { addLog } from '@fastgpt/service/common/system/log';
+import { startMongoWatch } from './middleware/volumnMongoWatch';
 
 /**
  * connect MongoDB and init data
@@ -30,6 +31,7 @@ export async function connectToDatabase(): Promise<void> {
       await Promise.all([getProInitData(), authLicense()]);
 
       startTrainingProcess();
+      startMongoWatch();
     } catch (error) {
       addLog.error('init error', error);
       exit(1);

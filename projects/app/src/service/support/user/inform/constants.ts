@@ -25,21 +25,21 @@ const MessageTemplateMap = {
     emailTemplate: expireSoonTemplate,
     smsTemplateCode: () => global.systemConfig?.auth?.sms?.EXPIRE_SOON,
     getInformTemplate: InformExpireSoonTemplate,
-    lockMinutes: 24 * 60, // 1 day
+    lockMinutes: 2 * 24 * 60, // 2 day
     isSendQueue: true
   },
   [SendInformTemplateCodeEnum.EXPIRED]: {
     emailTemplate: expiredTemplate,
     smsTemplateCode: () => global.systemConfig?.auth?.sms?.EXPIRED,
     getInformTemplate: InformExpiredTemplate,
-    lockMinutes: 24 * 60,
+    lockMinutes: 2 * 24 * 60,
     isSendQueue: true
   },
   [SendInformTemplateCodeEnum.FREE_CLEAN]: {
     emailTemplate: FreeCleanTemplate,
     smsTemplateCode: () => global.systemConfig?.auth?.sms?.FREE_CLEAN,
     getInformTemplate: InformFreeCleanTemplate,
-    lockMinutes: 24 * 60,
+    lockMinutes: 2 * 24 * 60,
     isSendQueue: true
   },
   [SendInformTemplateCodeEnum.REGISTER]: {

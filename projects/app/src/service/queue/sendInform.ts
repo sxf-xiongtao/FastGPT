@@ -16,7 +16,7 @@ const retryFn = async (fn?: () => Promise<void>, retryTimes = 3): Promise<any> =
 };
 
 export const startSendInform = async () => {
-  if (global.sendInformQueue.length === 0 || global.sendInformQueueLen > 0) return;
+  if (global.sendInformQueue.length === 0 || global.sendInformQueueLen > 5) return;
   global.sendInformQueueLen++;
 
   try {

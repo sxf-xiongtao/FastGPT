@@ -2,7 +2,7 @@ import { MongoUserAuth } from '@/service/support/user/auth/schema';
 import { customAlphabet } from 'nanoid';
 import requestIp from 'request-ip';
 import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
-import { authGoogleToken } from '@/service/common/ipLimit/tools';
+import { authGoogleToken } from '@/service/common/system/actionAuth';
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
 import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';

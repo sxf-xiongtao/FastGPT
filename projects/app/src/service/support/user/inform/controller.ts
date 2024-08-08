@@ -61,7 +61,7 @@ export async function sendInform2OneUser<
     };
   }
 
-  const onSend = async () => {
+  const onSendEmergency = async () => {
     // 紧急通知，发送短信/邮件
     if (level === 'emergency') {
       await sendMessage({
@@ -70,6 +70,8 @@ export async function sendInform2OneUser<
         templateParam
       });
     }
+  };
+  const onCreateInform = async () => {
     // Create inform
     if (getInformTemplate) {
       await MongoUserInform.create({
@@ -81,7 +83,8 @@ export async function sendInform2OneUser<
   };
 
   if (isSendQueue) {
-    global.sendInformQueue.push(onSend);
+    global.sendInformQueue.push(onSendEmergency);
+    global.sendInformQueue.push(onCreateInform);
     startSendInform();
 
     return {
@@ -90,7 +93,8 @@ export async function sendInform2OneUser<
   }
 
   try {
-    await onSend();
+    await onSendEmergency();
+    await onCreateInform();
     return {
       success: true
     };

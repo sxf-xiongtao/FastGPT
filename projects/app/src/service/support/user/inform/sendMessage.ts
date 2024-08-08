@@ -7,6 +7,7 @@ import { getMessageTemplate, MessageTemplateParamsType } from './constants';
 import { RequireOnlyOne } from '@fastgpt/global/common/type/utils';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { SendInformTemplateCodeEnum } from '@fastgpt/global/support/user/inform/constants';
+import axios from 'axios';
 
 export type SendEmailProps = {
   email: string;
@@ -78,6 +79,19 @@ export async function sendSms({
   const signName = global.systemConfig?.auth?.phone?.SNED_PHONE_SIGNNAME;
   const endpoint = 'dysmsapi.aliyuncs.com';
 
+  if (process.env.SMS_PROXY) {
+    return axios.post(process.env.SMS_PROXY, {
+      accessKeyId,
+      accessKeySecret,
+      signName,
+      endpoint,
+
+      templateCode,
+      phone,
+      templateParam
+    });
+  }
+
   const sendSmsRequest = new dysmsapi.SendSmsRequest({
     phoneNumbers: phone,
     signName,
@@ -135,7 +149,7 @@ export async function sendMessage<Key extends SendInformTemplateCodeEnum>({
   })();
 
   if (!target) {
-    return Promise.reject('Wrong target');
+    return;
   }
 
   const { emailTemplate, smsTemplateCode } = getMessageTemplate(templateCode);
@@ -151,10 +165,12 @@ export async function sendMessage<Key extends SendInformTemplateCodeEnum>({
       email: target
     });
   } else if (smsTemplateCode) {
+    // 去除所有空格
+    const formatName = name ? name.replace(/ /g, '') : 'FastGPT用户';
     console.log({
       templateCode: smsTemplateCode(),
       templateParam: {
-        name: name ?? '',
+        name: formatName,
         ...templateParam
       },
       phone: target
@@ -162,7 +178,7 @@ export async function sendMessage<Key extends SendInformTemplateCodeEnum>({
     await sendSms({
       templateCode: smsTemplateCode(),
       templateParam: {
-        name: name ?? '',
+        name: formatName,
         ...templateParam
       },
       phone: target
