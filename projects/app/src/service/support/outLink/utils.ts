@@ -38,44 +38,46 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
   messageId,
   replyCallback
 }: outLinkInvokeChatProps<T>) {
-  const [app, { nodes, chatConfig, edges }, { user }] = await Promise.all([
-    MongoApp.findById(shareChat.appId).lean(),
-    getAppLatestVersion(shareChat.appId),
-    getUserChatInfoAndAuthTeamPoints(shareChat.tmbId)
-  ]);
-
-  if (!nodes || !user || !chatConfig || !app) {
-    return Promise.reject('Invalid chat');
-  }
-
-  const { histories } = await getChatItems({
-    appId: shareChat.appId,
-    chatId,
-    limit: getMaxHistoryLimitFromNodes(nodes),
-    field: `dataId obj value`
-  });
-
-  // dedupe
-  if (histories.find((item) => item.dataId === messageId)) {
-    return; // dupelicated messaage, do noting
-  }
-
-  await authOutLinkLimit({
-    outLinkUid: messageId,
-    outLink: shareChat as any, // HACK, we do not need to provide app: T
-    question: userQuestion
-  });
-
-  const dispatchQuery: UserChatItemValueItemType[] = [
-    {
-      type: ChatItemValueTypeEnum.text,
-      text: {
-        content: userQuestion
-      }
-    }
-  ];
-
   try {
+    // Get app workflow config
+    const [app, { nodes, chatConfig, edges }, { user }] = await Promise.all([
+      MongoApp.findById(shareChat.appId).lean(),
+      getAppLatestVersion(shareChat.appId),
+      getUserChatInfoAndAuthTeamPoints(shareChat.tmbId)
+    ]);
+
+    if (!nodes || !user || !chatConfig || !app) {
+      return Promise.reject('Invalid chat');
+    }
+
+    const { histories } = await getChatItems({
+      appId: shareChat.appId,
+      chatId,
+      limit: getMaxHistoryLimitFromNodes(nodes),
+      field: `dataId obj value`
+    });
+
+    // dedupe
+    if (histories.find((item) => item.dataId === messageId)) {
+      return; // dupelicated messaage, do noting
+    }
+
+    await authOutLinkLimit({
+      outLinkUid: messageId,
+      outLink: shareChat as any, // HACK, we do not need to provide app: T
+      question: userQuestion,
+      ip: chatId
+    });
+
+    const dispatchQuery: UserChatItemValueItemType[] = [
+      {
+        type: ChatItemValueTypeEnum.text,
+        text: {
+          content: userQuestion
+        }
+      }
+    ];
+
     const { assistantResponses, newVariables, flowResponses, flowUsages } = await dispatchWorkFlow({
       res,
       mode: 'chat',

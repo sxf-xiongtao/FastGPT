@@ -96,6 +96,11 @@ export const formConfig: FormConfig = {
             type: 'string',
             title: '贡献插件文档地址'
           },
+          commitAppTemplateCourseUrl: {
+            key: 'siteSettings.feConfigs.appTemplateCourse',
+            type: 'string',
+            title: '贡献模板市场文档地址'
+          },
           chatbotUrl: {
             key: 'siteSettings.feConfigs.chatbotUrl',
             type: 'string',
