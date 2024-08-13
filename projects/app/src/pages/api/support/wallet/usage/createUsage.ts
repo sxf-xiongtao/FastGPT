@@ -3,9 +3,8 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { CreateUsageProps } from '@fastgpt/global/support/wallet/usage/api.d';
 import { addLog } from '@fastgpt/service/common/system/log';
-import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
-import { pushReduceTeamAiPointsTask } from '@/service/support/wallet/controller';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
+import { createUsage } from '@/service/support/wallet/usage/push';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -22,10 +21,3 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     jsonRes(res);
   }
 }
-
-export const createUsage = (data: CreateUsageProps) => {
-  return Promise.all([
-    MongoUsage.create(data),
-    pushReduceTeamAiPointsTask({ teamId: data.teamId, totalPoints: data.totalPoints })
-  ]);
-};

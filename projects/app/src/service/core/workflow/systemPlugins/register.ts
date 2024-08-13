@@ -4,17 +4,13 @@ import { isProduction } from '@fastgpt/service/common/system/constants';
 import { SystemPluginTemplateItemType } from '@fastgpt/global/core/workflow/type';
 import { getCommunityCb, getCommunityPlugins } from '@fastgpt/plugins/register';
 import { cloneDeep } from 'lodash';
+import { MongoSystemPluginSchema } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
+import { replaceVariable } from '@fastgpt/global/common/string/tools';
 
 let list: string[] = ['dalle3'];
 
 /* Get plugins */
-export const getSystemPluginTemplates = (refresh = false) => {
-  if (isProduction && global.systemPlugins && !refresh) return cloneDeep(global.systemPlugins);
-
-  if (!global.systemPlugins) {
-    global.systemPlugins = [];
-  }
-
+export const getSystemPlugins = () => {
   const communityPlugins = getCommunityPlugins();
 
   const commercialPlugins = list.map<SystemPluginTemplateItemType>((name) => {
@@ -34,8 +30,50 @@ export const getSystemPluginTemplates = (refresh = false) => {
     };
   });
 
-  global.systemPlugins = [...communityPlugins, ...commercialPlugins];
-  global.systemPlugins.sort((a, b) => (b.weight || 0) - (a.weight || 0));
+  const plugins = [...communityPlugins, ...commercialPlugins];
+
+  plugins.sort((a, b) => (b.weight || 0) - (a.weight || 0));
+
+  return plugins;
+};
+
+export const getSystemPluginsAndLoadThem = async (refresh = false) => {
+  if (isProduction && global.systemPlugins && !refresh) return cloneDeep(global.systemPlugins);
+
+  if (!global.systemPlugins) {
+    global.systemPlugins = [];
+  }
+
+  const systemPlugins = getSystemPlugins();
+
+  const pluginConfigs = await MongoSystemPluginSchema.find();
+  systemPlugins.forEach((plugin) => {
+    const pluginConfig = pluginConfigs.find((config) => config.pluginId === plugin.id);
+
+    if (pluginConfig) {
+      // 修改自身以及 children 的属性
+      const children = systemPlugins.filter((item) => item.parentId === plugin.id);
+      const list = [plugin, ...children];
+      list.forEach((item) => {
+        item.isActive = pluginConfig.isActive ?? false;
+        item.originCost = pluginConfig.originCost ?? 0;
+        item.currentCost = pluginConfig.currentCost ?? 0;
+
+        // 使用 inputConfig 的内容，替换插件的 nodes
+        if (pluginConfig.inputConfig) {
+          let nodeString = JSON.stringify(item.workflow.nodes);
+          pluginConfig.inputConfig.forEach((inputConfig) => {
+            nodeString = replaceVariable(nodeString, {
+              [inputConfig.key]: inputConfig.value
+            });
+          });
+
+          item.workflow.nodes = JSON.parse(nodeString);
+        }
+      });
+    }
+  });
+  global.systemPlugins = systemPlugins;
 
   return cloneDeep(global.systemPlugins);
 };

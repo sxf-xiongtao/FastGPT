@@ -18,7 +18,7 @@ import { TeamMemberWithUserSchema } from '@fastgpt/global/support/user/team/type
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { SubStatusEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import { addMonths } from 'date-fns';
-import { getErrText } from '@/utils/tools';
+import { getErrText } from '@fastgpt/global/common/error/utils';
 import { ClientSession } from '@fastgpt/service/common/mongo';
 
 /* 校验支付结果 */

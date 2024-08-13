@@ -60,7 +60,7 @@ export async function authOutLinkLimit({
   outLinkUid,
   question
 }: AuthOutLinkLimitProps): Promise<AuthOutLinkResponse> {
-  if (!ip || !outLink.limit) {
+  if (!outLink.limit) {
     return { uid: outLinkUid };
   }
 
@@ -78,7 +78,9 @@ export async function authOutLinkLimit({
   }
 
   // ip limit
-  await authIpLimit({ ip, outLink });
+  if (ip) {
+    await authIpLimit({ ip, outLink });
+  }
 
   // url auth. send request
   if (!outLink.limit.hookUrl) {

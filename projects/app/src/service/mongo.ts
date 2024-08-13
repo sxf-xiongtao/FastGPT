@@ -7,6 +7,10 @@ import { startCron } from './common/system/cron';
 import { startTrainingProcess } from './core/dataset/training/utils';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { startMongoWatch } from './middleware/volumnMongoWatch';
+import {
+  getSystemPluginCb,
+  getSystemPluginsAndLoadThem
+} from './core/workflow/systemPlugins/register';
 
 /**
  * connect MongoDB and init data
@@ -28,7 +32,12 @@ export async function connectToDatabase(): Promise<void> {
 
       initDatasetStatus();
 
-      await Promise.all([getProInitData(), authLicense()]);
+      await Promise.all([
+        getProInitData(),
+        authLicense(),
+        getSystemPluginCb(),
+        getSystemPluginsAndLoadThem()
+      ]);
 
       startTrainingProcess();
       startMongoWatch();

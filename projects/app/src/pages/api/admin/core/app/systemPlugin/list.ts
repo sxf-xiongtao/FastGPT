@@ -1,7 +1,7 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
 import { SystemPluginTemplateItemType } from '@fastgpt/global/core/workflow/type';
-import { getSystemPluginTemplates } from '@/service/core/workflow/systemPlugins/register';
+import { getSystemPluginsAndLoadThem } from '@/service/core/workflow/systemPlugins/register';
 import { MongoSystemPluginSchema } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
 
 export type getSystemPluginsQuery = {};
@@ -17,7 +17,7 @@ async function handler(
   // Get mongodb plugin config
   const pluginConfigs = await MongoSystemPluginSchema.find();
 
-  const systemPlugins = getSystemPluginTemplates().filter((item) => !item.parentId);
+  const systemPlugins = (await getSystemPluginsAndLoadThem()).filter((item) => !item.parentId);
 
   systemPlugins.forEach((plugin) => {
     const pluginConfig = pluginConfigs.find((config) => config.pluginId === plugin.id);
