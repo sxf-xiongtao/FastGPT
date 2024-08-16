@@ -2,7 +2,7 @@ import { ChatItemValueTypeEnum, ChatRoleEnum } from '@fastgpt/global/core/chat/c
 import { UserChatItemValueItemType } from '@fastgpt/global/core/chat/type';
 import { DispatchNodeResponseKeyEnum } from '@fastgpt/global/core/workflow/runtime/constants';
 import {
-  getDefaultEntryNodeIds,
+  getWorkflowEntryNodeIds,
   getMaxHistoryLimitFromNodes,
   initWorkflowEdgeStatus,
   storeNodes2RuntimeNodes
@@ -20,6 +20,8 @@ import { addOutLinkUsage } from '@fastgpt/service/support/outLink/tools';
 import { pushChatUsage } from '../wallet/usage/push';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { getErrText } from '@fastgpt/global/common/error/utils';
+import { getUsageSourceByPublishChannel } from '@fastgpt/global/support/wallet/usage/tools';
+import { getChatSourceByPublishChannel } from '@fastgpt/global/core/chat/utils';
 
 export type outLinkInvokeChatProps<T extends OutlinkAppType> = {
   shareChat: OutLinkSchema<T>;
@@ -93,7 +95,7 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
       stream: false,
       detail: false,
       runtimeEdges: initWorkflowEdgeStatus(edges),
-      runtimeNodes: storeNodes2RuntimeNodes(nodes, getDefaultEntryNodeIds(nodes)),
+      runtimeNodes: storeNodes2RuntimeNodes(nodes, getWorkflowEntryNodeIds(nodes)),
       maxRunTimes: 200
     });
 
@@ -115,7 +117,7 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
       isUpdateUseTime: true, // owner update use time
       newTitle: userQuestion.slice(0, 8),
       shareId: shareChat.shareId,
-      source: 'feishu',
+      source: getChatSourceByPublishChannel(shareChat.type),
       content: [
         {
           dataId: messageId,
@@ -140,7 +142,7 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
       appId: app._id,
       teamId: shareChat.teamId,
       tmbId: shareChat.tmbId,
-      source: 'feishu',
+      source: getUsageSourceByPublishChannel(shareChat.type),
       flowUsages
     });
 
@@ -150,6 +152,6 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
     });
   } catch (error) {
     addLog.error('Outlink app chat error', error);
-    await replyCallback(`App run error: ${getErrText(error)}`);
+    await replyCallback(`App run error: ${getErrText(error)} `);
   }
 }
