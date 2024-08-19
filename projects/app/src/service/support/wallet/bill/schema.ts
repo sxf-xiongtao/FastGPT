@@ -42,7 +42,7 @@ const BillSchema = new Schema({
     type: Number,
     required: true
   },
-  hasInvoice: Boolean,
+  hasInvoice: { type: Boolean, default: false },
   metadata: {
     type: Object,
     required: true

@@ -11,6 +11,7 @@ import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
+import { MongoInvoice } from '@/service/support/wallet/bill/invoiceSchema';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import {
   getStandardPlan,

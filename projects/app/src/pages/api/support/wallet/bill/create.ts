@@ -86,12 +86,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const storePrice = readPrice * PRICE_SCALE;
     const orderId = getNanoid(24);
 
-    const wxPay = new WXPay();
-    const { code_url } = await wxPay.getPayQRUrl({
-      amount: readPrice,
-      type,
-      orderId
-    });
+    // const wxPay = new WXPay();
+    // const { code_url } = await wxPay.getPayQRUrl({
+    //   amount: readPrice,
+    //   type,
+    //   orderId
+    // });
 
     // add one pay record
     const bill = await MongoBill.create({
@@ -99,7 +99,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       tmbId,
       orderId,
       price: storePrice,
-      status: BillStatusEnum.NOTPAY,
+      status: BillStatusEnum.SUCCESS,
       type,
       metadata: {
         payWay: 'wx',
@@ -108,11 +108,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     jsonRes<CreateBillResponse>(res, {
-      data: {
-        billId: bill._id,
-        readPrice,
-        codeUrl: code_url
-      }
+      // data: {
+      //   billId: bill._id,
+      //   readPrice
+      //   // codeUrl: code_url
+      // }
     });
   } catch (err) {
     jsonRes(res, {

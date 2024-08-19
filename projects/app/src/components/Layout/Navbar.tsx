@@ -43,6 +43,11 @@ export default function Navbar() {
           activeLink: '/users/pays',
           icon: 'support/bill/payRecordLight',
           name: '支付记录'
+        },
+        {
+          activeLink: '/users/invoice',
+          icon: 'support/bill/payRecordLight',
+          name: '开票管理'
         }
       ]
     },

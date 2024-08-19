@@ -50,7 +50,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const wxPay = new WXPay();
     const payRes = await wxPay.getPayResult(payOrder.orderId);
 
-    if (payRes.trade_state === 'SUCCESS') {
+    // if (payRes.trade_state === 'SUCCESS') {
+    if (payRes.trade_state !== 'SUCCESS') {
       // 订单已支付
       try {
         // 更新订单状态. 如果没有合适的订单，说明订单重复了
