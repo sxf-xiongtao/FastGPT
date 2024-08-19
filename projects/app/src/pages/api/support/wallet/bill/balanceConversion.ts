@@ -39,11 +39,13 @@ async function handler(
     return {};
   }
 
-  // balance conversion: 12 => 1000 points, expired 1 year
+  // balance conversion: n/1000 points, expired 1 year
   const points = (team?.balance || 0) * (global.subPlans?.extraPoints?.price || 0);
   if (points <= 0) {
     return {};
   }
+
+  const balance = team?.balance || 0;
 
   await mongoSessionRun(async (session) => {
     await MongoTeam.updateOne(
@@ -59,17 +61,16 @@ async function handler(
         {
           teamId,
           tmbId,
-          price: team?.balance || 0,
+          price: balance,
           status: BillStatusEnum.SUCCESS,
           type: BillTypeEnum.extraPoints,
           userId: team?.ownerId, // only owner can do this
           orderId: getNanoid(24),
-          hasInvoice: false,
+          hasInvoice: true,
           metadata: {
+            month: 12,
             payWay: BillPayWayEnum.balance,
-            extraPoints: points,
-            invoice: false,
-            subMode: SubModeEnum.year
+            extraPoints: points
           }
         }
       ],
@@ -84,7 +85,7 @@ async function handler(
           status: SubStatusEnum.active,
           startTime: new Date(),
           expiredTime: addYears(new Date(), 1),
-          price: global.subPlans?.extraPoints?.price || 0,
+          price: balance,
           totalPoints: points,
           surplusPoints: points
         }
