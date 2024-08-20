@@ -20,6 +20,11 @@ export default function Navbar() {
       icon: 'support/user/informLight'
     },
     {
+      activeLink: '/log',
+      name: '日志管理',
+      icon: 'support/user/informLight'
+    },
+    {
       activeLink: '/users',
       name: '用户管理',
       icon: 'support/user/userLight',
@@ -116,7 +121,7 @@ export default function Navbar() {
   };
 
   return (
-    <>
+    <Box overflow={'scroll'} flex={1}>
       {LIST.map((item) => {
         return (
           <Box key={item.activeLink}>
@@ -184,6 +189,6 @@ export default function Navbar() {
           </Box>
         );
       })}
-    </>
+    </Box>
   );
 }

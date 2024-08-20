@@ -10,7 +10,7 @@ const Layout = ({ children }: { children: JSX.Element }) => {
   return (
     <Flex h={'100%'} bg={'myGray.100'} flexDirection={['column', 'row']}>
       {isPc ? (
-        <Box px={3}>
+        <Flex h={'100%'} flexDir={'column'} px={3}>
           <Box
             textAlign={'center'}
             fontSize={'2xl'}
@@ -21,7 +21,7 @@ const Layout = ({ children }: { children: JSX.Element }) => {
             Admin
           </Box>
           <Navbar />
-        </Box>
+        </Flex>
       ) : (
         <Flex justifyContent={'space-between'} alignItems={'center'} px={8}>
           <Box
