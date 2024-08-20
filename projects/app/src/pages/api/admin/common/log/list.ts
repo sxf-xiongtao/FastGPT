@@ -3,6 +3,7 @@ import { NextAPI } from '@/service/middleware/entry';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { LogLevelEnum } from '@fastgpt/service/common/system/log/constant';
 import { getMongoLog } from '@fastgpt/service/common/system/log/schema';
+import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
 export type listQuery = {};
 
 export type listBody = {
@@ -30,10 +31,11 @@ async function handler(
     getMongoLog()
       .find(match, undefined, {
         skip: (pageNum - 1) * pageSize,
-        limit: pageSize
+        limit: pageSize,
+        ...readFromSecondary
       })
-      .sort({ createTime: -1 }),
-    getMongoLog().countDocuments({})
+      .sort({ time: -1 }),
+    getMongoLog().countDocuments({}, { ...readFromSecondary })
   ]);
   return {
     data: records,

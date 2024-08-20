@@ -1,4 +1,4 @@
-import { Box, Image, Input, Switch, Textarea } from '@chakra-ui/react';
+import { Box, Flex, Image, Input, Switch, Textarea } from '@chakra-ui/react';
 import JsonEditor from '@fastgpt/web/components/common/Textarea/JsonEditor';
 import { useRef } from 'react';
 import { useToast } from '@fastgpt/web/hooks/useToast';
@@ -26,7 +26,7 @@ const FormField = ({
 
   if (type === 'boolean') {
     return (
-      <Box className="flex items-center w-[70%] justify-between mt-8 flex-0">
+      <Flex alignItems={'center'} w={'90%'} my={4}>
         <FormLabel title={title} description={description} />
         <Switch
           className="ml-4"
@@ -35,7 +35,7 @@ const FormField = ({
             onChange(e.target.checked);
           }}
         />
-      </Box>
+      </Flex>
     );
   }
   if (type === 'string') {
@@ -61,6 +61,7 @@ const FormField = ({
         <Input
           type="file"
           className="hidden"
+          accept="image/*"
           ref={inputRef}
           onChange={async (event) => {
             if (event.target.files && event.target.files.length > 0) {

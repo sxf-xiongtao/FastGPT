@@ -220,18 +220,19 @@ export const getFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
                   url: {
                     key: 'siteSettings.sso.url',
                     type: 'string',
-                    title: 'SSO 登录地址',
-                    description: '需要完整域名，例如 https://example.com/login, 并且经过 URL 编码'
+                    title: 'SSO 登录跳转地址',
+                    description: `需要跳转的 SSO 域名，例如:https%3A%2F%2Fexample.com%2Fsso%2Flogin%3Fclient_id%3Dxxx%26callbackUrl%3Dhttps%3A%2F%2Fexample.com%2Fsso。
+Query 最好经过 encode 编码，回调验证的地址为：{{FastGPT 域名}}/sso`
                   },
                   title: {
                     key: 'siteSettings.sso.title',
-                    title: 'SSO 登陆按钮标题',
+                    title: 'SSO 登录按钮标题',
                     type: 'string',
-                    description: '配置 SSO 登陆按钮的标题'
+                    description: '配置 SSO 登录按钮的标题'
                   },
                   icon: {
                     key: 'siteSettings.sso.icon',
-                    title: 'SSO 登陆按钮的图标',
+                    title: 'SSO 登录按钮的图标',
                     type: 'image'
                   }
                 }

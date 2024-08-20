@@ -18,6 +18,7 @@ import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import { getApps } from '@/web/admin/apps/api';
 import MyModal from '@fastgpt/web/components/common/MyModal';
 import BoxCard from '@/components/common/BoxContainer/Card';
+import { serviceSideProps } from '@/web/common/i18n';
 
 const AppTable = () => {
   const [appDetail, setAppDetail] = useState();
@@ -135,4 +136,12 @@ function AppDetailModal({ app, onClose }: { app: any; onClose: () => void }) {
       </ModalBody>
     </MyModal>
   );
+}
+
+export async function getServerSideProps(content: any) {
+  return {
+    props: {
+      ...(await serviceSideProps(content))
+    }
+  };
 }

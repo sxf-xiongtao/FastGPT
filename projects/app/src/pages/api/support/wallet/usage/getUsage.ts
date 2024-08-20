@@ -40,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const where = {
       teamId: new Types.ObjectId(teamId),
-      ...(permission.isOwner && teamMemberId ? { tmbId: teamMemberId } : { tmbId }),
+      ...(permission.hasManagePer && teamMemberId ? { tmbId: teamMemberId } : { tmbId }),
       ...(source && { source }),
       time: {
         $gte: new Date(dateStart),

@@ -4,8 +4,7 @@ import { addLog } from '@fastgpt/service/common/system/log';
 export const censorCheckBaidu = async (text: string) => {
   if (!global.systemConfig?.censor?.BAIDU_TEXT_CENSOR_CLIENTID) {
     return {
-      code: 200,
-      message: 'BAIDU_TEXT_CENSOR_CLIENTID is not configured'
+      code: 200
     };
   }
 
@@ -24,7 +23,7 @@ export const censorCheckBaidu = async (text: string) => {
   const errResponse = responseList.find((item) => item.code);
 
   const response = {
-    code: errResponse?.code,
+    code: errResponse?.code || 200,
     message: errResponse?.message
   };
 

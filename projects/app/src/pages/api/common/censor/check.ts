@@ -22,13 +22,17 @@ async function handler(
 
   const customURL = global.systemConfig.censor?.customCensorURL;
 
-  const result = await (async () =>
-    customURL ? censorCheckCustom(text) : censorCheckBaidu(text))();
+  try {
+    if (customURL) {
+      return censorCheckCustom(text);
+    }
 
-  return {
-    code: result.code || 200,
-    message: result.message
-  };
+    return censorCheckBaidu(text);
+  } catch (error) {
+    return {
+      code: 200
+    };
+  }
 }
 
 export default NextAPI(handler);

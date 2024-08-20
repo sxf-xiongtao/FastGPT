@@ -22,17 +22,20 @@ import MyIcon from '@fastgpt/web/components/common/Icon';
 import MyModal from '@fastgpt/web/components/common/MyModal';
 import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import dayjs from 'dayjs';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 import { SystemLogType } from '@fastgpt/service/common/system/log/type';
 import { getSystemLogList } from '@/web/admin/common/api';
 import { LogLevelEnum } from '@fastgpt/service/common/system/log/constant';
+import { serviceSideProps } from '@/web/common/i18n';
+
 const LogTable = () => {
   const { isPc } = useSystem();
   const [search, setSearch] = useState<string>();
   const [logLevel, setLogLevel] = useState<LogLevelEnum[]>([LogLevelEnum.error]);
   const [logDetail, setLogDetail] = useState<SystemLogType>();
   const elementRef = useRef<HTMLDivElement>(null);
+
   const {
     data: logs,
     setData: setLogs,
@@ -54,6 +57,7 @@ const LogTable = () => {
     setLogs([]);
     getData(1);
   }, [getData, logLevel, setLogs]);
+
   return (
     <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
       <HStack px={[0, 8]} pb={[0, 4]}>
@@ -89,41 +93,30 @@ const LogTable = () => {
             <Table>
               <Thead>
                 <Tr>
-                  <Th w={'20%'}>时间</Th>
-                  <Th w={'20%'}>
+                  <Th>时间</Th>
+                  <Th>
                     <LevelPopover logLevels={logLevel} setLogLevels={setLogLevel} />{' '}
                   </Th>
-                  <Th w={'20%'}>日志内容</Th>
-                  <Th w={'20%'}>metadata</Th>
-                  <Th w={'20%'}></Th>
+                  <Th>日志内容</Th>
+                  <Th>metadata</Th>
+                  <Th></Th>
                 </Tr>
               </Thead>
               <Tbody fontSize={'sm'}>
                 {logs.map((item, i) => (
                   <Tr key={i}>
                     <Td>{item.time ? dayjs(item.time).format('YYYY/MM/DD HH:mm:ss') : '-'}</Td>
-                    <Td>{LogLevelEnum[item.level]}</Td>
-                    <Td maxW={'30px'} className="textEllipsis">
+                    <Td maxW={'180px'}>{LogLevelEnum[item.level]}</Td>
+                    <Td maxW={'300px'} className="textEllipsis">
                       {item.text}
                     </Td>
-                    <Td maxW={'30px'} className="textEllipsis">
-                      <Box>
-                        {(() => {
-                          const firstEntry = Object.entries(item.metadata || {})[0];
-                          return firstEntry ? `${firstEntry[0]}: ${firstEntry[1]}` : ' - ';
-                        })()}
-                      </Box>
+                    <Td maxW={'300px'} className="textEllipsis">
+                      {JSON.stringify(item.metadata)}
                     </Td>
                     <Td>
-                      <Flex className="space-x-2">
-                        <Button
-                          variant={'whiteBase'}
-                          size={'sm'}
-                          onClick={() => setLogDetail(item)}
-                        >
-                          详情
-                        </Button>
-                      </Flex>
+                      <Button variant={'whiteBase'} onClick={() => setLogDetail(item)}>
+                        详情
+                      </Button>
                     </Td>
                   </Tr>
                 ))}
@@ -238,13 +231,10 @@ function LevelPopover({
 function LogDetailModal({ log, onClose }: { log: SystemLogType; onClose: () => void }) {
   return (
     <MyModal
-      title={
-        <Flex align={'center'}>
-          <MyIcon name="paragraph" w={'20px'} h={'20px'} color={'blue.600'} />
-          <Box ml={'0.62rem'}>{'日志详情'}</Box>
-        </Flex>
-      }
-      w={'20vw'}
+      iconSrc="paragraph"
+      title={'日志详情'}
+      maxW={'90vw'}
+      w={'100%'}
       isOpen={true}
       onClose={onClose}
     >
@@ -258,7 +248,7 @@ function LogDetailModal({ log, onClose }: { log: SystemLogType; onClose: () => v
           <Box>{LogLevelEnum[log.level]}</Box>
         </Flex>
         <Box>
-          <FormLabel flex={'0 0 120px'}>{'日志内容:'}</FormLabel>
+          <FormLabel flex={'0 0 120px'}>{'日志消息:'}</FormLabel>
           <Box
             borderRadius={'lg'}
             border={'1px solid'}
@@ -283,12 +273,9 @@ function LogDetailModal({ log, onClose }: { log: SystemLogType; onClose: () => v
               p={2}
               maxH={'300px'}
               overflowY={'auto'}
+              whiteSpace={'pre'}
             >
-              {Object.entries(log.metadata || {}).map(([key, value]) => (
-                <li key={key}>
-                  <strong>{key}:</strong> {String(value)}
-                </li>
-              ))}
+              {JSON.stringify(log.metadata, null, 2)}
             </Box>
           </Box>
         )}
@@ -297,5 +284,12 @@ function LogDetailModal({ log, onClose }: { log: SystemLogType; onClose: () => v
   );
 }
 
-function LogDetailItem() {}
 export default LogTable;
+
+export async function getServerSideProps(content: any) {
+  return {
+    props: {
+      ...(await serviceSideProps(content))
+    }
+  };
+}

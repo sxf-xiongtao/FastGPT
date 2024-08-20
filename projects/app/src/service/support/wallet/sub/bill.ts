@@ -38,6 +38,7 @@ export const createStandardSubBill = async ({
         status: BillStatusEnum.SUCCESS,
         type: BillTypeEnum.standSubPlan,
         price: payPrice,
+        hasInvoice: true,
         metadata: {
           payWay: BillPayWayEnum.balance,
           subMode: mode,

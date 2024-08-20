@@ -26,6 +26,7 @@ import UserEditModal from './components/UserEditModal';
 import { UserModelSchema } from '@fastgpt/global/support/user/type';
 import UserAddModal from './components/UserAddModal';
 import BoxCard from '@/components/common/BoxContainer/Card';
+import { serviceSideProps } from '@/web/common/i18n';
 
 const UserTable = () => {
   const [username, setUsername] = useState<string>();
@@ -178,4 +179,12 @@ function UserDetailModal({ user, onClose }: { user: UserModelSchema; onClose: ()
       </ModalBody>
     </MyModal>
   );
+}
+
+export async function getServerSideProps(content: any) {
+  return {
+    props: {
+      ...(await serviceSideProps(content))
+    }
+  };
 }

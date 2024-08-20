@@ -23,6 +23,7 @@ import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tool
 import EditTeamModal from './components/EditTeamModal';
 import { getTeams } from '@/web/admin/users/api';
 import BoxCard from '@/components/common/BoxContainer/Card';
+import { serviceSideProps } from '@/web/common/i18n';
 
 const TeamTable = () => {
   const [search, setSearch] = useState<string>();
@@ -142,3 +143,11 @@ const TeamTable = () => {
 };
 
 export default TeamTable;
+
+export async function getServerSideProps(content: any) {
+  return {
+    props: {
+      ...(await serviceSideProps(content))
+    }
+  };
+}

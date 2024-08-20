@@ -24,6 +24,7 @@ import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/walle
 import PlanAddModal from './components/PlanAddModal';
 import PlanEditModal from './components/PlanEditModal';
 import BoxCard from '@/components/common/BoxContainer/Card';
+import { serviceSideProps } from '@/web/common/i18n';
 
 export type PlanType = {
   teamId: string;
@@ -182,3 +183,11 @@ const PlanTable = () => {
 };
 
 export default PlanTable;
+
+export async function getServerSideProps(content: any) {
+  return {
+    props: {
+      ...(await serviceSideProps(content))
+    }
+  };
+}

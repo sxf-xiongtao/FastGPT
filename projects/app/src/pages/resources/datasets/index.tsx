@@ -17,6 +17,7 @@ import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import MyModal from '@fastgpt/web/components/common/MyModal';
 import { getDatasets } from '@/web/admin/datasets/api';
 import BoxCard from '@/components/common/BoxContainer/Card';
+import { serviceSideProps } from '@/web/common/i18n';
 
 const DatasetTable = () => {
   const [appDetail, setAppDetail] = useState();
@@ -61,6 +62,8 @@ const DatasetTable = () => {
                   <Th>知识库名</Th>
                   <Th>创建者</Th>
                   <Th>介绍</Th>
+                  <Th>数据量</Th>
+                  <Th>向量总数</Th>
                 </Tr>
               </Thead>
               <Tbody fontSize={'sm'}>
@@ -70,6 +73,8 @@ const DatasetTable = () => {
                     <Td>{item.name}</Td>
                     <Td>{item.username}</Td>
                     <Td>{item.intro}</Td>
+                    <Td>{item.totalDatas}</Td>
+                    <Td>{item.totalVectors}</Td>
                   </Tr>
                 ))}
               </Tbody>
@@ -127,4 +132,12 @@ function AppDetailModal({ app, onClose }: { app: any; onClose: () => void }) {
       </ModalBody>
     </MyModal>
   );
+}
+
+export async function getServerSideProps(content: any) {
+  return {
+    props: {
+      ...(await serviceSideProps(content))
+    }
+  };
 }

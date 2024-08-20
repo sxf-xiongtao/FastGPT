@@ -32,6 +32,7 @@ import MyModal from '@fastgpt/web/components/common/MyModal';
 import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import { getPays } from '@/web/admin/pays/api';
 import BoxCard from '@/components/common/BoxContainer/Card';
+import { serviceSideProps } from '@/web/common/i18n';
 
 const billTypeList: { label: string; value: BillTypeEnum | 'ALL' }[] = [
   { label: '全部', value: 'ALL' },
@@ -287,4 +288,12 @@ function BillDetailModal({ bill, onClose }: { bill: BillSchemaType; onClose: () 
       </ModalBody>
     </MyModal>
   );
+}
+
+export async function getServerSideProps(content: any) {
+  return {
+    props: {
+      ...(await serviceSideProps(content))
+    }
+  };
 }
