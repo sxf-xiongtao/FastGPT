@@ -140,7 +140,8 @@ export function formatConfigStore2FormSchema({
     securitySettings: {
       censor: {
         BAIDU_TEXT_CENSOR_CLIENTID: fastgptPro?.censor?.BAIDU_TEXT_CENSOR_CLIENTID || '',
-        BAIDU_TEXT_CENSOR_CLIENTSECRET: fastgptPro?.censor?.BAIDU_TEXT_CENSOR_CLIENTSECRET || ''
+        BAIDU_TEXT_CENSOR_CLIENTSECRET: fastgptPro?.censor?.BAIDU_TEXT_CENSOR_CLIENTSECRET || '',
+        customCensorURL: fastgptPro?.censor?.customCensorURL || ''
       },
       googleV3Ver: {
         clientKey: fastgpt?.feConfigs?.googleClientVerKey || '',

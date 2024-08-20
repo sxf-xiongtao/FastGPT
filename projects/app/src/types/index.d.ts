@@ -21,6 +21,7 @@ export type SystemConfigType = {
   censor?: {
     BAIDU_TEXT_CENSOR_CLIENTID?: string;
     BAIDU_TEXT_CENSOR_CLIENTSECRET?: string;
+    customCensorURL?: string; // custom censor check url, which has higher priority than baidu
   };
   auth?: {
     googleServiceVerKey?: string;

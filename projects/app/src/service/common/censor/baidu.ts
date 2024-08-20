@@ -1,25 +1,12 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { jsonRes } from '@fastgpt/service/common/response';
 import axios from 'axios';
-import { authCert } from '@fastgpt/service/support/permission/auth/common';
-import { NextAPI } from '@/service/middleware/entry';
 import { addLog } from '@fastgpt/service/common/system/log';
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+export const censorCheckBaidu = async (text: string) => {
   if (!global.systemConfig?.censor?.BAIDU_TEXT_CENSOR_CLIENTID) {
-    return jsonRes(res, {
-      data: {
-        message: 'success'
-      }
-    });
-  }
-  await authCert({ req, authRoot: true });
-
-  const { text } = req.body as { text: string };
-  if (!text) {
-    return jsonRes(res, {
-      message: 'SUCCESS'
-    });
+    return {
+      code: 200,
+      message: 'BAIDU_TEXT_CENSOR_CLIENTID is not configured'
+    };
   }
 
   const time = Date.now();
@@ -44,9 +31,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   console.log(`安全校验, 长度: ${text.length},时间: ${Date.now() - time}ms `);
 
   return response;
-}
-
-export default NextAPI(handler);
+};
 
 // 获取access_token
 async function getAccessToken() {

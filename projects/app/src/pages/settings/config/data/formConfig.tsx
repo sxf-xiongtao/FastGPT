@@ -491,6 +491,13 @@ export const formConfig: FormConfig = {
             key: 'securitySettings.censor.BAIDU_TEXT_CENSOR_CLIENTSECRET',
             type: 'string',
             title: '百度安全 secret'
+          },
+          customCensorURL: {
+            key: 'securitySettings.censor.customCensorURL',
+            type: 'string',
+            title: '自定义安全校验 URL',
+            description:
+              '如果您有自己的安全校验服务，可以填写该地址，并在安全设置中开启自定义安全校验'
           }
         }
       },
