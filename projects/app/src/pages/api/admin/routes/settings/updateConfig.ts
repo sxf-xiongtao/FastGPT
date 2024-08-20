@@ -7,10 +7,12 @@ import { ConfigStoreType } from '@/global/admin/config';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
 import { addMonths } from 'date-fns';
 import { initFastGPTConfig } from '@fastgpt/service/common/system/tools';
+import { SSOEnum } from '@/global/user/auth/constants';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { fastgpt, fastgptPro } = req.body as ConfigStoreType;
+    const SSO = process.env.SSO as SSOEnum | undefined;
     await connectToDatabase();
     await adminCert({ req, authToken: true });
 
@@ -21,7 +23,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await Promise.all([
       MongoSystemConfigs.create({
         type: SystemConfigsTypeEnum.fastgpt,
-        value: fastgpt
+        value: {
+          ...fastgpt,
+          feConfigs: {
+            ...fastgpt.feConfigs,
+            ...(SSO && Object.values(SSOEnum).includes(SSO)
+              ? {}
+              : {
+                  sso: undefined
+                })
+          }
+        }
       }),
       MongoSystemConfigs.create({
         type: SystemConfigsTypeEnum.fastgptPro,

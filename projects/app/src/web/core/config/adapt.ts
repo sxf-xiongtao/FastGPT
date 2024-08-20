@@ -41,6 +41,7 @@ export function formatConfigStore2FormSchema({
     uploadFileMaxAmount = 15,
     uploadFileMaxSize = 500,
     lafEnv,
+    sso,
     ...feConfigsProps
   } = feConfigs || {};
 
@@ -73,6 +74,7 @@ export function formatConfigStore2FormSchema({
         lafEnv,
         ...feConfigsProps
       },
+      sso,
       concatMd,
       scripts: JSON.stringify(scripts, null, 2),
       limit,
@@ -158,12 +160,11 @@ export function formatFormData2ConfigStore({
   paySettings,
   securitySettings
 }: ConfigFormType): ConfigStoreType {
-  const { feConfigs, systemEnv, concatMd, scripts, limit } = siteSettings;
+  const { feConfigs, systemEnv, concatMd, scripts, limit, sso } = siteSettings;
   const { llmModels, vectorModels, reRankModels, audioSpeechModels, whisperModel } = modelSettings;
   const { email, phone, github, wechat, google, fastLogin, sms } = loginSettings;
-  const { censor, googleV3Ver } = securitySettings;
+  const { censor } = securitySettings;
   const { wx, subPlans } = paySettings;
-
   const formatFeConfig = {
     ...feConfigs,
     concatMd,
@@ -173,7 +174,15 @@ export function formatFormData2ConfigStore({
       github: github?.clientId,
       google: google?.clientId,
       wechat: wechat?.appID
-    }
+    },
+    sso,
+    show_register:
+      loginSettings?.email?.register ||
+      loginSettings?.phone?.REGISTER ||
+      github ||
+      google ||
+      wechat ||
+      sso
   };
 
   const formatLoginSettings = {

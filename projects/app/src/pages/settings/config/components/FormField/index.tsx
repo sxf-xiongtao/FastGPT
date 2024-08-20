@@ -26,7 +26,7 @@ const FormField = ({
 
   if (type === 'boolean') {
     return (
-      <Box className="flex items-center w-[70%] justify-between pb-8 flex-0">
+      <Box className="flex items-center w-[70%] justify-between mt-8 flex-0">
         <FormLabel title={title} description={description} />
         <Switch
           className="ml-4"

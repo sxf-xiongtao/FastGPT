@@ -28,6 +28,11 @@ export type ConfigFormType = {
       uploadFileMaxSize: number;
       lafEnv?: string;
     };
+    sso?: {
+      title?: string;
+      icon?: string;
+      url?: string;
+    };
     concatMd: string;
     scripts?: string;
     limit?: FastGPTConfigFileType['feConfigs']['limit'];
@@ -49,7 +54,7 @@ export type ConfigFormType = {
   loginSettings: {
     email: SystemConfigType['auth']['email'];
     phone: SystemConfigType['auth']['phone'];
-    sms: systemConfigType['auth']['sms'];
+    sms: SystemConfigType['auth']['sms'];
     github: SystemConfigType['auth']['github'];
     wechat: SystemConfigType['auth']['wechat'];
     google: SystemConfigType['auth']['google'];
