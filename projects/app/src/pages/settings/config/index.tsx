@@ -69,6 +69,7 @@ export const Settings = ({ sso }: InferGetServerSidePropsType<typeof getServerSi
     setIsLoading(true);
     try {
       const formData = formatFormData2ConfigStore(data);
+   
       await POST('/admin/routes/settings/updateConfig', formData);
 
       toast({

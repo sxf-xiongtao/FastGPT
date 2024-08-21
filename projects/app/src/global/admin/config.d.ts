@@ -52,16 +52,16 @@ export type ConfigFormType = {
     whisperModel: string;
   };
   loginSettings: {
-    email: SystemConfigType['auth']['email'];
-    phone: SystemConfigType['auth']['phone'];
-    sms: SystemConfigType['auth']['sms'];
-    github: SystemConfigType['auth']['github'];
-    wechat: SystemConfigType['auth']['wechat'];
-    google: SystemConfigType['auth']['google'];
+    email: NonNullable<SystemConfigType['auth']>['email'];
+    phone: NonNullable<SystemConfigType['auth']>['phone'];
+    sms: NonNullable<SystemConfigType['auth']>['sms'];
+    github: NonNullable<SystemConfigType['auth']>['github'];
+    wechat: NonNullable<SystemConfigType['auth']>['wechat'];
+    google: NonNullable<SystemConfigType['auth']>['google'];
     fastLogin: string;
   };
   paySettings: {
-    wx: SystemConfigType['pay']['wx'];
+    wx: NonNullable<SystemConfigType['pay']>['wx'];
     subPlans: {
       [SubTypeEnum.standard]: string;
       extraDatasetSizePrice: number;

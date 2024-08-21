@@ -105,7 +105,8 @@ export function formatConfigStore2FormSchema({
       email: {
         smtp: fastgptPro?.auth?.email?.smtp || '',
         user: fastgptPro?.auth?.email?.user || '',
-        pass: fastgptPro?.auth?.email?.pass || ''
+        pass: fastgptPro?.auth?.email?.pass || '',
+        register: fastgptPro?.auth?.email?.register || false
       },
       sms: {
         REGISTER: fastgptPro?.auth?.sms?.REGISTER || '',
@@ -176,13 +177,42 @@ export function formatFormData2ConfigStore({
       wechat: wechat?.appID
     },
     sso,
-    show_register:
-      loginSettings?.email?.register ||
-      loginSettings?.phone?.REGISTER ||
-      github ||
-      google ||
-      wechat ||
-      sso
+    register_method: (() => {
+      const methods = [];
+      if (loginSettings?.email?.register) {
+        methods.push('email');
+      }
+      if (loginSettings?.sms?.REGISTER) {
+        methods.push('phone');
+      }
+      return methods;
+    })() as ['email' | 'phone'],
+    login_method: (() => {
+      const methods = [];
+      if (loginSettings?.email?.register) {
+        methods.push('email');
+      }
+      if (loginSettings?.sms?.REGISTER) {
+        methods.push('phone');
+      }
+      return methods;
+    })() as ['email' | 'phone'],
+    find_password_method: (() => {
+      const methods = [];
+      if (loginSettings?.email?.register) {
+        methods.push('email');
+      }
+      if (loginSettings?.sms?.RESET_PASSWORD) {
+        methods.push('phone');
+      }
+      return methods;
+    })() as ['email' | 'phone'],
+    bind_notification_method: (() => {
+      if (loginSettings?.sms?.BIND_NOTIFICATION) {
+        return ['email', 'phone'];
+      }
+      return ['email'];
+    })() as ['email' | 'phone']
   };
 
   const formatLoginSettings = {

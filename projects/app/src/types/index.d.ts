@@ -63,12 +63,12 @@ export type SystemConfigType = {
   };
   pay?: {
     wx?: {
-      WX_APPID: string;
-      WX_MCHID: string;
-      WX_SERIAL_NO: string;
-      WX_V3_CODE: string;
-      WX_NOTIFY_URL: string;
-      WX_PRIVATE_KEY: string;
+      WX_APPID?: string;
+      WX_MCHID?: string;
+      WX_SERIAL_NO?: string;
+      WX_V3_CODE?: string;
+      WX_NOTIFY_URL?: string;
+      WX_PRIVATE_KEY?: string;
     };
   };
   fastLogin?: Record<

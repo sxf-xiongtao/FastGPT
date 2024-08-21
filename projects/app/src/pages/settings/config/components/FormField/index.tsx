@@ -42,7 +42,7 @@ const FormField = ({
     return (
       <Box>
         <FormLabel title={title} description={description} />
-        <Input defaultValue={value} onChange={(e) => onChange(e.target.value)} />
+        <Input value={value} onChange={(e) => onChange(e.target.value)} />
       </Box>
     );
   }
@@ -50,7 +50,7 @@ const FormField = ({
     return (
       <Box>
         <FormLabel title={title} description={description} />
-        <Input defaultValue={value} onChange={(e) => onChange(Number(e.target.value))} />
+        <Input value={value} onChange={(e) => onChange(Number(e.target.value))} />
       </Box>
     );
   }
