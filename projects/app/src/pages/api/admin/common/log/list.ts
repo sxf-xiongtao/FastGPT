@@ -35,7 +35,7 @@ async function handler(
         ...readFromSecondary
       })
       .sort({ time: -1 }),
-    getMongoLog().countDocuments({}, { ...readFromSecondary })
+    getMongoLog().countDocuments(match, { ...readFromSecondary })
   ]);
   return {
     data: records,
