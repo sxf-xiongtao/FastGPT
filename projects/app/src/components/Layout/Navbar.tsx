@@ -79,9 +79,24 @@ export default function Navbar() {
       icon: 'common/settingLight',
       subItems: [
         {
-          activeLink: '/settings/config',
-          name: '配置文件',
+          activeLink: '/settings/config/basic',
+          name: '基础配置',
           icon: 'common/settingLight'
+        },
+        {
+          activeLink: '/settings/config/model',
+          name: '模型配置',
+          icon: 'core/chat/chatModelTag'
+        },
+        {
+          activeLink: '/settings/config/user',
+          name: '用户 & 登录 & 通知',
+          icon: 'support/user/userLight'
+        },
+        {
+          activeLink: '/settings/config/pay',
+          name: '套餐 & 充值',
+          icon: 'support/bill/priceLight'
         },
         {
           activeLink: '/settings/systemPlugin',

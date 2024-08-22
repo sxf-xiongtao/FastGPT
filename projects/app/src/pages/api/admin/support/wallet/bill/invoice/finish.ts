@@ -7,6 +7,9 @@ import { readFileSync } from 'fs';
 import { removeFilesByPaths } from '@fastgpt/service/common/file/utils';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { InvoiceStatusEnum } from '@fastgpt/global/support/wallet/bill/invoice/constants';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { getNanoid } from '@fastgpt/global/common/string/tools';
+
 export type finishQuery = {};
 
 export type finishBody = {};
@@ -20,17 +23,41 @@ async function handler(
   const filePaths: string[] = [];
   try {
     const upload = getUploadModel({
-      maxSize: (global.feConfigs?.uploadFileMaxSize || 500) * 1024 * 1024
+      maxSize: global.feConfigs?.uploadFileMaxSize
     });
 
     const { file, metadata } = await upload.doUpload(req, res);
     filePaths.push(file.path);
 
     const fileData = readFileSync(file.path);
-    await MongoInvoice.updateOne(
-      { _id: metadata.invoiceId },
-      { $set: { status: InvoiceStatusEnum.completed, finishTime: new Date(), file: fileData } }
-    );
+
+    const invoice = await MongoInvoice.findById(metadata.invoiceId);
+
+    if (!invoice) {
+      return Promise.reject('找不到发票');
+    }
+
+    await mongoSessionRun(async (session) => {
+      invoice.status = InvoiceStatusEnum.completed;
+      invoice.finishTime = new Date();
+      invoice.file = fileData;
+
+      await invoice.save({ session });
+
+      await sendEmail({
+        email: invoice.emailAddress,
+        subject: `${global.feConfigs.systemTitle} —— 发票已开具`,
+        html: '您申请的发票已完成，请注意查收',
+        attachments: [
+          {
+            filename: file.originalname,
+            content: fileData,
+            contentType: file.mimetype,
+            cid: getNanoid()
+          }
+        ]
+      });
+    });
   } catch (error) {
     jsonRes(res, {
       code: 500,

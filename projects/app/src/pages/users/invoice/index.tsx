@@ -215,13 +215,27 @@ function InvoiceDetailModal({
           <LabelItem label={'开户账号'} value={invoice?.bankAccount} />
           <LabelItem label={'是否需要专票'} value={invoice?.needSpecialInvoice ? '是' : '否'} />
           <LabelItem label={'邮箱地址'} value={invoice?.emailAddress} />
+          <Flex alignItems={'center'} justify={'space-between'}>
+            <FormLabel flex={'0 0 120px'}>发票文件</FormLabel>
+            <Box
+              cursor={'pointer'}
+              onClick={() => {
+                window.open(
+                  `/api/support/wallet/bill/invoice/readFile?id=${invoice._id}&teamId=${invoice.teamId}&teamName=${invoice.teamName}&unifiedCreditCode=${invoice.unifiedCreditCode}`,
+                  '_blank'
+                );
+              }}
+            >
+              点击下载
+            </Box>
+          </Flex>
         </Flex>
       </ModalBody>
     </MyModal>
   );
 }
 
-function LabelItem({ label, value }: { label: string; value: string }) {
+function LabelItem({ label, value }: { label: string; value?: string }) {
   return (
     <Flex alignItems={'center'} justify={'space-between'}>
       <FormLabel flex={'0 0 120px'}>{label}</FormLabel>

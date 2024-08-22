@@ -10,11 +10,9 @@ import { getInitFormData } from '@/web/core/config/api';
 import ImportModal from './components/ImportModal';
 import FormField from './components/FormField';
 import { Controller, useForm } from 'react-hook-form';
-import { getFormConfig } from './data/formConfig';
+import { ModelFormConfig } from './data/formConfig';
 import BoxCard from '@/components/common/BoxContainer/Card';
 import MyTag from '@fastgpt/web/components/common/Tag/index';
-import { SSOEnum } from '@/global/user/auth/constants';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 
 interface formLevel {
   key: string;
@@ -29,18 +27,7 @@ interface titleType {
   subTitles: string[];
 }
 
-export const getServerSideProps = (async () => {
-  const sso = process.env.SSO as SSOEnum | undefined;
-  return {
-    props: {
-      sso: sso ?? null
-    }
-  };
-}) satisfies GetServerSideProps<{
-  sso: SSOEnum | null;
-}>;
-
-export const Settings = ({ sso }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+export const ModelSettings = () => {
   const [rawData, setRawData] = useState<any>({});
   const [isLoading, setIsLoading] = useState(false);
   const [titles, setTitles] = useState<Array<titleType>>([]);
@@ -69,7 +56,7 @@ export const Settings = ({ sso }: InferGetServerSidePropsType<typeof getServerSi
     setIsLoading(true);
     try {
       const formData = formatFormData2ConfigStore(data);
-   
+
       await POST('/admin/routes/settings/updateConfig', formData);
 
       toast({
@@ -119,7 +106,7 @@ export const Settings = ({ sso }: InferGetServerSidePropsType<typeof getServerSi
     }
   }, 100);
 
-  const formConfig = getFormConfig({ sso: !!sso });
+  const formConfig = ModelFormConfig;
   const firstLevels = Object.values(formConfig);
 
   useEffect(() => {
@@ -140,7 +127,7 @@ export const Settings = ({ sso }: InferGetServerSidePropsType<typeof getServerSi
 
     setTitles(formattedOutput);
     setActiveTitle(formattedOutput[0].mainTitle);
-  }, []);
+  }, [formConfig]);
 
   return (
     <Flex h={'100%'} gap={4}>
@@ -339,4 +326,4 @@ export const Settings = ({ sso }: InferGetServerSidePropsType<typeof getServerSi
   );
 };
 
-export default Settings;
+export default ModelSettings;

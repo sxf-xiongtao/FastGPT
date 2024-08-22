@@ -101,7 +101,7 @@ const FormField = ({
     return (
       <Box>
         <FormLabel title={title} description={description} />
-        <Box className="w-[88%]" mb={3}>
+        <Box mb={3}>
           <Textarea
             variant="outline"
             rows={8}

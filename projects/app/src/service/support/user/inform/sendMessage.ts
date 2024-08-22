@@ -13,8 +13,9 @@ export type SendEmailProps = {
   email: string;
   subject: string;
   html: string;
+  attachments?: any[];
 };
-export async function sendEmail({ email, subject, html }: SendEmailProps) {
+export async function sendEmail({ email, subject, html, attachments }: SendEmailProps) {
   const mailTransport = nodemailer.createTransport({
     host: global.systemConfig?.auth?.email?.smtp,
     secure: true, //安全方式发送,建议都加上
@@ -25,17 +26,18 @@ export async function sendEmail({ email, subject, html }: SendEmailProps) {
     }
   });
 
-  const options = {
-    from: `"${global.feConfigs?.systemTitle}" ${global.systemConfig?.auth?.email?.user}`,
-    to: email,
-    subject,
-    html
-  };
-
-  return mailTransport.sendMail(options).catch((err) => {
-    addLog.error('sendEmail error', err);
-    return Promise.reject(err);
-  });
+  return mailTransport
+    .sendMail({
+      from: `"${global.feConfigs?.systemTitle}" ${global.systemConfig?.auth?.email?.user}`,
+      to: email,
+      subject,
+      html,
+      attachments
+    })
+    .catch((err) => {
+      addLog.error('sendEmail error', err);
+      return Promise.reject(err);
+    });
 }
 
 const smsConfig = global.systemConfig?.auth?.sms;

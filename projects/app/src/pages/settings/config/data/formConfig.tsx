@@ -27,7 +27,7 @@ export const getFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
   return {
     siteSettings: {
       key: 'siteSettings',
-      title: '站点设置',
+      title: '基础配置',
       type: 'object',
       properties: {
         feConfigs: {
@@ -82,11 +82,32 @@ export const getFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
                 '可以设置一个额外的分享链接地址，不使用主站的地址，需配置域名的cname和ssl证书。'
             },
             favicon: { key: 'siteSettings.feConfigs.favicon', type: 'image', title: 'favicon' },
+            openapiPrefix: {
+              key: 'siteSettings.systemEnv.openapiPrefix',
+              type: 'string',
+              title: 'OpenAPI 前缀'
+            }
+          }
+        },
+
+        personalized: {
+          key: 'personalized.systemEnv',
+          type: 'object',
+          title: ' 个性化配置',
+
+          properties: {
+            concatMd: {
+              key: 'siteSettings.concatMd',
+              type: 'textarea',
+              title: '联系弹窗',
+              description:
+                '使用 Markdown 进行配置，配置之后，在网页中“联系我们”相关的内容，会提示填写的内容。'
+            },
             openAPIDocUrl: {
               key: 'siteSettings.feConfigs.openAPIDocUrl',
               type: 'string',
-              title: 'api 文档地址',
-              description: 'openapi的文档地址'
+              title: '自定义 api 文档地址',
+              description: '自定义 openapi 文档地址'
             },
             docUrl: {
               key: 'siteSettings.feConfigs.docUrl',
@@ -107,35 +128,8 @@ export const getFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
               key: 'siteSettings.feConfigs.chatbotUrl',
               type: 'string',
               title: '聊天机器人地址'
-            },
-            uploadFileMaxAmount: {
-              key: 'siteSettings.feConfigs.uploadFileMaxAmount',
-              type: 'number',
-              title: '单次最多上传多少个文件',
-              description: '用户上传知识库时，每次上传最多选择多少个文件'
-            },
-            uploadFileMaxSize: {
-              key: 'siteSettings.feConfigs.uploadFileMaxSize',
-              type: 'number',
-              title: '上传文件最大大小（M)',
-              description:
-                '用户上传知识库时，每个文件最大是多少。放大的话，需要注意网关也要设置得够大。'
-            },
-            lafEnv: {
-              key: 'siteSettings.feConfigs.lafEnv',
-              type: 'string',
-              title: 'laf 环境的地址',
-              description: 'laf 环境，例如 https://laf.dev'
             }
           }
-        },
-
-        concatMd: {
-          key: 'siteSettings.concatMd',
-          type: 'textarea',
-          title: '联系弹窗',
-          description:
-            '使用 Markdown 进行配置，配置之后，在网页中“联系我们”相关的内容，会提示填写的内容。'
         },
 
         scripts: {
@@ -150,21 +144,16 @@ export const getFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
           type: 'object',
           title: '系统参数',
           properties: {
-            openapiPrefix: {
-              key: 'siteSettings.systemEnv.openapiPrefix',
-              type: 'string',
-              title: 'OpenAPI 前缀'
-            },
             oneapiUrl: {
               key: 'siteSettings.systemEnv.oneapiUrl',
               type: 'string',
-              title: 'oneAPI地址',
+              title: 'oneAPI地址(会覆盖环境变量配置的)',
               description: 'oneAPI地址，可以使用 oneapi 来实现多模型接入'
             },
             chatApiKey: {
               key: 'siteSettings.systemEnv.chatApiKey',
               type: 'string',
-              title: '通用Key',
+              title: 'OneAPI 密钥(会覆盖环境变量配置的)',
               description:
                 '可以是 openai 的，也可以是 oneapi 的\n此处逻辑：优先走 ONEAPI_URL，如果填写了 ONEAPI_URL，key 也需要是 ONEAPI 的 key'
             },
@@ -188,6 +177,13 @@ export const getFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
               key: 'siteSettings.systemEnv.tokenWorkers',
               type: 'number',
               title: 'token计算最大进程（通常多少并发设置多少）'
+            },
+
+            lafEnv: {
+              key: 'siteSettings.feConfigs.lafEnv',
+              type: 'string',
+              title: 'laf 环境的地址',
+              description: 'laf 环境，例如 https://laf.dev'
             }
           }
         },
@@ -197,6 +193,19 @@ export const getFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
           type: 'object',
           title: '使用限制',
           properties: {
+            uploadFileMaxAmount: {
+              key: 'siteSettings.feConfigs.uploadFileMaxAmount',
+              type: 'number',
+              title: '单次最多上传多少个文件',
+              description: '用户上传知识库时，每次上传最多选择多少个文件'
+            },
+            uploadFileMaxSize: {
+              key: 'siteSettings.feConfigs.uploadFileMaxSize',
+              type: 'number',
+              title: '上传文件最大大小（M)',
+              description:
+                '用户上传知识库时，每个文件最大是多少。放大的话，需要注意网关也要设置得够大。'
+            },
             exportDatasetLimitMinutes: {
               key: 'siteSettings.limit.exportDatasetLimitMinutes',
               type: 'number',
@@ -208,65 +217,151 @@ export const getFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
               title: '站点同步使用间隔时长(分钟)'
             }
           }
-        },
+        }
+      }
+    }
+  };
+};
 
-        ...(sso
-          ? {
-              sso: {
-                key: 'siteSettings.sso',
-                type: 'object',
-                title: 'SSO 配置',
-                properties: {
-                  url: {
-                    key: 'siteSettings.sso.url',
-                    type: 'string',
-                    title: 'SSO 登录跳转地址',
-                    description: `需要跳转的 SSO 域名，例如:https%3A%2F%2Fexample.com%2Fsso%2Flogin%3Fclient_id%3Dxxx%26callbackUrl%3Dhttps%3A%2F%2Fexample.com%2Fsso。
-Query 最好经过 encode 编码，回调验证的地址为：{{FastGPT 域名}}/sso`
-                  },
-                  title: {
-                    key: 'siteSettings.sso.title',
-                    title: 'SSO 登录按钮标题',
-                    type: 'string',
-                    description: '配置 SSO 登录按钮的标题'
-                  },
-                  icon: {
-                    key: 'siteSettings.sso.icon',
-                    title: 'SSO 登录按钮的图标',
-                    type: 'image'
-                  }
-                }
-              }
-            }
-          : {})
+export default function Dom() {
+  return <></>;
+}
+
+export const ModelFormConfig: FormConfig = {
+  modelSettings: {
+    key: 'modelSettings',
+    title: '模型设置',
+    type: 'object',
+    properties: {
+      llmModels: {
+        key: 'modelSettings.llmModels',
+        title: 'LLM大语言模型',
+        description: '用于对话、分类、内容提取等',
+        type: 'json'
+      },
+      vectorModels: {
+        key: 'modelSettings.vectorModels',
+        title: '向量模型',
+        description: '用于知识库的索引',
+        type: 'json'
+      },
+      reRankModels: { key: 'modelSettings.reRankModels', title: '重排模型', type: 'json' },
+      audioSpeechModels: {
+        key: 'modelSettings.audioSpeechModels',
+        title: '语音播放模型',
+        type: 'json'
+      },
+      whisperModel: { key: 'modelSettings.whisperModel', title: '语音输入模型', type: 'json' }
+    }
+  },
+  censor: {
+    key: 'securitySettings.censor',
+    type: 'object',
+    title: '内容安全审查',
+    properties: {
+      BAIDU_TEXT_CENSOR_CLIENTID: {
+        key: 'securitySettings.censor.BAIDU_TEXT_CENSOR_CLIENTID',
+        type: 'string',
+        title: '百度安全 id',
+        description:
+          '![](https://oss.laf.dev/lk63dw-fastgpt/baidu_censor.png)\nhttps://console.bce.baidu.com/ai/?_=1693133074333#/ai/antiporn/overview/index 注册百度安全校验账号，并创建对应应用。提供应用的 id 和 secret'
+      },
+      BAIDU_TEXT_CENSOR_CLIENTSECRET: {
+        key: 'securitySettings.censor.BAIDU_TEXT_CENSOR_CLIENTSECRET',
+        type: 'string',
+        title: '百度安全 secret'
+      },
+      customCensorURL: {
+        key: 'securitySettings.censor.customCensorURL',
+        type: 'string',
+        title: '自定义安全校验 URL',
+        description: '如果您有自己的安全校验服务，可以填写该地址，并在安全设置中开启自定义安全校验'
       }
-    },
-    modelSettings: {
-      key: 'modelSettings',
-      title: '模型设置',
-      type: 'object',
-      properties: {
-        llmModels: {
-          key: 'modelSettings.llmModels',
-          title: 'LLM大语言模型',
-          description: '用于对话、分类、内容提取等',
-          type: 'json'
-        },
-        vectorModels: {
-          key: 'modelSettings.vectorModels',
-          title: '向量模型',
-          description: '用于知识库的索引',
-          type: 'json'
-        },
-        reRankModels: { key: 'modelSettings.reRankModels', title: '重排模型', type: 'json' },
-        audioSpeechModels: {
-          key: 'modelSettings.audioSpeechModels',
-          title: '语音播放模型',
-          type: 'json'
-        },
-        whisperModel: { key: 'modelSettings.whisperModel', title: '语音输入模型', type: 'json' }
+    }
+  }
+};
+
+export const PayFormConfig: FormConfig = {
+  subPlans: {
+    key: 'paySettings.subPlans',
+    type: 'object',
+    title: '订阅套餐',
+    properties: {
+      standard: {
+        key: 'paySettings.subPlans.standard',
+        title: '标准订阅套餐（需严格按模板填写，可修改里面的子项）',
+        type: 'json',
+        description: '如果需要提供Saas服务，可以私聊我们拿配置。'
+      },
+      extraDatasetSizePrice: {
+        key: 'paySettings.subPlans.extraDatasetSizePrice',
+        type: 'number',
+        title: '知识库存储费用（xx元/1000条/月）'
+      },
+      extraPointsPrice: {
+        key: 'paySettings.subPlans.extraPointsPrice',
+        type: 'number',
+        title: '额外AI积分费用（xx元/1000积分/月）'
       }
-    },
+    }
+  },
+  paySettings: {
+    key: 'paySettings',
+    title: '支付方式',
+    type: 'object',
+    properties: {
+      wx: {
+        key: 'paySettings.wx',
+        type: 'object',
+        title: '微信支付配置',
+        properties: {
+          WX_APPID: {
+            key: 'paySettings.wx.WX_APPID',
+            type: 'string',
+            title: 'appid',
+            description:
+              '微信支付相关材料\nhttps://pay.weixin.qq.com/index.php/core/home/login?return_url=https%3A%2F%2Fpay.weixin.qq.com%2Findex.php%2Fextend%2Femployee\n自行注册微信支付，目前需要wx扫码支付\nappid: ![](https://oss.laf.dev/lk63dw-fastgpt/appid.png)'
+          },
+          WX_MCHID: {
+            key: 'paySettings.wx.WX_MCHID',
+            type: 'string',
+            title: 'Merchant ID',
+            description: '![](https://oss.laf.dev/lk63dw-fastgpt/wx_mchid.png)'
+          },
+          WX_V3_CODE: {
+            key: 'paySettings.wx.WX_V3_CODE',
+            type: 'string',
+            title: 'V3 Code',
+            description: '![](https://oss.laf.dev/lk63dw-fastgpt/ws_v3_code.png)'
+          },
+          WX_NOTIFY_URL: {
+            key: 'paySettings.wx.WX_NOTIFY_URL',
+            type: 'string',
+            title: 'Notify URL',
+            description: '没用到，随便填个'
+          },
+          WX_SERIAL_NO: {
+            key: 'paySettings.wx.WX_SERIAL_NO',
+            type: 'string',
+            title: 'Serial Number',
+            description:
+              '点管理证书进去看到\n![](https://oss.laf.dev/lk63dw-fastgpt/wx_serial_no.png)'
+          },
+          WX_PRIVATE_KEY: {
+            key: 'paySettings.wx.WX_PRIVATE_KEY',
+            type: 'textarea',
+            title: 'Private Key',
+            description:
+              '按微信教程拿到这几个文件，txt打开key\n![](https://oss.laf.dev/lk63dw-fastgpt/wx_private_key.png)'
+          }
+        }
+      }
+    }
+  }
+};
+
+export const getUserFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
+  return {
     loginSettings: {
       key: 'loginSettings',
       title: '通知 & 登录配置',
@@ -354,22 +449,26 @@ Query 最好经过 encode 编码，回调验证的地址为：{{FastGPT 域名}}
             REGISTER: {
               key: 'loginSettings.sms.REGISTER',
               type: 'string',
-              title: '注册账号'
+              title: '注册账号',
+              description: '填写后，将会开启手机号注册'
             },
             RESET_PASSWORD: {
               key: 'loginSettings.sms.RESET_PASSWORD',
               type: 'string',
-              title: '重置密码'
+              title: '重置密码',
+              description: '填写后，将会开启手机号找回密码'
             },
             BIND_NOTIFICATION: {
               key: 'loginSettings.sms.BIND_NOTIFICATION',
               type: 'string',
-              title: '绑定通知手机号'
+              title: '绑定通知手机号',
+              description: '填写后，将会允许手机号绑定通知方式'
             },
             EXPIRE_SOON: {
               key: 'loginSettings.sms.EXPIRE_SOON',
               type: 'string',
-              title: '订阅套餐即将过期'
+              title: '订阅套餐即将过期',
+              description: '填写后，套餐即将过期，会发送一个短信'
             },
             FREE_CLEAN: {
               key: 'loginSettings.sms.FREE_CLEAN',
@@ -417,6 +516,35 @@ Query 最好经过 encode 编码，回调验证的地址为：{{FastGPT 域名}}
             }
           }
         },
+        ...(sso
+          ? {
+              sso: {
+                key: 'siteSettings.sso',
+                type: 'object',
+                title: 'SSO 配置',
+                properties: {
+                  url: {
+                    key: 'siteSettings.sso.url',
+                    type: 'string',
+                    title: 'SSO 登录跳转地址',
+                    description: `需要跳转的 SSO 域名，例如:https%3A%2F%2Fexample.com%2Fsso%2Flogin%3Fclient_id%3Dxxx%26callbackUrl%3Dhttps%3A%2F%2Fexample.com%2Fsso。
+Query 最好经过 encode 编码，回调验证的地址为：{{FastGPT 域名}}/sso`
+                  },
+                  title: {
+                    key: 'siteSettings.sso.title',
+                    title: 'SSO 登录按钮标题',
+                    type: 'string',
+                    description: '配置 SSO 登录按钮的标题'
+                  },
+                  icon: {
+                    key: 'siteSettings.sso.icon',
+                    title: 'SSO 登录按钮的图标',
+                    type: 'image'
+                  }
+                }
+              }
+            }
+          : {}),
         fastLogin: {
           key: 'fastlogin',
           type: 'object',
@@ -431,118 +559,15 @@ Query 最好经过 encode 编码，回调验证的地址为：{{FastGPT 域名}}
         }
       }
     },
-    paySettings: {
-      key: 'paySettings',
-      title: '支付 & 订阅套餐',
-      type: 'object',
-      properties: {
-        wx: {
-          key: 'paySettings.wx',
-          type: 'object',
-          title: '微信支付配置',
-          properties: {
-            WX_APPID: {
-              key: 'paySettings.wx.WX_APPID',
-              type: 'string',
-              title: 'appid',
-              description:
-                '微信支付相关材料\nhttps://pay.weixin.qq.com/index.php/core/home/login?return_url=https%3A%2F%2Fpay.weixin.qq.com%2Findex.php%2Fextend%2Femployee\n自行注册微信支付，目前需要wx扫码支付\nappid: ![](https://oss.laf.dev/lk63dw-fastgpt/appid.png)'
-            },
-            WX_MCHID: {
-              key: 'paySettings.wx.WX_MCHID',
-              type: 'string',
-              title: 'Merchant ID',
-              description: '![](https://oss.laf.dev/lk63dw-fastgpt/wx_mchid.png)'
-            },
-            WX_V3_CODE: {
-              key: 'paySettings.wx.WX_V3_CODE',
-              type: 'string',
-              title: 'V3 Code',
-              description: '![](https://oss.laf.dev/lk63dw-fastgpt/ws_v3_code.png)'
-            },
-            WX_NOTIFY_URL: {
-              key: 'paySettings.wx.WX_NOTIFY_URL',
-              type: 'string',
-              title: 'Notify URL',
-              description: '没用到，随便填个'
-            },
-            WX_SERIAL_NO: {
-              key: 'paySettings.wx.WX_SERIAL_NO',
-              type: 'string',
-              title: 'Serial Number',
-              description:
-                '点管理证书进去看到\n![](https://oss.laf.dev/lk63dw-fastgpt/wx_serial_no.png)'
-            },
-            WX_PRIVATE_KEY: {
-              key: 'paySettings.wx.WX_PRIVATE_KEY',
-              type: 'textarea',
-              title: 'Private Key',
-              description:
-                '按微信教程拿到这几个文件，txt打开key\n![](https://oss.laf.dev/lk63dw-fastgpt/wx_private_key.png)'
-            }
-          }
-        },
-        subPlans: {
-          key: 'paySettings.subPlans',
-          type: 'object',
-          title: '订阅套餐',
-          properties: {
-            standard: {
-              key: 'paySettings.subPlans.standard',
-              title: '标准订阅套餐（需严格按模板填写，可修改里面的子项）',
-              type: 'json',
-              description: '如果需要提供Saas服务，可以私聊我们拿配置。',
-              default: ''
-            },
-            extraDatasetSizePrice: {
-              key: 'paySettings.subPlans.extraDatasetSizePrice',
-              type: 'number',
-              title: '知识库存储费用（xx元/1000条/月）'
-            },
-            extraPointsPrice: {
-              key: 'paySettings.subPlans.extraPointsPrice',
-              type: 'number',
-              title: '额外AI积分费用（xx元/1000积分/月）'
-            }
-          }
-        }
-      }
-    },
     securitySettings: {
       key: 'securitySettings',
       title: '安全设置',
       type: 'object',
       properties: {
-        censor: {
-          key: 'securitySettings.censor',
-          type: 'object',
-          title: '内容审查',
-          properties: {
-            BAIDU_TEXT_CENSOR_CLIENTID: {
-              key: 'securitySettings.censor.BAIDU_TEXT_CENSOR_CLIENTID',
-              type: 'string',
-              title: '百度安全 id',
-              description:
-                '![](https://oss.laf.dev/lk63dw-fastgpt/baidu_censor.png)\nhttps://console.bce.baidu.com/ai/?_=1693133074333#/ai/antiporn/overview/index 注册百度安全校验账号，并创建对应应用。提供应用的 id 和 secret'
-            },
-            BAIDU_TEXT_CENSOR_CLIENTSECRET: {
-              key: 'securitySettings.censor.BAIDU_TEXT_CENSOR_CLIENTSECRET',
-              type: 'string',
-              title: '百度安全 secret'
-            },
-            customCensorURL: {
-              key: 'securitySettings.censor.customCensorURL',
-              type: 'string',
-              title: '自定义安全校验 URL',
-              description:
-                '如果您有自己的安全校验服务，可以填写该地址，并在安全设置中开启自定义安全校验'
-            }
-          }
-        },
         googleV3Ver: {
           key: 'securitySettings.googleV3Ver',
           type: 'object',
-          title: '谷歌V3安全校验',
+          title: '谷歌V3 验证码安全（防止机器人刷验证码）',
           properties: {
             clientKey: {
               key: 'securitySettings.googleV3Ver.clientKey',
@@ -562,7 +587,3 @@ Query 最好经过 encode 编码，回调验证的地址为：{{FastGPT 域名}}
     }
   };
 };
-
-export default function Dom() {
-  return <></>;
-}

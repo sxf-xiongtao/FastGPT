@@ -18,20 +18,16 @@ export const teamInvoiceTitleScheme = {
     required: true
   },
   companyAddress: {
-    type: String,
-    required: true
+    type: String
   },
   companyPhone: {
-    type: String,
-    required: true
+    type: String
   },
   bankName: {
-    type: String,
-    required: true
+    type: String
   },
   bankAccount: {
-    type: String,
-    required: true
+    type: String
   },
   needSpecialInvoice: {
     type: Boolean,

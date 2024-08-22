@@ -45,11 +45,10 @@ async function handler(
     MongoInvoice.find(match, undefined, {
       skip: (pageNum - 1) * pageSize,
       limit: pageSize,
-      fields: {
-        file: 0
-      },
       ...readFromSecondary
-    }).sort({ status: 1, createTime: -1 }),
+    })
+      .select('-file')
+      .sort({ status: 1, createTime: -1 }),
     MongoInvoice.countDocuments(match, {
       ...readFromSecondary
     })
