@@ -13,7 +13,7 @@ import {
 } from '@/service/support/wallet/sub/utils';
 import { MongoChatItem } from '@fastgpt/service/core/chat/chatItemSchema';
 import { MongoChat } from '@fastgpt/service/core/chat/chatSchema';
-import { getStandardPlan } from '@fastgpt/service/support/wallet/sub/utils';
+import { getStandardPlanConfig } from '@fastgpt/service/support/wallet/sub/utils';
 
 /* 
     清除用户过期的聊天记录
@@ -58,7 +58,7 @@ const clearHistories = async (plan: TeamSubSchema) => {
   try {
     // 获取较高级的一个level
     const level = getLargeStandardSubLevel([plan.currentSubLevel, plan.nextSubLevel]);
-    const levelData = getStandardPlan(level);
+    const levelData = getStandardPlanConfig(level);
 
     if (!levelData) return;
 

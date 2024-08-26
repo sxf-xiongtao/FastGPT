@@ -1,7 +1,7 @@
 import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
-import { SubStatusEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
@@ -46,7 +46,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       result = await MongoTeamSub.create({
         teamId,
         type,
-        status: SubStatusEnum.active,
         startTime,
         expiredTime,
         price: price * PRICE_SCALE,
@@ -57,7 +56,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       result = await MongoTeamSub.create({
         teamId,
         type,
-        status: SubStatusEnum.active,
         startTime,
         expiredTime,
         price: price * PRICE_SCALE,

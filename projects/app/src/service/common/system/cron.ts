@@ -24,16 +24,17 @@ const updateSubPlanCron = () => {
       clearExpiredSubPlan();
     }
   });
-  setCron('*/20 * * * *', async () => {
-    if (
-      await checkTimerLock({
-        timerId: TimerIdEnum.updateStandardPlan,
-        lockMinuted: 19
-      })
-    ) {
-      updateStandardPlan();
-    }
-  });
+  // 国内订阅，不再自动续费
+  // setCron('*/20 * * * *', async () => {
+  //   if (
+  //     await checkTimerLock({
+  //       timerId: TimerIdEnum.updateStandardPlan,
+  //       lockMinuted: 19
+  //     })
+  //   ) {
+  //     updateStandardPlan();
+  //   }
+  // });
 };
 
 const planNotifyCron = () => {

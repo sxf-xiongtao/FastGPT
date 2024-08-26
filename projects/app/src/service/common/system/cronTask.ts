@@ -11,23 +11,42 @@ import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
-import { MongoInvoice } from '@/service/support/wallet/bill/invoiceSchema';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import {
-  getStandardPlan,
+  getStandardPlanConfig,
   initTeamStandardPlan2Free
 } from '@fastgpt/service/support/wallet/sub/utils';
 import { addMonths } from 'date-fns';
 
+/* 
+  1. Extra dataset
+  2. Not free standard plans
+*/
 export const clearExpiredSubPlan = async () => {
-  const plans = await MongoTeamSub.deleteMany({
+  const extraPlans = await MongoTeamSub.deleteMany({
     type: [SubTypeEnum.extraDatasetSize, SubTypeEnum.extraPoints],
     expiredTime: { $lte: new Date() }
   });
 
-  addLog.info(`删除过期的额外套餐: ${plans.deletedCount}`);
+  addLog.info(`删除过期的额外套餐: ${extraPlans.deletedCount}`);
+
+  const standardPlans = await MongoTeamSub.deleteMany({
+    type: SubTypeEnum.standard,
+    currentSubLevel: [
+      StandardSubLevelEnum.experience,
+      StandardSubLevelEnum.team,
+      StandardSubLevelEnum.enterprise,
+      StandardSubLevelEnum.custom
+    ],
+    expiredTime: { $lte: new Date() }
+  });
+
+  addLog.info(`删除过期的订阅套餐: ${standardPlans.deletedCount}`);
 };
 
+/* 
+  TODO: 未来改成续费国外订阅模式，目前下面的代码不再使用
+*/
 export const updateStandardPlan = async () => {
   const updatePlan = async (plan: TeamSubSchema) => {
     try {
@@ -38,7 +57,7 @@ export const updateStandardPlan = async () => {
       ]);
       if (!team || !owner) return;
 
-      const newPlanContent = getStandardPlan(plan.nextSubLevel);
+      const newPlanContent = getStandardPlanConfig(plan.nextSubLevel);
       if (!newPlanContent) return;
 
       const monthMap =

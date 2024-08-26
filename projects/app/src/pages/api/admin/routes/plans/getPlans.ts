@@ -50,7 +50,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return {
           id: plan._id,
           type: plan.type,
-          price: plan.price / PRICE_SCALE,
           level: plan.currentSubLevel,
           totalPoints: plan.totalPoints,
           surplusPoints: plan.surplusPoints,

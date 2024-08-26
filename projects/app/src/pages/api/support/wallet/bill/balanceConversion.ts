@@ -12,7 +12,11 @@ import {
   SUB_EXTRA_POINT_RATE
 } from '@fastgpt/global/support/wallet/bill/constants';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
-import { SubStatusEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import {
+  StandardSubLevelEnum,
+  SubModeEnum,
+  SubTypeEnum
+} from '@fastgpt/global/support/wallet/sub/constants';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 
 import { addYears } from 'date-fns';
@@ -82,7 +86,6 @@ async function handler(
         {
           teamId,
           type: SubTypeEnum.extraPoints,
-          status: SubStatusEnum.active,
           startTime: new Date(),
           expiredTime: addYears(new Date(), 1),
           price: balance,
