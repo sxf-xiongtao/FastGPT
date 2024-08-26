@@ -51,7 +51,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const wxPay = new WXPay();
   const payRes = await wxPay.getPayResult(payOrder.orderId);
 
-  //  支付成功
+  //  重点检查：支付成功
   if (payRes.trade_state === 'SUCCESS') {
     return mongoSessionRun(async (session) => {
       // 更新订单状态. 如果没有合适的订单，说明订单重复了
