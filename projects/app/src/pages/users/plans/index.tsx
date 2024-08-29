@@ -37,7 +37,6 @@ export type PlanType = {
   startTime: string;
   totalPoints: number;
   surplusPoints: number;
-  price: number;
   extraDatasetSize: number;
 };
 

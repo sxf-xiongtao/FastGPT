@@ -93,7 +93,6 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
       query: dispatchQuery,
       chatConfig,
       stream: false,
-      detail: false,
       runtimeEdges: initWorkflowEdgeStatus(edges),
       runtimeNodes: storeNodes2RuntimeNodes(nodes, getWorkflowEntryNodeIds(nodes)),
       maxRunTimes: 200

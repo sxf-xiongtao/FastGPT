@@ -5,6 +5,10 @@ import { useToast } from '@fastgpt/web/hooks/useToast';
 import { compressImgFileAndUpload } from '@/service/admin/compressAndUpload';
 import { AddIcon } from '@chakra-ui/icons';
 import FormLabel from '../FormLabel';
+import { FiledTypeEnum } from '@/web/admin/config/constants';
+import dynamic from 'next/dynamic';
+
+const StandardPlans = dynamic(() => import('./StandardPlans'));
 
 const FormField = ({
   type,
@@ -121,6 +125,14 @@ const FormField = ({
         <Box className="mb-8" w={'100%'}>
           <JsonEditor value={value} onChange={onChange} defaultHeight={250} resize />
         </Box>
+      </Box>
+    );
+  }
+  if (type === FiledTypeEnum.StandardPlans) {
+    return (
+      <Box>
+        <FormLabel title={title} description={description} />
+        <StandardPlans value={value} onChange={onChange} />
       </Box>
     );
   }

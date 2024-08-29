@@ -14,7 +14,7 @@ const Description: React.FC<any> = ({ description }: { description?: string }) =
   }
 };
 
-const FormLabel = ({ title, description }: { title: string; description: string }) => {
+const FormLabel = ({ title, description }: { title: string; description?: string }) => {
   if (!title) return null;
   return (
     <HStack mb={2}>

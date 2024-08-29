@@ -1,3 +1,5 @@
+import { FiledTypeEnum } from '@/web/admin/config/constants';
+
 type FormConfig = {
   [key: string]: {
     key: string;
@@ -290,7 +292,7 @@ export const PayFormConfig: FormConfig = {
       standard: {
         key: 'paySettings.subPlans.standard',
         title: '标准订阅套餐（需严格按模板填写，可修改里面的子项）',
-        type: 'json',
+        type: FiledTypeEnum.StandardPlans,
         description: '如果需要提供Saas服务，可以私聊我们拿配置。'
       },
       extraDatasetSizePrice: {

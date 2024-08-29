@@ -13,6 +13,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { PayFormConfig } from './data/formConfig';
 import BoxCard from '@/components/common/BoxContainer/Card';
 import MyTag from '@fastgpt/web/components/common/Tag/index';
+import { serviceSideProps } from '@/web/common/i18n';
 
 interface formLevel {
   key: string;
@@ -327,3 +328,11 @@ export const ModelSettings = () => {
 };
 
 export default ModelSettings;
+
+export async function getServerSideProps(content: any) {
+  return {
+    props: {
+      ...(await serviceSideProps(content, ['user']))
+    }
+  };
+}

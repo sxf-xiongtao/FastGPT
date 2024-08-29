@@ -124,24 +124,6 @@ export default function PlanEditModal(props: {
               })}
             />
           </FormControl>
-          <FormControl className="mt-4">
-            <FormLabel htmlFor="price" className="!font-bold text-grayModern-700">
-              价格（元）
-              {errors && !!errors?.price && (
-                <span className="ml-2 text-[12px] text-red-500">*必填</span>
-              )}
-            </FormLabel>
-            <Input
-              {...register('price', {
-                required: 'This is required'
-              })}
-              className="!text-xl"
-              id="price"
-              variant="outline"
-              placeholder="价格"
-              type="number"
-            />
-          </FormControl>
           {subType === SubTypeEnum.standard && (
             <>
               <FormControl className="mt-4">
