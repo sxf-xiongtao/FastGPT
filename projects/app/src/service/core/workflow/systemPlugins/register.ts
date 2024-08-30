@@ -10,7 +10,7 @@ import { replaceVariable } from '@fastgpt/global/common/string/tools';
 let list: string[] = ['dalle3'];
 
 /* Get plugins */
-export const getSystemPlugins = () => {
+export const getSystemPlugins = async () => {
   const communityPlugins = getCommunityPlugins();
 
   const commercialPlugins = list.map<SystemPluginTemplateItemType>((name) => {
@@ -30,7 +30,33 @@ export const getSystemPlugins = () => {
     };
   });
 
-  const plugins = [...communityPlugins, ...commercialPlugins];
+  // 从数据库里加载插件配置
+  const dbPlugins = (
+    await MongoSystemPluginSchema.find({ customConfig: { $exists: true } })
+  ).map<SystemPluginTemplateItemType>((item) => {
+    const { name, avatar, intro, version, weight, workflow, templateType } = item.customConfig!;
+    return {
+      id: item.pluginId,
+      isActive: false,
+      isFolder: false,
+      parentId: null,
+      author: '',
+      version,
+      name,
+      avatar,
+      intro,
+      showStatus: true,
+      weight,
+      isTool: true,
+      templateType,
+      inputConfig: item.inputConfig,
+      workflow,
+      originCost: item.originCost,
+      currentCost: item.currentCost
+    };
+  });
+
+  const plugins = [...communityPlugins, ...commercialPlugins, ...dbPlugins];
 
   plugins.sort((a, b) => (b.weight || 0) - (a.weight || 0));
 
@@ -44,7 +70,7 @@ export const getSystemPluginsAndLoadThem = async (refresh = false) => {
     global.systemPlugins = [];
   }
 
-  const systemPlugins = getSystemPlugins();
+  const systemPlugins = await getSystemPlugins();
 
   const pluginConfigs = await MongoSystemPluginSchema.find();
   systemPlugins.forEach((plugin) => {
@@ -60,7 +86,7 @@ export const getSystemPluginsAndLoadThem = async (refresh = false) => {
         item.currentCost = pluginConfig.currentCost ?? 0;
 
         // 使用 inputConfig 的内容，替换插件的 nodes
-        if (pluginConfig.inputConfig) {
+        if (pluginConfig.inputConfig && item.workflow?.nodes) {
           let nodeString = JSON.stringify(item.workflow.nodes);
           pluginConfig.inputConfig.forEach((inputConfig) => {
             nodeString = replaceVariable(nodeString, {

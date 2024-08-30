@@ -15,9 +15,7 @@ async function handler(
 ): Promise<getSystemPluginsResponse> {
   // Get mongodb plugin config
 
-  const systemPlugins = getSystemPluginsAndLoadThem();
-
-  return systemPlugins;
+  return getSystemPluginsAndLoadThem();
 }
 
 export default NextAPI(handler);

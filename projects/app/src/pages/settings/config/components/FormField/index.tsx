@@ -2,11 +2,11 @@ import { Box, Flex, Image, Input, Switch, Textarea } from '@chakra-ui/react';
 import JsonEditor from '@fastgpt/web/components/common/Textarea/JsonEditor';
 import { useRef } from 'react';
 import { useToast } from '@fastgpt/web/hooks/useToast';
-import { compressImgFileAndUpload } from '@/service/admin/compressAndUpload';
 import { AddIcon } from '@chakra-ui/icons';
 import FormLabel from '../FormLabel';
 import { FiledTypeEnum } from '@/web/admin/config/constants';
 import dynamic from 'next/dynamic';
+import { compressImgFileAndUpload } from '@/web/common/file/utils';
 
 const StandardPlans = dynamic(() => import('./StandardPlans'));
 

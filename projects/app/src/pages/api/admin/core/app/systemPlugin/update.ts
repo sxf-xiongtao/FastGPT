@@ -2,7 +2,6 @@ import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/nex
 import { NextAPI } from '@/service/middleware/entry';
 import { SystemPluginTemplateItemType } from '@fastgpt/global/core/workflow/type';
 import { adminCert } from '@/service/support/permission/adminCert';
-import { getSystemPluginsAndLoadThem } from '@/service/core/workflow/systemPlugins/register';
 import { MongoSystemPluginSchema } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
 
 export type updateSystemPluginQuery = {};
@@ -39,9 +38,6 @@ async function handler(
       upsert: true
     }
   );
-
-  // refresh system plugins
-  getSystemPluginsAndLoadThem(true);
 
   return {};
 }

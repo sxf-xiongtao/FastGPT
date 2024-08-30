@@ -26,6 +26,9 @@ async function handler(
       plugin.inputConfig = pluginConfig.inputConfig ?? [];
       plugin.originCost = pluginConfig.originCost ?? 0;
       plugin.currentCost = pluginConfig.currentCost ?? 0;
+      plugin.customWorkflow = pluginConfig.customConfig
+        ? JSON.stringify(pluginConfig.customConfig?.workflow || {}, null, 2)
+        : undefined;
     }
   });
 

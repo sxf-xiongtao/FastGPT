@@ -37,8 +37,8 @@ function verifyWeChatRequest(req: NextApiRequest) {
   }
 }
 
-export const createLoginAuthCode = async ({ openid, code }: { openid: string; code: string }) => {
-  await MongoUserAuth.create({
+export const createLoginAuthCode = ({ openid, code }: { openid: string; code: string }) => {
+  return MongoUserAuth.create({
     key: code,
     openid,
     type: UserAuthTypeEnum.wxLogin
