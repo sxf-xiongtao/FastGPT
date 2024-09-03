@@ -1,8 +1,10 @@
+import { LeapMotorSSOHandler } from '@/service/support/user/sso/leapmotor';
 import { TestSSOHandler } from '@/service/support/user/sso/test';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
 
 export enum SSOEnum {
-  Test = 'test' // just for testing which should be never used in prod
+  Test = 'test', // just for testing which should be never used in prod
+  LeapMotor = 'leapmotor'
 } // Add new SSO source here
 
 export type SSOHandlerReturnType = {
@@ -19,5 +21,8 @@ export const SSOConfig: {
 } = {
   [SSOEnum.Test]: {
     handler: TestSSOHandler
+  },
+  [SSOEnum.LeapMotor]: {
+    handler: LeapMotorSSOHandler
   }
 };
