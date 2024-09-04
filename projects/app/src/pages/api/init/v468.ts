@@ -8,7 +8,7 @@ import { MongoBill } from '@/service/support/wallet/bill/schema';
 import { BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { delay } from '@fastgpt/global/common/system/utils';
-import { initTeamStandardPlan2Free } from '@fastgpt/service/support/wallet/sub/utils';
+import { initTeamFreePlan } from '@fastgpt/service/support/wallet/sub/utils';
 
 /* 初始化旧的订阅字段 */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -51,7 +51,7 @@ const addTeamDefaultSub = async () => {
         console.log(++success);
         return;
       }
-      await initTeamStandardPlan2Free({
+      await initTeamFreePlan({
         teamId
       });
     } catch (error) {

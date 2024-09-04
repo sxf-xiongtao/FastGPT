@@ -8,31 +8,69 @@ import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { MongoBill } from '@/service/support/wallet/bill/schema';
 import { BillStatusEnum } from '@fastgpt/global/support/wallet/bill/constants';
+import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
+import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import { initTeamFreePlan } from '@fastgpt/service/support/wallet/sub/utils';
+import { delay } from '@fastgpt/global/common/system/utils';
 
 /* 
     初始化开票状态
     status === success
     1. payway 不是微信的，都设置成 true（包括不存在的）
+
+    2. 遍历一遍用户，没有免费版套餐的，都加上免费版
 */
 let index = 0;
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   await authCert({ req, authRoot: true });
 
+  const result = await MongoBill.updateMany(
+    {
+      hasInvoice: { $ne: true },
+      status: BillStatusEnum.SUCCESS,
+      'metadata.payWay': { $ne: 'wx' }
+    },
+    {
+      $set: {
+        hasInvoice: true
+      }
+    }
+  );
+
+  const teams = await MongoTeam.find({}, '_id');
+
+  console.log('Total users', teams.length);
+  let index = 0;
+  for await (const team of teams) {
+    await initFreePlans(team._id);
+    console.log(++index);
+  }
+
   jsonRes(res, {
     message: 'success',
-    data: await MongoBill.updateMany(
-      {
-        hasInvoice: { $ne: true },
-        status: BillStatusEnum.SUCCESS,
-        'metadata.payWay': { $ne: 'wx' }
-      },
-      {
-        $set: {
-          hasInvoice: true
-        }
-      }
-    )
+    data: result
   });
 }
 
 export default NextAPI(handler);
+
+/* 
+  没有 free plan 的用户，加上 free plan
+*/
+async function initFreePlans(teamId: string) {
+  try {
+    const teamSub = await MongoTeamSub.findOne({
+      teamId,
+      type: SubTypeEnum.standard,
+      currentSubLevel: StandardSubLevelEnum.free
+    });
+    if (teamSub) return;
+
+    console.log('创建free plan', teamId);
+    await initTeamFreePlan({ teamId: teamId });
+  } catch (error) {
+    console.log(error);
+    await delay(500);
+    return initFreePlans(teamId);
+  }
+}

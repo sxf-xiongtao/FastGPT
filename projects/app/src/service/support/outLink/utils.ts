@@ -29,6 +29,7 @@ export type outLinkInvokeChatProps<T extends OutlinkAppType> = {
   userQuestion: string;
   res?: NextApiResponse;
   messageId: string;
+  chatUserId: string;
   replyCallback: (replyContent: string) => Promise<any>;
 };
 
@@ -38,6 +39,7 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
   userQuestion,
   res,
   messageId,
+  chatUserId,
   replyCallback
 }: outLinkInvokeChatProps<T>) {
   try {
@@ -65,7 +67,7 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
     }
 
     await authOutLinkLimit({
-      outLinkUid: messageId,
+      outLinkUid: chatUserId,
       outLink: shareChat as any, // HACK, we do not need to provide app: T
       question: userQuestion,
       ip: chatId
@@ -83,10 +85,13 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
     const { assistantResponses, newVariables, flowResponses, flowUsages } = await dispatchWorkFlow({
       res,
       mode: 'chat',
-      teamId: shareChat.teamId,
-      tmbId: shareChat.tmbId,
+      runningAppInfo: {
+        id: String(app._id),
+        teamId: shareChat.teamId,
+        tmbId: shareChat.tmbId
+      },
+      uid: chatUserId || shareChat.tmbId,
       user,
-      app,
       chatId,
       variables: {},
       histories,

@@ -1,3 +1,21 @@
+## dev
+
+1. 先安装一些 canvas 依赖:参考 https://www.npmjs.com/package/canvas Compiling章节
+2. 安装 ioslate-vm 依赖：https://www.npmjs.com/package/isolated-vm?ref=pixeljets.com 也是装 node-gyp
+3. 安装 make 命令
+
+```bash
+# 第一次运行，拉去 submodule，拉取后会多一个 FastGPT 目录，指向开源的 FastGPT。需要进去，手动修改下 git 的 remote，把 upstream 设置成 labring/FastGPT，origin 设置成自己 fork 的仓库。
+git submodule update --init --recursive
+pnpm i
+# 启动商业版
+make dev name=app
+# 启动开源版
+cd FastGPT
+make dev name=app
+make dev name=sandbox
+```
+
 ## build
 
 ```bash

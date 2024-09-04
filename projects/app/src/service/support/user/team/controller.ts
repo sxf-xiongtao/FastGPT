@@ -24,7 +24,7 @@ import { MongoOpenApi } from '@fastgpt/service/support/openapi/schema';
 import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
 import { ClientSession } from '@fastgpt/service/common/mongo';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
-import { initTeamStandardPlan2Free } from '@fastgpt/service/support/wallet/sub/utils';
+import { initTeamFreePlan } from '@fastgpt/service/support/wallet/sub/utils';
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
 import { PerResourceTypeEnum } from '@fastgpt/global/support/permission/constant';
 import { TeamPermission } from '@fastgpt/global/support/permission/user/controller';
@@ -103,7 +103,7 @@ export async function createTeam({
     );
 
     // create sub plan
-    await initTeamStandardPlan2Free({
+    await initTeamFreePlan({
       teamId: team._id,
       session
     });

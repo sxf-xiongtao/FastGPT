@@ -12,10 +12,7 @@ import { addLog } from '@fastgpt/service/common/system/log';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
-import {
-  getStandardPlanConfig,
-  initTeamStandardPlan2Free
-} from '@fastgpt/service/support/wallet/sub/utils';
+import { getStandardPlanConfig, initTeamFreePlan } from '@fastgpt/service/support/wallet/sub/utils';
 import { addMonths } from 'date-fns';
 
 /* 
@@ -79,7 +76,7 @@ export const updateStandardPlan = async () => {
 
       // 余额不足，改成免费版
       if (!balanceEnough) {
-        await initTeamStandardPlan2Free({ teamId: team._id });
+        await initTeamFreePlan({ teamId: team._id });
         return;
       }
 

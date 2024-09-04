@@ -63,6 +63,7 @@ async function handler(
     shareChat,
     messageId: body.MsgId,
     userQuestion: String(body.Content), // Important: must be string. Stupid Wechat could send number which cause errors
+    chatUserId: body.FromUserName,
     replyCallback: async (content: string) => {
       requestReply({
         access_token: await getAccessToken({

@@ -118,6 +118,7 @@ async function handler(
     chatId: event.message.chat_id + event.sender.sender_id.user_id,
     userQuestion: JSON.parse(event.message.content).text as string,
     shareChat,
+    chatUserId: event.sender.sender_id.union_id,
     replyCallback: async (replyContent: string) =>
       replyMessage({
         message_id: event.message.message_id,

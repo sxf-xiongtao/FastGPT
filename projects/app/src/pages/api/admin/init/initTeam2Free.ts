@@ -2,7 +2,7 @@ import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/nex
 import { NextAPI } from '@/service/middleware/entry';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
-import { initTeamStandardPlan2Free } from '@fastgpt/service/support/wallet/sub/utils';
+import { initTeamFreePlan } from '@fastgpt/service/support/wallet/sub/utils';
 
 export type initTeam2FreeQuery = {};
 
@@ -19,7 +19,7 @@ async function handler(
   const { teamId } = req.body as { teamId: string };
 
   await MongoTeamSub.deleteMany({ teamId });
-  await initTeamStandardPlan2Free({ teamId });
+  await initTeamFreePlan({ teamId });
 
   return {};
 }

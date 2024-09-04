@@ -62,6 +62,7 @@ async function handler(
     shareChat,
     messageId: body.MsgId,
     userQuestion: body.Content,
+    chatUserId: body.FromUserName,
     replyCallback: async (content: string) => {
       replyMessage({
         agentid: AgentId,
