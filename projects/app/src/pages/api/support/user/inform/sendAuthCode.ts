@@ -9,6 +9,7 @@ import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 import { sendMessage } from '@/service/support/user/inform/sendMessage';
 import { getMessageTemplate } from '@/service/support/user/inform/constants';
 import { checkTimerLock } from '@fastgpt/service/common/system/timerLock/utils';
+import { authCode } from '@/service/support/user/auth/controller';
 
 const nanoid = customAlphabet('123456789', 6);
 
@@ -17,6 +18,7 @@ export type SendAuthCodeBody = {
   username: string;
   type: `${UserAuthTypeEnum}`;
   googleToken: string;
+  captcha: string;
 };
 export type SendAuthCodeResponse = {};
 
@@ -24,11 +26,17 @@ async function handler(
   req: ApiRequestProps<SendAuthCodeBody, SendAuthCodeQuery>,
   _res: ApiResponseType<any>
 ): Promise<SendAuthCodeResponse> {
-  const { username, type, googleToken } = req.body;
+  const { username, type, googleToken, captcha } = req.body;
 
   if (!username || !type) {
     return Promise.reject(CommonErrEnum.missingParams);
   }
+
+  await authCode({
+    username,
+    type: UserAuthTypeEnum.captcha,
+    code: captcha
+  });
 
   // google auth
   await authGoogleToken({

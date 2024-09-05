@@ -9,6 +9,7 @@ import { userAuthTypeMap } from '@fastgpt/global/support/user/auth/constants';
   2. register
   3. find password
   4. wx login
+  5. captcha
 */
 
 const UserAuthSchema = new Schema({

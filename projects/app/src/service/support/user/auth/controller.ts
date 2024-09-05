@@ -13,10 +13,9 @@ export const authCode = async ({
   const result = await MongoUserAuth.findOne({
     key: username,
     type,
-    code
+    code: type === UserAuthTypeEnum.captcha ? { $regex: new RegExp(code, 'i') } : code
   });
-
-  if (!result || result.code !== code) {
+  if (!result || (type !== UserAuthTypeEnum.captcha && result.code !== code)) {
     return Promise.reject('验证码错误');
   }
 
