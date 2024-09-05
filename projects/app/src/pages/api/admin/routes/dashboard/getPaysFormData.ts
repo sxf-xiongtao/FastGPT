@@ -17,9 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       {
         $match: {
           status: 'SUCCESS',
-          type: {
-            $in: [BillTypeEnum.standSubPlan, BillTypeEnum.extraDatasetSub, BillTypeEnum.extraPoints]
-          },
+          'metadata.payWay': 'wx',
           createTime: {
             $gte: getDashboardDataStartTime()
           }

@@ -94,6 +94,7 @@ const SystemPlugin = () => {
                         id: plugin.id,
                         templateType: plugin.templateType,
                         name: plugin.name,
+                        intro: plugin.intro,
                         avatar: plugin.avatar,
                         weight: plugin.weight ?? 10,
                         originCost: plugin.originCost,

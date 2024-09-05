@@ -1,6 +1,6 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
-import { createCanvas, Canvas, DOMMatrix } from 'canvas';
+import { createCanvas, Canvas, DOMMatrix, registerFont } from 'canvas';
 import { MongoUserAuth } from '@/service/support/user/auth/schema';
 import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
 
@@ -32,32 +32,8 @@ async function handler(
     tempLetter = '';
 
   for (let i = 0; i < 6; i++) {
-    const fontFamilies = [
-      'Arial',
-      'Bradley Hand ITC',
-      'Century',
-      'Century Gothic',
-      'Comic Sans MS',
-      'Courier',
-      'Courier New',
-      'Cursive',
-      'fantasy',
-      'Georgia',
-      'Lucida Sans Unicode',
-      'Papyrus',
-      'Tahoma',
-      'Times New Roman',
-      'Trebuchet MS',
-      'Verdana',
-      'serif',
-      'sans-serif',
-      'monospace',
-      'cursive',
-      'fantasy'
-    ];
     const randomFontSize = `${85 + 40 * Math.random()}px`;
-    const randomFontFamily = fontFamilies[Math.floor(Math.random() * fontFamilies.length)];
-    context.font = randomFontSize + ' ' + randomFontFamily;
+    context.font = randomFontSize + ' FreeFont';
     context.fillStyle = getRandomColor();
     tempLetter = generateCaptchaText();
     answer += tempLetter;

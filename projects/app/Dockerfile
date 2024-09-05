@@ -1,13 +1,17 @@
 # --------- install dependence -----------
-FROM node:20.14.0-alpine AS mainDeps
+FROM node:20.14.0-alpine AS maindeps
 WORKDIR /app
 
 ARG proxy
 
 # if proxy exists, set proxy
 RUN [ -z "$proxy" ] || sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
+
 RUN apk add --no-cache libc6-compat && npm install -g pnpm@9.4.0
-RUN apk add --no-cache build-base cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev
+
+# To install canvas
+RUN apk add --no-cache python3 g++ make cairo-dev pango-dev
+
 RUN [ -z "$proxy" ] || pnpm config set registry https://registry.npmmirror.com
 
 # copy packages and one project
@@ -28,10 +32,10 @@ ARG proxy
 # copy common node_modules and one project node_modules
 COPY package.json pnpm-workspace.yaml .npmrc./
 COPY ./FastGPT/tsconfig.json ./FastGPT/tsconfig.json
-COPY --from=mainDeps /app/FastGPT/packages ./FastGPT/packages
-COPY --from=mainDeps /app/node_modules ./node_modules
+COPY --from=maindeps /app/FastGPT/packages ./FastGPT/packages
+COPY --from=maindeps /app/node_modules ./node_modules
 COPY ./projects/app ./projects/app
-COPY --from=mainDeps /app/projects/app/node_modules ./projects/app/node_modules
+COPY --from=maindeps /app/projects/app/node_modules ./projects/app/node_modules
 
 RUN [ -z "$proxy" ] || sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
 
@@ -54,6 +58,10 @@ RUN [ -z "$proxy" ] || sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /
 RUN apk add --no-cache curl ca-certificates \
   && update-ca-certificates
 
+# To run canvas
+RUN apk add  --no-cache cairo pango libjpeg-turbo giflib
+RUN apk add --no-cache ttf-freefont fontconfig
+
 # copy running files
 COPY --from=builder /app/projects/app/public ./projects/app/public
 COPY --from=builder /app/projects/app/next.config.js ./projects/app/next.config.js
@@ -65,9 +73,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/projects/app/.next/server/chunks 
 COPY --from=builder --chown=nextjs:nodejs /app/projects/app/.next/server/worker /app/projects/app/.next/server/worker
 
 # copy standload packages
-COPY --from=mainDeps /app/node_modules/tiktoken ./node_modules/tiktoken
+COPY --from=maindeps /app/node_modules/tiktoken ./node_modules/tiktoken
 RUN rm -rf ./node_modules/tiktoken/encoders
-COPY --from=mainDeps /app/node_modules/@zilliz/milvus2-sdk-node ./node_modules/@zilliz/milvus2-sdk-node
+COPY --from=maindeps /app/node_modules/@zilliz/milvus2-sdk-node ./node_modules/@zilliz/milvus2-sdk-node
 
 # copy package.json to version file
 COPY --from=builder /app/projects/app/package.json ./package.json 

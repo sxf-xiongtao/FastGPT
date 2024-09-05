@@ -1,10 +1,9 @@
-import { useEffect } from 'react';
 import Head from 'next/head';
 import { ChakraProvider } from '@chakra-ui/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import NProgress from 'nprogress';
-import Router, { useRouter } from 'next/router';
-import { appWithTranslation, useTranslation } from 'next-i18next';
+import Router from 'next/router';
+import { appWithTranslation } from 'next-i18next';
 import { theme } from '@fastgpt/web/styles/theme';
 import Layout from '@/components/Layout';
 
@@ -14,7 +13,6 @@ import 'tailwindcss/tailwind.css';
 import 'nprogress/nprogress.css';
 import '@/styles/reset.scss';
 import '@/styles/default.scss';
-import { change2DefaultLng, setLngStore } from '@/web/common/i18n';
 
 //Binding events.
 Router.events.on('routeChangeStart', () => NProgress.start());
@@ -34,17 +32,6 @@ const queryClient = new QueryClient({
 });
 
 function App({ Component, pageProps }: any) {
-  const router = useRouter();
-  const { i18n } = useTranslation();
-
-  useEffect(() => {
-    const targetLng = change2DefaultLng(i18n.language);
-    if (targetLng) {
-      setLngStore(targetLng);
-      router.replace(router.asPath, undefined, { locale: targetLng });
-    }
-  }, [i18n.language, router]);
-
   return (
     <>
       <Head>
