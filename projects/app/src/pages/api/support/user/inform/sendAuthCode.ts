@@ -34,7 +34,7 @@ async function handler(
 
   await authCode({
     username,
-    type: UserAuthTypeEnum.captcha,
+    type: 'captcha',
     code: captcha
   });
 

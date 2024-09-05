@@ -1,22 +1,24 @@
 import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
 import { MongoUserAuth } from './schema';
+import { i18nT } from '@fastgpt/web/i18n/utils';
 
 export const authCode = async ({
   username,
-  code,
-  type
+  type,
+  code
 }: {
   username: string;
-  code: string;
   type: `${UserAuthTypeEnum}`;
+  code: string;
 }) => {
   const result = await MongoUserAuth.findOne({
     key: username,
     type,
-    code: type === UserAuthTypeEnum.captcha ? { $regex: new RegExp(code, 'i') } : code
+    code: { $regex: new RegExp(code, 'i') }
   });
-  if (!result || (type !== UserAuthTypeEnum.captcha && result.code !== code)) {
-    return Promise.reject('验证码错误');
+
+  if (!result) {
+    return Promise.reject(i18nT('common:error.code_error'));
   }
 
   return 'SUCCESS';

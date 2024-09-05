@@ -2,19 +2,20 @@ import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/nex
 import { NextAPI } from '@/service/middleware/entry';
 import { createCanvas, Canvas, DOMMatrix } from 'canvas';
 import { MongoUserAuth } from '@/service/support/user/auth/schema';
-import { UserAuthTypeEnum, userAuthTypeMap } from '@fastgpt/global/support/user/auth/constants';
-export type captchaQuery = {
+import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
+
+export type getImgCaptchaQuery = {
   username: string;
 };
 
 export type captchaBody = {};
 
-export type captchaResponse = {};
+export type getImgCaptchaResponse = { captchaImage: string };
 
 async function handler(
-  req: ApiRequestProps<captchaBody, captchaQuery>,
+  req: ApiRequestProps<captchaBody, getImgCaptchaQuery>,
   res: ApiResponseType<any>
-): Promise<captchaResponse> {
+): Promise<getImgCaptchaResponse> {
   const canvas = createCanvas(400, 200);
   const context = canvas.getContext('2d');
   context.fillStyle = getRandomColor();
@@ -23,6 +24,7 @@ async function handler(
   const canvasHeight = canvas.height;
   let answer = '',
     tempLetter = '';
+
   for (let i = 0; i < 6; i++) {
     const fontFamilies = [
       'Arial',
@@ -90,6 +92,7 @@ async function handler(
     context.stroke();
   }
   adjustGlobalContrast(canvas, 0.4);
+
   await MongoUserAuth.updateOne(
     {
       key: req.query.username,
@@ -97,13 +100,14 @@ async function handler(
     },
     {
       code: answer,
-      createTime: new Date()
+      createTime: new Date() // reset time
     },
     {
       upsert: true
     }
   );
   const imageSrc = canvas.toDataURL();
+
   return {
     captchaImage: imageSrc
   };
