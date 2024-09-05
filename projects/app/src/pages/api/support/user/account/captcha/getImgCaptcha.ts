@@ -16,6 +16,12 @@ async function handler(
   req: ApiRequestProps<captchaBody, getImgCaptchaQuery>,
   res: ApiResponseType<any>
 ): Promise<getImgCaptchaResponse> {
+  const { username } = req.query;
+
+  if (!username) {
+    return Promise.reject('username is required');
+  }
+
   const canvas = createCanvas(400, 200);
   const context = canvas.getContext('2d');
   context.fillStyle = getRandomColor();
@@ -95,7 +101,7 @@ async function handler(
 
   await MongoUserAuth.updateOne(
     {
-      key: req.query.username,
+      key: username,
       type: UserAuthTypeEnum.captcha
     },
     {
