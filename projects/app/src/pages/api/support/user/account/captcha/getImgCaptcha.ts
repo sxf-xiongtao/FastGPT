@@ -22,7 +22,7 @@ async function handler(
     return Promise.reject('username is required');
   }
 
-  const canvas = createCanvas(400, 200);
+  const canvas = createCanvas(360, 200);
   const context = canvas.getContext('2d');
   context.fillStyle = getRandomColor();
   context.fillRect(0, 0, canvas.width, canvas.height);
@@ -55,24 +55,24 @@ async function handler(
       'cursive',
       'fantasy'
     ];
-    const randomFontSize = `${65 + 60 * Math.random()}px`;
+    const randomFontSize = `${85 + 40 * Math.random()}px`;
     const randomFontFamily = fontFamilies[Math.floor(Math.random() * fontFamilies.length)];
     context.font = randomFontSize + ' ' + randomFontFamily;
     context.fillStyle = getRandomColor();
     tempLetter = generateCaptchaText();
     answer += tempLetter;
-    context.rotate(-0.7 + Math.random() * 1.2);
+    context.rotate(-0.7 + Math.random() * 1);
     context.setTransform(
       new DOMMatrix([
-        Math.random() * 0.12 + 0.88,
-        Math.random() * 0.25,
-        Math.random() * 0.25,
+        Math.random() * 0.1 + 0.9,
+        Math.random() * 0.1,
+        Math.random() * 0.1,
         Math.random() * 0.15 + 0.85,
-        Math.random() * 0.25,
-        Math.random() * 0.25
+        Math.random() * 0.2,
+        Math.random() * 0.2
       ])
     );
-    context.fillText(tempLetter, 10 + (50 + Math.random() * 5) * i, 75);
+    context.fillText(tempLetter, 10 + (50 + Math.random() * 5) * i, 130);
     context.setTransform(new DOMMatrix([1, 0, 0, 1, 0, 0]));
   }
   for (let i = 0; i < 3; i++) {
