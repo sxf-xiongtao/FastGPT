@@ -1,15 +1,19 @@
 import { delay } from '@fastgpt/global/common/system/utils';
-import { CheerioCrawler, LogLevel, EnqueueStrategy, Configuration } from 'crawlee';
+import { LogLevel, EnqueueStrategy, Configuration, PuppeteerCrawler } from 'crawlee';
 import { htmlToMarkdown } from '@fastgpt/service/common/string/utils';
-import { cheerioToHtml } from '@fastgpt/service/common/string/cheerio';
+import { cheerioToHtml, loadContentByCheerio } from '@fastgpt/service/common/string/cheerio';
 import { filterRegxs, excludeList, contentMinLength } from './constants';
 
 export type CrawlDataItemType = { url: string; title: string; content: string };
 
-export const crawlWebsite = async ({
+const maxConcurrency = process.env.CRAWL_MAX_CONCURRENCY
+  ? parseInt(process.env.CRAWL_MAX_CONCURRENCY)
+  : 1;
+
+export const crawlDynamicWebsite = async ({
   uid,
   url,
-  maxPage = 50,
+  maxPage = 200,
   selector = 'body',
   crawlOnePageCallback,
   onSuccess
@@ -28,24 +32,31 @@ export const crawlWebsite = async ({
     persistStorage: false,
     logLevel: LogLevel.INFO
   });
-  let crawler = new CheerioCrawler(
+
+  let crawler = new PuppeteerCrawler(
     {
       maxRequestsPerCrawl: maxPage,
       keepAlive: false,
 
       minConcurrency: 1,
-      maxConcurrency: 1,
+      maxConcurrency,
 
       maxRequestRetries: 3,
       requestHandlerTimeoutSecs: 60,
 
-      async requestHandler({ $, request, enqueueLinks, log }) {
+      async requestHandler({ request, enqueueLinks, log, page }) {
         log.info(request.url);
 
-        const { title, html } = cheerioToHtml({
-          fetchUrl: request.url,
+        // await page.waitForSelector(selector);
+        await page.waitForNetworkIdle();
+
+        const content = await page.content();
+
+        const $ = await loadContentByCheerio(content);
+        const { html, title } = cheerioToHtml({
           $,
-          selector
+          selector,
+          fetchUrl: request.url
         });
 
         const markdown = await htmlToMarkdown(html);
@@ -73,7 +84,7 @@ export const crawlWebsite = async ({
           exclude: excludeList
         });
       },
-      errorHandler({ error, request }) {
+      errorHandler({ error }) {
         console.log(error);
       }
     },
@@ -83,6 +94,7 @@ export const crawlWebsite = async ({
   function stopCrawler() {
     crawler.requestQueue?.drop();
     crawler.requestList = undefined;
+    crawler.browserPool.destroy();
     crawler.teardown();
     // @ts-ignore
     crawler = undefined;

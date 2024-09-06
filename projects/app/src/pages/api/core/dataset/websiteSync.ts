@@ -21,10 +21,12 @@ import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/sch
 import { checkTeamWebSyncPermission } from '@/service/support/permission/teamLimit';
 import { MongoBill } from '@/service/support/wallet/bill/schema';
 import { WritePermissionVal } from '@fastgpt/global/support/permission/constant';
+import { crawlDynamicWebsite } from '@/service/common/crawler/crawlDynamicWebsite';
 
 // config
-const maxCrawlPage = 200;
+const maxCrawlPage = process.env.MAX_CRAWL_PAGE ? parseInt(process.env.MAX_CRAWL_PAGE) : 200;
 const chunkSize = 768;
+const dynamic = process.env.CRAWL_DYNAMIC_WEBSITE === 'true';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { datasetId, billId } = req.body as PostWebsiteSyncParams;
@@ -48,7 +50,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await mongoSessionRun((session) => delDatasetRelevantData({ datasets: [dataset], session }));
 
     // 2. crawl all website
-    crawlWebsite({
+    const crawl = dynamic ? crawlDynamicWebsite : crawlWebsite;
+    crawl({
       uid: datasetId,
       url: dataset.websiteConfig.url.trim(),
       maxPage: maxCrawlPage,
