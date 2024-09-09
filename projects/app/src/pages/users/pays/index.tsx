@@ -106,7 +106,7 @@ const BillTable = () => {
     isLoading,
     ScrollData,
     getData
-  } = usePagination<BillSchemaType>({
+  } = usePagination({
     api: getPays,
     pageSize: 20,
     params: {

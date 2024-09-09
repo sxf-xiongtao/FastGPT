@@ -5,6 +5,19 @@ import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
+import { PagingData } from '@/types';
+import { UserModelSchema } from '@fastgpt/global/support/user/type';
+
+type Team = {
+  id: string;
+  name: string;
+  balance: number;
+  createTime: Date;
+  ownerName: string;
+  owner: UserModelSchema;
+};
+
+export type getTeamsResponse = PagingData<Team>;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -39,7 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const teams = await Promise.all(
       records.map(async (team) => {
-        const owner = await MongoUser.find({
+        const owner = await MongoUser.findOne({
           _id: team.ownerId
         });
 
@@ -48,9 +61,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           name: team.name,
           balance: formatStorePrice2Read(team.balance),
           createTime: team.createTime,
-          owner: owner,
-          ownerName: owner[0]?.username
-        };
+          owner,
+          ownerName: owner?.username
+        } as Team;
       })
     );
 

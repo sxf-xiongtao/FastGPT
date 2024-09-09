@@ -10,7 +10,8 @@ import {
   Flex,
   Box,
   HStack,
-  ModalBody
+  ModalBody,
+  Button
 } from '@chakra-ui/react';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { usePagination } from '@fastgpt/web/hooks/usePagination';
@@ -18,10 +19,13 @@ import MyModal from '@fastgpt/web/components/common/MyModal';
 import { getDatasets } from '@/web/admin/datasets/api';
 import BoxCard from '@/components/common/BoxContainer/Card';
 import { serviceSideProps } from '@/web/common/i18n';
+import { useRouter } from 'next/router';
+import { type InferGetServerSidePropsType } from 'next';
 
-const DatasetTable = () => {
+const DatasetTable = ({ FE_URL }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [appDetail, setAppDetail] = useState();
   const elementRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const {
     data: datasets,
@@ -38,6 +42,10 @@ const DatasetTable = () => {
   useEffect(() => {
     getData(1);
   }, [getData]);
+
+  const routeToDataset = (id: string) => {
+    window.open(FE_URL + '/dataset/detail?datasetId=' + id, '_blank');
+  };
 
   return (
     <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
@@ -64,6 +72,7 @@ const DatasetTable = () => {
                   <Th>介绍</Th>
                   <Th>数据量</Th>
                   <Th>向量总数</Th>
+                  <Th></Th>
                 </Tr>
               </Thead>
               <Tbody fontSize={'sm'}>
@@ -71,10 +80,28 @@ const DatasetTable = () => {
                   <Tr key={i}>
                     <Td>{i + 1}</Td>
                     <Td>{item.name}</Td>
-                    <Td>{item.username}</Td>
+                    <Td
+                      cursor={'pointer'}
+                      onClick={() => {
+                        router.push(`/users/users?username=${item.username}`);
+                      }}
+                    >
+                      {item.username}
+                    </Td>
                     <Td>{item.intro}</Td>
                     <Td>{item.totalDatas}</Td>
                     <Td>{item.totalVectors}</Td>
+                    <Td>
+                      <HStack>
+                        <Button
+                          variant={'whiteBase'}
+                          size={'sm'}
+                          onClick={() => routeToDataset(item.id)}
+                        >
+                          跳转
+                        </Button>
+                      </HStack>
+                    </Td>
                   </Tr>
                 ))}
               </Tbody>
@@ -135,9 +162,11 @@ function AppDetailModal({ app, onClose }: { app: any; onClose: () => void }) {
 }
 
 export async function getServerSideProps(content: any) {
+  const FE_URL = process.env.FE_URL;
   return {
     props: {
-      ...(await serviceSideProps(content))
+      ...(await serviceSideProps(content)),
+      FE_URL
     }
   };
 }

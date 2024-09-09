@@ -8,12 +8,17 @@ import {
 } from '@fastgpt/global/common/system/types';
 import { SSOEnum } from '@/global/user/auth/constants';
 
-export type PagingData<T> = {
+export type PagingData<T = never> = {
   pageNum: number;
   pageSize: number;
   data: T[];
   total?: number;
 };
+
+export type PagingParams<T = Record<string, any>> = {
+  pageNum: number;
+  pageSize: number;
+} & T;
 
 export type RequestPaging = { pageNum: number; pageSize: number; [key]: any };
 

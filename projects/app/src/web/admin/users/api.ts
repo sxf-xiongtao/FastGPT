@@ -1,7 +1,13 @@
+import type { getTeamsResponse } from '@/pages/api/admin/routes/teams/getTeams';
+import type { AdminGetUsersResponse } from '@/pages/api/admin/routes/users/getUsers';
+import { PlanType } from '@/pages/users/plans';
 import { POST } from '@/service/common/request';
+import { PagingData } from '@/types';
 
-export const getUsers = (data: any) => POST('/admin/routes/users/getUsers', data);
+export const getUsers = (data: any) =>
+  POST<AdminGetUsersResponse>('/admin/routes/users/getUsers', data);
 
-export const getTeams = (data: any) => POST('/admin/routes/teams/getTeams', data);
+export const getTeams = (data: any) => POST<getTeamsResponse>('/admin/routes/teams/getTeams', data);
 
-export const getPlans = (data: any) => POST('/admin/routes/plans/getPlans', data);
+export const getPlans = (data: any) =>
+  POST<PagingData<PlanType>>('/admin/routes/plans/getPlans', data);

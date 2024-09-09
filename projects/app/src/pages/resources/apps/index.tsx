@@ -19,10 +19,13 @@ import { getApps } from '@/web/admin/apps/api';
 import MyModal from '@fastgpt/web/components/common/MyModal';
 import BoxCard from '@/components/common/BoxContainer/Card';
 import { serviceSideProps } from '@/web/common/i18n';
+import { useRouter } from 'next/router';
+import { type InferGetServerSidePropsType } from 'next';
 
-const AppTable = () => {
-  const [appDetail, setAppDetail] = useState();
+const AppTable = ({ FE_URL }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const [appDetail, setAppDetail] = useState<any>();
   const elementRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const {
     data: apps,
@@ -40,6 +43,10 @@ const AppTable = () => {
   useEffect(() => {
     getData(1);
   }, [getData]);
+
+  const routeToApp = (id: string) => {
+    window.open(FE_URL + '/app/detail?appId=' + id, '_blank');
+  };
 
   return (
     <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
@@ -62,7 +69,7 @@ const AppTable = () => {
                 <Tr>
                   <Th>#</Th>
                   <Th>应用名</Th>
-                  <Th>收藏数</Th>
+                  <Th>创建者</Th>
                   <Th>介绍</Th>
                   <Th></Th>
                 </Tr>
@@ -72,12 +79,32 @@ const AppTable = () => {
                   <Tr key={i}>
                     <Td>{i + 1}</Td>
                     <Td>{item.name}</Td>
-                    <Td>{item['share.collection']}</Td>
+                    <Td
+                      cursor={'pointer'}
+                      onClick={() => {
+                        router.push(`/users/users?username=${item.username}`);
+                      }}
+                    >
+                      {item.username}
+                    </Td>
                     <Td>{item.intro}</Td>
-                    <Td>
-                      <Button variant={'whiteBase'} size={'sm'} onClick={() => setAppDetail(item)}>
-                        详情
-                      </Button>
+                    <Td textAlign={'center'}>
+                      <HStack spacing={2} ml={4}>
+                        <Button
+                          variant={'whiteBase'}
+                          size={'sm'}
+                          onClick={() => setAppDetail(item)}
+                        >
+                          详情
+                        </Button>
+                        <Button
+                          variant={'whiteBase'}
+                          size={'sm'}
+                          onClick={() => routeToApp(item.id)}
+                        >
+                          跳转
+                        </Button>
+                      </HStack>
                     </Td>
                   </Tr>
                 ))}
@@ -130,8 +157,12 @@ function AppDetailModal({ app, onClose }: { app: any; onClose: () => void }) {
           <Box>{app.intro}</Box>
         </Flex>
         <Flex alignItems={'center'} pb={4}>
-          <Box flex={'0 0 120px'}>收藏数:</Box>
-          <Box>{app['share.collection']}</Box>
+          <Box flex={'0 0 120px'}>创建者:</Box>
+          <Box>{app.username}</Box>
+        </Flex>
+        <Flex alignItems={'center'} pb={4}>
+          <Box flex={'0 0 120px'}>创建者 ID:</Box>
+          <Box>{app.userId}</Box>
         </Flex>
       </ModalBody>
     </MyModal>
@@ -139,9 +170,11 @@ function AppDetailModal({ app, onClose }: { app: any; onClose: () => void }) {
 }
 
 export async function getServerSideProps(content: any) {
+  const FE_URL = process.env.FE_URL;
   return {
     props: {
-      ...(await serviceSideProps(content))
+      ...(await serviceSideProps(content)),
+      FE_URL
     }
   };
 }

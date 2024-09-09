@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Button,
   Table,
@@ -27,12 +27,16 @@ import { UserModelSchema } from '@fastgpt/global/support/user/type';
 import UserAddModal from './components/UserAddModal';
 import BoxCard from '@/components/common/BoxContainer/Card';
 import { serviceSideProps } from '@/web/common/i18n';
+import { useRouter } from 'next/router';
 
 const UserTable = () => {
-  const [username, setUsername] = useState<string>();
-  const [userDetail, setUserDetail] = useState();
+  // const [username, setUsername] = useState<string>();
+  const [userDetail, setUserDetail] = useState<UserModelSchema>();
   const elementRef = useRef<HTMLDivElement>(null);
   const [isMobile] = useMediaQuery('(max-width: 768px)');
+  const router = useRouter();
+  const username = useMemo(() => router.query.username ?? '', [router.query.username]);
+  const queryUsername = useRef<string>('');
 
   const {
     data: users,
@@ -53,7 +57,7 @@ const UserTable = () => {
 
   useEffect(() => {
     getData(1);
-  }, [getData]);
+  }, [getData, username]);
 
   return (
     <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
@@ -76,10 +80,12 @@ const UserTable = () => {
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 setUsers([]);
-                getData(1);
+                router.replace(`/users/users?username=${queryUsername.current}`);
               }
             }}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => {
+              queryUsername.current = e.target.value;
+            }}
             size={'sm'}
           ></Input>
         </InputGroup>

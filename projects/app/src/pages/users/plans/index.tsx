@@ -51,7 +51,7 @@ const PlanTable = () => {
     isLoading,
     ScrollData,
     getData
-  } = usePagination<PlanType>({
+  } = usePagination({
     api: getPlans,
     pageSize: 20,
     params: {

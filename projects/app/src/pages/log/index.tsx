@@ -42,7 +42,7 @@ const LogTable = () => {
     isLoading,
     ScrollData,
     getData
-  } = usePagination<SystemLogType>({
+  } = usePagination({
     api: getSystemLogList,
     pageSize: 20,
     params: {

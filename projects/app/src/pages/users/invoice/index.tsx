@@ -46,7 +46,7 @@ const InvoiceManageTable = () => {
     isLoading,
     ScrollData,
     getData
-  } = usePagination<InvoiceSchemaType>({
+  } = usePagination({
     api: getInvoiceList,
     pageSize: 20,
     params: {

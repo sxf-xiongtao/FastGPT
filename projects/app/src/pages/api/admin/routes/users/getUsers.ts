@@ -1,53 +1,40 @@
-import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
-import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
+import { NextAPI } from '@/service/middleware/entry';
+import { PagingData, PagingParams } from '@/types';
+import { UserModelSchema } from '@fastgpt/global/support/user/type';
 
-export const isValidObjectIdString = (str: string) => {
-  const mongoose = require('mongoose');
-  return mongoose.Types.ObjectId.isValid(str);
-};
+export type AdminGetUsersQuery = {};
+export type AdminGetUsersBody = PagingParams<{
+  username: string;
+}>;
+export type AdminGetUsersResponse = PagingData<UserModelSchema>;
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    await connectToDatabase();
-    await adminCert({ req, authToken: true });
+async function handler(
+  req: ApiRequestProps<AdminGetUsersBody, AdminGetUsersQuery>,
+  _res: ApiResponseType<any>
+): Promise<AdminGetUsersResponse> {
+  await adminCert({ req, authToken: true });
+  const { pageNum = 1, pageSize = 20, username } = req.body;
 
-    const {
-      pageNum = 1,
-      pageSize = 20,
-      username
-    } = req.body as {
-      pageNum: number;
-      pageSize: number;
-      username: string;
-    };
+  const match = {
+    username: new RegExp(username, 'i')
+  };
 
-    const match = {
-      username: new RegExp(username, 'i')
-    };
-
-    const [records, total] = await Promise.all([
-      MongoUser.find(match)
-        .sort({ createTime: -1 })
-        .skip((pageNum - 1) * pageSize)
-        .limit(pageSize),
-      MongoUser.countDocuments(match)
-    ]);
-
-    jsonRes(res, {
-      data: {
-        pageNum,
-        pageSize,
-        data: records,
-        total
-      }
-    });
-  } catch (err) {
-    jsonRes(res, {
-      code: 500,
-      error: err
-    });
-  }
+  const [records, total] = await Promise.all([
+    MongoUser.find(match)
+      .sort({ createTime: -1 })
+      .skip((pageNum - 1) * pageSize)
+      .limit(pageSize)
+      .lean(),
+    MongoUser.countDocuments(match)
+  ]);
+  return {
+    total,
+    pageNum,
+    pageSize,
+    data: records
+  };
 }
+export default NextAPI(handler);

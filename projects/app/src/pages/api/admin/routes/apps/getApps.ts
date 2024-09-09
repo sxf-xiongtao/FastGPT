@@ -1,91 +1,66 @@
-import { connectToDatabase } from '@/service/mongo';
-import { adminCert } from '@/service/support/permission/adminCert';
-import { jsonRes } from '@fastgpt/service/common/response';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
+import { NextAPI } from '@/service/middleware/entry';
 import { MongoApp } from '@fastgpt/service/core/app/schema';
+import { PagingData } from '@/types';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
+import { adminCert } from '@/service/support/permission/adminCert';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    await connectToDatabase();
-    await adminCert({ req, authToken: true });
+type AppType = {
+  id: string;
+  username: string;
+  userId: string;
+  name: string;
+  intro: string;
+};
 
-    const {
-      pageNum = 1,
-      pageSize = 20,
-      username
-    } = req.body as {
-      pageNum: number;
-      pageSize: number;
-      username: string;
-    };
+export type AdminGetAPPQuery = {};
+export type AdminGetAPPBody = PagingData;
+export type AdminGetAPPResponse = PagingData<AppType>;
 
-    const match = {
-      username: new RegExp(username, 'i')
-    };
+async function handler(
+  req: ApiRequestProps<AdminGetAPPBody, AdminGetAPPQuery>,
+  _res: ApiResponseType<any>
+): Promise<AdminGetAPPResponse> {
+  await adminCert({ req, authToken: true });
+  const { pageNum = 1, pageSize = 20 } = req.body;
 
-    // const modelsRaw = await MongoApp.find(where)
-    //   .skip(start)
-    //   .limit(end - start)
-    //   .sort({ 'share.collection': -1 });
+  const [apps, total] = await Promise.all([
+    MongoApp.find()
+      .sort({ createTime: -1 })
+      .skip((pageNum - 1) * pageSize)
+      .limit(pageSize),
+    MongoApp.countDocuments()
+  ]);
 
-    // const models = [];
+  const tmbIdList = Array.from(new Set(apps.map((app) => String(app.tmbId))));
+  const tmbList = await MongoTeamMember.find({
+    _id: {
+      $in: tmbIdList
+    }
+  }).populate('userId');
 
-    // for (const modelRaw of modelsRaw) {
-    //   const app: any = modelRaw.toObject();
-
-    //   const orderedModel = {
-    //     id: app._id.toString(),
-    //     userId: app.userId,
-    //     name: app.name,
-    //     intro: app.intro,
-    //     systemPrompt: app.chat?.systemPrompt || '',
-    //     temperature: app.chat?.temperature || 0,
-    //     'share.topNum': app.share?.topNum || 0,
-    //     'share.isShare': app.share?.isShare || false,
-    //     'share.collection': app.share?.collection || 0
-    //   };
-
-    //   models.push(orderedModel);
-    // }
-    // const totalCount = await MongoApp.countDocuments(where);
-
-    const [records, total] = await Promise.all([
-      MongoApp.find(match)
-        .sort({ createTime: -1 })
-        .skip((pageNum - 1) * pageSize)
-        .limit(pageSize),
-      MongoApp.countDocuments(match)
-    ]);
-
-    const newRecords = await Promise.all(
-      records.map(async (record) => {
-        const app: any = record.toObject();
-        return {
-          id: app._id.toString(),
-          userId: app.userId,
-          name: app.name,
-          intro: app.intro,
-          systemPrompt: app.chat?.systemPrompt || '',
-          temperature: app.chat?.temperature || 0,
-          'share.topNum': app.share?.topNum || 0,
-          'share.isShare': app.share?.isShare || false,
-          'share.collection': app.share?.collection || 0
-        };
-      })
-    );
-
-    jsonRes(res, {
-      data: {
-        pageNum,
-        pageSize,
-        data: newRecords,
-        total
-      }
-    });
-  } catch (err) {
-    jsonRes(res, {
-      code: 500,
-      error: err
-    });
-  }
+  const newRecords: AppType[] = await Promise.all(
+    apps.map(async (app) => {
+      return {
+        id: app._id.toString(),
+        name: app.name,
+        intro: app.intro,
+        userId:
+          (
+            tmbList.find((tmb) => String(tmb._id) === String(app.tmbId))?.userId as any
+          )._id.toString() || '',
+        username:
+          (tmbList.find((tmb) => String(tmb._id) === String(app.tmbId))?.userId as any)?.username ||
+          ''
+      };
+    })
+  );
+  return {
+    total,
+    pageNum,
+    pageSize,
+    data: newRecords
+  };
 }
+
+export default NextAPI(handler);
