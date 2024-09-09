@@ -79,14 +79,7 @@ const AppTable = ({ FE_URL }: InferGetServerSidePropsType<typeof getServerSidePr
                   <Tr key={i}>
                     <Td>{i + 1}</Td>
                     <Td>{item.name}</Td>
-                    <Td
-                      cursor={'pointer'}
-                      onClick={() => {
-                        router.push(`/users/users?username=${item.username}`);
-                      }}
-                    >
-                      {item.username}
-                    </Td>
+                    <Td>{item.username}</Td>
                     <Td>{item.intro}</Td>
                     <Td textAlign={'center'}>
                       <HStack spacing={2} ml={4}>
