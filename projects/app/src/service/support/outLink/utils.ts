@@ -22,6 +22,7 @@ import { addLog } from '@fastgpt/service/common/system/log';
 import { getErrText } from '@fastgpt/global/common/error/utils';
 import { getUsageSourceByPublishChannel } from '@fastgpt/global/support/wallet/usage/tools';
 import { getChatSourceByPublishChannel } from '@fastgpt/global/core/chat/utils';
+import { WORKFLOW_MAX_RUN_TIMES } from '@fastgpt/service/core/workflow/constants';
 
 export type outLinkInvokeChatProps<T extends OutlinkAppType> = {
   shareChat: OutLinkSchema<T>;
@@ -100,7 +101,7 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
       stream: false,
       runtimeEdges: initWorkflowEdgeStatus(edges),
       runtimeNodes: storeNodes2RuntimeNodes(nodes, getWorkflowEntryNodeIds(nodes)),
-      maxRunTimes: 200
+      maxRunTimes: WORKFLOW_MAX_RUN_TIMES
     });
 
     const responseContent = assistantResponses
