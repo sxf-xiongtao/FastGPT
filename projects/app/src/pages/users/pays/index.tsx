@@ -97,15 +97,13 @@ const BillTable = () => {
   const [billType, setBillType] = useState<BillTypeEnum | 'ALL'>('ALL');
   const [username, setUsername] = useState<string>();
   const [billDetail, setBillDetail] = useState<BillSchemaType>();
-  const elementRef = useRef<HTMLDivElement>(null);
   const [isMobile] = useMediaQuery('(max-width: 768px)');
 
   const {
     data: bills,
     setData: setBills,
     isLoading,
-    ScrollData,
-    getData
+    ScrollData
   } = usePagination({
     api: getPays,
     pageSize: 20,
@@ -115,14 +113,8 @@ const BillTable = () => {
       username
     },
     type: 'scroll',
-    defaultRequest: false,
-    elementRef
+    refreshDeps: [billType, username]
   });
-
-  useEffect(() => {
-    setBills([]);
-    getData(1);
-  }, [billType, getData, setBills]);
 
   return (
     <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
@@ -134,89 +126,75 @@ const BillTable = () => {
             <MyIcon name="common/searchLight" w={4} color={'myGray.400'} />
           </InputLeftElement>
           <Input
-            placeholder="请输入用户名，回车搜索"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                setBills([]);
-                getData(1);
-              }
-            }}
+            placeholder="请输入用户名搜索"
             onChange={(e) => setUsername(e.target.value)}
             size={'sm'}
           ></Input>
         </InputGroup>
       </HStack>
-      <Box
-        position={'relative'}
-        h={'100%'}
-        overflow={'overlay'}
-        ref={elementRef}
-        py={[0, 5]}
-        px={[3, 8]}
-      >
-        <ScrollData>
-          <TableContainer>
-            <Table>
-              <Thead>
-                <Tr>
-                  <Th>#</Th>
-                  <Th>用户名</Th>
-                  <Th>
-                    <MySelect<BillTypeEnum | 'ALL'>
-                      list={billTypeList}
-                      value={billType}
-                      size={'sm'}
-                      onchange={(e) => {
-                        setBillType(e);
-                      }}
-                      w={'130px'}
-                    ></MySelect>
-                  </Th>
-                  <Th>时间</Th>
-                  <Th>金额</Th>
-                  <Th></Th>
-                </Tr>
-              </Thead>
-              <Tbody fontSize={'sm'}>
-                {bills.map((item, i) => (
-                  <Tr key={i}>
-                    <Td>{i + 1}</Td>
-                    {/* @ts-ignore */}
-                    <Td>{item.username}</Td>
-                    <Td>{billTypeMap[item.type]?.label}</Td>
-                    <Td>
-                      {item.createTime ? dayjs(item.createTime).format('YYYY/MM/DD HH:mm:ss') : '-'}
-                    </Td>
-                    <Td>{formatStorePrice2Read(item.price)}元</Td>
-                    <Td>
-                      <Button variant={'whiteBase'} size={'sm'} onClick={() => setBillDetail(item)}>
-                        详情
-                      </Button>
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-            {!isLoading && bills.length === 0 && (
-              <Flex
-                mt={'20vh'}
-                flexDirection={'column'}
-                alignItems={'center'}
-                justifyContent={'center'}
-              >
-                <MyIcon name="empty" w={'48px'} h={'48px'} color={'transparent'} />
-                <Box mt={2} color={'myGray.500'}>
-                  无账单记录～
-                </Box>
-              </Flex>
-            )}
-          </TableContainer>
-        </ScrollData>
 
-        {!!billDetail && (
-          <BillDetailModal bill={billDetail} onClose={() => setBillDetail(undefined)} />
-        )}
-      </Box>
+      <ScrollData position={'relative'} h={'100%'} py={[0, 5]} px={[3, 8]}>
+        <TableContainer>
+          <Table>
+            <Thead>
+              <Tr>
+                <Th>#</Th>
+                <Th>用户名</Th>
+                <Th>
+                  <MySelect<BillTypeEnum | 'ALL'>
+                    list={billTypeList}
+                    value={billType}
+                    size={'sm'}
+                    onchange={(e) => {
+                      setBillType(e);
+                    }}
+                    w={'130px'}
+                  ></MySelect>
+                </Th>
+                <Th>时间</Th>
+                <Th>金额</Th>
+                <Th></Th>
+              </Tr>
+            </Thead>
+            <Tbody fontSize={'sm'}>
+              {bills.map((item, i) => (
+                <Tr key={i}>
+                  <Td>{i + 1}</Td>
+                  {/* @ts-ignore */}
+                  <Td>{item.username}</Td>
+                  <Td>{billTypeMap[item.type]?.label}</Td>
+                  <Td>
+                    {item.createTime ? dayjs(item.createTime).format('YYYY/MM/DD HH:mm:ss') : '-'}
+                  </Td>
+                  <Td>{formatStorePrice2Read(item.price)}元</Td>
+                  <Td>
+                    <Button variant={'whiteBase'} size={'sm'} onClick={() => setBillDetail(item)}>
+                      详情
+                    </Button>
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+          {!isLoading && bills.length === 0 && (
+            <Flex
+              mt={'20vh'}
+              flexDirection={'column'}
+              alignItems={'center'}
+              justifyContent={'center'}
+            >
+              <MyIcon name="empty" w={'48px'} h={'48px'} color={'transparent'} />
+              <Box mt={2} color={'myGray.500'}>
+                无账单记录～
+              </Box>
+            </Flex>
+          )}
+        </TableContainer>
+      </ScrollData>
+
+      {!!billDetail && (
+        <BillDetailModal bill={billDetail} onClose={() => setBillDetail(undefined)} />
+      )}
     </BoxCard>
   );
 };

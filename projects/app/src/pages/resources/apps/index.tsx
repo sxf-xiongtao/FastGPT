@@ -19,30 +19,20 @@ import { getApps } from '@/web/admin/apps/api';
 import MyModal from '@fastgpt/web/components/common/MyModal';
 import BoxCard from '@/components/common/BoxContainer/Card';
 import { serviceSideProps } from '@/web/common/i18n';
-import { useRouter } from 'next/router';
 import { type InferGetServerSidePropsType } from 'next';
 
 const AppTable = ({ FE_URL }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [appDetail, setAppDetail] = useState<any>();
-  const elementRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
   const {
     data: apps,
     isLoading,
-    ScrollData,
-    getData
+    ScrollData
   } = usePagination({
     api: getApps,
     pageSize: 20,
-    type: 'scroll',
-    defaultRequest: false,
-    elementRef
+    type: 'scroll'
   });
-
-  useEffect(() => {
-    getData(1);
-  }, [getData]);
 
   const routeToApp = (id: string) => {
     window.open(FE_URL + '/app/detail?appId=' + id, '_blank');
@@ -54,73 +44,56 @@ const AppTable = ({ FE_URL }: InferGetServerSidePropsType<typeof getServerSidePr
         <Box className="text-2xl font-bold text-[#405169]">应用列表</Box>
         <Box className="flex-grow"></Box>
       </HStack>
-      <Box
-        position={'relative'}
-        h={'100%'}
-        overflow={'overlay'}
-        ref={elementRef}
-        py={[0, 5]}
-        px={[3, 8]}
-      >
-        <ScrollData>
-          <TableContainer>
-            <Table>
-              <Thead>
-                <Tr>
-                  <Th>#</Th>
-                  <Th>应用名</Th>
-                  <Th>创建者</Th>
-                  <Th>介绍</Th>
-                  <Th></Th>
+      <ScrollData position={'relative'} h={'100%'} py={[0, 5]} px={[3, 8]}>
+        <TableContainer>
+          <Table>
+            <Thead>
+              <Tr>
+                <Th>#</Th>
+                <Th>应用名</Th>
+                <Th>创建者</Th>
+                <Th>介绍</Th>
+                <Th></Th>
+              </Tr>
+            </Thead>
+            <Tbody fontSize={'sm'}>
+              {apps.map((item, i) => (
+                <Tr key={i}>
+                  <Td>{i + 1}</Td>
+                  <Td>{item.name}</Td>
+                  <Td>{item.username}</Td>
+                  <Td>{item.intro}</Td>
+                  <Td textAlign={'center'}>
+                    <HStack spacing={2} ml={4}>
+                      <Button variant={'whiteBase'} size={'sm'} onClick={() => setAppDetail(item)}>
+                        详情
+                      </Button>
+                      <Button variant={'whiteBase'} size={'sm'} onClick={() => routeToApp(item.id)}>
+                        跳转
+                      </Button>
+                    </HStack>
+                  </Td>
                 </Tr>
-              </Thead>
-              <Tbody fontSize={'sm'}>
-                {apps.map((item, i) => (
-                  <Tr key={i}>
-                    <Td>{i + 1}</Td>
-                    <Td>{item.name}</Td>
-                    <Td>{item.username}</Td>
-                    <Td>{item.intro}</Td>
-                    <Td textAlign={'center'}>
-                      <HStack spacing={2} ml={4}>
-                        <Button
-                          variant={'whiteBase'}
-                          size={'sm'}
-                          onClick={() => setAppDetail(item)}
-                        >
-                          详情
-                        </Button>
-                        <Button
-                          variant={'whiteBase'}
-                          size={'sm'}
-                          onClick={() => routeToApp(item.id)}
-                        >
-                          跳转
-                        </Button>
-                      </HStack>
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-            {!isLoading && apps.length === 0 && (
-              <Flex
-                mt={'20vh'}
-                flexDirection={'column'}
-                alignItems={'center'}
-                justifyContent={'center'}
-              >
-                <MyIcon name="empty" w={'48px'} h={'48px'} color={'transparent'} />
-                <Box mt={2} color={'myGray.500'}>
-                  无应用记录～
-                </Box>
-              </Flex>
-            )}
-          </TableContainer>
-        </ScrollData>
+              ))}
+            </Tbody>
+          </Table>
+          {!isLoading && apps.length === 0 && (
+            <Flex
+              mt={'20vh'}
+              flexDirection={'column'}
+              alignItems={'center'}
+              justifyContent={'center'}
+            >
+              <MyIcon name="empty" w={'48px'} h={'48px'} color={'transparent'} />
+              <Box mt={2} color={'myGray.500'}>
+                无应用记录～
+              </Box>
+            </Flex>
+          )}
+        </TableContainer>
+      </ScrollData>
 
-        {!!appDetail && <AppDetailModal app={appDetail} onClose={() => setAppDetail(undefined)} />}
-      </Box>
+      {!!appDetail && <AppDetailModal app={appDetail} onClose={() => setAppDetail(undefined)} />}
     </BoxCard>
   );
 };

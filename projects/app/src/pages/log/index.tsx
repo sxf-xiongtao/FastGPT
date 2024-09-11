@@ -22,7 +22,7 @@ import MyIcon from '@fastgpt/web/components/common/Icon';
 import MyModal from '@fastgpt/web/components/common/MyModal';
 import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import dayjs from 'dayjs';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 import { SystemLogType } from '@fastgpt/service/common/system/log/type';
 import { getSystemLogList } from '@/web/admin/common/api';
@@ -34,7 +34,6 @@ const LogTable = () => {
   const [search, setSearch] = useState<string>();
   const [logLevel, setLogLevel] = useState<LogLevelEnum[]>([LogLevelEnum.error]);
   const [logDetail, setLogDetail] = useState<SystemLogType>();
-  const elementRef = useRef<HTMLDivElement>(null);
 
   const {
     data: logs,
@@ -50,13 +49,8 @@ const LogTable = () => {
       logLevel
     },
     type: 'scroll',
-    defaultRequest: false,
-    elementRef
+    refreshDeps: [logLevel, search]
   });
-  useEffect(() => {
-    setLogs([]);
-    getData(1);
-  }, [getData, logLevel, setLogs]);
 
   return (
     <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
@@ -69,75 +63,61 @@ const LogTable = () => {
           </InputLeftElement>
           <Input
             placeholder="请想要查找的日志内容，回车搜索"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                setLogs([]);
-                getData(1);
-              }
-            }}
             size={'sm'}
             onChange={(e) => setSearch(e.target.value)}
           ></Input>
         </InputGroup>
       </HStack>
-      <Box
-        position={'relative'}
-        h={'100%'}
-        overflow={'overlay'}
-        ref={elementRef}
-        py={[0, 5]}
-        px={[3, 8]}
-      >
-        <ScrollData>
-          <TableContainer>
-            <Table>
-              <Thead>
-                <Tr>
-                  <Th>时间</Th>
-                  <Th>
-                    <LevelPopover logLevels={logLevel} setLogLevels={setLogLevel} />{' '}
-                  </Th>
-                  <Th>日志内容</Th>
-                  <Th>metadata</Th>
-                  <Th></Th>
+
+      <ScrollData position={'relative'} h={'100%'} overflow={'overlay'} py={[0, 5]} px={[3, 8]}>
+        <TableContainer>
+          <Table>
+            <Thead>
+              <Tr>
+                <Th>时间</Th>
+                <Th>
+                  <LevelPopover logLevels={logLevel} setLogLevels={setLogLevel} />{' '}
+                </Th>
+                <Th>日志内容</Th>
+                <Th>metadata</Th>
+                <Th></Th>
+              </Tr>
+            </Thead>
+            <Tbody fontSize={'sm'}>
+              {logs.map((item, i) => (
+                <Tr key={i}>
+                  <Td>{item.time ? dayjs(item.time).format('YYYY/MM/DD HH:mm:ss') : '-'}</Td>
+                  <Td maxW={'180px'}>{LogLevelEnum[item.level]}</Td>
+                  <Td maxW={'300px'} className="textEllipsis">
+                    {item.text}
+                  </Td>
+                  <Td maxW={'300px'} className="textEllipsis">
+                    {JSON.stringify(item.metadata)}
+                  </Td>
+                  <Td>
+                    <Button variant={'whiteBase'} onClick={() => setLogDetail(item)}>
+                      详情
+                    </Button>
+                  </Td>
                 </Tr>
-              </Thead>
-              <Tbody fontSize={'sm'}>
-                {logs.map((item, i) => (
-                  <Tr key={i}>
-                    <Td>{item.time ? dayjs(item.time).format('YYYY/MM/DD HH:mm:ss') : '-'}</Td>
-                    <Td maxW={'180px'}>{LogLevelEnum[item.level]}</Td>
-                    <Td maxW={'300px'} className="textEllipsis">
-                      {item.text}
-                    </Td>
-                    <Td maxW={'300px'} className="textEllipsis">
-                      {JSON.stringify(item.metadata)}
-                    </Td>
-                    <Td>
-                      <Button variant={'whiteBase'} onClick={() => setLogDetail(item)}>
-                        详情
-                      </Button>
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-            {!isLoading && logs.length === 0 && (
-              <Flex
-                mt={'20vh'}
-                flexDirection={'column'}
-                alignItems={'center'}
-                justifyContent={'center'}
-              >
-                <MyIcon name="empty" w={'48px'} h={'48px'} color={'transparent'} />
-                <Box mt={2} color={'myGray.500'}>
-                  无Log记录～
-                </Box>
-              </Flex>
-            )}
-          </TableContainer>
-        </ScrollData>
-      </Box>
+              ))}
+            </Tbody>
+          </Table>
+          {!isLoading && logs.length === 0 && (
+            <Flex
+              mt={'20vh'}
+              flexDirection={'column'}
+              alignItems={'center'}
+              justifyContent={'center'}
+            >
+              <MyIcon name="empty" w={'48px'} h={'48px'} color={'transparent'} />
+              <Box mt={2} color={'myGray.500'}>
+                无Log记录～
+              </Box>
+            </Flex>
+          )}
+        </TableContainer>
+      </ScrollData>
       {logDetail && <LogDetailModal log={logDetail} onClose={() => setLogDetail(undefined)} />}
     </BoxCard>
   );

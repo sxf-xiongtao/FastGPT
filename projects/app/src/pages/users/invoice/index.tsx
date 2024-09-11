@@ -26,7 +26,7 @@ import MyModal from '@fastgpt/web/components/common/MyModal';
 import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
 import dayjs from 'dayjs';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 import { useSelectFile } from '@fastgpt/web/common/file/hooks/useSelectFile';
 import { InvoiceStatusEnum } from '@fastgpt/global/support/wallet/bill/invoice/constants';
@@ -38,11 +38,9 @@ const InvoiceManageTable = () => {
   const [search, setSearch] = useState<string>();
   const [uploadInvoiceId, setUploadInvoiceId] = useState<string>();
   const [invoiceDetailData, setInvoiceDetailData] = useState<InvoiceSchemaType>();
-  const elementRef = useRef<HTMLDivElement>(null);
 
   const {
     data: invoices,
-    setData: setInvoices,
     isLoading,
     ScrollData,
     getData
@@ -53,14 +51,8 @@ const InvoiceManageTable = () => {
       search
     },
     type: 'scroll',
-    defaultRequest: false,
-    elementRef
+    refreshDeps: [search]
   });
-  const flashData = useCallback(() => {
-    setInvoices([]);
-    getData(1);
-  }, [getData, setInvoices]);
-  useEffect(() => flashData(), [flashData, getData, setInvoices]);
 
   return (
     <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
@@ -77,109 +69,95 @@ const InvoiceManageTable = () => {
           </InputLeftElement>
           <Input
             placeholder="请输入用户名，回车搜索"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                setInvoices([]);
-                getData(1);
-              }
-            }}
             size={'sm'}
             onChange={(e) => setSearch(e.target.value)}
           ></Input>
         </InputGroup>
       </HStack>
-      <Box
-        position={'relative'}
-        h={'100%'}
-        overflow={'overlay'}
-        ref={elementRef}
-        py={[0, 5]}
-        px={[3, 8]}
-      >
-        <ScrollData>
-          <TableContainer>
-            <Table>
-              <Thead>
-                <Tr>
-                  <Th>提交状态</Th>
-                  <Th>提交时间/完成时间</Th>
-                  <Th>金额</Th>
-                  <Th>抬头</Th>
-                  <Th>操作</Th>
-                  <Th>Team Id</Th>
+
+      <ScrollData position={'relative'} h={'100%'} py={[0, 5]} px={[3, 8]}>
+        <TableContainer>
+          <Table>
+            <Thead>
+              <Tr>
+                <Th>提交状态</Th>
+                <Th>提交时间/完成时间</Th>
+                <Th>金额</Th>
+                <Th>抬头</Th>
+                <Th>操作</Th>
+                <Th>Team Id</Th>
+              </Tr>
+            </Thead>
+            <Tbody fontSize={'sm'}>
+              {invoices.map((item, i) => (
+                <Tr key={i}>
+                  <Td
+                    {...(item.status === InvoiceStatusEnum.submitted
+                      ? {
+                          color: 'red.600'
+                        }
+                      : {
+                          color: 'primary.600'
+                        })}
+                  >
+                    {item.status === InvoiceStatusEnum.submitted ? '等待开票' : '已完成'}
+                  </Td>
+                  <Td>
+                    {item.createTime ? dayjs(item.createTime).format('YYYY/MM/DD HH:mm:ss') : '-'}
+                    <br />
+                    {item.finishTime ? dayjs(item.finishTime).format('YYYY/MM/DD HH:mm:ss') : '-'}
+                  </Td>
+                  <Td>{formatStorePrice2Read(item.amount)}元</Td>
+                  <Td>{item.teamName}</Td>
+                  <Td>
+                    {item.status === InvoiceStatusEnum.submitted ? (
+                      <Button onClick={() => setUploadInvoiceId(item._id)} size={'sm'}>
+                        {'确认开票'}
+                      </Button>
+                    ) : (
+                      <Button
+                        variant={'whiteBase'}
+                        size={'sm'}
+                        onClick={() => setInvoiceDetailData(item)}
+                      >
+                        详情
+                      </Button>
+                    )}
+                  </Td>
+                  <Td>{item.teamId}</Td>
                 </Tr>
-              </Thead>
-              <Tbody fontSize={'sm'}>
-                {invoices.map((item, i) => (
-                  <Tr key={i}>
-                    <Td
-                      {...(item.status === InvoiceStatusEnum.submitted
-                        ? {
-                            color: 'red.600'
-                          }
-                        : {
-                            color: 'primary.600'
-                          })}
-                    >
-                      {item.status === InvoiceStatusEnum.submitted ? '等待开票' : '已完成'}
-                    </Td>
-                    <Td>
-                      {item.createTime ? dayjs(item.createTime).format('YYYY/MM/DD HH:mm:ss') : '-'}
-                      <br />
-                      {item.finishTime ? dayjs(item.finishTime).format('YYYY/MM/DD HH:mm:ss') : '-'}
-                    </Td>
-                    <Td>{formatStorePrice2Read(item.amount)}元</Td>
-                    <Td>{item.teamName}</Td>
-                    <Td>
-                      {item.status === InvoiceStatusEnum.submitted ? (
-                        <Button onClick={() => setUploadInvoiceId(item._id)} size={'sm'}>
-                          {'确认开票'}
-                        </Button>
-                      ) : (
-                        <Button
-                          variant={'whiteBase'}
-                          size={'sm'}
-                          onClick={() => setInvoiceDetailData(item)}
-                        >
-                          详情
-                        </Button>
-                      )}
-                    </Td>
-                    <Td>{item.teamId}</Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-            {!isLoading && invoices.length === 0 && (
-              <Flex
-                mt={'20vh'}
-                flexDirection={'column'}
-                alignItems={'center'}
-                justifyContent={'center'}
-              >
-                <MyIcon name="empty" w={'48px'} h={'48px'} color={'transparent'} />
-                <Box mt={2} color={'myGray.500'}>
-                  无开票记录～
-                </Box>
-              </Flex>
-            )}
-            {!!invoiceDetailData && (
-              <InvoiceDetailModal
-                invoice={invoiceDetailData}
-                onClose={() => setInvoiceDetailData(undefined)}
-              />
-            )}
-            {uploadInvoiceId && (
-              <InvoiceFinishModal
-                invoice={invoices.find((item) => item._id === uploadInvoiceId)!}
-                invoiceId={uploadInvoiceId}
-                onClose={() => setUploadInvoiceId(undefined)}
-                flashData={flashData}
-              />
-            )}
-          </TableContainer>
-        </ScrollData>
-      </Box>
+              ))}
+            </Tbody>
+          </Table>
+          {!isLoading && invoices.length === 0 && (
+            <Flex
+              mt={'20vh'}
+              flexDirection={'column'}
+              alignItems={'center'}
+              justifyContent={'center'}
+            >
+              <MyIcon name="empty" w={'48px'} h={'48px'} color={'transparent'} />
+              <Box mt={2} color={'myGray.500'}>
+                无开票记录～
+              </Box>
+            </Flex>
+          )}
+          {!!invoiceDetailData && (
+            <InvoiceDetailModal
+              invoice={invoiceDetailData}
+              onClose={() => setInvoiceDetailData(undefined)}
+            />
+          )}
+          {uploadInvoiceId && (
+            <InvoiceFinishModal
+              invoice={invoices.find((item) => item._id === uploadInvoiceId)!}
+              invoiceId={uploadInvoiceId}
+              onClose={() => setUploadInvoiceId(undefined)}
+              flashData={() => getData(1)}
+            />
+          )}
+        </TableContainer>
+      </ScrollData>
     </BoxCard>
   );
 };

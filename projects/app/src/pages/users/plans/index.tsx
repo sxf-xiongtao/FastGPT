@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   Table,
   Thead,
@@ -42,12 +42,10 @@ export type PlanType = {
 
 const PlanTable = () => {
   const [search, setSearch] = useState<string>();
-  const elementRef = useRef<HTMLDivElement>(null);
   const [isMobile] = useMediaQuery('(max-width: 768px)');
 
   const {
     data: plans,
-    setData: setPlans,
     isLoading,
     ScrollData,
     getData
@@ -58,13 +56,8 @@ const PlanTable = () => {
       search
     },
     type: 'scroll',
-    defaultRequest: false,
-    elementRef
+    refreshDeps: [search]
   });
-
-  useEffect(() => {
-    getData(1);
-  }, [getData]);
 
   return (
     <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
@@ -76,7 +69,6 @@ const PlanTable = () => {
             type: SubTypeEnum.extraDatasetSize
           }}
           updateData={() => {
-            setPlans([]);
             getData(1);
           }}
         />
@@ -85,98 +77,83 @@ const PlanTable = () => {
             <MyIcon name="common/searchLight" w={4} color={'myGray.400'} />
           </InputLeftElement>
           <Input
-            placeholder="请输入用户名，回车搜索"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                setPlans([]);
-                getData(1);
-              }
-            }}
+            placeholder="请输入用户名搜索"
             size={'sm'}
             onChange={(e) => setSearch(e.target.value)}
           ></Input>
         </InputGroup>
       </HStack>
-      <Box
-        position={'relative'}
-        h={'100%'}
-        overflow={'overlay'}
-        ref={elementRef}
-        py={[0, 5]}
-        px={[3, 8]}
-      >
-        <ScrollData>
-          <TableContainer>
-            <Table>
-              <Thead>
-                <Tr>
-                  <Th>团队id</Th>
-                  <Th>团队名</Th>
-                  <Th>用户名</Th>
-                  <Th>订阅套餐</Th>
-                  <Th>积分</Th>
-                  <Th>起止时间</Th>
-                  <Th></Th>
-                </Tr>
-              </Thead>
-              <Tbody fontSize={'sm'}>
-                {plans.map((item, i) => (
-                  <Tr key={i}>
-                    <Td>{item.teamId}</Td>
-                    <Td>{item.teamName}</Td>
-                    <Td>{item.userName}</Td>
-                    <Td>
-                      {item.type === SubTypeEnum.standard
-                        ? `${standardSubLevelMap[item.level]?.label}版`
-                        : item.type === SubTypeEnum.extraDatasetSize
-                          ? '额外知识库'
-                          : 'AI 积分套餐'}
-                    </Td>
-                    <Td>
-                      {item.totalPoints
-                        ? `${Math.round(item.totalPoints - item.surplusPoints)} / ${item.totalPoints}`
+
+      <ScrollData position={'relative'} h={'100%'} py={[0, 5]} px={[3, 8]}>
+        <TableContainer>
+          <Table>
+            <Thead>
+              <Tr>
+                <Th>团队id</Th>
+                <Th>团队名</Th>
+                <Th>用户名</Th>
+                <Th>订阅套餐</Th>
+                <Th>积分</Th>
+                <Th>起止时间</Th>
+                <Th></Th>
+              </Tr>
+            </Thead>
+            <Tbody fontSize={'sm'}>
+              {plans.map((item, i) => (
+                <Tr key={i}>
+                  <Td>{item.teamId}</Td>
+                  <Td>{item.teamName}</Td>
+                  <Td>{item.userName}</Td>
+                  <Td>
+                    {item.type === SubTypeEnum.standard
+                      ? `${standardSubLevelMap[item.level]?.label}版`
+                      : item.type === SubTypeEnum.extraDatasetSize
+                        ? '额外知识库'
+                        : 'AI 积分套餐'}
+                  </Td>
+                  <Td>
+                    {item.totalPoints
+                      ? `${Math.round(item.totalPoints - item.surplusPoints)} / ${item.totalPoints}`
+                      : '-'}
+                  </Td>
+                  <Td>
+                    <Box>
+                      {item.startTime ? dayjs(item.startTime).format('YYYY/MM/DD HH:mm:ss') : '-'}
+                    </Box>
+                    <Box>
+                      {item.expiredTime
+                        ? dayjs(item.expiredTime).format('YYYY/MM/DD HH:mm:ss')
                         : '-'}
-                    </Td>
-                    <Td>
-                      <Box>
-                        {item.startTime ? dayjs(item.startTime).format('YYYY/MM/DD HH:mm:ss') : '-'}
-                      </Box>
-                      <Box>
-                        {item.expiredTime
-                          ? dayjs(item.expiredTime).format('YYYY/MM/DD HH:mm:ss')
-                          : '-'}
-                      </Box>
-                    </Td>
-                    <Td>
-                      <PlanEditModal
-                        data={item}
-                        subType={item.type}
-                        getData={() => {
-                          setPlans([]);
-                          getData(1);
-                        }}
-                      />
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-            {!isLoading && plans.length === 0 && (
-              <Flex
-                mt={'20vh'}
-                flexDirection={'column'}
-                alignItems={'center'}
-                justifyContent={'center'}
-              >
-                <MyIcon name="empty" w={'48px'} h={'48px'} color={'transparent'} />
-                <Box mt={2} color={'myGray.500'}>
-                  无套餐记录～
-                </Box>
-              </Flex>
-            )}
-          </TableContainer>
-        </ScrollData>
-      </Box>
+                    </Box>
+                  </Td>
+                  <Td>
+                    <PlanEditModal
+                      data={item}
+                      subType={item.type}
+                      getData={() => {
+                        getData(1);
+                      }}
+                    />
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+          {!isLoading && plans.length === 0 && (
+            <Flex
+              mt={'20vh'}
+              flexDirection={'column'}
+              alignItems={'center'}
+              justifyContent={'center'}
+            >
+              <MyIcon name="empty" w={'48px'} h={'48px'} color={'transparent'} />
+              <Box mt={2} color={'myGray.500'}>
+                无套餐记录～
+              </Box>
+            </Flex>
+          )}
+        </TableContainer>
+      </ScrollData>
     </BoxCard>
   );
 };

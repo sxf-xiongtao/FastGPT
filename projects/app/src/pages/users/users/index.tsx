@@ -32,15 +32,11 @@ import { useRouter } from 'next/router';
 const UserTable = () => {
   // const [username, setUsername] = useState<string>();
   const [userDetail, setUserDetail] = useState<UserModelSchema>();
-  const elementRef = useRef<HTMLDivElement>(null);
   const [isMobile] = useMediaQuery('(max-width: 768px)');
-  const router = useRouter();
-  const username = useMemo(() => router.query.username ?? '', [router.query.username]);
-  const queryUsername = useRef<string>('');
+  const [search, setSearch] = useState<string>();
 
   const {
     data: users,
-    setData: setUsers,
     isLoading,
     ScrollData,
     getData
@@ -48,16 +44,11 @@ const UserTable = () => {
     api: getUsers,
     pageSize: 20,
     params: {
-      username
+      username: search
     },
     type: 'scroll',
-    defaultRequest: false,
-    elementRef
+    refreshDeps: [search]
   });
-
-  useEffect(() => {
-    getData(1);
-  }, [getData, username]);
 
   return (
     <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
@@ -67,7 +58,6 @@ const UserTable = () => {
         <UserAddModal
           data={{}}
           updateData={() => {
-            setUsers([]);
             getData(1);
           }}
         />
@@ -76,90 +66,75 @@ const UserTable = () => {
             <MyIcon name="common/searchLight" w={4} color={'myGray.400'} />
           </InputLeftElement>
           <Input
-            placeholder="请输入用户名，回车搜索"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                setUsers([]);
-                router.replace(`/users/users?username=${queryUsername.current}`);
-              }
-            }}
+            placeholder="请输入用户名搜索"
             onChange={(e) => {
-              queryUsername.current = e.target.value;
+              setSearch(e.target.value);
             }}
             size={'sm'}
           ></Input>
         </InputGroup>
       </HStack>
-      <Box
-        position={'relative'}
-        h={'100%'}
-        overflow={'overlay'}
-        ref={elementRef}
-        py={[0, 5]}
-        px={[3, 8]}
-      >
-        <ScrollData>
-          <TableContainer>
-            <Table>
-              <Thead>
-                <Tr>
-                  <Th>#</Th>
-                  <Th>用户名</Th>
-                  <Th>创建时间</Th>
-                  <Th>状态</Th>
-                  <Th></Th>
-                </Tr>
-              </Thead>
-              <Tbody fontSize={'sm'}>
-                {users.map((item, i) => (
-                  <Tr key={i}>
-                    <Td>{i + 1}</Td>
-                    <Td>{item.username}</Td>
-                    <Td>
-                      {item.createTime ? dayjs(item.createTime).format('YYYY/MM/DD HH:mm:ss') : '-'}
-                    </Td>
-                    <Td>{item.status}</Td>
-                    <Td>
-                      <Button
-                        variant={'whiteBase'}
-                        size={'sm'}
-                        mr={2}
-                        onClick={() => setUserDetail(item)}
-                      >
-                        详情
-                      </Button>
-                      <UserEditModal
-                        data={item}
-                        getData={() => {
-                          setUsers([]);
-                          getData(1);
-                        }}
-                      />
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-            {!isLoading && users.length === 0 && (
-              <Flex
-                mt={'20vh'}
-                flexDirection={'column'}
-                alignItems={'center'}
-                justifyContent={'center'}
-              >
-                <MyIcon name="empty" w={'48px'} h={'48px'} color={'transparent'} />
-                <Box mt={2} color={'myGray.500'}>
-                  无用户记录～
-                </Box>
-              </Flex>
-            )}
-          </TableContainer>
-        </ScrollData>
 
-        {!!userDetail && (
-          <UserDetailModal user={userDetail} onClose={() => setUserDetail(undefined)} />
-        )}
-      </Box>
+      <ScrollData position={'relative'} h={'100%'} py={[0, 5]} px={[3, 8]}>
+        <TableContainer>
+          <Table>
+            <Thead>
+              <Tr>
+                <Th>#</Th>
+                <Th>用户名</Th>
+                <Th>创建时间</Th>
+                <Th>状态</Th>
+                <Th></Th>
+              </Tr>
+            </Thead>
+            <Tbody fontSize={'sm'}>
+              {users.map((item, i) => (
+                <Tr key={i}>
+                  <Td>{i + 1}</Td>
+                  <Td>{item.username}</Td>
+                  <Td>
+                    {item.createTime ? dayjs(item.createTime).format('YYYY/MM/DD HH:mm:ss') : '-'}
+                  </Td>
+                  <Td>{item.status}</Td>
+                  <Td>
+                    <Button
+                      variant={'whiteBase'}
+                      size={'sm'}
+                      mr={2}
+                      onClick={() => setUserDetail(item)}
+                    >
+                      详情
+                    </Button>
+                    <UserEditModal
+                      data={item}
+                      getData={() => {
+                        getData(1);
+                      }}
+                    />
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+          {!isLoading && users.length === 0 && (
+            <Flex
+              mt={'20vh'}
+              flexDirection={'column'}
+              alignItems={'center'}
+              justifyContent={'center'}
+            >
+              <MyIcon name="empty" w={'48px'} h={'48px'} color={'transparent'} />
+              <Box mt={2} color={'myGray.500'}>
+                无用户记录～
+              </Box>
+            </Flex>
+          )}
+        </TableContainer>
+      </ScrollData>
+
+      {!!userDetail && (
+        <UserDetailModal user={userDetail} onClose={() => setUserDetail(undefined)} />
+      )}
     </BoxCard>
   );
 };

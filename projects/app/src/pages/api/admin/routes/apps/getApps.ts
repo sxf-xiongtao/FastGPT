@@ -46,12 +46,10 @@ async function handler(
         name: app.name,
         intro: app.intro,
         userId:
-          (
-            tmbList.find((tmb) => String(tmb._id) === String(app.tmbId))?.userId as any
-          )._id.toString() || '',
+          (tmbList.find((tmb) => String(tmb._id) === String(app.tmbId))?.userId as any)?._id || '',
         username:
           (tmbList.find((tmb) => String(tmb._id) === String(app.tmbId))?.userId as any)?.username ||
-          ''
+          '这人被删了'
       };
     })
   );
