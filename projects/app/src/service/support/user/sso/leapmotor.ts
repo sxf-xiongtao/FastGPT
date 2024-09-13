@@ -31,7 +31,7 @@ export const LeapMotorSSOHandler = async (req: ApiRequestProps) => {
   });
 
   return {
-    username: userInfo.data.id + '-LeapMotor',
+    username: userInfo.data.jobNumber,
     email: userInfo.data.email
   };
 };
