@@ -67,7 +67,7 @@ export const getFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
             show_compliance_documentation: {
               key: 'siteSettings.feConfigs.show_compliance_copywriting',
               type: 'boolean',
-              title: '前端是否展示规范性文案'
+              title: '前端是否展示合规提示文案'
             },
             systemTitle: {
               key: 'siteSettings.feConfigs.systemTitle',
