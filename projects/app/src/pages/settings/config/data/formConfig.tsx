@@ -64,6 +64,11 @@ export const getFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
               type: 'boolean',
               title: '展示邀请好友活动'
             },
+            show_compliance_documentation: {
+              key: 'siteSettings.feConfigs.show_compliance_copywriting',
+              type: 'boolean',
+              title: '前端是否展示规范性文案'
+            },
             systemTitle: {
               key: 'siteSettings.feConfigs.systemTitle',
               type: 'string',
