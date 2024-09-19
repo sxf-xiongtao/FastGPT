@@ -26,7 +26,7 @@ export function formatConfigStore2FormSchema({
     show_promotion = false,
     favicon = '',
     concatMd = '',
-    docUrl = 'https://doc.fastgpt.in',
+    docUrl = 'https://doc.tryfastgpt.ai',
     systemPluginCourseUrl = '',
     chatbotUrl = '',
     openAPIDocUrl = '',
@@ -145,10 +145,6 @@ export function formatConfigStore2FormSchema({
         BAIDU_TEXT_CENSOR_CLIENTID: fastgptPro?.censor?.BAIDU_TEXT_CENSOR_CLIENTID || '',
         BAIDU_TEXT_CENSOR_CLIENTSECRET: fastgptPro?.censor?.BAIDU_TEXT_CENSOR_CLIENTSECRET || '',
         customCensorURL: fastgptPro?.censor?.customCensorURL || ''
-      },
-      googleV3Ver: {
-        clientKey: fastgpt?.feConfigs?.googleClientVerKey || '',
-        serviceKey: fastgptPro?.auth?.googleServiceVerKey || ''
       }
     }
   };

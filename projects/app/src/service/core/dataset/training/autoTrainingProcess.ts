@@ -18,7 +18,8 @@ import { addMinutes } from 'date-fns';
 import { countGptMessagesTokens } from '@fastgpt/service/common/string/tiktoken/index';
 import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
 import { pushDataListToTrainingQueueByCollectionId } from '@fastgpt/service/core/dataset/training/controller';
-import { loadRequestMessages } from '../../../../../../../FastGPT/packages/service/core/chat/utils';
+import { loadRequestMessages } from '@fastgpt/service/core/chat/utils';
+import { llmCompletionsBodyFormat } from '@fastgpt/service/core/ai/utils';
 
 const reduceQueue = () => {
   global.autoTrainingLen = global.autoTrainingLen > 0 ? global.autoTrainingLen - 1 : 0;
@@ -101,7 +102,7 @@ export async function generateAutoTraining(): Promise<any> {
 
   try {
     const startTime = Date.now();
-    const model = getLLMModel(data.model)?.model;
+    const modelData = getLLMModel(data.model);
     const prompt = replaceVariable(AUTO_TRAINING_PROMPT, { text });
 
     // request LLM to get QA
@@ -115,12 +116,17 @@ export async function generateAutoTraining(): Promise<any> {
     const ai = getAIApi({
       timeout: 600000
     });
-    const chatResponse = await ai.chat.completions.create({
-      model,
-      temperature: 0.3,
-      messages: await loadRequestMessages({ messages, useVision: false }),
-      stream: false
-    });
+    const chatResponse = await ai.chat.completions.create(
+      llmCompletionsBodyFormat(
+        {
+          model: modelData.model,
+          temperature: 0.3,
+          messages: await loadRequestMessages({ messages, useVision: false }),
+          stream: false
+        },
+        modelData
+      )
+    );
     const answer = chatResponse.choices?.[0].message?.content || '';
 
     const splitIndexResult = formatSplitText2Index(answer, text); // 格式化后的索引
@@ -156,7 +162,7 @@ export async function generateAutoTraining(): Promise<any> {
         tmbId: data.tmbId,
         tokens: await countGptMessagesTokens(messages),
         billId: data.billId,
-        model
+        model: modelData.model
       });
     } else {
       addLog.info(`[Auto Training Queue] Result 0:`, { answer });

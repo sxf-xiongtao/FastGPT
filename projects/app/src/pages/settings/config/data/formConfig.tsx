@@ -565,32 +565,6 @@ Query 最好经过 encode 编码，回调验证的地址为：{{FastGPT 域名}}
           }
         }
       }
-    },
-    securitySettings: {
-      key: 'securitySettings',
-      title: '安全设置',
-      type: 'object',
-      properties: {
-        googleV3Ver: {
-          key: 'securitySettings.googleV3Ver',
-          type: 'object',
-          title: '谷歌V3 验证码安全（防止机器人刷验证码）',
-          properties: {
-            clientKey: {
-              key: 'securitySettings.googleV3Ver.clientKey',
-              type: 'string',
-              title: '客户端Key',
-              description:
-                '![](https://oss.laf.dev/lk63dw-fastgpt/google_service_ver_key_1.png)\n![](https://oss.laf.dev/lk63dw-fastgpt/google_service_ver_key_2.png)\nhttps://www.google.com/recaptcha/about/\nclientId: \nserviceId:\n每月有免费额度，基本够用'
-            },
-            serviceKey: {
-              key: 'securitySettings.googleV3Ver.serviceKey',
-              type: 'string',
-              title: '服务端Key'
-            }
-          }
-        }
-      }
     }
   };
 };

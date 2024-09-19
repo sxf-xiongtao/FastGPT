@@ -70,6 +70,5 @@ export type ConfigFormType = {
   };
   securitySettings: {
     censor?: SystemConfigType['censor'];
-    googleV3Ver: SystemConfigType['auth']['googleServiceVerKey'];
   };
 };
