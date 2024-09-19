@@ -35,6 +35,10 @@ async function handler(req: ApiRequestProps<ExternalFileCreateDatasetCollectionP
     ...body
   } = req.body;
 
+  if (!externalFileId) {
+    return Promise.reject('Missing externalFileId');
+  }
+
   const { teamId, tmbId, dataset } = await authDataset({
     req,
     authToken: true,
@@ -76,7 +80,7 @@ async function handler(req: ApiRequestProps<ExternalFileCreateDatasetCollectionP
       ...body,
       teamId,
       tmbId,
-      type: DatasetCollectionTypeEnum.file,
+      type: DatasetCollectionTypeEnum.externalFile,
       name: parseFilename,
       metadata: {
         relatedImgId: relatedId
