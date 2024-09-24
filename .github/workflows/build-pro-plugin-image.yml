@@ -1,14 +1,14 @@
-name: Build fastgpt-admin images and copy image to docker hub
+name: Build fastgpt-pro-plugin images
 on:
   workflow_dispatch:
   push:
     paths:
-      - 'projects/app/**'
+      - 'projects/plugin/**'
       - 'FastGPT/packages/**'
     tags:
       - 'v*'
 jobs:
-  build-fastgpt-pro-images:
+  build-fastgpt-pro-plugin-images:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
@@ -42,15 +42,15 @@ jobs:
       - name: Set DOCKER_REPO_TAGGED based on branch or tag
         run: |
           if [[ "${{ github.ref_name }}" == "main" ]]; then
-            echo "Git_Latest=ghcr.io/${{ github.repository_owner }}/fastgpt-pro:latest" >> $GITHUB_ENV
-            echo "Git_Tag=ghcr.io/${{ github.repository_owner }}/fastgpt-pro:latest" >> $GITHUB_ENV
-            echo "Ali_Latest=${{ secrets.ALI_IMAGE_NAME }}/fastgpt-pro:latest" >> $GITHUB_ENV
-            echo "Ali_Tag=${{ secrets.ALI_IMAGE_NAME }}/fastgpt-pro:latest" >> $GITHUB_ENV
+            echo "Git_Latest=ghcr.io/${{ github.repository_owner }}/fastgpt-pro-plugin:latest" >> $GITHUB_ENV
+            echo "Git_Tag=ghcr.io/${{ github.repository_owner }}/fastgpt-pro-plugin:latest" >> $GITHUB_ENV
+            echo "Ali_Latest=${{ secrets.ALI_IMAGE_NAME }}/fastgpt-pro-plugin:latest" >> $GITHUB_ENV
+            echo "Ali_Tag=${{ secrets.ALI_IMAGE_NAME }}/fastgpt-pro-plugin:latest" >> $GITHUB_ENV
           else
-            echo "Git_Tag=ghcr.io/${{ github.repository_owner }}/fastgpt-pro:${{ github.ref_name }}" >> $GITHUB_ENV
-            echo "Git_Latest=ghcr.io/${{ github.repository_owner }}/fastgpt-pro:latest" >> $GITHUB_ENV
-            echo "Ali_Tag=${{ secrets.ALI_IMAGE_NAME }}/fastgpt-pro:${{ github.ref_name }}" >> $GITHUB_ENV
-            echo "Ali_Latest=${{ secrets.ALI_IMAGE_NAME }}/fastgpt-pro:latest" >> $GITHUB_ENV
+            echo "Git_Tag=ghcr.io/${{ github.repository_owner }}/fastgpt-pro-plugin:${{ github.ref_name }}" >> $GITHUB_ENV
+            echo "Git_Latest=ghcr.io/${{ github.repository_owner }}/fastgpt-pro-plugin:latest" >> $GITHUB_ENV
+            echo "Ali_Tag=${{ secrets.ALI_IMAGE_NAME }}/fastgpt-pro-plugin:${{ github.ref_name }}" >> $GITHUB_ENV
+            echo "Ali_Latest=${{ secrets.ALI_IMAGE_NAME }}/fastgpt-pro-plugin:latest" >> $GITHUB_ENV
           fi
 
       - name: Build and publish image for main branch or tag push event
@@ -58,11 +58,11 @@ jobs:
           DOCKER_REPO_TAGGED: ${{ env.DOCKER_REPO_TAGGED }}
         run: |
           docker buildx build \
-          -f projects/app/Dockerfile \
-          --build-arg name=app \
+          -f projects/plugin/Dockerfile \
+          --build-arg name=plugin \
           --platform linux/amd64,linux/arm64 \
-          --label "org.opencontainers.image.source=https://github.com/${{ github.repository_owner }}/fastgpt-pro" \
-          --label "org.opencontainers.image.description=fastgpt-pro image" \
+          --label "org.opencontainers.image.source=https://github.com/${{ github.repository_owner }}/fastgpt-pro-plugin" \
+          --label "org.opencontainers.image.description=fastgpt-pro-plugin image" \
           --push \
           --cache-from=type=local,src=/tmp/.buildx-cache \
           --cache-to=type=local,dest=/tmp/.buildx-cache \

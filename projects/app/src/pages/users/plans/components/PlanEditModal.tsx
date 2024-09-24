@@ -15,6 +15,7 @@ import MyModal from '@fastgpt/web/components/common/MyModal';
 import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import MySelect from '@fastgpt/web/components/common/MySelect';
 import { PlanType } from '@/pages/users/plans';
+import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
 
 function transformDate(date: string) {
   const initialDate = new Date(date);
@@ -46,7 +47,7 @@ export default function PlanEditModal(props: {
     defaultValues: data
   });
 
-  const onSubmit = async (formData: PlanType) => {
+  const { runAsync: onSubmit, loading } = useRequest2(async (formData: PlanType) => {
     try {
       const startTimeISO = new Date(formData.startTime).toISOString();
       const expiredTimeISO = new Date(formData.expiredTime).toISOString();
@@ -56,6 +57,7 @@ export default function PlanEditModal(props: {
       if (Number(formData.surplusPoints) > Number(formData.totalPoints)) {
         throw new Error('剩余积分不能大于总积分');
       }
+
       await POST(`/admin/routes/plans/updatePlan`, {
         ...formData,
         startTime: startTimeISO,
@@ -73,7 +75,7 @@ export default function PlanEditModal(props: {
         status: 'error'
       });
     }
-  };
+  });
 
   return (
     <>
@@ -97,9 +99,6 @@ export default function PlanEditModal(props: {
           <FormControl className="mt-4">
             <FormLabel htmlFor="startTime" className="!font-bold text-grayModern-700">
               开始时间
-              {errors && !!errors?.startTime && (
-                <span className="ml-2 text-[12px] text-red-500">*必填</span>
-              )}
             </FormLabel>
             <Input
               size="md"
@@ -112,9 +111,6 @@ export default function PlanEditModal(props: {
           <FormControl className="mt-4">
             <FormLabel htmlFor="expiredTime" className="!font-bold text-grayModern-700">
               结束时间
-              {errors && !!errors?.expiredTime && (
-                <span className="ml-2 text-[12px] text-red-500">*必填</span>
-              )}
             </FormLabel>
             <Input
               size="md"
@@ -129,9 +125,6 @@ export default function PlanEditModal(props: {
               <FormControl className="mt-4">
                 <FormLabel htmlFor="level" className="!font-bold text-grayModern-700">
                   套餐等级
-                  {errors && !!errors?.level && (
-                    <span className="ml-2 text-[12px] text-red-500">*必填</span>
-                  )}
                 </FormLabel>
                 <Controller
                   control={control}
@@ -177,9 +170,6 @@ export default function PlanEditModal(props: {
               <FormControl className="mt-4">
                 <FormLabel htmlFor="totalPoints" className="!font-bold text-grayModern-700">
                   总积分
-                  {errors && !!errors?.totalPoints && (
-                    <span className="ml-2 text-[12px] text-red-500">*必填</span>
-                  )}
                 </FormLabel>
                 <Input
                   {...register('totalPoints', {
@@ -195,9 +185,6 @@ export default function PlanEditModal(props: {
               <FormControl className="mt-4">
                 <FormLabel htmlFor="surplusPoints" className="!font-bold text-grayModern-700">
                   剩余积分
-                  {errors && !!errors?.surplusPoints && (
-                    <span className="ml-2 text-[12px] text-red-500">*必填</span>
-                  )}
                 </FormLabel>
                 <Input
                   {...register('surplusPoints', {
@@ -217,7 +204,7 @@ export default function PlanEditModal(props: {
           <Button variant={'outline'} mr={4} onClick={onClose}>
             关闭
           </Button>
-          <Button variant={'primary'} onClick={handleSubmit(onSubmit)}>
+          <Button isLoading={loading} variant={'primary'} onClick={handleSubmit(onSubmit)}>
             确定
           </Button>
         </ModalFooter>

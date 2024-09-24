@@ -1,7 +1,10 @@
+import { reComputeStandPlans } from '@/pages/api/support/wallet/bill/checkPayResult';
+import { NextAPI } from '@/service/middleware/entry';
 import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
@@ -19,58 +22,55 @@ export type UpdatePlanBody = {
   level?: number;
 };
 
-export default async function handler(
-  req: ApiRequestProps<UpdatePlanBody>,
-  res: NextApiResponse<any>
-) {
-  try {
-    await connectToDatabase();
-    await adminCert({ req, authToken: true });
+async function handler(req: ApiRequestProps<UpdatePlanBody>, res: NextApiResponse<any>) {
+  await connectToDatabase();
+  await adminCert({ req, authToken: true });
 
-    const {
-      id,
-      type,
-      startTime,
-      expiredTime,
-      price,
-      totalPoints,
-      surplusPoints,
-      extraDatasetSize,
-      level
-    } = req.body;
+  const {
+    id,
+    type,
+    startTime,
+    expiredTime,
+    price,
+    totalPoints,
+    surplusPoints,
+    extraDatasetSize,
+    level
+  } = req.body;
 
-    const sub = await MongoTeamSub.findById(id);
-    if (!sub) {
-      throw new Error('订阅不存在');
-    }
+  const sub = await MongoTeamSub.findById(id);
+  if (!sub) {
+    throw new Error('订阅不存在');
+  }
 
-    let result;
-    if (type === SubTypeEnum.extraDatasetSize) {
-      result = await MongoTeamSub.updateOne(
-        {
-          _id: id
-        },
-        {
-          startTime,
-          expiredTime,
-          price: price * PRICE_SCALE,
-          currentExtraDatasetSize: extraDatasetSize
-        }
-      );
-    } else if (type === SubTypeEnum.extraPoints) {
-      result = await MongoTeamSub.updateOne(
-        {
-          _id: id
-        },
-        {
-          startTime,
-          expiredTime,
-          price: price * PRICE_SCALE,
-          totalPoints,
-          surplusPoints
-        }
-      );
-    } else if (type === SubTypeEnum.standard) {
+  let result;
+  if (type === SubTypeEnum.extraDatasetSize) {
+    result = await MongoTeamSub.updateOne(
+      {
+        _id: id
+      },
+      {
+        startTime,
+        expiredTime,
+        price: price * PRICE_SCALE,
+        currentExtraDatasetSize: extraDatasetSize
+      }
+    );
+  } else if (type === SubTypeEnum.extraPoints) {
+    result = await MongoTeamSub.updateOne(
+      {
+        _id: id
+      },
+      {
+        startTime,
+        expiredTime,
+        price: price * PRICE_SCALE,
+        totalPoints,
+        surplusPoints
+      }
+    );
+  } else if (type === SubTypeEnum.standard) {
+    await mongoSessionRun(async (session) => {
       result = await MongoTeamSub.updateOne(
         {
           _id: id
@@ -82,19 +82,15 @@ export default async function handler(
           currentSubLevel: level,
           totalPoints,
           surplusPoints
+        },
+        {
+          session
         }
       );
-    }
-
-    jsonRes(res, {
-      data: {
-        result
-      }
-    });
-  } catch (err) {
-    jsonRes(res, {
-      code: 500,
-      error: err
+      await reComputeStandPlans(sub.teamId, session);
     });
   }
+
+  return result;
 }
+export default NextAPI(handler);

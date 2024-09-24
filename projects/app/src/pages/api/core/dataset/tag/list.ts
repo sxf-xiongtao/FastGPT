@@ -14,9 +14,9 @@ export type GetDatasetTagsProps = PaginationProps<{
 }>;
 
 async function handler(
-  req: ApiRequestProps<{}, GetDatasetTagsProps>
+  req: ApiRequestProps<GetDatasetTagsProps, {}>
 ): Promise<PaginationResponse<DatasetTagType>> {
-  let { datasetId, pageSize, current, searchText } = req.query;
+  let { datasetId, pageSize, offset, searchText } = req.body;
   if (!datasetId) {
     return Promise.reject(CommonErrEnum.missingParams);
   }
@@ -41,11 +41,7 @@ async function handler(
   };
 
   const [tags, total]: [DatasetTagType[], number] = await Promise.all([
-    MongoDatasetCollectionTags.find(match)
-      .sort({ _id: -1 })
-      .skip(pageSize * (current - 1))
-      .limit(pageSize)
-      .lean(),
+    MongoDatasetCollectionTags.find(match).sort({ _id: -1 }).skip(offset).limit(pageSize).lean(),
     MongoDatasetCollectionTags.countDocuments(match)
   ]);
 

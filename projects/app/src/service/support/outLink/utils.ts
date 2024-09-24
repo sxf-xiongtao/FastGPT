@@ -58,6 +58,7 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
     const { histories } = await getChatItems({
       appId: shareChat.appId,
       chatId,
+      offset: 0,
       limit: getMaxHistoryLimitFromNodes(nodes),
       field: `dataId obj value`
     });

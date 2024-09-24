@@ -12,6 +12,8 @@ import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import { initTeamFreePlan } from '@fastgpt/service/support/wallet/sub/utils';
 import { delay } from '@fastgpt/global/common/system/utils';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { reComputeStandPlans } from '../../support/wallet/bill/checkPayResult';
 
 /* 
     初始化开票状态
@@ -67,7 +69,10 @@ async function initFreePlans(teamId: string) {
     if (teamSub) return;
 
     console.log('创建free plan', teamId);
-    await initTeamFreePlan({ teamId: teamId });
+    await mongoSessionRun(async (session) => {
+      await initTeamFreePlan({ teamId: teamId, session });
+      await reComputeStandPlans(teamId, session);
+    });
   } catch (error) {
     console.log(error);
     await delay(500);

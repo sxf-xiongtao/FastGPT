@@ -1,79 +1,106 @@
+import { reComputeStandPlans } from '@/pages/api/support/wallet/bill/checkPayResult';
+import { NextAPI } from '@/service/middleware/entry';
 import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
-import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
+import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    await connectToDatabase();
-    await adminCert({ req, authToken: true });
+export type AddTeamPlanBody = {
+  teamId: string; // 团队id
+  type: SubTypeEnum; // 套餐类型
+  startTime: string; // 开始时间
+  expiredTime: string; // 结束时间
+  price: number; // 价格
+  level: StandardSubLevelEnum; // 套餐等级
+  extraDatasetSize: number; // 额外知识库容量
+  totalPoints: number; // 总积分
+  surplusPoints: number; // 剩余积分
+};
 
-    const {
+async function handler(req: ApiRequestProps<AddTeamPlanBody>, res: NextApiResponse) {
+  await adminCert({ req, authToken: true });
+
+  const {
+    teamId,
+    type,
+    level,
+    startTime,
+    expiredTime,
+    price,
+    extraDatasetSize,
+    totalPoints,
+    surplusPoints
+  } = req.body;
+
+  if (!teamId) {
+    throw new Error('缺少字段');
+  }
+
+  const team = await MongoTeam.findById(teamId);
+  if (!team) {
+    throw new Error('团队不存在');
+  }
+
+  let result;
+  if (type === SubTypeEnum.extraDatasetSize) {
+    result = await MongoTeamSub.create({
       teamId,
       type,
       startTime,
       expiredTime,
-      price,
-      extraDatasetSize,
+      price: price * PRICE_SCALE,
+
+      currentExtraDatasetSize: extraDatasetSize
+    });
+  } else if (type === SubTypeEnum.extraPoints) {
+    result = await MongoTeamSub.create({
+      teamId,
+      type,
+      startTime,
+      expiredTime,
+      price: price * PRICE_SCALE,
+
       totalPoints,
       surplusPoints
-    } = req.body as {
-      teamId: string;
-      type: `${SubTypeEnum}`;
-      startTime: Date;
-      expiredTime: Date;
-      price: number;
-      extraDatasetSize?: number;
-      totalPoints?: number;
-      surplusPoints?: number;
-    };
+    });
+  } else if (type === SubTypeEnum.standard) {
+    // 1. 查找是否有相同类型的订阅，有的话，直接更新过期时间和增加积分；没有的话，创建新的订阅
+    const teamSub = await MongoTeamSub.findOne({
+      teamId,
+      type: SubTypeEnum.standard,
+      currentSubLevel: level
+    });
 
-    if (!teamId) {
-      throw new Error('缺少字段');
+    if (teamSub) {
+      return Promise.reject('已存在相同类型的订阅');
     }
 
-    const team = await MongoTeam.findById(teamId);
-    if (!team) {
-      throw new Error('团队不存在');
-    }
-
-    let result;
-    if (type === SubTypeEnum.extraDatasetSize) {
+    await mongoSessionRun(async (session) => {
       result = await MongoTeamSub.create({
         teamId,
         type,
         startTime,
         expiredTime,
         price: price * PRICE_SCALE,
-
-        currentExtraDatasetSize: extraDatasetSize
-      });
-    } else if (type === SubTypeEnum.extraPoints) {
-      result = await MongoTeamSub.create({
-        teamId,
-        type,
-        startTime,
-        expiredTime,
-        price: price * PRICE_SCALE,
-
+        currentSubLevel: level,
         totalPoints,
         surplusPoints
       });
-    }
-
-    jsonRes(res, {
-      data: {
-        result
-      }
-    });
-  } catch (err) {
-    jsonRes(res, {
-      code: 500,
-      error: err
+      await reComputeStandPlans(teamId, session);
     });
   }
+
+  jsonRes(res, {
+    data: {
+      result
+    }
+  });
 }
+
+export default NextAPI(handler);

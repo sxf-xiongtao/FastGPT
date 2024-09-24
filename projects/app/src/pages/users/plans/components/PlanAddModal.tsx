@@ -5,7 +5,6 @@ import {
   Input,
   ModalBody,
   ModalFooter,
-  Select,
   useDisclosure
 } from '@chakra-ui/react';
 import React, { useState } from 'react';
@@ -14,8 +13,9 @@ import { POST } from '@/service/common/request';
 import { AddIcon } from '@chakra-ui/icons';
 import { useToast } from '@fastgpt/web/hooks/useToast';
 import MyModal from '@fastgpt/web/components/common/MyModal';
-import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import MySelect from '@fastgpt/web/components/common/MySelect';
+import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
 
 type TFormData = {
   teamId: string; // 团队id
@@ -23,29 +23,43 @@ type TFormData = {
   startTime: string; // 开始时间
   expiredTime: string; // 结束时间
   price: number; // 价格
+  level: StandardSubLevelEnum; // 套餐等级
   extraDatasetSize: number; // 额外知识库容量
   totalPoints: number; // 总积分
   surplusPoints: number; // 剩余积分
 };
 
-export default function PlanAddModal(props: { data: any; updateData: any }) {
+const defaultData: TFormData = {
+  teamId: '',
+  type: SubTypeEnum.standard,
+  startTime: new Date().toISOString(),
+  expiredTime: new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+  level: StandardSubLevelEnum.team,
+  price: 0,
+  extraDatasetSize: 0,
+  totalPoints: 0,
+  surplusPoints: 0
+};
+
+export default function PlanAddModal(props: { updateData: any }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data, updateData } = props;
-  const [isLoading, setIsLoading] = useState(false);
+  const { updateData } = props;
   const { toast } = useToast();
-  const [currentType, setCurrentType] = useState<SubTypeEnum>(SubTypeEnum.extraDatasetSize);
 
   const {
     register,
     handleSubmit,
     reset,
     control,
-    formState: { errors }
-  } = useForm({
-    defaultValues: data
+    formState: { errors },
+    watch
+  } = useForm<TFormData>({
+    defaultValues: defaultData
   });
 
-  const onSubmit = async (formData: TFormData) => {
+  const currentType = watch('type');
+
+  const { runAsync: onSubmit, loading } = useRequest2(async (formData: TFormData) => {
     try {
       const startTimeISO = new Date(formData.startTime).toISOString();
       const expiredTimeISO = new Date(formData.expiredTime).toISOString();
@@ -60,7 +74,6 @@ export default function PlanAddModal(props: { data: any; updateData: any }) {
         startTime: startTimeISO,
         expiredTime: expiredTimeISO
       });
-      setIsLoading(true);
       toast({
         title: '添加成功',
         status: 'success'
@@ -73,8 +86,7 @@ export default function PlanAddModal(props: { data: any; updateData: any }) {
         status: 'error'
       });
     }
-    setIsLoading(false);
-  };
+  });
 
   return (
     <>
@@ -84,7 +96,7 @@ export default function PlanAddModal(props: { data: any; updateData: any }) {
         leftIcon={<AddIcon boxSize={2} />}
         onClick={() => {
           onOpen();
-          reset(data);
+          reset(defaultData);
         }}
       >
         添加套餐
@@ -95,9 +107,6 @@ export default function PlanAddModal(props: { data: any; updateData: any }) {
           <FormControl>
             <FormLabel htmlFor="teamId" className="!font-bold text-grayModern-700">
               团队id
-              {errors && !!errors?.teamId && (
-                <span className="ml-2 text-[12px] text-red-500">*必填</span>
-              )}
             </FormLabel>
             <Input
               {...register('teamId', {
@@ -121,10 +130,10 @@ export default function PlanAddModal(props: { data: any; updateData: any }) {
                   h={10}
                   value={value}
                   onchange={(value) => {
-                    setCurrentType(value);
                     onChange(value);
                   }}
                   list={[
+                    { label: '基础套餐', value: SubTypeEnum.standard },
                     { label: '知识库扩容', value: SubTypeEnum.extraDatasetSize },
                     { label: 'AI 积分套餐', value: SubTypeEnum.extraPoints }
                   ]}
@@ -162,25 +171,31 @@ export default function PlanAddModal(props: { data: any; updateData: any }) {
               })}
             />
           </FormControl>
-          <FormControl className="mt-4">
-            <FormLabel htmlFor="price" className="!font-bold text-grayModern-700">
-              价格（元）
-              {errors && !!errors?.price && (
-                <span className="ml-2 text-[12px] text-red-500">*必填</span>
-              )}
-            </FormLabel>
-            <Input
-              {...register('price', {
-                required: 'This is required'
-              })}
-              className="!text-xl"
-              id="price"
-              variant="outline"
-              placeholder="价格"
-              type="number"
-            />
-          </FormControl>
-          {currentType === SubTypeEnum.extraDatasetSize ? (
+
+          {currentType === SubTypeEnum.standard && (
+            <FormControl className="mt-4">
+              <FormLabel htmlFor="level" className="!font-bold text-grayModern-700">
+                套餐等级
+              </FormLabel>
+              <Controller
+                control={control}
+                name="level"
+                render={({ field: { value, onChange } }) => (
+                  <MySelect
+                    h={10}
+                    value={value}
+                    onchange={onChange}
+                    list={[
+                      { label: '体验版', value: StandardSubLevelEnum.experience },
+                      { label: '团队版', value: StandardSubLevelEnum.team },
+                      { label: '企业版', value: StandardSubLevelEnum.enterprise }
+                    ]}
+                  />
+                )}
+              />
+            </FormControl>
+          )}
+          {currentType === SubTypeEnum.extraDatasetSize && (
             <FormControl className="mt-4">
               <FormLabel htmlFor="extraDatasetSize" className="!font-bold text-grayModern-700">
                 额外知识库容量
@@ -199,7 +214,8 @@ export default function PlanAddModal(props: { data: any; updateData: any }) {
                 type="number"
               />
             </FormControl>
-          ) : (
+          )}
+          {(currentType === SubTypeEnum.extraPoints || currentType === SubTypeEnum.standard) && (
             <>
               <FormControl className="mt-4">
                 <FormLabel htmlFor="totalPoints" className="!font-bold text-grayModern-700">
@@ -239,12 +255,28 @@ export default function PlanAddModal(props: { data: any; updateData: any }) {
               </FormControl>
             </>
           )}
+
+          <FormControl className="mt-4">
+            <FormLabel htmlFor="price" className="!font-bold text-grayModern-700">
+              价格(元)-仅用于记录
+            </FormLabel>
+            <Input
+              {...register('price', {
+                required: 'This is required'
+              })}
+              className="!text-xl"
+              id="price"
+              variant="outline"
+              placeholder="价格"
+              type="number"
+            />
+          </FormControl>
         </ModalBody>
         <ModalFooter>
           <Button variant="outline" mr={4} onClick={onClose}>
             关闭
           </Button>
-          <Button variant="primary" onClick={handleSubmit(onSubmit)} isLoading={isLoading}>
+          <Button variant="primary" onClick={handleSubmit(onSubmit)} isLoading={loading}>
             确定
           </Button>
         </ModalFooter>

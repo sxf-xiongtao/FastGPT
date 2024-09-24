@@ -173,7 +173,7 @@ export async function generateAutoTraining(): Promise<any> {
   } catch (err: any) {
     reduceQueue();
 
-    if (await checkInvalidChunkAndLock({ err, data, errText: '文件处理模型调用失败' })) {
+    if (await checkInvalidChunkAndLock({ err, data, errText: '文本理解模型调用失败' })) {
       return generateAutoTraining();
     }
 

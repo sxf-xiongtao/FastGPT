@@ -65,9 +65,6 @@ const PlanTable = () => {
         {!isMobile && <Box className="text-2xl font-bold text-[#405169]">套餐管理</Box>}
         <Box className="flex-grow"></Box>
         <PlanAddModal
-          data={{
-            type: SubTypeEnum.extraDatasetSize
-          }}
           updateData={() => {
             getData(1);
           }}
