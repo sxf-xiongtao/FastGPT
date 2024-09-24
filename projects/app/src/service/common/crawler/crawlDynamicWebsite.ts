@@ -1,22 +1,25 @@
-import { delay } from '@fastgpt/global/common/system/utils';
-import { LogLevel, EnqueueStrategy, Configuration, PuppeteerCrawler } from 'crawlee';
-import { htmlToMarkdown } from '@fastgpt/service/common/string/utils';
-import { cheerioToHtml, loadContentByCheerio } from '@fastgpt/service/common/string/cheerio';
-import { filterRegxs, excludeList, contentMinLength } from './constants';
+import axios from 'axios';
+const pluginURL = process.env.PLUGIN_URL;
 
 export type CrawlDataItemType = { url: string; title: string; content: string };
-
-const maxConcurrency = process.env.CRAWL_MAX_CONCURRENCY
-  ? parseInt(process.env.CRAWL_MAX_CONCURRENCY)
-  : 1;
+export type dynamicWebsiteCrawlerTask = {
+  uid: string;
+  status: 'running' | 'completed' | 'failed';
+  items: CrawlDataItemType[];
+};
+export type startDynamicWebsiteCrawlerRequest = {
+  uid: string;
+  url: string;
+  maxPage?: number;
+  selector?: string;
+};
 
 export const crawlDynamicWebsite = async ({
   uid,
   url,
   maxPage = 200,
   selector = 'body',
-  crawlOnePageCallback,
-  onSuccess
+  crawlOnePageCallback
 }: {
   uid: string;
   url: string;
@@ -25,88 +28,47 @@ export const crawlDynamicWebsite = async ({
   crawlOnePageCallback?: (e: CrawlDataItemType, stopCrawler: () => void) => any;
   onSuccess?: (e: CrawlDataItemType[]) => any;
 }) => {
-  const datas: CrawlDataItemType[] = [];
-
-  const config = new Configuration({
-    defaultDatasetId: uid,
-    persistStorage: false,
-    logLevel: LogLevel.INFO
-  });
-
-  let crawler = new PuppeteerCrawler(
-    {
-      maxRequestsPerCrawl: maxPage,
-      keepAlive: false,
-
-      minConcurrency: 1,
-      maxConcurrency,
-
-      maxRequestRetries: 3,
-      requestHandlerTimeoutSecs: 60,
-
-      async requestHandler({ request, enqueueLinks, log, page }) {
-        log.info(request.url);
-
-        // await page.waitForSelector(selector);
-        await page.waitForNetworkIdle();
-
-        const content = await page.content();
-
-        const $ = await loadContentByCheerio(content);
-        const { html, title } = cheerioToHtml({
-          $,
-          selector,
-          fetchUrl: request.url
-        });
-
-        const markdown = await htmlToMarkdown(html);
-
-        const item: CrawlDataItemType = {
-          url: request.url,
-          title,
-          content: markdown
-        };
-
-        if (datas.find((e) => e.url === item.url)) {
-          return;
-        }
-
-        if (item.content.length > contentMinLength) {
-          datas.push(item);
-          crawlOnePageCallback?.(item, stopCrawler);
-        }
-
-        await delay(200);
-
-        await enqueueLinks({
-          strategy: EnqueueStrategy.SameHostname,
-          regexps: [...filterRegxs],
-          exclude: excludeList
-        });
-      },
-      errorHandler({ error }) {
-        console.log(error);
-      }
-    },
-    config
-  );
-
-  function stopCrawler() {
-    crawler.requestQueue?.drop();
-    crawler.requestList = undefined;
-    crawler.browserPool.destroy();
-    crawler.teardown();
-    // @ts-ignore
-    crawler = undefined;
+  if (!pluginURL) {
+    return Promise.reject(new Error('pluginURL is not set'));
   }
 
-  await crawler.run([url]);
+  const start = await axios.post(pluginURL + '/api/dynamicWebSiteCrawler/start', {
+    uid,
+    url,
+    maxPage,
+    selector
+  });
 
-  stopCrawler();
+  if (start.status !== 200) {
+    return;
+  }
 
-  const reuslts = datas.filter((item) => item.content.length > contentMinLength);
+  const interval = setInterval(async () => {
+    try {
+      const query = await axios.get<dynamicWebsiteCrawlerTask>(
+        `${pluginURL}/api/dynamicWebSiteCrawler/query?uid=${uid}`
+      );
+      if (query.data.status === 'completed') {
+        clearInterval(interval);
+      }
 
-  onSuccess?.(reuslts);
+      if (query.data.status === 'failed') {
+        clearInterval(interval);
+      }
 
-  return reuslts;
+      if (query.data.items.length > 0) {
+        crawlOnePageCallback?.(query.data.items[0], stopCrawler);
+      }
+    } catch (e) {
+      clearInterval(interval);
+      return;
+    }
+  }, 1000);
+
+  function stopCrawler() {
+    axios.post(pluginURL + '/api/dynamicWebSiteCrawler/stop', {
+      uid
+    });
+    clearInterval(interval);
+  }
 };
