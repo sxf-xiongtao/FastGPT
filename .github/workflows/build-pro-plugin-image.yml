@@ -70,4 +70,4 @@ jobs:
           -t ${Git_Latest} \
           -t ${Ali_Tag} \
           -t ${Ali_Latest} \
-          .
+          projects/plugin
