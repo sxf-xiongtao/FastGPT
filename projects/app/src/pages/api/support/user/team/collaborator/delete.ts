@@ -6,32 +6,42 @@ import {
   PerResourceTypeEnum
 } from '@fastgpt/global/support/permission/constant';
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
+import { RequireOnlyOne } from '@fastgpt/global/common/type/utils';
 
-export type removeQuery = {
-  tmbId: string;
-};
-
+export type removeQuery = RequireOnlyOne<{
+  tmbId?: string;
+  groupId?: string;
+}>;
 export type removeBody = {};
-
 export type removeResponse = {};
 
 async function handler(
   req: ApiRequestProps<removeBody, removeQuery>,
-  res: ApiResponseType<any>
+  _res: ApiResponseType<any>
 ): Promise<removeResponse> {
-  const { tmbId } = req.query;
+  const { tmbId, groupId } = req.query;
 
-  if (!tmbId) {
-    return Promise.reject('tmbId is required');
+  if (!tmbId && !groupId) {
+    return Promise.reject('tmbId or groupId is required');
   }
 
   const { teamId } = await authMember({ req, authToken: true, per: OwnerPermissionVal });
 
-  const delRes = await MongoResourcePermission.findOneAndRemove({
-    teamId,
-    tmbId,
-    resourceType: PerResourceTypeEnum.team
-  });
+  if (tmbId) {
+    await MongoResourcePermission.findOneAndRemove({
+      teamId,
+      tmbId,
+      resourceType: PerResourceTypeEnum.team
+    });
+  }
+
+  if (groupId) {
+    await MongoResourcePermission.findOneAndRemove({
+      teamId,
+      groupId,
+      resourceType: PerResourceTypeEnum.team
+    });
+  }
 
   return {};
 }

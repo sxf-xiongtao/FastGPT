@@ -1,7 +1,6 @@
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import type {
-  AuthTeamRoleProps,
   CreateTeamProps,
   UpdateTeamProps
 } from '@fastgpt/global/support/user/team/controller.d';
@@ -29,8 +28,15 @@ import { MongoResourcePermission } from '@fastgpt/service/support/permission/sch
 import { PerResourceTypeEnum } from '@fastgpt/global/support/permission/constant';
 import { TeamPermission } from '@fastgpt/global/support/permission/user/controller';
 import { TeamDefaultPermissionVal } from '@fastgpt/global/support/permission/user/constant';
-import { getResourcePermission } from '@fastgpt/service/support/permission/controller';
+import { getGroupPer, getResourcePermission } from '@fastgpt/service/support/permission/controller';
 import { LOGO_ICON } from '@fastgpt/global/common/system/constants';
+
+import { getGroupsByTeamId } from './group/controller';
+import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
+import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
+import { DefaultGroupName } from '@fastgpt/global/support/user/team/group/constant';
+import { getGroupsByTmbId } from '@fastgpt/service/support/permission/memberGroup/controllers';
+import { GroupMemberRole } from '@fastgpt/global/support/permission/memberGroup/constant';
 
 /* -------- format --------- */
 export async function teamMemberSchema2TeamItemType(
@@ -41,6 +47,7 @@ export async function teamMemberSchema2TeamItemType(
     teamId: data.teamId._id,
     tmbId: data._id
   });
+
   return {
     userId: String(data.userId._id),
     teamId: String(data.teamId._id),
@@ -55,13 +62,23 @@ export async function teamMemberSchema2TeamItemType(
     defaultTeam: data.defaultTeam,
     lafAccount: data.teamId.lafAccount,
     permission: new TeamPermission({
-      per: per?.permission ?? data.teamId.defaultPermission ?? TeamDefaultPermissionVal,
+      per: per ?? TeamDefaultPermissionVal,
       isOwner: data.role === TeamMemberRoleEnum.owner
     })
   };
 }
 
 /* -------------- team ------------ */
+/** create team, as well as tmb and default group
+ * @param{Object} obj
+ * @param{string} obj.ownerId
+ * @param{string} obj.notificationAccount
+ * @param{string} obj.name
+ * @param{string} obj.avatar
+ * @param{boolean} obj.defaultTeam
+ * @param{ClientSession} obj.session
+ * @throws{Error} if ownerId or name is not exist
+ */
 export async function createTeam({
   ownerId,
   notificationAccount,
@@ -75,6 +92,7 @@ export async function createTeam({
   session: ClientSession;
 }): Promise<TeamTmbItemType> {
   try {
+    // create team
     const [team] = await MongoTeam.create(
       [
         {
@@ -87,7 +105,7 @@ export async function createTeam({
       ],
       { session }
     );
-
+    // create team member
     const [tmb] = await MongoTeamMember.create(
       [
         {
@@ -97,6 +115,17 @@ export async function createTeam({
           role: TeamMemberRoleEnum.owner,
           status: TeamMemberStatusEnum.active,
           defaultTeam
+        }
+      ],
+      { session }
+    );
+
+    await MongoMemberGroupModel.create(
+      [
+        {
+          teamId: team._id,
+          name: DefaultGroupName,
+          avatar: team.avatar
         }
       ],
       { session }
@@ -121,7 +150,6 @@ export async function createTeam({
       status: tmb.status,
       defaultTeam: tmb.defaultTeam,
       permission: new TeamPermission({
-        per: team.defaultPermission,
         isOwner: true
       })
     };
@@ -218,12 +246,15 @@ export async function getUserTeamOrDefaultTeam(tmbId?: string, userId?: string) 
 }
 
 /* --------------- member -------------- */
-// get the members of a team
-// @param teamId: the objectId of team
-// @return a object whose type is [TeamMemberItemType]
+/** get the members of a team
+ * @param teamId: the objectId of team
+ * @return a object whose type is [TeamMemberItemType]
+ * @throws {Error} if teamId is not exist
+ */
+
 export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType[]> {
-  const [team, permissions, members] = await Promise.all([
-    MongoTeam.findById(teamId),
+  const [groups, permissions, members] = await Promise.all([
+    getGroupsByTeamId(teamId),
     MongoResourcePermission.find({
       teamId: teamId,
       resourceType: PerResourceTypeEnum.team
@@ -236,9 +267,17 @@ export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType
 
   return members.map((member) => {
     const isOwner = member.role === TeamMemberRoleEnum.owner;
+
+    const groupPermission = groups
+      .filter((g) => g.members.includes(String(member._id)))
+      .map((g) => g.permission)
+      .filter((p) => p !== undefined);
+
+    const groupPer = getGroupPer(groupPermission);
+
     const per =
       permissions.find((p) => String(p.tmbId) === String(member._id))?.permission ??
-      team?.defaultPermission ??
+      groupPer ??
       TeamDefaultPermissionVal;
 
     return {
@@ -267,26 +306,26 @@ export async function getTeamMember({
   teamId: string;
   tmbId: string;
 }): Promise<TeamMemberItemType> {
-  const member = (await MongoTeamMember.findOne({
-    teamId,
-    _id: tmbId
-  }).populate('userId')) as TeamMemberWithUserSchema;
+  const [member, team, per] = await Promise.all([
+    MongoTeamMember.findOne({
+      teamId,
+      _id: tmbId
+    }).populate('userId') as Promise<TeamMemberWithUserSchema>,
+    MongoTeam.findById(teamId),
+    getResourcePermission({
+      resourceType: PerResourceTypeEnum.team,
+      teamId,
+      tmbId
+    })
+  ]);
 
   if (!member) {
     return Promise.reject('member not exist');
   }
 
-  const team = await MongoTeam.findById(member.teamId);
-
   if (!team) {
     return Promise.reject('team not exist');
   }
-
-  const per = await getResourcePermission({
-    resourceType: PerResourceTypeEnum.team,
-    teamId: member.teamId,
-    tmbId: member._id
-  });
 
   return {
     userId: member.userId._id,
@@ -297,12 +336,17 @@ export async function getTeamMember({
     role: member.role,
     status: member.status,
     permission: new TeamPermission({
-      per: per?.permission ?? team.defaultPermission ?? TeamDefaultPermissionVal,
+      per: per ?? TeamDefaultPermissionVal,
       isOwner: member.role === TeamMemberRoleEnum.owner
     })
   };
 }
-
+/** remove user from team
+ * @param{Object} obj
+ * @param{string} obj.teamId
+ * @param{string} obj.memberId
+ * @throws{Error} if teamId or memberId is not exist
+ */
 export async function removeUser({ teamId, memberId }: { teamId: string; memberId: string }) {
   const tmb = await MongoTeamMember.findOne({
     teamId,
@@ -345,11 +389,21 @@ export async function removeUser({ teamId, memberId }: { teamId: string; memberI
     );
 
     // delete permission
-    await MongoResourcePermission.deleteMany({
-      resourceType: { $exists: true },
-      teamId,
-      tmbId: memberTmbId
-    });
+    await MongoResourcePermission.deleteMany(
+      {
+        resourceType: { $exists: true },
+        teamId,
+        tmbId: memberTmbId
+      },
+      { session }
+    );
+
+    await MongoGroupMemberModel.deleteMany(
+      {
+        tmbId: memberTmbId
+      },
+      { session }
+    );
 
     // update status is leave
     await MongoTeamMember.findOneAndUpdate(
@@ -362,6 +416,36 @@ export async function removeUser({ teamId, memberId }: { teamId: string; memberI
         status: TeamMemberStatusEnum.leave
       },
       { session }
+    );
+
+    // Transfer group to team owner
+    const groups = await getGroupsByTmbId({
+      tmbId: memberTmbId,
+      teamId: tmb.teamId,
+      role: [GroupMemberRole.owner]
+    });
+
+    // delete group member
+    await MongoGroupMemberModel.deleteMany(
+      {
+        tmbId: memberTmbId
+      },
+      { session }
+    );
+
+    // update group member owner
+    await MongoGroupMemberModel.updateMany(
+      {
+        groupId: { $in: groups.map((group) => String(group._id)) },
+        tmbId: teamOwnerTmbId
+      },
+      {
+        role: GroupMemberRole.owner
+      },
+      {
+        upsert: true,
+        session
+      }
     );
   });
 }

@@ -20,7 +20,7 @@ import { MongoResourcePermission } from '@fastgpt/service/support/permission/sch
 
 async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
   // Authorization
-  const { datasetId, tmbIds, permission } = req.body;
+  const { datasetId, members: tmbIds = [], permission } = req.body; // TODO: Temporary
 
   const {
     teamId,
@@ -73,10 +73,12 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
             permission
           }))
           .concat(
-            FolderClbs.filter((item) => !tmbIds.includes(String(item.tmbId))).map((item) => ({
-              tmbId: item.tmbId,
-              permission: tmbIds.includes(String(item.tmbId)) ? permission : item.permission
-            }))
+            FolderClbs.filter((item) => !!item.teamId && !tmbIds.includes(String(item.tmbId))).map(
+              (item) => ({
+                tmbId: item.tmbId!,
+                permission: tmbIds.includes(String(item.tmbId)) ? permission : item.permission
+              })
+            )
           );
 
         return {
@@ -115,7 +117,7 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
 
           return {
             updateClbs,
-            updateTmbIds: updateClbs.map((item) => item.tmbId) // 继承态 dataset 是没有协作者的，这里需要全量复制
+            updateTmbIds: updateClbs.filter((item) => !!item.tmbId).map((item) => item.tmbId!) // 继承态 dataset 是没有协作者的，这里需要全量复制
           };
         }
 

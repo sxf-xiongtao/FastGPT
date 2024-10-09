@@ -8,7 +8,7 @@ import {
   storeNodes2RuntimeNodes
 } from '@fastgpt/global/core/workflow/runtime/utils';
 import { OutlinkAppType, OutLinkSchema } from '@fastgpt/global/support/outLink/type';
-import { getAppLatestVersion } from '@fastgpt/service/core/app/controller';
+import { getAppLatestVersion } from '@fastgpt/service/core/app/version/controller';
 import { MongoApp } from '@fastgpt/service/core/app/schema';
 import { getChatItems } from '@fastgpt/service/core/chat/controller';
 import { saveChat } from '@fastgpt/service/core/chat/saveChat';

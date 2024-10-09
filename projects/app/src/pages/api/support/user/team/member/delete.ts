@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { jsonRes } from '@fastgpt/service/common/response';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { getTeamMember, removeUser } from '@/service/support/user/team/controller';
 import { DelMemberProps } from '@fastgpt/global/support/user/team/controller';
@@ -31,7 +30,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     memberId
   });
 
-  jsonRes(res, {});
+  return {};
 }
 
 export default NextAPI(handler);

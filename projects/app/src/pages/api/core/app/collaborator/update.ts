@@ -29,7 +29,7 @@ import { MongoResourcePermission } from '@fastgpt/service/support/permission/sch
 
 async function handler(req: NextApiRequest) {
   // Authorization
-  const { appId, tmbIds, permission } = req.body as UpdateAppCollaboratorBody;
+  const { appId, permission, members: tmbIds = [] } = req.body as UpdateAppCollaboratorBody; // TODO: Temporary
 
   const {
     teamId,
@@ -82,10 +82,12 @@ async function handler(req: NextApiRequest) {
             permission
           }))
           .concat(
-            FolderClbs.filter((item) => !tmbIds.includes(String(item.tmbId))).map((item) => ({
-              tmbId: item.tmbId,
-              permission: tmbIds.includes(String(item.tmbId)) ? permission : item.permission
-            }))
+            FolderClbs.filter((item) => !!item.tmbId && !tmbIds.includes(String(item.tmbId))).map(
+              (item) => ({
+                tmbId: item.tmbId!,
+                permission: tmbIds.includes(String(item.tmbId)) ? permission : item.permission
+              })
+            )
           );
 
         return {
@@ -126,7 +128,7 @@ async function handler(req: NextApiRequest) {
 
           return {
             updateClbs,
-            updateTmbIds: updateClbs.map((item) => item.tmbId) // 继承态 app 是没有协作者的，这里需要全量复制
+            updateTmbIds: updateClbs.filter((item) => !!item.tmbId).map((item) => item.tmbId!) // 继承态 app 是没有协作者的，这里需要全量复制
           };
         }
 
