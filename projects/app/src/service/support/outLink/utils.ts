@@ -158,6 +158,6 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
     });
   } catch (error) {
     addLog.error('Outlink app chat error', error);
-    await replyCallback(`App run error: ${getErrText(error)} `);
+    await replyCallback(`App run error: ${getErrText(error, JSON.stringify(error))}`);
   }
 }
