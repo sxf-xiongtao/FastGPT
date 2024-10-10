@@ -15,17 +15,7 @@ export const html2md = (html: string): string => {
   });
 
   try {
-    turndownService.remove(['i', 'script', 'iframe']);
-    turndownService.addRule('codeBlock', {
-      filter: 'pre',
-      replacement(_, node) {
-        const content = node.textContent?.trim() || '';
-        // @ts-ignore
-        const codeName = node?._attrsByQName?.class?.data?.trim() || '';
-
-        return `\n\`\`\`${codeName}\n${content}\n\`\`\`\n`;
-      }
-    });
+    turndownService.remove(['i', 'script', 'iframe', 'style']);
 
     turndownService.use(turndownPluginGfm.gfm);
 

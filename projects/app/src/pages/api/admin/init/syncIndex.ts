@@ -24,6 +24,19 @@ import { MongoRawTextBuffer } from '@fastgpt/service/common/buffer/rawText/schem
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
 import { MongoTimerLock } from '@fastgpt/service/common/system/timerLock/schema';
 import { MongoUserAuth } from '@/service/support/user/auth/schema';
+import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
+import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
+import { MongoTTSBuffer } from '@fastgpt/service/common/buffer/tts/schema';
+import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema';
+import { getMongoLog } from '@fastgpt/service/common/system/log/schema';
+import { MongoSystemPluginSchema } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
+import { MongoAppVersion } from '@fastgpt/service/core/app/version/schema';
+import { MongoChatInputGuide } from '@fastgpt/service/core/chat/inputGuide/schema';
+import { MongoDatasetCollectionTags } from '@fastgpt/service/core/dataset/tag/schema';
+import { MongoPromotionRecord } from '@fastgpt/service/support/activity/promotion/schema';
+import { MongoTmpData } from '@fastgpt/service/support/tmpData/schema';
+import { MongoTeamInvoiceTitle } from '@/service/support/user/team/invoiceAccount/teamInvoiceSchema';
+import { MongoInvoice } from '@/service/support/wallet/bill/invoiceSchema';
 
 export type syncIndexQuery = {};
 
@@ -46,7 +59,8 @@ async function handler(
     MongoTeamSub.syncIndexes();
     MongoTeamTags.syncIndexes();
     MongoResourcePermission.syncIndexes();
-
+    MongoGroupMemberModel.syncIndexes();
+    MongoMemberGroupModel.syncIndexes();
     MongoUsage.syncIndexes();
     MongoFrequencyLimit.syncIndexes();
     MongoOpenApi.syncIndexes();
@@ -54,7 +68,6 @@ async function handler(
     MongoRawTextBuffer.syncIndexes();
     MongoTimerLock.syncIndexes();
     MongoUserAuth.syncIndexes();
-
     MongoApp.syncIndexes();
     MongoBill.syncIndexes();
     MongoUserInform.syncIndexes();
@@ -65,6 +78,17 @@ async function handler(
     MongoDatasetData.syncIndexes();
     MongoDatasetTraining.syncIndexes();
     MongoImage.syncIndexes();
+    MongoTTSBuffer.syncIndexes();
+    MongoSystemConfigs.syncIndexes();
+    getMongoLog().syncIndexes();
+    MongoSystemPluginSchema.syncIndexes();
+    MongoAppVersion.syncIndexes();
+    MongoChatInputGuide.syncIndexes();
+    MongoDatasetCollectionTags.syncIndexes();
+    MongoPromotionRecord.syncIndexes();
+    MongoTmpData.syncIndexes();
+    MongoTeamInvoiceTitle.syncIndexes();
+    MongoInvoice.syncIndexes();
   } catch (error) {}
 
   return {};
