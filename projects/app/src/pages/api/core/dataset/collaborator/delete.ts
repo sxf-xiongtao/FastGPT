@@ -51,7 +51,7 @@ async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>
         folderTypeList: [DatasetTypeEnum.folder],
         resourceType: PerResourceTypeEnum.dataset,
         resourceModel: MongoDataset,
-        collaborators: folderClbs.filter((clb) => String(clb.tmbId) != tmbId),
+        collaborators: folderClbs.filter((clb) => String(clb.tmbId) !== tmbId),
         session
       });
     } else {
@@ -68,7 +68,15 @@ async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>
           resourceId: datasetId,
           resourceType: PerResourceTypeEnum.dataset,
           session,
-          collaborators: parentClbs.filter((clb) => String(clb.tmbId) != tmbId)
+          collaborators: parentClbs.filter((clb) => String(clb.tmbId) !== tmbId)
+        });
+      } else {
+        await delResourcePermission({
+          resourceType: PerResourceTypeEnum.dataset,
+          teamId,
+          tmbId,
+          resourceId: dataset._id,
+          session
         });
       }
     }
