@@ -76,7 +76,7 @@ async function sendTextCensor(text: string): Promise<{
 
       return {
         code: 5000,
-        message: `${data.data?.[0]?.msg || '您的内容不合规'}`
+        message: `${data.data?.[0]?.msg || '您的内容不合规'}: ${hitsWord}`
       };
     }
 
