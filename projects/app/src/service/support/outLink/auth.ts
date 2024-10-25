@@ -1,4 +1,4 @@
-import { authFrequencyLimit } from '@/service/common/frequencyLimit/tools';
+import { authFrequencyLimit } from '@fastgpt/service/common/system/frequencyLimit/utils';
 import type {
   AuthOutLinkInitProps,
   AuthOutLinkLimitProps,

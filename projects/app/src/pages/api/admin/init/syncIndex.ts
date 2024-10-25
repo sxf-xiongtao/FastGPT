@@ -17,7 +17,7 @@ import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSc
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { MongoTeamTags } from '@fastgpt/service/support/user/team/teamTagsSchema';
 import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
-import { MongoFrequencyLimit } from '@/service/common/frequencyLimit/schema';
+import { MongoFrequencyLimit } from '@fastgpt/service/common/system/frequencyLimit/schema';
 import { MongoOpenApi } from '@fastgpt/service/support/openapi/schema';
 import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
 import { MongoRawTextBuffer } from '@fastgpt/service/common/buffer/rawText/schema';
