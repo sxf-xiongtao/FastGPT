@@ -32,6 +32,7 @@ type EventProps = {
       message_id: string;
       message_type: string;
       update_time: string;
+      thread_id?: string; // 话题组特有
     };
     sender: {
       sender_id: {
@@ -113,9 +114,19 @@ async function handler(
 
   const event = (data as EventProps).event; // HACK
 
+  const chatId = (() => {
+    // 特殊情况
+    if (!event.message.chat_id) {
+      return event.message.message_id;
+    }
+    // 个人对话框/普通群：thread_id为空；话题群：thread_id不为空
+    return `${event.message.chat_id}-${event.message.thread_id}`;
+  })();
+  console.log(chatId, '=-=-', 1111);
+
   outlinkInvokeChat({
     // res,
-    chatId: event.message.chat_id + event.sender.sender_id.user_id,
+    chatId,
     userQuestion: JSON.parse(event.message.content).text as string,
     shareChat,
     chatUserId: event.sender.sender_id.union_id,
