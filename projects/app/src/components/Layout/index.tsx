@@ -37,7 +37,7 @@ const Layout = ({ children }: { children: JSX.Element }) => {
               fontSize={'2xl'}
               color={'primary.600'}
               fontWeight={'bold'}
-              py={4}
+              pt={4}
             >
               Admin
             </Box>
