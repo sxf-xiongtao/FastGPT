@@ -11,22 +11,31 @@ import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { DatasetTypeEnum } from '@fastgpt/global/core/dataset/constants';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
-import { getResourceAllClbs } from '@fastgpt/service/support/permission/controller';
+import { getResourceClbsAndGroups } from '@fastgpt/service/support/permission/controller';
 import {
   syncChildrenPermission,
   UpdateCollaboratorItem
 } from '@fastgpt/service/support/permission/inheritPermission';
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
+import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
+import { DatasetErrEnum } from '@fastgpt/global/common/error/code/dataset';
+import { getGroupsByTmbId } from '@fastgpt/service/support/permission/memberGroup/controllers';
+import { ResourcePermissionType } from '@fastgpt/global/support/permission/type';
 
 async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
   // Authorization
-  const { datasetId, members: tmbIds = [], permission } = req.body; // TODO: Temporary
+  const { datasetId, members: tmbIds = [], groups: groupIds = [], permission } = req.body;
+
+  if (tmbIds === undefined && groupIds === undefined) {
+    return Promise.reject(CommonErrEnum.missingParams);
+  }
 
   const {
     teamId,
     tmbId,
     permission: myPer,
-    dataset
+    dataset,
+    isRoot
   } = await authDataset({
     req,
     authToken: true,
@@ -34,15 +43,45 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
     per: ManagePermissionVal
   });
 
-  if (tmbIds.includes(tmbId)) {
-    return Promise.reject('Can not update your own permission');
-  }
+  await (async () => {
+    if (isRoot) return;
 
-  if (new DatasetPermission({ per: permission }).hasManagePer && !myPer.isOwner) {
-    return Promise.reject('Only owner could grant manage permission');
-  }
+    // can not update own permission
+    if (tmbIds.includes(tmbId)) {
+      return Promise.reject(DatasetErrEnum.unAuthDataset);
+    }
+    // can not update my group's permission unless I am owner
+    const myGroupIds = (await getGroupsByTmbId({ tmbId, teamId })).map((item) => String(item._id));
+    if (groupIds.some((groupId) => myGroupIds.includes(groupId)) && !myPer.isOwner) {
+      return Promise.reject(DatasetErrEnum.unAuthDataset);
+    }
+
+    // can not update admin's permission unless I am owner
+    if (new DatasetPermission({ per: permission }).hasManagePer && !myPer.isOwner) {
+      return Promise.reject(DatasetErrEnum.unAuthDataset);
+    }
+  })();
 
   const isFolder = dataset.type === DatasetTypeEnum.folder;
+  const checkAdminPerChanged = async (clbOrGroups: ResourcePermissionType[]) => {
+    if (
+      clbOrGroups.some((clb) => {
+        const oldPer = new DatasetPermission({ per: clb.permission });
+        const newPer = new DatasetPermission({ per: permission });
+        const updatedClbAndGroups = [...tmbIds, ...groupIds];
+        if (
+          oldPer.hasManagePer !== newPer.hasManagePer && // manage permission changed
+          (updatedClbAndGroups.includes(String(clb.tmbId)) || // clb is updated
+            updatedClbAndGroups.includes(String(clb.groupId))) // clb is updated
+        ) {
+          return true;
+        }
+      }) &&
+      !myPer.isOwner
+    ) {
+      return Promise.reject(DatasetErrEnum.unAuthDataset);
+    }
+  };
 
   await mongoSessionRun(async (session) => {
     // 关闭继承态
@@ -58,97 +97,108 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
       );
     }
 
-    const { updateClbs, updateTmbIds } = await (async () => {
-      if (isFolder) {
-        // 获取当前目录的协作者，并与需要变更的协作者合并
-        const FolderClbs = await getResourceAllClbs({
-          resourceId: datasetId,
-          teamId,
+    if (isFolder) {
+      // 获取当前目录的协作者，并与需要变更的协作者合并
+      const FolderClbsAndGroups = await getResourceClbsAndGroups({
+        resourceId: datasetId,
+        teamId,
+        resourceType: PerResourceTypeEnum.dataset,
+        session
+      });
+
+      await checkAdminPerChanged(FolderClbsAndGroups);
+
+      const updateClbsAndGroups = <UpdateCollaboratorItem[]>[];
+
+      updateClbsAndGroups.push(
+        ...tmbIds?.map((tmbId) => ({
+          tmbId,
+          permission
+        })),
+        ...groupIds?.map((groupId) => ({
+          groupId,
+          permission
+        })),
+        ...FolderClbsAndGroups.filter(
+          (item) => !!item.tmbId && !tmbIds?.includes(String(item.tmbId))
+        ).map((item) => ({
+          tmbId: item.tmbId!,
+          permission: tmbIds?.includes(String(item.tmbId)) ? permission : item.permission
+        })),
+        ...FolderClbsAndGroups.filter(
+          (item) => !!item.groupId && !groupIds?.includes(String(item.groupId))
+        ).map((item) => ({
+          groupId: item.groupId!,
+          permission: groupIds?.includes(String(item.groupId)) ? permission : item.permission
+        }))
+      );
+
+      await syncChildrenPermission({
+        resource: dataset,
+        resourceModel: MongoDataset,
+        folderTypeList: [DatasetTypeEnum.folder],
+        resourceType: PerResourceTypeEnum.dataset,
+        collaborators: updateClbsAndGroups,
+        session
+      });
+    } else {
+      if (dataset.inheritPermission && dataset.parentId) {
+        // 获取父级的协作者， 并与需要变更的协作者合并
+        const parentClbsAndGroups = await getResourceClbsAndGroups({
+          teamId: dataset.teamId,
+          resourceId: dataset.parentId,
           resourceType: PerResourceTypeEnum.dataset,
           session
         });
-        const updateClbs = tmbIds
-          .map<UpdateCollaboratorItem>((tmbId) => ({
+
+        const updateClbsAndGroups: UpdateCollaboratorItem[] = [];
+
+        updateClbsAndGroups.push(
+          ...groupIds?.map((groupId) => ({
+            teamId,
+            resourceId: datasetId,
+            resourceType: PerResourceTypeEnum.dataset,
+            groupId,
+            permission
+          })),
+          ...tmbIds?.map((tmbId) => ({
+            teamId,
+            resourceId: datasetId,
+            resourceType: PerResourceTypeEnum.dataset,
             tmbId,
             permission
           }))
-          .concat(
-            FolderClbs.filter((item) => !!item.teamId && !tmbIds.includes(String(item.tmbId))).map(
-              (item) => ({
-                tmbId: item.tmbId!,
-                permission: tmbIds.includes(String(item.tmbId)) ? permission : item.permission
-              })
-            )
-          );
+        );
 
-        return {
-          updateClbs,
-          updateTmbIds: tmbIds
-        };
-      } else {
-        if (dataset.inheritPermission && dataset.parentId) {
-          // 获取父级的协作者， 并与需要变更的协作者合并
-          const parentClbs = await getResourceAllClbs({
-            teamId: dataset.teamId,
-            resourceId: dataset.parentId,
+        const unchangedClbsAndGroups = parentClbsAndGroups.filter(
+          (item) =>
+            (!!item.tmbId && !tmbIds?.includes(String(item.tmbId))) || // parent's tmbIds
+            (!!item.groupId && !groupIds?.includes(String(item.groupId))) // parent's groupIds
+        );
+
+        await MongoResourcePermission.create(
+          unchangedClbsAndGroups.map((item) => ({
+            teamId,
+            resourceId: datasetId,
             resourceType: PerResourceTypeEnum.dataset,
-            session
-          });
-
-          const updateClbs = parentClbs
-            .filter((item) => tmbIds.includes(String(item.tmbId)))
-            .map((item) => ({
-              ...item,
-              permission
-            }));
-
-          const unchangedClbs = parentClbs.filter((item) => !tmbIds.includes(String(item.tmbId)));
-
-          await MongoResourcePermission.create(
-            unchangedClbs.map((item) => ({
-              teamId,
-              resourceId: datasetId,
-              resourceType: PerResourceTypeEnum.dataset,
-              tmbId: item.tmbId,
-              permission: item.permission
-            })),
-            { session }
-          );
-
-          return {
-            updateClbs,
-            updateTmbIds: updateClbs.filter((item) => !!item.tmbId).map((item) => item.tmbId!) // 继承态 dataset 是没有协作者的，这里需要全量复制
-          };
-        }
-
-        return {
-          updateClbs: [],
-          updateTmbIds: tmbIds
-        };
+            ...(item.tmbId && { tmbId: item.tmbId }),
+            ...(item.groupId && { groupId: item.groupId }),
+            permission: item.permission
+          })),
+          { session }
+        );
       }
-    })();
-
+    }
     // 更新的协作者
     await updateResourcePermission({
       resourceType: PerResourceTypeEnum.dataset,
       resourceId: datasetId,
       session,
       teamId,
-      tmbIdList: updateTmbIds,
+      tmbIdList: tmbIds,
+      groupIdList: groupIds,
       permission
     });
-
-    // 同步子目录
-    if (dataset.type === DatasetTypeEnum.folder) {
-      await syncChildrenPermission({
-        resource: dataset,
-        resourceModel: MongoDataset,
-        folderTypeList: [DatasetTypeEnum.folder],
-        resourceType: PerResourceTypeEnum.dataset,
-        collaborators: updateClbs,
-        session
-      });
-    }
   });
 }
 

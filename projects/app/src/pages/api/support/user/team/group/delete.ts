@@ -8,6 +8,7 @@ import { MongoResourcePermission } from '@fastgpt/service/support/permission/sch
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { DefaultGroupName } from '@fastgpt/global/support/user/team/group/constant';
 import { authGroupMemberRole } from '@fastgpt/service/support/permission/memberGroup/controllers';
+import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 
 export type GroupDeleteQuery = {
   groupId: string;
@@ -20,6 +21,9 @@ async function handler(
   _res: ApiResponseType<any>
 ): Promise<GroupDeleteResponse> {
   const { groupId } = req.query;
+  if (!groupId) {
+    return Promise.reject(CommonErrEnum.missingParams);
+  }
   const { teamId } = await authGroupMemberRole({
     req,
     per: TeamManagePermissionVal,

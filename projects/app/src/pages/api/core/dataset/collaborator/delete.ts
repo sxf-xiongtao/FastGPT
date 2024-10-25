@@ -7,7 +7,7 @@ import {
 import { DatasetCollaboratorDeleteParams } from '@fastgpt/global/core/dataset/collaborator';
 import {
   delResourcePermission,
-  getResourceAllClbs
+  getResourceClbsAndGroups
 } from '@fastgpt/service/support/permission/controller';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
@@ -20,7 +20,7 @@ import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 
 async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>) {
   // Authorization
-  const { datasetId, tmbId } = req.query;
+  const { datasetId, tmbId, groupId } = req.query;
 
   const { teamId, dataset } = await authDataset({
     req,
@@ -31,7 +31,7 @@ async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>
 
   await mongoSessionRun(async (session) => {
     if (dataset.type == DatasetTypeEnum.folder) {
-      const folderClbs = await getResourceAllClbs({
+      const folderClbsAndGroups = await getResourceClbsAndGroups({
         teamId,
         resourceId: datasetId,
         resourceType: PerResourceTypeEnum.dataset,
@@ -42,6 +42,7 @@ async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>
         resourceType: PerResourceTypeEnum.dataset,
         teamId,
         tmbId,
+        groupId,
         resourceId: dataset._id,
         session
       });
@@ -51,12 +52,12 @@ async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>
         folderTypeList: [DatasetTypeEnum.folder],
         resourceType: PerResourceTypeEnum.dataset,
         resourceModel: MongoDataset,
-        collaborators: folderClbs.filter((clb) => String(clb.tmbId) !== tmbId),
+        collaborators: folderClbsAndGroups.filter((clb) => String(clb.tmbId) !== tmbId),
         session
       });
     } else {
       if (dataset.inheritPermission && dataset.parentId) {
-        const parentClbs = await getResourceAllClbs({
+        const parentClbsAndGroups = await getResourceClbsAndGroups({
           teamId,
           resourceId: dataset.parentId,
           resourceType: PerResourceTypeEnum.dataset,
@@ -68,13 +69,14 @@ async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>
           resourceId: datasetId,
           resourceType: PerResourceTypeEnum.dataset,
           session,
-          collaborators: parentClbs.filter((clb) => String(clb.tmbId) !== tmbId)
+          collaborators: parentClbsAndGroups.filter((clb) => String(clb.tmbId) !== tmbId)
         });
       } else {
         await delResourcePermission({
           resourceType: PerResourceTypeEnum.dataset,
           teamId,
           tmbId,
+          groupId,
           resourceId: dataset._id,
           session
         });
@@ -82,15 +84,10 @@ async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>
     }
 
     if (dataset.inheritPermission && dataset.parentId) {
-      const parent = await MongoDataset.findById(dataset.parentId, 'defaultPermission')
-        .session(session)
-        .lean();
-
       await MongoDataset.updateOne(
         { _id: dataset._id },
         {
-          inheritPermission: false,
-          defaultPermission: parent?.defaultPermission ?? dataset.defaultPermission
+          inheritPermission: false
         }
       ).session(session);
     }

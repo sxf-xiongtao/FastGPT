@@ -8,16 +8,18 @@ export const updateResourcePermission = async ({
   resourceId,
   resourceType,
   teamId,
-  tmbIdList,
+  tmbIdList = [],
+  groupIdList = [],
   permission,
   session
 }: {
   resourceId?: string;
-  resourceType: PerResourceTypeEnum;
+  resourceType: Omit<`${PerResourceTypeEnum}`, 'team'>;
   teamId: string;
-  tmbIdList: string[];
   permission: PermissionValueType;
   session?: ClientSession;
+  tmbIdList?: string[];
+  groupIdList?: string[];
 }) => {
   const fn = async (session: ClientSession) => {
     for await (const tmbId of tmbIdList) {
@@ -26,6 +28,24 @@ export const updateResourcePermission = async ({
           resourceType,
           teamId,
           tmbId,
+          resourceId
+        },
+        {
+          permission
+        },
+        {
+          session,
+          upsert: true
+        }
+      );
+    }
+
+    for await (const groupId of groupIdList) {
+      await MongoResourcePermission.findOneAndUpdate(
+        {
+          resourceType,
+          teamId,
+          groupId,
           resourceId
         },
         {
