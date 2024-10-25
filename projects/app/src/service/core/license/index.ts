@@ -81,7 +81,7 @@ export async function authLicense() {
     console.log(
       `商业版插件加载成功，${licenseData.company}, 过期时间: ${licenseData.expTime}, 最大用户: ${licenseData.maxRegister}`
     );
-    return;
+    return licenseData;
   } catch (error) {
     console.log(error);
     return Promise.reject('License 不合法');
