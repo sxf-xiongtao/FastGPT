@@ -242,8 +242,8 @@ importers:
         specifier: ^3.3.0
         version: 3.3.0
       tiktoken:
-        specifier: ^1.0.15
-        version: 1.0.15
+        specifier: 1.0.17
+        version: 1.0.17
       tunnel:
         specifier: ^0.0.6
         version: 0.0.6
@@ -677,8 +677,8 @@ importers:
         specifier: ^7.8.1
         version: 7.8.1
       tiktoken:
-        specifier: ^1.0.15
-        version: 1.0.15
+        specifier: 1.0.17
+        version: 1.0.17
     devDependencies:
       '@nestjs/cli':
         specifier: ^10.0.0
@@ -9554,8 +9554,8 @@ packages:
   through@2.3.8:
     resolution: {integrity: sha512-w89qg7PI8wAdvX60bMDP+bFoD5Dvhm9oLheFp5O4a2QF0cSBGsBX4qZmadPMvVqlLJBBci+WqGGOAPvcDeNSVg==}
 
-  tiktoken@1.0.15:
-    resolution: {integrity: sha512-sCsrq/vMWUSEW29CJLNmPvWxlVp7yh2tlkAjpJltIKqp5CKf98ZNpdeHRmAlPVFlGEbswDc6SmI8vz64W/qErw==}
+  tiktoken@1.0.17:
+    resolution: {integrity: sha512-UuFHqpy/DxOfNiC3otsqbx3oS6jr5uKdQhB/CvDEroZQbVHt+qAK+4JbIooabUWKU9g6PpsFylNu9Wcg4MxSGA==}
 
   timezones-list@3.0.3:
     resolution: {integrity: sha512-C+Vdvvj2c1xB6pu81pOX8geo6mrk/QsudFVlTVQET7QQwu8WAIyhDNeCrK5grU7EMzmbKLWqz7uU6dN8fvQvPQ==}
@@ -21249,7 +21249,7 @@ snapshots:
 
   through@2.3.8: {}
 
-  tiktoken@1.0.15: {}
+  tiktoken@1.0.17: {}
 
   timezones-list@3.0.3: {}
 

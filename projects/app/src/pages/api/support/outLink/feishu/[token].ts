@@ -116,18 +116,24 @@ async function handler(
 
   const chatId = (() => {
     // 特殊情况
-    if (!event.message.chat_id) {
+    if (!event.message?.chat_id) {
+      console.log(event);
       return event.message.message_id;
     }
     // 个人对话框/普通群：thread_id为空；话题群：thread_id不为空
     return `${event.message.chat_id}-${event.message.thread_id}`;
   })();
-  console.log(chatId, '=-=-', 1111);
+
+  const question = (() => {
+    const text = JSON.parse(event.message.content).text as string;
+    // 如果开头是“@_user_1”字符串，则认为是@用户提问，需要将@用户名去掉
+    return text.replace(/^@_user_1 /, '');
+  })();
 
   outlinkInvokeChat({
     // res,
     chatId,
-    userQuestion: JSON.parse(event.message.content).text as string,
+    userQuestion: question,
     shareChat,
     chatUserId: event.sender.sender_id.union_id,
     replyCallback: async (replyContent: string) =>
