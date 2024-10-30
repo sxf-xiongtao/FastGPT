@@ -10,10 +10,11 @@ import { authMaxUsers } from '@/service/support/user/auth';
 import { createUserByUsername } from '@/service/support/user/controller';
 import { createOnePromotion } from '@/service/support/activity/promotion/controller';
 import { Types } from '@fastgpt/service/common/mongo';
+import { trackBaiduConversion } from '@/service/common/tracking/baidu';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
-    const { username, code, password, inviterId } = req.body;
+    const { username, code, password, inviterId, bd_vid } = req.body;
     await connectToDatabase();
 
     if (!username || !code || !password) {
@@ -57,6 +58,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         amount: 5 * PRICE_SCALE
       });
     }
+
+    bd_vid && trackBaiduConversion(bd_vid);
 
     jsonRes(res, {
       data: {
