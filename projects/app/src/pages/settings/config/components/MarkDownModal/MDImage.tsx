@@ -8,6 +8,7 @@ import {
   Skeleton,
   useDisclosure
 } from '@chakra-ui/react';
+import MyImage from '@fastgpt/web/components/common/Image/MyImage';
 
 const MdImage = ({ src }: { src?: string }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -22,7 +23,7 @@ const MdImage = ({ src }: { src?: string }) => {
       justifyContent={'center'}
       my={1}
     >
-      <Image
+      <MyImage
         display={'inline-block'}
         borderRadius={'md'}
         border={'1px solid #ccc'}
@@ -46,7 +47,7 @@ const MdImage = ({ src }: { src?: string }) => {
       <Modal isOpen={isOpen} onClose={onClose} size={'full'}>
         <ModalOverlay />
         <ModalContent m={'auto'}>
-          <Image
+          <MyImage
             src={src}
             alt={''}
             fallbackSrc={'/imgs/errImg.png'}

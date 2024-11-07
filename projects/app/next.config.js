@@ -4,6 +4,7 @@ const fs = require('fs');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  basePath: process.env.NEXT_PUBLIC_BASE_URL,
   i18n,
   output: 'standalone',
   reactStrictMode: process.env.NODE_ENV === 'development' ? false : true,
@@ -85,14 +86,12 @@ const nextConfig = {
 module.exports = nextConfig;
 
 function getWorkerConfig() {
-  const baseUrl = path.resolve(__dirname, '../../FastGPT/packages/service/worker')
+  const baseUrl = path.resolve(__dirname, '../../FastGPT/packages/service/worker');
   const result = fs.readdirSync(baseUrl);
 
   // 获取所有的目录名
   const folderList = result.filter((item) => {
-    return fs
-      .statSync(path.resolve(baseUrl, item))
-      .isDirectory();
+    return fs.statSync(path.resolve(baseUrl, item)).isDirectory();
   });
 
   const workerConfig = folderList.reduce((acc, item) => {

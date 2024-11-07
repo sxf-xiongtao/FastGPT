@@ -28,6 +28,7 @@ FROM node:20.14.0-alpine AS builder
 WORKDIR /app
 
 ARG proxy
+ARG base_url
 
 # copy common node_modules and one project node_modules
 COPY package.json pnpm-workspace.yaml .npmrc./
@@ -40,6 +41,7 @@ COPY --from=maindeps /app/projects/app/node_modules ./projects/app/node_modules
 RUN [ -z "$proxy" ] || sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
 
 RUN apk add --no-cache libc6-compat && npm install -g pnpm@9.4.0
+ENV NEXT_PUBLIC_BASE_URL=$base_url
 RUN pnpm --filter=app build
 
 
@@ -48,6 +50,7 @@ FROM node:20.14.0-alpine AS runner
 WORKDIR /app
 
 ARG proxy
+ARG base_url
 
 # create user and use it
 RUN addgroup --system --gid 1001 nodejs
@@ -86,6 +89,7 @@ COPY ./projects/app/data/config.json /app/data/config.json
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
+ENV NEXT_PUBLIC_BASE_URL=$base_url
 
 EXPOSE 3000
 

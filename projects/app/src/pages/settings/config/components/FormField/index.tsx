@@ -7,6 +7,7 @@ import FormLabel from '../FormLabel';
 import { FiledTypeEnum } from '@/web/admin/config/constants';
 import dynamic from 'next/dynamic';
 import { compressImgFileAndUpload } from '@/web/common/file/utils';
+import MyImage from '@fastgpt/web/components/common/Image/MyImage';
 
 const StandardPlans = dynamic(() => import('./StandardPlans'));
 
@@ -83,7 +84,7 @@ const FormField = ({
           }}
         />
         {value ? (
-          <Image
+          <MyImage
             src={value}
             alt="image"
             className="w-28 h-28 cursor-pointer border border-solid border-[#CED5E4]"
