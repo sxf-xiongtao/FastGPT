@@ -6,25 +6,14 @@ import { useSystem } from '@fastgpt/web/hooks/useSystem';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
 import { GET } from '@/service/common/request';
 import { LicenseDataType } from '@/types';
-import { useConfirm } from '@fastgpt/web/hooks/useConfirm';
-import { addDays } from 'date-fns';
 
 const Layout = ({ children }: { children: JSX.Element }) => {
   const { isPc } = useSystem();
-  const { openConfirm, ConfirmModal } = useConfirm({
-    title: '过期提示',
-    content: 'Lincense 距离过期不足 30 天, 请及时联系技术人员进行更新',
-    type: 'common'
-  });
   const { data: licenseData } = useRequest2(
     () => GET<LicenseDataType>('/admin/common/license/auth'),
     {
       manual: false,
-      throttleWait: 1000 * 60 * 5,
-      onSuccess: (data) => {
-        const expTime = new Date(data.expTime);
-        if (addDays(expTime, -30) < new Date()) openConfirm();
-      }
+      throttleWait: 1000 * 60 * 5
     }
   );
   return (
@@ -41,6 +30,7 @@ const Layout = ({ children }: { children: JSX.Element }) => {
             >
               Admin
             </Box>
+            <Navbar />
             {licenseData && (
               <Flex direction="column">
                 <Box>{licenseData.company}</Box>
@@ -48,7 +38,6 @@ const Layout = ({ children }: { children: JSX.Element }) => {
                 <Box>最大用户: {licenseData.maxRegister}</Box>
               </Flex>
             )}
-            <Navbar />
           </Flex>
         ) : (
           <Flex justifyContent={'space-between'} alignItems={'center'} px={8}>
@@ -69,6 +58,13 @@ const Layout = ({ children }: { children: JSX.Element }) => {
               </PopoverTrigger>
               <PopoverContent>
                 <Navbar />
+                {licenseData && (
+                  <Box p={4}>
+                    <Box>{licenseData.company}</Box>
+                    <Box>过期时间: {licenseData.expTime}</Box>
+                    <Box>最大用户: {licenseData.maxRegister}</Box>
+                  </Box>
+                )}
               </PopoverContent>
             </Popover>
           </Flex>
@@ -77,7 +73,6 @@ const Layout = ({ children }: { children: JSX.Element }) => {
           {children}
         </Box>
       </Flex>
-      <ConfirmModal />;
     </>
   );
 };
