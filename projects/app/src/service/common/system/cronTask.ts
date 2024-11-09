@@ -29,13 +29,13 @@ export const clearExpiredSubPlan = async () => {
 
   const standardPlans = await MongoTeamSub.deleteMany({
     type: SubTypeEnum.standard,
+    expiredTime: { $lte: new Date() },
     currentSubLevel: [
       StandardSubLevelEnum.experience,
       StandardSubLevelEnum.team,
       StandardSubLevelEnum.enterprise,
       StandardSubLevelEnum.custom
-    ],
-    expiredTime: { $lte: new Date() }
+    ]
   });
 
   addLog.info(`删除过期的订阅套餐: ${standardPlans.deletedCount}`);
