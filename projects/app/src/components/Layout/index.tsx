@@ -3,41 +3,29 @@ import { Box, Button, Flex, Popover, PopoverContent, PopoverTrigger } from '@cha
 import Navbar from './Navbar';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
-import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
-import { GET } from '@/service/common/request';
-import { LicenseDataType } from '@/types';
+import LicenseData from './LicenseData';
 
 const Layout = ({ children }: { children: JSX.Element }) => {
   const { isPc } = useSystem();
-  const { data: licenseData } = useRequest2(
-    () => GET<LicenseDataType>('/admin/common/license/auth'),
-    {
-      manual: false,
-      throttleWait: 1000 * 60 * 5
-    }
-  );
+
   return (
     <>
-      <Flex h={'100%'} bg={'myGray.100'} flexDirection={['column', 'row']}>
+      <Flex h={'100%'} bg={'myGray.100'} flexDirection={['column', 'row']} userSelect={'none'}>
         {isPc ? (
-          <Flex h={'100%'} flexDir={'column'} px={3}>
+          <Flex h={'100%'} flexDir={'column'} pl={3} bg={'white'}>
             <Box
               textAlign={'center'}
-              fontSize={'2xl'}
+              fontSize={'xl'}
               color={'primary.600'}
               fontWeight={'bold'}
               pt={4}
             >
               Admin
             </Box>
+
             <Navbar />
-            {licenseData && (
-              <Flex direction="column">
-                <Box>{licenseData.company}</Box>
-                <Box>过期时间: {licenseData.expTime}</Box>
-                <Box>最大用户: {licenseData.maxRegister}</Box>
-              </Flex>
-            )}
+
+            <LicenseData />
           </Flex>
         ) : (
           <Flex justifyContent={'space-between'} alignItems={'center'} px={8}>
@@ -58,13 +46,7 @@ const Layout = ({ children }: { children: JSX.Element }) => {
               </PopoverTrigger>
               <PopoverContent>
                 <Navbar />
-                {licenseData && (
-                  <Box p={4}>
-                    <Box>{licenseData.company}</Box>
-                    <Box>过期时间: {licenseData.expTime}</Box>
-                    <Box>最大用户: {licenseData.maxRegister}</Box>
-                  </Box>
-                )}
+                <LicenseData />
               </PopoverContent>
             </Popover>
           </Flex>

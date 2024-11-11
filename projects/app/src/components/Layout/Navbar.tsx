@@ -90,7 +90,7 @@ export default function Navbar() {
         },
         {
           activeLink: '/settings/config/user',
-          name: '用户 & 登录 & 通知',
+          name: '用户配置',
           icon: 'support/user/userLight'
         },
         {
@@ -116,7 +116,10 @@ export default function Navbar() {
     alignItems: 'center',
     justifyContent: 'space-between',
     cursor: 'pointer',
-    borderRadius: 'md'
+    borderRadius: 'md',
+    _hover: {
+      bg: 'myGray.100'
+    }
   };
 
   const handleItemClick = (item: any) => {
@@ -136,7 +139,7 @@ export default function Navbar() {
   };
 
   return (
-    <Box overflow={'scroll'} flex={1}>
+    <Box overflow={'scroll'} pr={3} flex={1}>
       {LIST.map((item) => {
         return (
           <Box key={item.activeLink}>
@@ -144,15 +147,9 @@ export default function Navbar() {
               alignItems={'center'}
               key={item.activeLink}
               {...itemStyles}
-              {...(router.pathname.startsWith(item.activeLink)
-                ? {
-                    color: 'primary.600'
-                  }
-                : {
-                    _hover: {
-                      bg: 'rgba(255,255,255,0.9)'
-                    }
-                  })}
+              {...(router.pathname.startsWith(item.activeLink) && {
+                color: 'primary.600'
+              })}
               onClick={() => handleItemClick(item)}
             >
               <HStack spacing={3} justifyContent={'space-between'}>
@@ -180,15 +177,9 @@ export default function Navbar() {
                       {...(router.pathname.startsWith(subItem.activeLink)
                         ? {
                             color: 'primary.600',
-                            boxShadow:
-                              '0px 0px 1px 0px rgba(19, 51, 107, 0.08), 0px 4px 4px 0px rgba(19, 51, 107, 0.05)',
-                            bg: 'white'
+                            bg: 'myGray.200'
                           }
-                        : {
-                            _hover: {
-                              bg: 'rgba(255,255,255,0.9)'
-                            }
-                          })}
+                        : {})}
                       onClick={() => handleSubItemClick(subItem)}
                     >
                       <Flex>

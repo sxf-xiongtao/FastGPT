@@ -77,7 +77,7 @@ jobs:
           -t ${Ali_Tag} \
           -t ${Ali_Latest} \
           .
-  build-fastgpt-pro-images-child-route:
+  build-fastgpt-pro-images-sub-route:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
@@ -118,15 +118,15 @@ jobs:
       - name: Set image name and tag
         run: |
           if [[ "${{ github.ref_name }}" == "main" ]]; then
-            echo "Git_Tag=ghcr.io/${{ github.repository_owner }}/fastgpt-pro-child-route:latest" >> $GITHUB_ENV
-            echo "Git_Latest=ghcr.io/${{ github.repository_owner }}/fastgpt-pro-child-route:latest" >> $GITHUB_ENV
-            echo "Ali_Tag=${{ secrets.ALI_IMAGE_NAME }}/fastgpt-pro-child-route:latest" >> $GITHUB_ENV
-            echo "Ali_Latest=${{ secrets.ALI_IMAGE_NAME }}/fastgpt-pro-child-route:latest" >> $GITHUB_ENV
+            echo "Git_Tag=ghcr.io/${{ github.repository_owner }}/fastgpt-pro-sub-route:latest" >> $GITHUB_ENV
+            echo "Git_Latest=ghcr.io/${{ github.repository_owner }}/fastgpt-pro-sub-route:latest" >> $GITHUB_ENV
+            echo "Ali_Tag=${{ secrets.ALI_IMAGE_NAME }}/fastgpt-pro-sub-route:latest" >> $GITHUB_ENV
+            echo "Ali_Latest=${{ secrets.ALI_IMAGE_NAME }}/fastgpt-pro-sub-route:latest" >> $GITHUB_ENV
           else
-            echo "Git_Tag=ghcr.io/${{ github.repository_owner }}/fastgpt-pro-child-route:${{ github.ref_name }}" >> $GITHUB_ENV
-            echo "Git_Latest=ghcr.io/${{ github.repository_owner }}/fastgpt-pro-child-route:latest" >> $GITHUB_ENV
-            echo "Ali_Tag=${{ secrets.ALI_IMAGE_NAME }}/fastgpt-pro-child-route:${{ github.ref_name }}" >> $GITHUB_ENV
-            echo "Ali_Latest=${{ secrets.ALI_IMAGE_NAME }}/fastgpt-pro-child-route:latest" >> $GITHUB_ENV
+            echo "Git_Tag=ghcr.io/${{ github.repository_owner }}/fastgpt-pro-sub-route:${{ github.ref_name }}" >> $GITHUB_ENV
+            echo "Git_Latest=ghcr.io/${{ github.repository_owner }}/fastgpt-pro-sub-route:latest" >> $GITHUB_ENV
+            echo "Ali_Tag=${{ secrets.ALI_IMAGE_NAME }}/fastgpt-pro-sub-route:${{ github.ref_name }}" >> $GITHUB_ENV
+            echo "Ali_Latest=${{ secrets.ALI_IMAGE_NAME }}/fastgpt-pro-sub-route:latest" >> $GITHUB_ENV
           fi
 
       - name: Build and publish image for main branch or tag push event
@@ -136,7 +136,7 @@ jobs:
           docker buildx build \
           -f projects/app/Dockerfile \
           --platform linux/amd64,linux/arm64 \
-          --build-arg base_url=fastai \ 
+          --build-arg base_url=fastai \
           --label "org.opencontainers.image.source=https://github.com/${{ github.repository_owner }}/FastGPT" \
           --label "org.opencontainers.image.description=fastgpt-pro image" \
           --push \
