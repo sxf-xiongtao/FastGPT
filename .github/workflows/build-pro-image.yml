@@ -1,4 +1,4 @@
-name: Build fastgpt-admin images and copy image to docker hub
+name: Build fastgpt-admin images
 on:
   workflow_dispatch:
   push:
