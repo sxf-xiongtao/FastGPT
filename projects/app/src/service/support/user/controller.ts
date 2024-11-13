@@ -17,6 +17,9 @@ type UserProps = {
   notificationAccount?: string;
   avatar?: string;
   inviterId?: string;
+  fastgpt_sem?: {
+    keyword: string;
+  };
 };
 
 /* create user and team */
@@ -26,7 +29,8 @@ export async function createUserByUsername({
   phonePrefix,
   avatar,
   inviterId,
-  notificationAccount
+  notificationAccount,
+  fastgpt_sem
 }: UserProps & {
   password: string;
 }): Promise<UserType> {
@@ -40,7 +44,8 @@ export async function createUserByUsername({
           avatar,
           password,
           inviterId: inviterId && Types.ObjectId.isValid(inviterId) ? inviterId : undefined,
-          phonePrefix
+          phonePrefix,
+          fastgpt_sem
         }
       ],
       { session }

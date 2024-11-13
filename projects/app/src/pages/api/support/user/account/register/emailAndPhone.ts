@@ -14,7 +14,7 @@ import { trackBaiduConversion } from '@/service/common/tracking/baidu';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
-    const { username, code, password, inviterId, bd_vid } = req.body;
+    const { username, code, password, inviterId, bd_vid, fastgpt_sem } = req.body;
     await connectToDatabase();
 
     if (!username || !code || !password) {
@@ -44,7 +44,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       password,
       inviterId,
       notificationAccount: username,
-      phonePrefix: 86 // 目前只支持国内的
+      phonePrefix: 86, // 目前只支持国内的
+      fastgpt_sem
     });
 
     const token = createJWT(user);
