@@ -10,9 +10,9 @@ const Layout = ({ children }: { children: JSX.Element }) => {
 
   return (
     <>
-      <Flex h={'100%'} bg={'myGray.100'} flexDirection={['column', 'row']} userSelect={'none'}>
+      <Flex h={'100%'} bg={'myGray.100'} flexDirection={['column', 'row']}>
         {isPc ? (
-          <Flex h={'100%'} flexDir={'column'} pl={3} bg={'white'}>
+          <Flex h={'100%'} flexDir={'column'} pl={3} bg={'white'} userSelect={'none'}>
             <Box
               textAlign={'center'}
               fontSize={'xl'}
@@ -28,7 +28,7 @@ const Layout = ({ children }: { children: JSX.Element }) => {
             <LicenseData />
           </Flex>
         ) : (
-          <Flex justifyContent={'space-between'} alignItems={'center'} px={8}>
+          <Flex justifyContent={'space-between'} alignItems={'center'} px={8} userSelect={'none'}>
             <Box
               textAlign={'center'}
               fontSize={'2xl'}
