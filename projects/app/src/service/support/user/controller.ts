@@ -51,10 +51,18 @@ export async function createUserByUsername({
       { session }
     );
 
+    // username: email;phone;git-xxx;google-xxx
+    const teamName = (() => {
+      const splitUsername = username.split('-');
+      if (splitUsername.length > 1) {
+        return splitUsername[1];
+      }
+      return splitUsername[0];
+    })();
     const team = await getAndCreateUserDefaultTeam({
       ownerId: user._id,
       notificationAccount,
-      teamName: `${username.slice(0, 10)}的团队`,
+      teamName: `${teamName.slice(0, 10)}的团队`,
       teamAvatar: avatar,
       session
     });

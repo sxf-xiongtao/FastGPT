@@ -374,23 +374,6 @@ export const getUserFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
       title: '通知 & 登录配置',
       type: 'object',
       properties: {
-        google: {
-          type: 'object',
-          title: '谷歌登录配置',
-          key: 'loginSettings.google',
-          properties: {
-            clientId: {
-              key: 'loginSettings.google.clientId',
-              type: 'string',
-              title: 'Google Client ID'
-            },
-            secret: {
-              key: 'loginSettings.google.secret',
-              type: 'string',
-              title: 'Google Secret'
-            }
-          }
-        },
         email: {
           key: 'loginSettings.email',
           type: 'object',
@@ -500,6 +483,23 @@ export const getUserFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
               key: 'loginSettings.github.secret',
               type: 'string',
               title: 'GitHub Secret'
+            }
+          }
+        },
+        google: {
+          type: 'object',
+          title: '谷歌登录配置',
+          key: 'loginSettings.google',
+          properties: {
+            clientId: {
+              key: 'loginSettings.google.clientId',
+              type: 'string',
+              title: 'Google Client ID'
+            },
+            secret: {
+              key: 'loginSettings.google.secret',
+              type: 'string',
+              title: 'Google Secret'
             }
           }
         },
