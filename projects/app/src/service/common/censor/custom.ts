@@ -1,4 +1,5 @@
 import { addLog } from '@fastgpt/service/common/system/log';
+import { i18nT } from '@fastgpt/web/i18n/utils';
 import axios from 'axios';
 
 export const censorCheckCustom = async (text: string) => {
@@ -17,14 +18,14 @@ export const censorCheckCustom = async (text: string) => {
       'Content-Type': 'application/json'
     }
   });
-  addLog.info('censor check failed: ' + result.data.message);
+  addLog.debug('censor check failed: ' + result.data.message);
   if (result.data.success) {
     return {
       code: 200
     };
-  } else {
-    return {
-      code: 5000
-    };
   }
+  return {
+    code: 5000,
+    message: result.data.message
+  };
 };

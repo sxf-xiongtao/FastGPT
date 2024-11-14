@@ -20,10 +20,8 @@ async function handler(
   const { text } = req.body;
   await authCert({ req, authRoot: true });
 
-  const customURL = global.systemConfig.censor?.customCensorURL;
-
   try {
-    if (customURL) {
+    if (global.systemConfig.censor?.customCensorURL) {
       return censorCheckCustom(text);
     }
 
