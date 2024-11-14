@@ -66,47 +66,61 @@ export const getSystemPlugins = async () => {
 export const getSystemPluginsAndLoadThem = async (refresh = false) => {
   if (isProduction && global.systemPlugins && !refresh) return cloneDeep(global.systemPlugins);
 
-  if (!global.systemPlugins) {
+  if (!global.systemPlugins || global.systemPlugins.length === 0) {
     global.systemPlugins = [];
   }
 
-  const systemPlugins = await getSystemPlugins();
+  try {
+    const systemPlugins = await getSystemPlugins();
 
-  const pluginConfigs = await MongoSystemPluginSchema.find();
-  systemPlugins.forEach((plugin) => {
-    const pluginConfig = pluginConfigs.find((config) => config.pluginId === plugin.id);
+    const pluginConfigs = await MongoSystemPluginSchema.find();
+    systemPlugins.forEach((plugin) => {
+      // 如果有插件的配置信息，则需要进行替换
+      const pluginConfig = pluginConfigs.find((config) => config.pluginId === plugin.id);
 
-    if (pluginConfig) {
-      // 修改自身以及 children 的属性
-      const children = systemPlugins.filter((item) => item.parentId === plugin.id);
-      const list = [plugin, ...children];
-      list.forEach((item) => {
-        item.isActive = pluginConfig.isActive ?? false;
-        item.originCost = pluginConfig.originCost ?? 0;
-        item.currentCost = pluginConfig.currentCost ?? 0;
+      if (pluginConfig) {
+        // 修改自身以及 children 的属性
+        const children = systemPlugins.filter((item) => item.parentId === plugin.id);
+        const list = [plugin, ...children];
+        list.forEach((item) => {
+          item.isActive = pluginConfig.isActive ?? false;
+          item.originCost = pluginConfig.originCost ?? 0;
+          item.currentCost = pluginConfig.currentCost ?? 0;
 
-        // 使用 inputConfig 的内容，替换插件的 nodes
-        if (pluginConfig.inputConfig && item.workflow?.nodes) {
-          let nodeString = JSON.stringify(item.workflow.nodes);
-          pluginConfig.inputConfig.forEach((inputConfig) => {
-            nodeString = replaceVariable(nodeString, {
-              [inputConfig.key]: inputConfig.value
-            });
-          });
+          // 使用 inputConfig 的内容，替换插件的 nodes
+          if (pluginConfig.inputConfig && item.workflow?.nodes) {
+            try {
+              let nodeString = JSON.stringify(item.workflow.nodes);
+              pluginConfig.inputConfig.forEach((inputConfig) => {
+                nodeString = replaceVariable(nodeString, {
+                  [inputConfig.key]: inputConfig.value
+                });
+              });
 
-          item.workflow.nodes = JSON.parse(nodeString);
-        }
-      });
-    }
-  });
-  global.systemPlugins = systemPlugins;
+              item.workflow.nodes = JSON.parse(nodeString);
+            } catch (error) {}
+          }
+        });
+      }
+    });
+    global.systemPlugins = systemPlugins;
 
-  return cloneDeep(global.systemPlugins);
+    return cloneDeep(global.systemPlugins);
+  } catch (error) {
+    global.systemPlugins = [];
+    return [];
+  }
 };
 
 /* Get callback */
-export const getSystemPluginCb = async () => {
-  if (isProduction && global.systemPluginCb) return global.systemPluginCb;
+export const getSystemPluginCb = async (refresh = false) => {
+  if (
+    isProduction &&
+    global.systemPluginCb &&
+    Object.keys(global.systemPluginCb).length > 0 &&
+    !refresh
+  )
+    return global.systemPluginCb;
 
   global.systemPluginCb = {};
 
@@ -134,12 +148,14 @@ export const getSystemPluginCb = async () => {
     cb: any;
   }[];
 
+  const communityCb = await getCommunityCb();
+
   global.systemPluginCb = result.reduce<Record<string, (e: any) => SystemPluginResponseType>>(
     (acc, { name, cb }) => {
       acc[name] = cb;
       return acc;
     },
-    await getCommunityCb()
+    communityCb
   );
 
   return global.systemPluginCb;

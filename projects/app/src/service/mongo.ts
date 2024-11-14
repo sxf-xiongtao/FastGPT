@@ -35,8 +35,8 @@ export async function connectToDatabase(): Promise<void> {
       await Promise.all([
         getProInitData(),
         authLicense(),
-        getSystemPluginCb(),
-        getSystemPluginsAndLoadThem()
+        getSystemPluginCb(true),
+        getSystemPluginsAndLoadThem(true)
       ]);
 
       startTrainingProcess();

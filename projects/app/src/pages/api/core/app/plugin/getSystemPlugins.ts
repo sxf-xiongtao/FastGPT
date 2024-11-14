@@ -13,8 +13,6 @@ async function handler(
   req: ApiRequestProps<getSystemPluginsBody, getSystemPluginsQuery>,
   res: ApiResponseType<any>
 ): Promise<getSystemPluginsResponse> {
-  // Get mongodb plugin config
-
   return getSystemPluginsAndLoadThem();
 }
 

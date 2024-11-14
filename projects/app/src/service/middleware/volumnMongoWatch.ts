@@ -1,7 +1,10 @@
 import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema';
 import { getProInitData } from '../init';
 import { MongoSystemPluginSchema } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
-import { getSystemPluginsAndLoadThem } from '../core/workflow/systemPlugins/register';
+import {
+  getSystemPluginCb,
+  getSystemPluginsAndLoadThem
+} from '../core/workflow/systemPlugins/register';
 
 export const startMongoWatch = async () => {
   reloadConfigWatch();
@@ -26,7 +29,9 @@ const refetchSystemPlugins = () => {
 
   changeStream.on('change', async (change) => {
     try {
+      console.log('refresh system plugins');
       getSystemPluginsAndLoadThem(true);
+      getSystemPluginCb(true);
     } catch (error) {}
   });
 };

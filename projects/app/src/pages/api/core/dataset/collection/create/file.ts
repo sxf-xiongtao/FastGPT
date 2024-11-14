@@ -71,6 +71,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const { rawText } = await readRawTextByLocalFile({
       teamId,
       path: file.path,
+      encoding: file.encoding,
       metadata: {
         ...fileMetadata,
         relatedId: relatedImgId
@@ -85,6 +86,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       path: file.path,
       filename: file.originalname,
       contentType: file.mimetype,
+      encoding: file.encoding,
       metadata: fileMetadata
     });
 
