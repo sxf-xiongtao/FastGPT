@@ -17,6 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const { username, avatarUrl, email } = await (async () => {
       if (type === OAuthEnum.github) return authGithub(code);
       if (type === OAuthEnum.google) return authGoogle(code, callbackUrl);
+      if (type === OAuthEnum.microsoft) return authMicrosoft(code, callbackUrl);
       return Promise.reject('type error');
     })();
 
@@ -94,5 +95,45 @@ export async function authGoogle(code: string, callbackUrl: string) {
     avatarUrl: picture,
     username,
     email
+  };
+}
+
+export async function authMicrosoft(code: string, callbackUrl: string) {
+  const { data: tokenData } = await axios.post<{
+    access_token: string;
+    refresh_token: string;
+  }>(
+    `https://login.microsoftonline.com/common/oauth2/v2.0/token`,
+    new URLSearchParams({
+      client_id: global.systemConfig?.auth?.microsoft?.clientId || '',
+      client_secret: global.systemConfig?.auth?.microsoft?.secret || '',
+      scope: 'https://graph.microsoft.com/user.read',
+      code: code,
+      redirect_uri: callbackUrl,
+      grant_type: 'authorization_code'
+    })
+  );
+
+  const { data: userData } = await axios.get<{
+    id: string;
+    userPrincipalName: string;
+    displayName: string;
+    mail?: string;
+  }>('https://graph.microsoft.com/v1.0/me', {
+    headers: {
+      Authorization: `Bearer ${tokenData.access_token}`
+    }
+  });
+
+  if (!userData.id) {
+    throw new Error('Fail to get microsoft user info');
+  }
+
+  const username = `microsoft-${userData.id}`;
+
+  return {
+    avatarUrl: '',
+    username,
+    email: userData.mail || userData.userPrincipalName
   };
 }

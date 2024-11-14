@@ -58,6 +58,7 @@ export type ConfigFormType = {
     github: NonNullable<SystemConfigType['auth']>['github'];
     wechat: NonNullable<SystemConfigType['auth']>['wechat'];
     google: NonNullable<SystemConfigType['auth']>['google'];
+    microsoft: NonNullable<SystemConfigType['auth']>['microsoft'];
     fastLogin: string;
   };
   paySettings: {

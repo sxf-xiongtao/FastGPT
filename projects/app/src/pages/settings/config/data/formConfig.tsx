@@ -523,6 +523,24 @@ export const getUserFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
             }
           }
         },
+        microsoft: {
+          type: 'object',
+          title: '微软登录配置',
+          key: 'loginSettings.microsoft',
+          properties: {
+            clientId: {
+              key: 'loginSettings.microsoft.clientId',
+              type: 'string',
+              title: 'Microsoft Client ID',
+              description: '对应 Microsoft 应用的「应用程序(客户端) ID」'
+            },
+            secret: {
+              key: 'loginSettings.microsoft.secret',
+              type: 'string',
+              title: 'Microsoft Client Secret'
+            }
+          }
+        },
         ...(sso
           ? {
               sso: {

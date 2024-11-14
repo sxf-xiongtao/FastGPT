@@ -39,6 +39,10 @@ export type SystemConfigType = {
       clientId: string;
       secret: string;
     };
+    microsoft?: {
+      clientId: string;
+      secret: string;
+    };
     email?: {
       smtp: string;
       user: string;
