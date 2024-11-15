@@ -64,9 +64,10 @@ export const getSystemPlugins = async () => {
 };
 
 export const getSystemPluginsAndLoadThem = async (refresh = false) => {
-  if (isProduction && global.systemPlugins && !refresh) return cloneDeep(global.systemPlugins);
+  if (isProduction && global.systemPlugins && global.systemPlugins.length > 0 && !refresh)
+    return cloneDeep(global.systemPlugins);
 
-  if (!global.systemPlugins || global.systemPlugins.length === 0) {
+  if (!global.systemPlugins) {
     global.systemPlugins = [];
   }
 
@@ -123,6 +124,8 @@ export const getSystemPluginCb = async (refresh = false) => {
     return global.systemPluginCb;
 
   global.systemPluginCb = {};
+
+  await getSystemPluginsAndLoadThem(refresh);
 
   // Do not modify the following code
   const loadModule = async (name: string) => {
