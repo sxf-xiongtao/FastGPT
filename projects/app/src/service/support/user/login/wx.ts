@@ -1,3 +1,4 @@
+import { addLog } from '@fastgpt/service/common/system/log';
 import axios from 'axios';
 
 export const getWechatLoginConfig = async () => {
@@ -25,6 +26,10 @@ export const getWeChatAccessToken = async () => {
   });
 
   const newAccessToken = data.access_token;
+
+  if (!newAccessToken) {
+    addLog.warn('getWeChatAccessToken error', { data });
+  }
 
   return newAccessToken;
 };
