@@ -30,8 +30,8 @@ async function handler(
   _res: ApiResponseType<any>
 ): Promise<OutLinkWecomResponse> {
   const { token, msg_signature, timestamp, nonce, echostr } = req.query;
-  const { shareChat } = await authOutLinkValid<WecomAppType>({ shareId: token });
-  const { CallbackEncodingAesKey, CallbackToken, AgentId, SuiteSecret, CorpId } = shareChat.app;
+  const { outLinkConfig } = await authOutLinkValid<WecomAppType>({ shareId: token });
+  const { CallbackEncodingAesKey, CallbackToken, AgentId, SuiteSecret, CorpId } = outLinkConfig.app;
 
   // handle challenge
   if (echostr) {
@@ -59,7 +59,7 @@ async function handler(
 
   outlinkInvokeChat({
     chatId,
-    shareChat,
+    outLinkConfig,
     messageId: body.MsgId,
     userQuestion: body.Content,
     chatUserId: body.FromUserName,

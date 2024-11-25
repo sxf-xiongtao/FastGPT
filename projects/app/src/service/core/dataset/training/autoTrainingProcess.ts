@@ -42,11 +42,13 @@ export async function generateAutoTraining(): Promise<any> {
     try {
       const data = await MongoDatasetTraining.findOneAndUpdate(
         {
-          lockTime: { $lte: addMinutes(new Date(), -6) },
-          mode: TrainingModeEnum.auto
+          mode: TrainingModeEnum.auto,
+          retryCount: { $gte: 0 },
+          lockTime: { $lte: addMinutes(new Date(), -6) }
         },
         {
-          lockTime: new Date()
+          lockTime: new Date(),
+          $inc: { retryCount: -1 }
         }
       )
         .select({

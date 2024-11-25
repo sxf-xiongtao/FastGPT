@@ -79,7 +79,8 @@ const nextConfig = {
   experimental: {
     // 指定导出包优化，按需引入包模块
     serverComponentsExternalPackages: ['mongoose', 'pg', '@node-rs/jieba'],
-    outputFileTracingRoot: path.join(__dirname, '../../')
+    outputFileTracingRoot: path.join(__dirname, '../../'),
+    instrumentationHook: true
   }
 };
 

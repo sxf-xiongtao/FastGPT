@@ -32,8 +32,8 @@ async function handler(
   _res: ApiResponseType<any>
 ): Promise<OutLinkOffiAccountResponse> {
   const { signature, timestamp, nonce, echostr, token } = req.query;
-  const { shareChat } = await authOutLinkValid<OffiAccountAppType>({ shareId: token });
-  const { CallbackToken, appId, secret, CallbackEncodingAesKey } = shareChat.app;
+  const { outLinkConfig } = await authOutLinkValid<OffiAccountAppType>({ shareId: token });
+  const { CallbackToken, appId, secret, CallbackEncodingAesKey } = outLinkConfig.app;
 
   if (echostr) {
     const decoded_signature = getSignature(CallbackToken, timestamp, nonce);
@@ -60,7 +60,7 @@ async function handler(
 
   outlinkInvokeChat({
     chatId,
-    shareChat,
+    outLinkConfig,
     messageId: body.MsgId,
     userQuestion: String(body.Content), // Important: must be string. Stupid Wechat could send number which cause errors
     chatUserId: body.FromUserName,

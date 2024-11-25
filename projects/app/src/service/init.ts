@@ -47,7 +47,7 @@ export const getProInitData = async () => {
   }
 };
 
-export function initGlobal() {
+export function initGlobalVariables() {
   global.sendInformQueue = [];
   global.sendInformQueueLen = 0;
 

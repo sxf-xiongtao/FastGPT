@@ -48,7 +48,7 @@ export async function requestReply({
   content: string;
   access_token: string;
 }) {
-  const res = await axios.request({
+  return axios.request({
     url: replyURL,
     method: 'POST',
     data: {

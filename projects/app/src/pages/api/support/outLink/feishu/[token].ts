@@ -9,6 +9,7 @@ import {
   signatureVerification
 } from '@/service/support/outLink/feishu/utils';
 import { outlinkInvokeChat } from '@/service/support/outLink/utils';
+import { addLog } from '@fastgpt/service/common/system/log';
 
 // Request type from feishu
 type EncryptedProps = { encrypt: string };
@@ -67,13 +68,13 @@ async function handler(
   _res: ApiResponseType<any>
 ): Promise<FeishuResponse> {
   const { token } = req.query;
-  const { appId, shareChat } = await authOutLinkValid<FeishuAppType>({ shareId: token });
+  const { appId, outLinkConfig } = await authOutLinkValid<FeishuAppType>({ shareId: token });
 
   if (!appId) {
     return Promise.reject('No appId found');
   }
 
-  const encryptKey = shareChat?.app?.encryptKey;
+  const encryptKey = outLinkConfig?.app?.encryptKey;
 
   // decrypt the message sent from feishu server if it is encrypted
   // or just return the body without any modification
@@ -114,10 +115,16 @@ async function handler(
 
   const event = (data as EventProps).event; // HACK
 
+  if (!event.message) {
+    addLog.warn(`feishu message error, not message`, {
+      event
+    });
+    return 'ok';
+  }
+
   const chatId = (() => {
     // 特殊情况
     if (!event.message?.chat_id) {
-      console.log(event);
       return event.message.message_id;
     }
     // 个人对话框/普通群：thread_id为空；话题群：thread_id不为空
@@ -134,14 +141,14 @@ async function handler(
     // res,
     chatId,
     userQuestion: question,
-    shareChat,
+    outLinkConfig,
     chatUserId: event.sender.sender_id.union_id,
     replyCallback: async (replyContent: string) =>
       replyMessage({
         message_id: event.message.message_id,
         accessToken: await getTenantAccesssToken({
-          appSecret: shareChat.app.appSecret,
-          appId: shareChat.app.appId
+          appSecret: outLinkConfig.app.appSecret,
+          appId: outLinkConfig.app.appId
         }),
         replyContent
       }),

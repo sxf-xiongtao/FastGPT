@@ -25,7 +25,7 @@ import { getChatSourceByPublishChannel } from '@fastgpt/global/core/chat/utils';
 import { WORKFLOW_MAX_RUN_TIMES } from '@fastgpt/service/core/workflow/constants';
 
 export type outLinkInvokeChatProps<T extends OutlinkAppType> = {
-  shareChat: OutLinkSchema<T>;
+  outLinkConfig: OutLinkSchema<T>;
   chatId: string; // specific chat
   userQuestion: string;
   res?: NextApiResponse;
@@ -35,7 +35,7 @@ export type outLinkInvokeChatProps<T extends OutlinkAppType> = {
 };
 
 export async function outlinkInvokeChat<T extends OutlinkAppType>({
-  shareChat,
+  outLinkConfig,
   chatId,
   userQuestion,
   res,
@@ -46,9 +46,9 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
   try {
     // Get app workflow config
     const [app, { nodes, chatConfig, edges }, { user }] = await Promise.all([
-      MongoApp.findById(shareChat.appId).lean(),
-      getAppLatestVersion(shareChat.appId),
-      getUserChatInfoAndAuthTeamPoints(shareChat.tmbId)
+      MongoApp.findById(outLinkConfig.appId).lean(),
+      getAppLatestVersion(outLinkConfig.appId),
+      getUserChatInfoAndAuthTeamPoints(outLinkConfig.tmbId)
     ]);
 
     if (!nodes || !user || !chatConfig || !app) {
@@ -56,7 +56,7 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
     }
 
     const { histories } = await getChatItems({
-      appId: shareChat.appId,
+      appId: outLinkConfig.appId,
       chatId,
       offset: 0,
       limit: getMaxHistoryLimitFromNodes(nodes),
@@ -70,7 +70,7 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
 
     await authOutLinkLimit({
       outLinkUid: chatUserId,
-      outLink: shareChat as any, // HACK, we do not need to provide app: T
+      outLink: outLinkConfig as any, // HACK, we do not need to provide app: T
       question: userQuestion,
       ip: chatId
     });
@@ -89,10 +89,10 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
       mode: 'chat',
       runningAppInfo: {
         id: String(app._id),
-        teamId: shareChat.teamId,
-        tmbId: shareChat.tmbId
+        teamId: outLinkConfig.teamId,
+        tmbId: outLinkConfig.tmbId
       },
-      uid: chatUserId || shareChat.tmbId,
+      uid: chatUserId || outLinkConfig.tmbId,
       user,
       chatId,
       variables: {},
@@ -115,15 +115,15 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
     await saveChat({
       chatId,
       appId: app._id,
-      teamId: shareChat.teamId,
-      tmbId: shareChat.tmbId,
+      teamId: outLinkConfig.teamId,
+      tmbId: outLinkConfig.tmbId,
       nodes,
       appChatConfig: chatConfig,
       variables: newVariables,
       isUpdateUseTime: true, // owner update use time
       newTitle: userQuestion.slice(0, 8),
-      shareId: shareChat.shareId,
-      source: getChatSourceByPublishChannel(shareChat.type),
+      shareId: outLinkConfig.shareId,
+      source: getChatSourceByPublishChannel(outLinkConfig.type),
       content: [
         {
           dataId: messageId,
@@ -141,19 +141,20 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
       }
     });
 
-    await replyCallback(responseContent);
+    const replyResult = await replyCallback(responseContent);
+    console.log(replyResult, '--=-=');
 
     const { totalPoints } = pushChatUsage({
       appName: app.name,
       appId: app._id,
-      teamId: shareChat.teamId,
-      tmbId: shareChat.tmbId,
-      source: getUsageSourceByPublishChannel(shareChat.type),
+      teamId: outLinkConfig.teamId,
+      tmbId: outLinkConfig.tmbId,
+      source: getUsageSourceByPublishChannel(outLinkConfig.type),
       flowUsages
     });
 
     await addOutLinkUsage({
-      shareId: shareChat.shareId,
+      shareId: outLinkConfig.shareId,
       totalPoints: totalPoints
     });
   } catch (error) {
