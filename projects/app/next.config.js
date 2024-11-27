@@ -78,7 +78,12 @@ const nextConfig = {
   transpilePackages: ['@fastgpt/*', 'ahooks', '@chakra-ui/*', 'react'],
   experimental: {
     // 指定导出包优化，按需引入包模块
-    serverComponentsExternalPackages: ['mongoose', 'pg', '@node-rs/jieba'],
+    serverComponentsExternalPackages: [
+      'mongoose',
+      'pg',
+      '@node-rs/jieba',
+      '@zilliz/milvus2-sdk-node'
+    ],
     outputFileTracingRoot: path.join(__dirname, '../../'),
     instrumentationHook: true
   }
