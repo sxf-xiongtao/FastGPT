@@ -103,7 +103,7 @@ export async function authMicrosoft(code: string, callbackUrl: string) {
     access_token: string;
     refresh_token: string;
   }>(
-    `https://login.microsoftonline.com/common/oauth2/v2.0/token`,
+    `https://login.microsoftonline.com/${global.systemConfig?.auth?.microsoft?.tenantId || 'common'}/oauth2/v2.0/token`,
     new URLSearchParams({
       client_id: global.systemConfig?.auth?.microsoft?.clientId || '',
       client_secret: global.systemConfig?.auth?.microsoft?.secret || '',

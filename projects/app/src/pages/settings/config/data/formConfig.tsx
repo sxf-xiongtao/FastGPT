@@ -538,6 +538,18 @@ export const getUserFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
               key: 'loginSettings.microsoft.secret',
               type: 'string',
               title: 'Microsoft Client Secret'
+            },
+            tenantId: {
+              key: 'loginSettings.microsoft.tenantId',
+              type: 'string',
+              title: 'Microsoft Tenant ID',
+              description: '对应 Microsoft 应用的「租户 ID」, 若使用默认的 common 可不用填写'
+            },
+            customButton: {
+              key: 'loginSettings.microsoft.customButton',
+              type: 'string',
+              title: '自定义按钮名',
+              description: '自定义按钮的名称，若不填写则使用默认的 Microsoft 按钮'
             }
           }
         },

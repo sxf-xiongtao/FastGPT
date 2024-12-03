@@ -104,7 +104,9 @@ export function formatConfigStore2FormSchema({
       },
       microsoft: {
         clientId: fastgptPro?.auth?.microsoft?.clientId || '',
-        secret: fastgptPro?.auth?.microsoft?.secret || ''
+        secret: fastgptPro?.auth?.microsoft?.secret || '',
+        tenantId: fastgptPro?.auth?.microsoft?.tenantId || '',
+        customButton: fastgptPro?.auth?.microsoft?.customButton || ''
       },
       email: {
         smtp: fastgptPro?.auth?.email?.smtp || '',
@@ -175,7 +177,11 @@ export function formatFormData2ConfigStore({
       github: github?.clientId,
       google: google?.clientId,
       wechat: wechat?.appID,
-      microsoft: microsoft?.clientId
+      microsoft: {
+        clientId: microsoft?.clientId,
+        tenantId: microsoft?.tenantId,
+        customButton: microsoft?.customButton
+      }
     },
     sso,
     register_method: (() => {

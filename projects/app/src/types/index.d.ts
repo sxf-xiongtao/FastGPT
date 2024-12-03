@@ -42,6 +42,8 @@ export type SystemConfigType = {
     microsoft?: {
       clientId: string;
       secret: string;
+      tenantId: string;
+      customButton?: string;
     };
     email?: {
       smtp: string;
