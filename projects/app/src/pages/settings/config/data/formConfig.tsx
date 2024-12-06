@@ -1,4 +1,4 @@
-import { FiledTypeEnum } from '@/web/admin/config/constants';
+import { FieldTypeEnum } from '@/web/admin/config/constants';
 
 type FormConfig = {
   [key: string]: {
@@ -25,7 +25,7 @@ type FormConfig = {
   };
 };
 
-export const getFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
+export const getFormConfig = (): FormConfig => {
   return {
     siteSettings: {
       key: 'siteSettings',
@@ -48,11 +48,6 @@ export const getFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
               key: 'siteSettings.feConfigs.show_emptyChat',
               type: 'boolean',
               title: '展示聊天空白页（都关闭即可）'
-            },
-            show_git: {
-              key: 'siteSettings.feConfigs.show_git',
-              type: 'boolean',
-              title: '展示 github 图标'
             },
             show_openai_account: {
               key: 'siteSettings.feConfigs.show_openai_account',
@@ -130,22 +125,15 @@ export const getFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
               key: 'siteSettings.feConfigs.appTemplateCourse',
               type: 'string',
               title: '贡献模板市场文档地址'
-            },
-            chatbotUrl: {
-              key: 'siteSettings.feConfigs.chatbotUrl',
-              type: 'string',
-              title: '聊天机器人地址'
             }
           }
         },
-
         scripts: {
           key: 'siteSettings.scripts',
           type: 'json',
           title: '全局 Script 脚本',
           description: '自定义 Script 脚本，可以全局插入（可以做站点流量监控之类的）'
         },
-
         systemEnv: {
           key: 'siteSettings.systemEnv',
           type: 'object',
@@ -194,7 +182,6 @@ export const getFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
             }
           }
         },
-
         limit: {
           key: 'siteSettings.limit',
           type: 'object',
@@ -224,6 +211,12 @@ export const getFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
               title: '站点同步使用间隔时长(分钟)'
             }
           }
+        },
+        navbar: {
+          key: 'siteSettings.navbar',
+          type: FieldTypeEnum.NavbarItems,
+          title: '侧边栏配置',
+          description: '移动端的侧边栏显示在账号 - 个人信息里'
         }
       }
     }
@@ -296,9 +289,16 @@ export const PayFormConfig: FormConfig = {
     properties: {
       standard: {
         key: 'paySettings.subPlans.standard',
-        title: '标准订阅套餐（需严格按模板填写，可修改里面的子项）',
-        type: FiledTypeEnum.StandardPlans,
-        description: '如果需要提供Saas服务，可以私聊我们拿配置。'
+        title: '标准订阅套餐',
+        type: FieldTypeEnum.StandardPlans,
+        description: ''
+      },
+      planDescriptionUrl: {
+        key: 'paySettings.subPlans.planDescriptionUrl',
+        type: 'string',
+        title: '自定义套餐说明',
+        description:
+          '如果填写了该地址，会覆盖系统上套餐页面，会跳转到这个自定义页面，你可以在自定义页面里定义收费规则。'
       },
       extraDatasetSizePrice: {
         key: 'paySettings.subPlans.extraDatasetSizePrice',
@@ -367,7 +367,7 @@ export const PayFormConfig: FormConfig = {
   }
 };
 
-export const getUserFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
+export const getUserFormConfig = (): FormConfig => {
   return {
     loginSettings: {
       key: 'loginSettings',
@@ -553,39 +553,34 @@ export const getUserFormConfig = ({ sso }: { sso?: boolean }): FormConfig => {
             }
           }
         },
-        ...(sso
-          ? {
-              sso: {
-                key: 'siteSettings.sso',
-                type: 'object',
-                title: 'SSO 配置',
-                properties: {
-                  url: {
-                    key: 'siteSettings.sso.url',
-                    type: 'string',
-                    title: 'SSO 登录跳转地址',
-                    description: `需要跳转的 SSO 域名，例如:https%3A%2F%2Fexample.com%2Fsso%2Flogin%3Fclient_id%3Dxxx%26callbackUrl%3Dhttps%3A%2F%2Fexample.com%2Fsso。
-Query 最好经过 encode 编码，回调验证的地址为：{{FastGPT 域名}}/sso`
-                  },
-                  title: {
-                    key: 'siteSettings.sso.title',
-                    title: 'SSO 登录按钮标题',
-                    type: 'string',
-                    description: '配置 SSO 登录按钮的标题'
-                  },
-                  icon: {
-                    key: 'siteSettings.sso.icon',
-                    title: 'SSO 登录按钮的图标',
-                    type: 'image'
-                  }
-                }
-              }
+        sso: {
+          key: 'siteSettings.sso',
+          type: 'object',
+          title: '自定义 SSO 配置',
+          properties: {
+            url: {
+              key: 'siteSettings.sso.url',
+              type: 'string',
+              title: 'SSO 服务根地址(末尾不加/)',
+              description: `具体用法请看： [FastGPT SSO 配置](https://fael3z0zfze.feishu.cn/docx/FugkdIgOJoCnrcxUcTycWZwInde)`
+            },
+            title: {
+              key: 'siteSettings.sso.title',
+              title: 'SSO 登录按钮标题',
+              type: 'string',
+              description: '配置 SSO 登录按钮的标题'
+            },
+            icon: {
+              key: 'siteSettings.sso.icon',
+              title: 'SSO 登录按钮的图标',
+              type: 'image'
             }
-          : {}),
+          }
+        },
         fastLogin: {
           key: 'fastlogin',
           type: 'object',
-          title: '快速登录(可选)',
+          title: '快速登录(不推荐)',
           properties: {
             fastlogin: {
               key: 'loginSettings.fastLogin',

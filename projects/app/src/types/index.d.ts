@@ -6,7 +6,6 @@ import {
   FastGPTFeConfigsType,
   SystemEnvType
 } from '@fastgpt/global/common/system/types';
-import { SSOEnum } from '@/global/user/auth/constants';
 
 export type PagingData<T = never> = {
   pageNum: number;
@@ -88,7 +87,6 @@ export type SystemConfigType = {
       authUrl: string;
     }
   >;
-  sso?: `${SSOEnum}`;
 };
 
 export type LicenseDataType = {

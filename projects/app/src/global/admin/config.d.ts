@@ -1,3 +1,4 @@
+import { NavbarItemType } from '@/pages/settings/config/components/FormField/NavbarItems';
 import { SystemConfigType } from '@/types';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
 import { FastGPTConfigFileType } from '@fastgpt/global/common/system/types';
@@ -13,13 +14,11 @@ export type ConfigFormType = {
     feConfigs: {
       show_emptyChat: boolean;
       show_team_chat: boolean;
-      show_git: boolean;
       show_openai_account: boolean;
       show_promotion: boolean;
       favicon: string;
       docUrl: string;
       systemPluginCourseUrl: string;
-      chatbotUrl: string;
       openAPIDocUrl: string;
       systemTitle: string;
       customApiDomain: string;
@@ -43,6 +42,7 @@ export type ConfigFormType = {
       pgHNSWEfSearch: number;
       tokenWorkers: number;
     };
+    navbar?: NavbarItemType[];
   };
   modelSettings: {
     llmModels: string;
@@ -64,6 +64,7 @@ export type ConfigFormType = {
   paySettings: {
     wx: NonNullable<SystemConfigType['pay']>['wx'];
     subPlans: {
+      planDescriptionUrl: string;
       [SubTypeEnum.standard]: string;
       extraDatasetSizePrice: number;
       extraPointsPrice: number;

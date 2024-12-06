@@ -1,0 +1,5 @@
+dist
+.rollup.cache
+*.js
+node_modules
+.env.local

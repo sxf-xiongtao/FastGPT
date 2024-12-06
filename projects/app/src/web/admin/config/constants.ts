@@ -1,3 +1,4 @@
-export enum FiledTypeEnum {
-  StandardPlans = 'StandardPlans'
+export enum FieldTypeEnum {
+  StandardPlans = 'StandardPlans',
+  NavbarItems = 'NavbarItems'
 }

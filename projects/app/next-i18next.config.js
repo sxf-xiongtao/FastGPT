@@ -6,7 +6,7 @@
 module.exports = {
   i18n: {
     defaultLocale: 'zh-CN',
-    locales: ['en', 'zh-CN', 'zh-TW'],
+    locales: ['en', 'zh-CN', 'zh-Hant'],
     localeDetection: false
   },
   localePath: require('path').resolve('../../FastGPT/packages/web/i18n'),

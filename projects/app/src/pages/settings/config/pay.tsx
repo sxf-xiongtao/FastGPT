@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Flex, useMediaQuery } from '@chakra-ui/react';
+import { Box, Button, Flex, HStack, Switch, useMediaQuery } from '@chakra-ui/react';
 import { useToast } from '@fastgpt/web/hooks/useToast';
-import { POST } from '@/service/common/request';
 import { throttle } from '@/utils/tools';
 import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';
 import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
 import { useQuery } from '@tanstack/react-query';
-import { getInitFormData } from '@/web/core/config/api';
+import { getInitFormData, postUpdateConfig } from '@/web/core/config/api';
 import ImportModal from './components/ImportModal';
 import FormField from './components/FormField';
 import { Controller, useForm } from 'react-hook-form';
@@ -14,6 +13,9 @@ import { PayFormConfig } from './data/formConfig';
 import BoxCard from '@/components/common/BoxContainer/Card';
 import MyTag from '@fastgpt/web/components/common/Tag/index';
 import { serviceSideProps } from '@/web/common/i18n';
+
+let defaultStandardValue =
+  '{"free":{"name":"免费版","price":0,"pointPrice":0,"totalPoints":100,"maxTeamMember":1,"maxAppAmount":10,"maxDatasetAmount":10,"chatHistoryStoreDuration":30,"maxDatasetSize":600,"trainingWeight":1,"permissionCustomApiKey":false,"permissionCustomCopyright":false,"permissionWebsiteSync":false,"permissionReRank":false},"experience":{"name":"体验版","price":59,"pointPrice":30,"totalPoints":3000,"maxTeamMember":3,"maxAppAmount":30,"maxDatasetAmount":30,"chatHistoryStoreDuration":180,"maxDatasetSize":5000,"trainingWeight":2,"permissionCustomApiKey":true,"permissionCustomCopyright":false,"permissionWebsiteSync":true,"permissionReRank":true},"team":{"name":"团队版","price":399,"pointPrice":200,"totalPoints":20000,"maxTeamMember":10,"maxAppAmount":100,"maxDatasetAmount":100,"chatHistoryStoreDuration":360,"maxDatasetSize":40000,"trainingWeight":3,"permissionCustomApiKey":true,"permissionCustomCopyright":true,"permissionWebsiteSync":true,"permissionReRank":true},"enterprise":{"name":"企业版","price":999,"pointPrice":600,"totalPoints":60000,"maxTeamMember":100,"maxAppAmount":500,"maxDatasetAmount":500,"chatHistoryStoreDuration":720,"maxDatasetSize":150000,"trainingWeight":4,"permissionCustomApiKey":true,"permissionCustomCopyright":true,"permissionWebsiteSync":true,"permissionReRank":true}}';
 
 interface formLevel {
   key: string;
@@ -28,6 +30,8 @@ interface titleType {
   subTitles: string[];
 }
 
+const PLAN_KEY = 'paySettings.subPlans';
+
 export const ModelSettings = () => {
   const [rawData, setRawData] = useState<any>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -35,15 +39,27 @@ export const ModelSettings = () => {
   const [activeTitle, setActiveTitle] = useState('');
   const [isMobile] = useMediaQuery('(max-width: 768px)');
 
+  const [openPlan, setOpenPlan] = useState<boolean>(false);
+
   const { toast } = useToast();
 
-  const { reset, control, handleSubmit, setValue } = useForm();
+  const { reset, control, handleSubmit, getValues, setValue } = useForm();
 
   useQuery(['getInitFormData'], () => getInitFormData(), {
     onSuccess: (data: ConfigStoreType) => {
       setRawData(data);
+
       const aggregatedConfigs: ConfigFormType = formatConfigStore2FormSchema(data);
       reset(aggregatedConfigs);
+
+      if (
+        !!aggregatedConfigs.paySettings.subPlans &&
+        aggregatedConfigs.paySettings.subPlans.standard !== '{}'
+      ) {
+        setOpenPlan(true);
+      } else {
+        setOpenPlan(false);
+      }
     },
     onError: () => {
       toast({
@@ -58,7 +74,7 @@ export const ModelSettings = () => {
     try {
       const formData = formatFormData2ConfigStore(data);
 
-      await POST('/admin/routes/settings/updateConfig', formData);
+      await postUpdateConfig(formData);
 
       toast({
         title: '配置保存成功',
@@ -156,81 +172,107 @@ export const ModelSettings = () => {
               >
                 {firstLevel.title}
               </Box>
-              {secondLevels.map((secondLevel) => {
-                return (
-                  <Box
-                    key={secondLevel.title}
-                    px={6}
-                    py={6}
-                    _notLast={{
-                      borderBottomWidth: '1.5px',
-                      borderBottomColor: 'myGray.200'
-                    }}
-                  >
-                    {!!secondLevel.properties ? (
-                      <Box>
-                        <Flex id={secondLevel.title} color={'primary.600'} mb={5}>
-                          <MyTag fontSize={'md'} type="borderFill">
-                            {secondLevel.title}
-                          </MyTag>
-                        </Flex>
-                        <Flex pl={2} flexWrap={'wrap'}>
-                          {Object.values(secondLevel.properties).map((thirdLevel) => {
-                            const thirdLevelTyped = thirdLevel as formLevel;
-                            return (
-                              <Box
-                                key={thirdLevelTyped.title}
-                                {...(thirdLevelTyped.type === 'boolean'
-                                  ? {
-                                      w: '50%'
-                                    }
-                                  : {
-                                      w: '100%',
-                                      _notFirst: { mt: 5 }
-                                    })}
-                              >
-                                <Controller
-                                  control={control}
-                                  name={thirdLevelTyped.key}
-                                  render={({ field: { onChange, value } }) => (
-                                    <FormField
-                                      type={thirdLevelTyped.type}
-                                      title={thirdLevelTyped.title}
-                                      description={thirdLevelTyped.description || ''}
-                                      value={value}
-                                      onChange={(value) => {
-                                        console.log(thirdLevelTyped.key, value);
-                                        onChange(value);
-                                        setValue(thirdLevelTyped.key, value);
-                                      }}
-                                      level={3}
+              {firstLevel.key === PLAN_KEY && (
+                <Box px={6} pt={5} pb={openPlan ? 0 : 5}>
+                  <HStack>
+                    <Box>是否启用订阅套餐</Box>
+                    <Switch
+                      isChecked={openPlan}
+                      onChange={(e) => {
+                        const val = e.target.checked;
+
+                        if (val) {
+                          setValue('paySettings.subPlans.standard', defaultStandardValue);
+                          setOpenPlan(true);
+                        } else {
+                          const standard = getValues('paySettings.subPlans.standard');
+                          defaultStandardValue = standard;
+
+                          setValue('paySettings.subPlans.standard', '{}');
+                          setOpenPlan(false);
+                        }
+                      }}
+                    />
+                  </HStack>
+                </Box>
+              )}
+              {firstLevel.key === PLAN_KEY && !openPlan
+                ? null
+                : secondLevels.map((secondLevel) => {
+                    return (
+                      <Box
+                        key={secondLevel.title}
+                        px={6}
+                        py={6}
+                        _notLast={{
+                          borderBottomWidth: '1.5px',
+                          borderBottomColor: 'myGray.200'
+                        }}
+                      >
+                        {!!secondLevel.properties ? (
+                          <Box>
+                            <Flex id={secondLevel.title} color={'primary.600'} mb={5}>
+                              <MyTag fontSize={'md'} type="borderFill">
+                                {secondLevel.title}
+                              </MyTag>
+                            </Flex>
+                            <Flex pl={2} flexWrap={'wrap'}>
+                              {Object.values(secondLevel.properties).map((thirdLevel) => {
+                                const thirdLevelTyped = thirdLevel as formLevel;
+                                return (
+                                  <Box
+                                    key={thirdLevelTyped.title}
+                                    {...(thirdLevelTyped.type === 'boolean'
+                                      ? {
+                                          w: '50%'
+                                        }
+                                      : {
+                                          w: '100%',
+                                          _notFirst: { mt: 5 }
+                                        })}
+                                  >
+                                    <Controller
+                                      control={control}
+                                      name={thirdLevelTyped.key}
+                                      render={({ field: { onChange, value } }) => (
+                                        <FormField
+                                          type={thirdLevelTyped.type}
+                                          title={thirdLevelTyped.title}
+                                          description={thirdLevelTyped.description || ''}
+                                          value={value}
+                                          onChange={(value) => {
+                                            console.log(thirdLevelTyped.key, value);
+                                            onChange(value);
+                                            setValue(thirdLevelTyped.key, value);
+                                          }}
+                                          level={3}
+                                        />
+                                      )}
                                     />
-                                  )}
-                                />
-                              </Box>
-                            );
-                          })}
-                        </Flex>
-                      </Box>
-                    ) : (
-                      <Controller
-                        control={control}
-                        name={secondLevel.key}
-                        render={({ field: { onChange, value } }) => (
-                          <FormField
-                            type={secondLevel.type}
-                            title={secondLevel.title}
-                            description={secondLevel.description || ''}
-                            value={value}
-                            onChange={onChange}
-                            level={2}
+                                  </Box>
+                                );
+                              })}
+                            </Flex>
+                          </Box>
+                        ) : (
+                          <Controller
+                            control={control}
+                            name={secondLevel.key}
+                            render={({ field: { onChange, value } }) => (
+                              <FormField
+                                type={secondLevel.type}
+                                title={secondLevel.title}
+                                description={secondLevel.description || ''}
+                                value={value}
+                                onChange={onChange}
+                                level={2}
+                              />
+                            )}
                           />
                         )}
-                      />
-                    )}
-                  </Box>
-                );
-              })}
+                      </Box>
+                    );
+                  })}
             </Box>
           );
         })}

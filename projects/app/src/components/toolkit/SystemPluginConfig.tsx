@@ -5,9 +5,9 @@ import type { SystemPluginTemplateItemType } from '@fastgpt/global/core/workflow
 import MyModal from '@fastgpt/web/components/common/MyModal';
 import { useFieldArray, useForm } from 'react-hook-form';
 import QuestionTip from '@fastgpt/web/components/common/MyTooltip/QuestionTip';
-import MyNumberInput from '@fastgpt/web/components/common/Input/NumberInput/index';
-import { putUpdateSystemPlugin } from '@/web/core/app/plugin/api';
 import { FlowNodeTemplateTypeEnum } from '@fastgpt/global/core/workflow/constants';
+import MyNumberInput from '@fastgpt/web/components/common/Input/NumberInput';
+import { putUpdatePlugin } from '@/web/core/app/plugin/api';
 
 const defaultPlugin: SystemPluginTemplateItemType = {
   id: '',
@@ -20,17 +20,20 @@ const defaultPlugin: SystemPluginTemplateItemType = {
   },
   originCost: 0,
   currentCost: 0,
+  hasTokenFee: false,
   templateType: FlowNodeTemplateTypeEnum.other,
   customWorkflow: '',
   isTool: false,
   isActive: false,
-  inputConfig: []
+  inputConfig: [],
+  pluginOrder: 0
 };
 
 type FormType = {
   isActive: boolean;
   originCost: number;
   currentCost: number;
+  hasTokenFee: boolean;
   inputConfig: SystemPluginTemplateItemType['inputConfig'];
 };
 
@@ -43,10 +46,10 @@ const SystemPluginConfig = ({
   onSuccess: () => void;
   onClose: () => void;
 }) => {
-  const { register, setValue, control, watch, handleSubmit } = useForm<FormType>({
+  const { register, control, handleSubmit, setValue, watch } = useForm<FormType>({
     defaultValues: plugin
   });
-  const originCost = watch('originCost');
+  const currentCost = watch('currentCost');
 
   const { fields: inputs } = useFieldArray({
     control, // control props comes from useForm (optional: if you are using FormProvider)
@@ -55,11 +58,12 @@ const SystemPluginConfig = ({
 
   const { runAsync: onSubmit, loading } = useRequest2(
     async (e: FormType) => {
-      return putUpdateSystemPlugin({
+      return putUpdatePlugin({
         pluginId: plugin.id,
         isActive: e.isActive,
         originCost: e.originCost,
         currentCost: e.currentCost,
+        hasTokenFee: e.hasTokenFee,
         inputConfig: e.inputConfig
       }).then(onSuccess);
     },
@@ -75,31 +79,40 @@ const SystemPluginConfig = ({
     <MyModal isOpen title={`${plugin?.name}配置`} iconSrc={plugin.avatar} onClose={onClose}>
       <ModalBody>
         <HStack>
-          <Box flex={1}>是否启用</Box>
+          <Box flex={1} fontSize={'sm'} fontWeight={'medium'}>
+            是否启用
+          </Box>
           <Switch {...register('isActive')} />
         </HStack>
-        <Box mt={5}>
-          <HStack>
-            <Box position={'relative'}>价格（n 积分/次）</Box>
-          </HStack>
-          <Box mt={1}>
-            <MyNumberInput
-              value={originCost ?? 0}
-              onChange={(e) => setValue('originCost', e ?? 0)}
-              step={0.01}
-            />
+        <HStack mt={5}>
+          <Box flex={1} fontSize={'sm'} fontWeight={'medium'}>
+            是否收取 Token 费用
           </Box>
-        </Box>
+          <Switch {...register('hasTokenFee')} />
+        </HStack>
+        <HStack mt={5}>
+          <Box flex={1} fontSize={'sm'} fontWeight={'medium'}>
+            调用价格 (n积分/次)
+          </Box>
+          <MyNumberInput
+            value={currentCost ?? 0}
+            onChange={(e) => setValue('currentCost', e ?? 0)}
+            max={1000}
+            min={0}
+            step={0.1}
+            ml={8}
+          />
+        </HStack>
         {inputs?.map((item, i) => (
           <Box key={item.key} mt={5}>
             <HStack>
-              <Box position={'relative'}>
+              <Box position={'relative'} fontSize={'sm'} fontWeight={'medium'}>
                 <Box position={'absolute'} color={'red.600'} left={'-2'} top={'-1'}>
                   *
                 </Box>
                 {item.label}
               </Box>
-              {item.description && <QuestionTip label={item.description} />}
+              {item.description && <QuestionTip label={item.description} pt={1} />}
             </HStack>
             <Box mt={1}>
               <Input bg={'myGray.50'} {...register(`inputConfig.${i}.value`, { required: true })} />

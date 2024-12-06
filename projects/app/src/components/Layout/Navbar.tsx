@@ -1,126 +1,125 @@
 import { useRouter } from 'next/router';
-import { Box, BoxProps, Flex, HStack, LinkProps } from '@chakra-ui/react';
+import { Box, BoxProps, Flex, LinkProps } from '@chakra-ui/react';
 import MyIcon from '@fastgpt/web/components/common/Icon';
-import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import { useState } from 'react';
+
+const itemStyles: BoxProps & LinkProps = {
+  h: 9,
+  px: 3,
+  mb: 0.5,
+  fontSize: '14px',
+  fontWeight: 'medium',
+  display: 'flex',
+  alignItems: 'center',
+  cursor: 'pointer',
+  borderRadius: 'xs',
+  _hover: {
+    bg: 'primary.50'
+  }
+};
+
+const LIST = [
+  {
+    activeLink: '/dashboard',
+    name: '数据面板',
+    icon: 'common/overviewLight'
+  },
+  {
+    activeLink: '/inform',
+    name: '通知管理',
+    icon: 'support/user/informLight'
+  },
+  {
+    activeLink: '/log',
+    name: '日志管理',
+    icon: 'core/app/logsLight'
+  },
+  {
+    activeLink: '/users',
+    name: '用户管理',
+    icon: 'common/administrator',
+    subItems: [
+      {
+        activeLink: '/users/users',
+        icon: 'common/userInfo',
+        name: '用户信息'
+      },
+      {
+        activeLink: '/users/teams',
+        icon: 'support/team/group',
+        name: '团队管理'
+      },
+      {
+        activeLink: '/users/plans',
+        icon: 'support/account/plans',
+        name: '套餐管理'
+      },
+      {
+        activeLink: '/users/pays',
+        icon: 'support/bill/payRecordLight',
+        name: '支付记录'
+      },
+      {
+        activeLink: '/users/invoice',
+        icon: 'common/billing',
+        name: '开票管理'
+      }
+    ]
+  },
+  {
+    activeLink: '/resources',
+    name: '资源管理',
+    icon: 'book',
+    subItems: [
+      {
+        activeLink: '/resources/apps',
+        name: '应用管理',
+        icon: 'core/app/aiLightSmall'
+      },
+      {
+        activeLink: '/resources/datasets',
+        name: '知识库管理',
+        icon: 'core/dataset/datasetLightSmall'
+      }
+    ]
+  },
+  {
+    activeLink: '/settings',
+    name: '系统配置',
+    icon: 'common/settingLight',
+    subItems: [
+      {
+        activeLink: '/settings/config/basic',
+        name: '基础配置',
+        icon: 'core/workflow/debugResult'
+      },
+      {
+        activeLink: '/settings/config/model',
+        name: '模型配置',
+        icon: 'common/modal'
+      },
+      {
+        activeLink: '/settings/config/user',
+        name: '用户配置',
+        icon: 'support/user/userLightSmall'
+      },
+      {
+        activeLink: '/settings/config/pay',
+        name: '套餐 & 充值',
+        icon: 'support/bill/priceLight'
+      }
+    ]
+  },
+  {
+    activeLink: '/toolkit',
+    name: '工具箱',
+    icon: 'common/toolkit'
+  }
+];
 
 export default function Navbar() {
   const router = useRouter();
   const [expandItems, setExpandItems] = useState<string[]>([]);
-
-  const LIST = [
-    {
-      activeLink: '/dashboard',
-      name: '数据面板',
-      icon: 'common/data'
-    },
-    {
-      activeLink: '/inform',
-      name: '通知管理',
-      icon: 'support/user/informLight'
-    },
-    {
-      activeLink: '/log',
-      name: '日志管理',
-      icon: 'support/user/informLight'
-    },
-    {
-      activeLink: '/users',
-      name: '用户管理',
-      icon: 'support/user/userLight',
-      subItems: [
-        {
-          activeLink: '/users/users',
-          icon: 'support/team/memberLight',
-          name: '用户信息'
-        },
-        {
-          activeLink: '/users/teams',
-          icon: 'support/permission/publicLight',
-          name: '团队管理'
-        },
-        {
-          activeLink: '/users/plans',
-          icon: 'support/bill/priceLight',
-          name: '套餐管理'
-        },
-        {
-          activeLink: '/users/pays',
-          icon: 'support/bill/payRecordLight',
-          name: '支付记录'
-        },
-        {
-          activeLink: '/users/invoice',
-          icon: 'support/bill/payRecordLight',
-          name: '开票管理'
-        }
-      ]
-    },
-    {
-      activeLink: '/resources',
-      name: '资源管理',
-      icon: 'common/courseLight',
-      subItems: [
-        {
-          activeLink: '/resources/apps',
-          name: '应用管理',
-          icon: 'core/app/aiLight'
-        },
-        {
-          activeLink: '/resources/datasets',
-          name: '知识库管理',
-          icon: 'core/dataset/datasetLight'
-        }
-      ]
-    },
-    {
-      activeLink: '/settings',
-      name: '系统配置',
-      icon: 'common/settingLight',
-      subItems: [
-        {
-          activeLink: '/settings/config/basic',
-          name: '基础配置',
-          icon: 'common/settingLight'
-        },
-        {
-          activeLink: '/settings/config/model',
-          name: '模型配置',
-          icon: 'core/chat/chatModelTag'
-        },
-        {
-          activeLink: '/settings/config/user',
-          name: '用户配置',
-          icon: 'support/user/userLight'
-        },
-        {
-          activeLink: '/settings/config/pay',
-          name: '套餐 & 充值',
-          icon: 'support/bill/priceLight'
-        },
-        {
-          activeLink: '/settings/systemPlugin',
-          name: '系统插件',
-          icon: 'common/navbar/pluginLight'
-        }
-      ]
-    }
-  ];
-
-  const itemStyles: BoxProps & LinkProps = {
-    py: 3,
-    mb: 2,
-    pl: 6,
-    pr: 3,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    borderRadius: 'md',
-    _hover: {
-      bg: 'myGray.100'
-    }
-  };
 
   const handleItemClick = (item: any) => {
     if (item.subItems) {
@@ -139,62 +138,75 @@ export default function Navbar() {
   };
 
   return (
-    <Box overflow={'scroll'} pr={3} flex={1}>
+    <>
       {LIST.map((item) => {
+        const isActive = router.pathname.startsWith(item.activeLink);
+
         return (
           <Box key={item.activeLink}>
             <Flex
               alignItems={'center'}
               key={item.activeLink}
               {...itemStyles}
-              {...(router.pathname.startsWith(item.activeLink) && {
-                color: 'primary.600'
+              {...(isActive && {
+                color: 'primary.600',
+                bg: 'primary.50'
               })}
               onClick={() => handleItemClick(item)}
             >
-              <HStack spacing={3} justifyContent={'space-between'}>
-                <Flex>
-                  <MyIcon name={item.icon as any} w={'16px'} mr={2} />
-                  <Box>{item.name}</Box>
-                </Flex>
-                {item.subItems ? (
-                  expandItems.includes(item.activeLink) ? (
-                    <ChevronUpIcon fontSize={'1.5rem'} />
-                  ) : (
-                    <ChevronDownIcon fontSize={'1.5rem'} />
-                  )
-                ) : null}
-              </HStack>
+              <Flex>
+                <MyIcon
+                  name={item.icon as any}
+                  w={'18px'}
+                  mr={2}
+                  color={isActive ? 'primary.600' : 'myGray.500'}
+                />
+                <Box>{item.name}</Box>
+              </Flex>
+              <Box flex={1} />
+              {item.subItems ? (
+                expandItems.includes(item.activeLink) || isActive ? (
+                  <MyIcon name={'core/chat/chevronUp'} w={'16px'} />
+                ) : (
+                  <MyIcon name={'core/chat/chevronDown'} w={'16px'} />
+                )
+              ) : null}
             </Flex>
-            {item.subItems &&
-              (expandItems.includes(item.activeLink) ||
-                router.pathname.startsWith(item.activeLink)) && (
-                <Box ml={4}>
-                  {item.subItems.map((subItem) => (
-                    <Flex
-                      key={subItem.activeLink}
-                      {...itemStyles}
-                      {...(router.pathname.startsWith(subItem.activeLink)
-                        ? {
-                            color: 'primary.600',
-                            bg: 'myGray.200'
-                          }
-                        : {})}
-                      onClick={() => handleSubItemClick(subItem)}
-                    >
-                      <Flex>
-                        <MyIcon name={subItem.icon as any} w={'14px'} />
-                        <Box ml={2} fontSize={'14px'}>
-                          {subItem.name}
-                        </Box>
-                      </Flex>
+            {item.subItems && (expandItems.includes(item.activeLink) || isActive) && (
+              <Box ml={4}>
+                {item.subItems.map((subItem) => (
+                  <Flex
+                    key={subItem.activeLink}
+                    {...itemStyles}
+                    {...(router.pathname.startsWith(subItem.activeLink)
+                      ? {
+                          color: 'primary.600',
+                          bg: 'primary.50'
+                        }
+                      : {})}
+                    onClick={() => handleSubItemClick(subItem)}
+                  >
+                    <Flex>
+                      <MyIcon
+                        name={subItem.icon as any}
+                        w={'18px'}
+                        color={
+                          router.pathname.startsWith(subItem.activeLink)
+                            ? 'primary.600'
+                            : 'myGray.500'
+                        }
+                      />
+                      <Box ml={2} fontSize={'14px'}>
+                        {subItem.name}
+                      </Box>
                     </Flex>
-                  ))}
-                </Box>
-              )}
+                  </Flex>
+                ))}
+              </Box>
+            )}
           </Box>
         );
       })}
-    </Box>
+    </>
   );
 }

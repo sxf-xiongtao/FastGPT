@@ -1,4 +1,14 @@
-import { Box, Button, Flex, Grid, HStack, ModalBody, ModalFooter, Switch } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Flex,
+  Grid,
+  HStack,
+  Input,
+  ModalBody,
+  ModalFooter,
+  Switch
+} from '@chakra-ui/react';
 import {
   StandardSubLevelEnum,
   standardSubLevelMap
@@ -16,9 +26,6 @@ import MyModal from '@fastgpt/web/components/common/MyModal';
 import FormLabel from '@fastgpt/web/components/common/MyBox/FormLabel';
 import MyNumberInput from '@fastgpt/web/components/common/Input/NumberInput';
 
-let defaultValue =
-  '{"free":{"price":0,"pointPrice":0,"totalPoints":100,"maxTeamMember":1,"maxAppAmount":10,"maxDatasetAmount":10,"chatHistoryStoreDuration":30,"maxDatasetSize":600,"trainingWeight":1,"permissionCustomApiKey":false,"permissionCustomCopyright":false,"permissionWebsiteSync":false,"permissionReRank":false},"experience":{"price":59,"pointPrice":30,"totalPoints":3000,"maxTeamMember":3,"maxAppAmount":30,"maxDatasetAmount":30,"chatHistoryStoreDuration":180,"maxDatasetSize":5000,"trainingWeight":2,"permissionCustomApiKey":true,"permissionCustomCopyright":false,"permissionWebsiteSync":true,"permissionReRank":true},"team":{"price":399,"pointPrice":200,"totalPoints":20000,"maxTeamMember":10,"maxAppAmount":100,"maxDatasetAmount":100,"chatHistoryStoreDuration":360,"maxDatasetSize":40000,"trainingWeight":3,"permissionCustomApiKey":true,"permissionCustomCopyright":true,"permissionWebsiteSync":true,"permissionReRank":true},"enterprise":{"price":999,"pointPrice":600,"totalPoints":60000,"maxTeamMember":100,"maxAppAmount":500,"maxDatasetAmount":500,"chatHistoryStoreDuration":720,"maxDatasetSize":150000,"trainingWeight":4,"permissionCustomApiKey":true,"permissionCustomCopyright":true,"permissionWebsiteSync":true,"permissionReRank":true}}';
-
 const StandardPlanContentList = ({
   planMap,
   level
@@ -30,6 +37,7 @@ const StandardPlanContentList = ({
 
   const planContent = useMemo(() => {
     const plan = planMap?.[level];
+
     if (!plan) return;
     return {
       price: plan.price,
@@ -142,7 +150,7 @@ const EditPlanModal = ({
 }) => {
   const { t } = useTranslation();
   const { register, handleSubmit, watch, setValue } = useForm({ defaultValues: planMap[level] });
-  const label = standardSubLevelMap[level].label;
+  const label = planMap?.[level].name || t(standardSubLevelMap[level].label);
 
   const onSubmit = (data: TeamStandardSubPlanItemType) => {
     onChange(
@@ -155,9 +163,29 @@ const EditPlanModal = ({
   };
 
   return (
-    <MyModal isOpen iconSrc="modal/edit" title={`编辑 ${t(label)} 套餐`}>
+    <MyModal
+      isOpen
+      iconSrc="modal/edit"
+      title={`编辑 ${label} 套餐`}
+      isCentered
+      w={'500px'}
+      maxH={'90vh'}
+    >
       <ModalBody>
         <HStack>
+          <FormLabel flex={'0 0 150px'}>套餐名称</FormLabel>
+          <Input
+            flex={'1 0 0'}
+            bg={'myGray.50'}
+            value={watch('name')}
+            onChange={(e) => {
+              // @ts-ignore
+              setValue('name', e.target.value ?? '');
+            }}
+            placeholder={'自定义套餐名，可覆盖原套餐名'}
+          />
+        </HStack>
+        <HStack mt={3}>
           <FormLabel flex={'0 0 150px'}>每月价格</FormLabel>
           <MyNumberInput
             flex={'1 0 0'}
@@ -166,7 +194,7 @@ const EditPlanModal = ({
             min={0}
             onChange={(e) => {
               // @ts-ignore
-              setValue('price', e || '');
+              setValue('price', e ?? '');
             }}
           />
         </HStack>
@@ -179,7 +207,7 @@ const EditPlanModal = ({
             min={0}
             onChange={(e) => {
               // @ts-ignore
-              setValue('maxTeamMember', e || '');
+              setValue('maxTeamMember', e ?? '');
             }}
           />
         </HStack>
@@ -192,7 +220,7 @@ const EditPlanModal = ({
             min={0}
             onChange={(e) => {
               // @ts-ignore
-              setValue('maxAppAmount', e || '');
+              setValue('maxAppAmount', e ?? '');
             }}
           />
         </HStack>
@@ -205,7 +233,7 @@ const EditPlanModal = ({
             min={0}
             onChange={(e) => {
               // @ts-ignore
-              setValue('maxDatasetAmount', e || '');
+              setValue('maxDatasetAmount', e ?? '');
             }}
           />
         </HStack>
@@ -218,7 +246,7 @@ const EditPlanModal = ({
             min={0}
             onChange={(e) => {
               // @ts-ignore
-              setValue('chatHistoryStoreDuration', e || '');
+              setValue('chatHistoryStoreDuration', e ?? '');
             }}
           />
         </HStack>
@@ -231,7 +259,7 @@ const EditPlanModal = ({
             min={0}
             onChange={(e) => {
               // @ts-ignore
-              setValue('maxDatasetSize', e || '');
+              setValue('maxDatasetSize', e ?? '');
             }}
           />
         </HStack>
@@ -245,7 +273,7 @@ const EditPlanModal = ({
             max={5}
             onChange={(e) => {
               // @ts-ignore
-              setValue('trainingWeight', e || '');
+              setValue('trainingWeight', e ?? '');
             }}
           />
         </HStack>
@@ -266,7 +294,7 @@ const EditPlanModal = ({
             min={0}
             onChange={(e) => {
               // @ts-ignore
-              setValue('totalPoints', e || '');
+              setValue('totalPoints', e ?? '');
             }}
           />
         </HStack>
@@ -304,6 +332,7 @@ const StandardPlans = ({
       {
         level: StandardSubLevelEnum.free,
         ...standardSubLevelMap[StandardSubLevelEnum.free],
+        label: planMap['free']?.name || t(standardSubLevelMap[StandardSubLevelEnum.free].label),
         price: planMap['free']?.price,
         maxTeamMember: planMap['free']?.maxTeamMember,
         maxAppAmount: planMap['free']?.maxAppAmount,
@@ -320,6 +349,9 @@ const StandardPlans = ({
       {
         level: StandardSubLevelEnum.experience,
         ...standardSubLevelMap[StandardSubLevelEnum.experience],
+        label:
+          planMap['experience']?.name ||
+          t(standardSubLevelMap[StandardSubLevelEnum.experience].label),
         price: planMap['experience']?.price,
         maxTeamMember: planMap['experience']?.maxTeamMember,
         maxAppAmount: planMap['experience']?.maxAppAmount,
@@ -336,6 +368,7 @@ const StandardPlans = ({
       {
         level: StandardSubLevelEnum.team,
         ...standardSubLevelMap[StandardSubLevelEnum.team],
+        label: planMap['team']?.name || t(standardSubLevelMap[StandardSubLevelEnum.team].label),
         price: planMap['team']?.price,
         maxTeamMember: planMap['team']?.maxTeamMember,
         maxAppAmount: planMap['team']?.maxAppAmount,
@@ -352,6 +385,9 @@ const StandardPlans = ({
       {
         level: StandardSubLevelEnum.enterprise,
         ...standardSubLevelMap[StandardSubLevelEnum.enterprise],
+        label:
+          planMap['enterprise']?.name ||
+          t(standardSubLevelMap[StandardSubLevelEnum.enterprise].label),
         price: planMap['enterprise']?.price,
         maxTeamMember: planMap['enterprise']?.maxTeamMember,
         maxAppAmount: planMap['enterprise']?.maxAppAmount,
@@ -368,77 +404,58 @@ const StandardPlans = ({
     ];
   }, [planMap]);
 
-  const openPlan = !!value && value !== '{}';
+  // const openPlan = !!value && value !== '{}';
 
   return (
     <>
-      <HStack>
-        <Box>是否启用订阅套餐</Box>
-        <Switch
-          isChecked={openPlan}
-          onChange={(e) => {
-            const val = e.target.checked;
-            if (!val) {
-              if (value && value !== '{}') {
-                defaultValue = value;
-              }
-              onChange('');
-            } else {
-              onChange(defaultValue);
-            }
-          }}
-        />
-      </HStack>
-      {openPlan && (
-        <Grid mt={5} gridTemplateColumns={'repeat(2,1fr)'} gap={8} w={'100%'} minH={'550px'}>
-          {planList.map((item) => {
-            return (
-              <Box
-                key={item.level}
-                flex={'1 0 0'}
-                bg={'rgba(255, 255, 255, 0.90)'}
-                p={'28px'}
-                borderRadius={'2xl'}
-                boxShadow={'1.5'}
-                border={'base'}
+      <Grid mt={5} gridTemplateColumns={'repeat(2,1fr)'} gap={8} w={'100%'} minH={'550px'}>
+        {planList.map((item) => {
+          return (
+            <Box
+              key={item.level}
+              flex={'1 0 0'}
+              bg={'rgba(255, 255, 255, 0.90)'}
+              p={'28px'}
+              borderRadius={'2xl'}
+              boxShadow={'1.5'}
+              border={'base'}
+            >
+              <HStack fontSize={'md'} fontWeight={'500'}>
+                <Box>{item.label}</Box>
+
+                <Box fontSize={'lg'} fontWeight={'bold'}>
+                  ￥{item.price}
+                </Box>
+              </HStack>
+
+              {/* Button */}
+              <Button
+                my={3}
+                mx={'auto'}
+                onClick={() => {
+                  setEditedLevel(item.level);
+                }}
               >
-                <HStack fontSize={'md'} fontWeight={'500'}>
-                  <Box>{t(item.label)}</Box>
+                点击配置套餐
+              </Button>
 
-                  <Box fontSize={'lg'} fontWeight={'bold'}>
-                    ￥{item.price}
-                  </Box>
-                </HStack>
+              {/* function list */}
+              <StandardPlanContentList level={item.level} planMap={planMap} />
+            </Box>
+          );
+        })}
 
-                {/* Button */}
-                <Button
-                  my={3}
-                  mx={'auto'}
-                  onClick={() => {
-                    setEditedLevel(item.level);
-                  }}
-                >
-                  点击配置套餐
-                </Button>
-
-                {/* function list */}
-                <StandardPlanContentList level={item.level} planMap={planMap} />
-              </Box>
-            );
-          })}
-
-          {!!editedLevel && (
-            <EditPlanModal
-              level={editedLevel}
-              planMap={planMap}
-              onChange={onChange}
-              onClose={() => {
-                setEditedLevel(undefined);
-              }}
-            />
-          )}
-        </Grid>
-      )}
+        {!!editedLevel && (
+          <EditPlanModal
+            level={editedLevel}
+            planMap={planMap}
+            onChange={onChange}
+            onClose={() => {
+              setEditedLevel(undefined);
+            }}
+          />
+        )}
+      </Grid>
     </>
   );
 };

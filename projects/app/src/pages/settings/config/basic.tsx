@@ -1,20 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, Flex, useMediaQuery } from '@chakra-ui/react';
 import { useToast } from '@fastgpt/web/hooks/useToast';
-import { POST } from '@/service/common/request';
 import { throttle } from '@/utils/tools';
 import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';
 import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
 import { useQuery } from '@tanstack/react-query';
-import { getInitFormData } from '@/web/core/config/api';
+import { getInitFormData, postUpdateConfig } from '@/web/core/config/api';
 import ImportModal from './components/ImportModal';
 import FormField from './components/FormField';
 import { Controller, useForm } from 'react-hook-form';
 import { getFormConfig } from './data/formConfig';
 import BoxCard from '@/components/common/BoxContainer/Card';
 import MyTag from '@fastgpt/web/components/common/Tag/index';
-import { SSOEnum } from '@/global/user/auth/constants';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 
 interface formLevel {
   key: string;
@@ -29,18 +26,7 @@ interface titleType {
   subTitles: string[];
 }
 
-export const getServerSideProps = (async () => {
-  const sso = process.env.SSO as SSOEnum | undefined;
-  return {
-    props: {
-      sso: sso ?? null
-    }
-  };
-}) satisfies GetServerSideProps<{
-  sso: SSOEnum | null;
-}>;
-
-export const Settings = ({ sso }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+export const Settings = () => {
   const [rawData, setRawData] = useState<any>({});
   const [isLoading, setIsLoading] = useState(false);
   const [titles, setTitles] = useState<Array<titleType>>([]);
@@ -70,7 +56,7 @@ export const Settings = ({ sso }: InferGetServerSidePropsType<typeof getServerSi
     try {
       const formData = formatFormData2ConfigStore(data);
 
-      await POST('/admin/routes/settings/updateConfig', formData);
+      await postUpdateConfig(formData);
 
       toast({
         title: '配置保存成功',
@@ -119,7 +105,7 @@ export const Settings = ({ sso }: InferGetServerSidePropsType<typeof getServerSi
     }
   }, 100);
 
-  const formConfig = getFormConfig({ sso: !!sso });
+  const formConfig = getFormConfig();
   const firstLevels = Object.values(formConfig);
 
   useEffect(() => {

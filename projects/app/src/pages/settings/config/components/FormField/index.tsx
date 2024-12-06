@@ -4,10 +4,11 @@ import { useRef } from 'react';
 import { useToast } from '@fastgpt/web/hooks/useToast';
 import { AddIcon } from '@chakra-ui/icons';
 import FormLabel from '../FormLabel';
-import { FiledTypeEnum } from '@/web/admin/config/constants';
+import { FieldTypeEnum } from '@/web/admin/config/constants';
 import dynamic from 'next/dynamic';
 import { compressImgFileAndUpload } from '@/web/common/file/utils';
 import MyImage from '@fastgpt/web/components/common/Image/MyImage';
+import NavbarItems from './NavbarItems';
 
 const StandardPlans = dynamic(() => import('./StandardPlans'));
 
@@ -31,8 +32,8 @@ const FormField = ({
 
   if (type === 'boolean') {
     return (
-      <Flex alignItems={'center'} w={'90%'} my={4}>
-        <FormLabel title={title} description={description} />
+      <Flex alignItems={'center'} w={'90%'} my={3}>
+        <FormLabel title={title} description={description} mb={2} />
         <Switch
           className="ml-4"
           isChecked={value}
@@ -46,23 +47,23 @@ const FormField = ({
   if (type === 'string') {
     return (
       <Box>
-        <FormLabel title={title} description={description} />
-        <Input value={value} onChange={(e) => onChange(e.target.value)} />
+        <FormLabel title={title} description={description} mb={2} />
+        <Input value={value} placeholder={description} onChange={(e) => onChange(e.target.value)} />
       </Box>
     );
   }
   if (type === 'number') {
     return (
       <Box>
-        <FormLabel title={title} description={description} />
+        <FormLabel title={title} description={description} mb={2} />
         <Input value={value} onChange={(e) => onChange(Number(e.target.value))} />
       </Box>
     );
   }
   if (type === 'image') {
     return (
-      <Box className="mt-4 mb-8">
-        <FormLabel title={title} description={description} />
+      <Box className="mt-4 mb-4">
+        <FormLabel title={title} description={description} mb={2} />
         <Input
           type="file"
           className="hidden"
@@ -105,7 +106,7 @@ const FormField = ({
   if (type === 'textarea') {
     return (
       <Box>
-        <FormLabel title={title} description={description} />
+        <FormLabel title={title} description={description} mb={2} />
         <Box mb={3}>
           <Textarea
             variant="outline"
@@ -122,18 +123,25 @@ const FormField = ({
   if (type === 'json') {
     return (
       <Box>
-        <FormLabel title={title} description={description} />
+        <FormLabel title={title} description={description} mb={2} />
         <Box className="mb-8" w={'100%'}>
           <JsonEditor value={value} onChange={onChange} defaultHeight={250} resize />
         </Box>
       </Box>
     );
   }
-  if (type === FiledTypeEnum.StandardPlans) {
+  if (type === FieldTypeEnum.StandardPlans) {
     return (
       <Box>
-        <FormLabel title={title} description={description} />
+        <FormLabel title={title} description={description} mb={2} />
         <StandardPlans value={value} onChange={onChange} />
+      </Box>
+    );
+  }
+  if (type === FieldTypeEnum.NavbarItems) {
+    return (
+      <Box>
+        <NavbarItems value={value} onChange={onChange} title={title} description={description} />
       </Box>
     );
   }

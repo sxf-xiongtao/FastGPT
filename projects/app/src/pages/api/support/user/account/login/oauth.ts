@@ -8,23 +8,31 @@ import { setCookie } from '@fastgpt/service/support/permission/controller';
 import { usernameLogin } from '@/service/support/user/controller';
 import { OAuthEnum } from '@fastgpt/global/support/user/constant';
 import type { OauthLoginProps } from '@fastgpt/global/support/user/api';
+import { UserErrEnum } from '@fastgpt/global/common/error/code/user';
+
+type OauthResponse = {
+  username: string;
+  avatarUrl?: string;
+  concat?: string;
+};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     await connectToDatabase();
     const { type, code, inviterId, callbackUrl } = req.body as OauthLoginProps;
 
-    const { username, avatarUrl, email } = await (async () => {
+    const { username, avatarUrl, concat } = await (async () => {
       if (type === OAuthEnum.github) return authGithub(code);
       if (type === OAuthEnum.google) return authGoogle(code, callbackUrl);
       if (type === OAuthEnum.microsoft) return authMicrosoft(code, callbackUrl);
+      if (type === OAuthEnum.sso) return authSso(code);
       return Promise.reject('type error');
     })();
 
     const { user, token } = await usernameLogin({
       username,
       avatar: avatarUrl,
-      notificationAccount: email,
+      notificationAccount: concat,
       inviterId
     });
 
@@ -42,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   }
 }
 
-export async function authGithub(code: string) {
+export async function authGithub(code: string): Promise<OauthResponse> {
   const { data: gitAccessToken } = await axios.post<string>(
     `https://github.com/login/oauth/access_token?client_id=${global.systemConfig.auth?.github?.clientId}&client_secret=${global.systemConfig.auth?.github?.secret}&code=${code}&scope=user:email`
   );
@@ -70,11 +78,11 @@ export async function authGithub(code: string) {
   return {
     avatarUrl: data.avatar_url,
     username,
-    email: data.email
+    concat: data.email
   };
 }
 
-export async function authGoogle(code: string, callbackUrl: string) {
+export async function authGoogle(code: string, callbackUrl: string): Promise<OauthResponse> {
   const { data } = await axios.post<{ id_token: string }>(
     `https://oauth2.googleapis.com/token?client_id=${global.systemConfig?.auth?.google?.clientId}&client_secret=${global.systemConfig?.auth?.google?.secret}&code=${code}&redirect_uri=${callbackUrl}&grant_type=authorization_code`
   );
@@ -94,11 +102,11 @@ export async function authGoogle(code: string, callbackUrl: string) {
   return {
     avatarUrl: picture,
     username,
-    email
+    concat: email
   };
 }
 
-export async function authMicrosoft(code: string, callbackUrl: string) {
+export async function authMicrosoft(code: string, callbackUrl: string): Promise<OauthResponse> {
   const { data: tokenData } = await axios.post<{
     access_token: string;
     refresh_token: string;
@@ -134,6 +142,34 @@ export async function authMicrosoft(code: string, callbackUrl: string) {
   return {
     avatarUrl: '',
     username,
-    email: userData.mail || userData.userPrincipalName
+    concat: userData.mail || userData.userPrincipalName
+  };
+}
+
+/* 
+  通用 SSO 登录封装
+*/
+export async function authSso(code: string): Promise<OauthResponse> {
+  if (!global.feConfigs?.sso || !global.feConfigs?.sso?.url)
+    return Promise.reject('Not config sso');
+
+  if (!code) return Promise.reject('Not found code');
+
+  const { data } = await axios.get<{
+    success: boolean;
+    message?: string;
+    username: string;
+    avatar?: string;
+    contact?: string;
+  }>(`${global.feConfigs.sso.url}/login/oauth/access_token?code=${code}`);
+
+  if (!data.success) {
+    return Promise.reject(data.message || UserErrEnum.unAuthSso);
+  }
+
+  return {
+    avatarUrl: data.avatar,
+    username: data.username,
+    concat: data.contact
   };
 }

@@ -1,17 +1,29 @@
-import { getLicenseData } from '@/web/admin/common/api';
-import { Box } from '@chakra-ui/react';
-import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
+import { LicenseDataType } from '@/types';
+import { Box, Flex } from '@chakra-ui/react';
+import Avatar from '@fastgpt/web/components/common/Avatar';
 import React from 'react';
 
-const LicenseData = () => {
-  const { data: licenseData } = useRequest2(getLicenseData, {
-    manual: false
-  });
+const LicenseData = ({ licenseData }: { licenseData?: LicenseDataType }) => {
   return licenseData ? (
-    <Box p={4} fontSize={'xs'} color={'myGray.500'} borderTop={'base'}>
-      <Box>{licenseData.company}</Box>
-      <Box>过期时间: {licenseData.expTime}</Box>
-      <Box>最大用户: {licenseData.maxRegister}</Box>
+    <Box p={4} pb={3}>
+      <Flex gap={2}>
+        <Avatar src="/icon/user.svg" w={6} h={6} />
+        <Box fontSize={'sm'} color={'myGray.900'}>
+          {licenseData.company}
+        </Box>
+      </Flex>
+      <Flex mt={3} fontSize={'mini'}>
+        <Box color={'myGray.500'} mr={1}>
+          过期时间:
+        </Box>
+        <Box color={'myGray.600'}>{licenseData.expTime}</Box>
+      </Flex>
+      <Flex mt={2} fontSize={'mini'}>
+        <Box color={'myGray.500'} mr={1}>
+          最大用户:{' '}
+        </Box>
+        <Box color={'myGray.600'}>{licenseData.maxRegister}</Box>
+      </Flex>
     </Box>
   ) : null;
 };

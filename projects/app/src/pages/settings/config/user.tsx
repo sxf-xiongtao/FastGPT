@@ -6,15 +6,13 @@ import { throttle } from '@/utils/tools';
 import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';
 import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
 import { useQuery } from '@tanstack/react-query';
-import { getInitFormData } from '@/web/core/config/api';
+import { getInitFormData, postUpdateConfig } from '@/web/core/config/api';
 import ImportModal from './components/ImportModal';
 import FormField from './components/FormField';
 import { Controller, useForm } from 'react-hook-form';
 import { getUserFormConfig } from './data/formConfig';
 import BoxCard from '@/components/common/BoxContainer/Card';
 import MyTag from '@fastgpt/web/components/common/Tag/index';
-import { SSOEnum } from '@/global/user/auth/constants';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 
 interface formLevel {
   key: string;
@@ -29,18 +27,7 @@ interface titleType {
   subTitles: string[];
 }
 
-export const getServerSideProps = (async () => {
-  const sso = process.env.SSO as SSOEnum | undefined;
-  return {
-    props: {
-      sso: sso ?? null
-    }
-  };
-}) satisfies GetServerSideProps<{
-  sso: SSOEnum | null;
-}>;
-
-export const UserSetting = ({ sso }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const UserSetting = () => {
   const [rawData, setRawData] = useState<any>({});
   const [isLoading, setIsLoading] = useState(false);
   const [titles, setTitles] = useState<Array<titleType>>([]);
@@ -70,7 +57,7 @@ export const UserSetting = ({ sso }: InferGetServerSidePropsType<typeof getServe
     try {
       const formData = formatFormData2ConfigStore(data);
 
-      await POST('/admin/routes/settings/updateConfig', formData);
+      await postUpdateConfig(formData);
 
       toast({
         title: '配置保存成功',
@@ -119,7 +106,7 @@ export const UserSetting = ({ sso }: InferGetServerSidePropsType<typeof getServe
     }
   }, 100);
 
-  const formConfig = useMemo(() => getUserFormConfig({ sso: !!sso }), [sso]);
+  const formConfig = useMemo(() => getUserFormConfig(), []);
   const firstLevels = Object.values(formConfig);
 
   useEffect(() => {
@@ -211,7 +198,6 @@ export const UserSetting = ({ sso }: InferGetServerSidePropsType<typeof getServe
                                       description={thirdLevelTyped.description || ''}
                                       value={value}
                                       onChange={(value) => {
-                                        console.log(thirdLevelTyped.key, value);
                                         onChange(value);
                                         setValue(thirdLevelTyped.key, value);
                                       }}

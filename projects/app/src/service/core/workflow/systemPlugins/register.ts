@@ -4,7 +4,7 @@ import { isProduction } from '@fastgpt/service/common/system/constants';
 import { SystemPluginTemplateItemType } from '@fastgpt/global/core/workflow/type';
 import { getCommunityCb, getCommunityPlugins } from '@fastgpt/plugins/register';
 import { cloneDeep } from 'lodash';
-import { MongoSystemPluginSchema } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
+import { MongoSystemPlugin } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
 import { replaceVariable } from '@fastgpt/global/common/string/tools';
 
 let list: string[] = ['dalle3'];
@@ -26,35 +26,50 @@ export const getSystemPlugins = async () => {
       id: `${PluginSourceEnum.commercial}-${name}`,
       isActive: false,
       isFolder,
-      parentId
+      parentId,
+      isOfficial: true
     };
   });
 
   // 从数据库里加载插件配置
-  const dbPlugins = (
-    await MongoSystemPluginSchema.find({ customConfig: { $exists: true } })
-  ).map<SystemPluginTemplateItemType>((item) => {
-    const { name, avatar, intro, version, weight, workflow, templateType } = item.customConfig!;
-    return {
-      id: item.pluginId,
-      isActive: false,
-      isFolder: false,
-      parentId: null,
-      author: '',
-      version,
-      name,
-      avatar,
-      intro,
-      showStatus: true,
-      weight,
-      isTool: true,
-      templateType,
-      inputConfig: item.inputConfig,
-      workflow,
-      originCost: item.originCost,
-      currentCost: item.currentCost
-    };
-  });
+  const dbPlugins = (await MongoSystemPlugin.find({ customConfig: { $exists: true } })).map(
+    (item) => {
+      const {
+        name,
+        avatar,
+        intro,
+        version,
+        weight,
+        workflow,
+        templateType,
+        associatedPluginId,
+        userGuide
+      } = item.customConfig!;
+      return {
+        id: item.pluginId,
+        isActive: false,
+        isFolder: false,
+        parentId: null,
+        author: '',
+        version,
+        name,
+        avatar,
+        intro,
+        showStatus: true,
+        weight,
+        isTool: true,
+        templateType,
+        inputConfig: item.inputConfig,
+        workflow,
+        originCost: item.originCost,
+        currentCost: item.currentCost,
+        hasTokenFee: item.hasTokenFee,
+        pluginOrder: item.pluginOrder,
+        associatedPluginId,
+        userGuide
+      };
+    }
+  );
 
   const plugins = [...communityPlugins, ...commercialPlugins, ...dbPlugins];
 
@@ -74,7 +89,7 @@ export const getSystemPluginsAndLoadThem = async (refresh = false) => {
   try {
     const systemPlugins = await getSystemPlugins();
 
-    const pluginConfigs = await MongoSystemPluginSchema.find();
+    const pluginConfigs = await MongoSystemPlugin.find();
     systemPlugins.forEach((plugin) => {
       // 如果有插件的配置信息，则需要进行替换
       const pluginConfig = pluginConfigs.find((config) => config.pluginId === plugin.id);
@@ -85,8 +100,13 @@ export const getSystemPluginsAndLoadThem = async (refresh = false) => {
         const list = [plugin, ...children];
         list.forEach((item) => {
           item.isActive = pluginConfig.isActive ?? false;
+          item.inputConfig = pluginConfig.inputConfig ?? [];
           item.originCost = pluginConfig.originCost ?? 0;
           item.currentCost = pluginConfig.currentCost ?? 0;
+          item.hasTokenFee = pluginConfig.hasTokenFee ?? false;
+          item.pluginOrder = pluginConfig.pluginOrder ?? 0;
+          // @ts-ignore
+          item.customWorkflow = pluginConfig.customConfig;
 
           // 使用 inputConfig 的内容，替换插件的 nodes
           if (pluginConfig.inputConfig && item.workflow?.nodes) {
@@ -104,6 +124,8 @@ export const getSystemPluginsAndLoadThem = async (refresh = false) => {
         });
       }
     });
+    systemPlugins.sort((a, b) => (a.pluginOrder ?? 0) - (b.pluginOrder ?? 0));
+
     global.systemPlugins = systemPlugins;
 
     return cloneDeep(global.systemPlugins);

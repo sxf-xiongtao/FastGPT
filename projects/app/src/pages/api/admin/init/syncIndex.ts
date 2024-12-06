@@ -29,7 +29,7 @@ import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/membe
 import { MongoTTSBuffer } from '@fastgpt/service/common/buffer/tts/schema';
 import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema';
 import { getMongoLog } from '@fastgpt/service/common/system/log/schema';
-import { MongoSystemPluginSchema } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
+import { MongoSystemPlugin } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
 import { MongoAppVersion } from '@fastgpt/service/core/app/version/schema';
 import { MongoChatInputGuide } from '@fastgpt/service/core/chat/inputGuide/schema';
 import { MongoDatasetCollectionTags } from '@fastgpt/service/core/dataset/tag/schema';
@@ -81,7 +81,7 @@ async function handler(
     MongoTTSBuffer.syncIndexes();
     MongoSystemConfigs.syncIndexes();
     getMongoLog().syncIndexes();
-    MongoSystemPluginSchema.syncIndexes();
+    MongoSystemPlugin.syncIndexes();
     MongoAppVersion.syncIndexes();
     MongoChatInputGuide.syncIndexes();
     MongoDatasetCollectionTags.syncIndexes();

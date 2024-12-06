@@ -21,14 +21,12 @@ export function formatConfigStore2FormSchema({
   const {
     show_emptyChat = false,
     show_team_chat = false,
-    show_git = false,
     show_openai_account = false,
     show_promotion = false,
     favicon = '',
     concatMd = '',
     docUrl = 'https://doc.tryfastgpt.ai',
     systemPluginCourseUrl = '',
-    chatbotUrl = '',
     openAPIDocUrl = '',
     systemTitle = 'FastAI',
     customApiDomain = '',
@@ -42,6 +40,7 @@ export function formatConfigStore2FormSchema({
     uploadFileMaxSize = 500,
     lafEnv,
     sso,
+    navbarItems = [],
     ...feConfigsProps
   } = feConfigs || {};
 
@@ -58,13 +57,11 @@ export function formatConfigStore2FormSchema({
       feConfigs: {
         show_emptyChat,
         show_team_chat,
-        show_git,
         show_openai_account,
         show_promotion,
         favicon,
         docUrl,
         systemPluginCourseUrl,
-        chatbotUrl,
         openAPIDocUrl,
         systemTitle,
         customApiDomain,
@@ -78,6 +75,7 @@ export function formatConfigStore2FormSchema({
       concatMd,
       scripts: JSON.stringify(scripts, null, 2),
       limit,
+      navbar: navbarItems || [],
       systemEnv: {
         openapiPrefix,
         vectorMaxProcess,
@@ -138,6 +136,9 @@ export function formatConfigStore2FormSchema({
     paySettings: {
       wx: fastgptPro?.pay?.wx || {},
       subPlans: {
+        planDescriptionUrl:
+          // @ts-ignore
+          subPlans.planDescriptionUrl,
         // @ts-ignore
         standard: JSON.stringify(subPlans[SubTypeEnum.standard], null, 2) || '{}',
         // @ts-ignore
@@ -163,11 +164,12 @@ export function formatFormData2ConfigStore({
   paySettings,
   securitySettings
 }: ConfigFormType): ConfigStoreType {
-  const { feConfigs, systemEnv, concatMd, scripts, limit, sso } = siteSettings;
+  const { feConfigs, systemEnv, concatMd, scripts, limit, sso, navbar } = siteSettings;
   const { llmModels, vectorModels, reRankModels, audioSpeechModels, whisperModel } = modelSettings;
   const { email, phone, github, wechat, google, fastLogin, sms, microsoft } = loginSettings;
   const { censor } = securitySettings;
   const { wx, subPlans } = paySettings;
+
   const formatFeConfig = {
     ...feConfigs,
     concatMd,
@@ -177,11 +179,13 @@ export function formatFormData2ConfigStore({
       github: github?.clientId,
       google: google?.clientId,
       wechat: wechat?.appID,
-      microsoft: {
-        clientId: microsoft?.clientId,
-        tenantId: microsoft?.tenantId,
-        customButton: microsoft?.customButton
-      }
+      microsoft: microsoft?.clientId
+        ? {
+            clientId: microsoft?.clientId,
+            tenantId: microsoft?.tenantId,
+            customButton: microsoft?.customButton
+          }
+        : undefined
     },
     sso,
     register_method: (() => {
@@ -219,7 +223,8 @@ export function formatFormData2ConfigStore({
         return ['email', 'phone'];
       }
       return ['email'];
-    })() as ['email' | 'phone']
+    })() as ['email' | 'phone'],
+    navbarItems: Array.isArray(navbar) ? navbar : []
   };
 
   const formatLoginSettings = {
@@ -245,6 +250,7 @@ export function formatFormData2ConfigStore({
       feConfigs: formatFeConfig,
       systemEnv,
       subPlans: {
+        planDescriptionUrl: subPlans.planDescriptionUrl ?? 'https://cloud.tryfastgpt.ai/price',
         [SubTypeEnum.standard]: standardSubPlanJson,
         [SubTypeEnum.extraDatasetSize]: {
           price: subPlans.extraDatasetSizePrice || 0

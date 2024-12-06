@@ -6,7 +6,7 @@ import { throttle } from '@/utils/tools';
 import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';
 import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
 import { useQuery } from '@tanstack/react-query';
-import { getInitFormData } from '@/web/core/config/api';
+import { getInitFormData, postUpdateConfig } from '@/web/core/config/api';
 import ImportModal from './components/ImportModal';
 import FormField from './components/FormField';
 import { Controller, useForm } from 'react-hook-form';
@@ -57,7 +57,7 @@ export const ModelSettings = () => {
     try {
       const formData = formatFormData2ConfigStore(data);
 
-      await POST('/admin/routes/settings/updateConfig', formData);
+      await postUpdateConfig(formData);
 
       toast({
         title: '配置保存成功',
