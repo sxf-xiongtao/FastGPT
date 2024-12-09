@@ -37,6 +37,7 @@ const updateSubPlanCron = () => {
   // });
 };
 
+// 通知即将过期的套餐
 const planNotifyCron = () => {
   setCron('10 */3 * * *', async () => {
     if (
@@ -50,6 +51,7 @@ const planNotifyCron = () => {
     }
   });
 };
+// 通知免费版用户清理
 const freeAccountCron = () => {
   setCron('20 */8 * * *', async () => {
     if (

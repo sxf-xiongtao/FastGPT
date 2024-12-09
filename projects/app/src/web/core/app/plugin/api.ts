@@ -10,7 +10,7 @@ import type { createPluginBody } from '@/pages/api/admin/core/app/plugin/create'
 import type { updatePluginOrderBody } from '@/pages/api/admin/core/app/plugin/updateOrder';
 import type { deletePluginQuery } from '@/pages/api/admin/core/app/plugin/delete';
 import type { ListAppBody } from '@/pages/api/admin/core/app/plugin/allPlugin';
-import { getPluginGroupsResponse } from '@/pages/api/admin/core/app/pluginGroup/list';
+import type { getPluginGroupsResponse } from '@/pages/api/core/app/plugin/getPluginGroups';
 
 export const getSystemPlugins = () => GET<getSystemPluginsResponse>('/admin/core/app/plugin/list');
 
@@ -29,7 +29,7 @@ export const postCreatePluginGroup = (data: createPluginGroupBody) =>
   POST('/admin/core/app/pluginGroup/create', data);
 
 export const getPluginGroups = () =>
-  GET<getPluginGroupsResponse>('/admin/core/app/pluginGroup/list');
+  GET<getPluginGroupsResponse>('/core/app/plugin/getPluginGroups');
 
 export const putUpdatePluginGroup = (data: updatePluginGroupBody) =>
   PUT('/admin/core/app/pluginGroup/update', data);

@@ -89,7 +89,8 @@ export const getSystemPluginsAndLoadThem = async (refresh = false) => {
   try {
     const systemPlugins = await getSystemPlugins();
 
-    const pluginConfigs = await MongoSystemPlugin.find();
+    // 从数据库里加载插件配置进行替换
+    const pluginConfigs = await MongoSystemPlugin.find().lean();
     systemPlugins.forEach((plugin) => {
       // 如果有插件的配置信息，则需要进行替换
       const pluginConfig = pluginConfigs.find((config) => config.pluginId === plugin.id);
@@ -99,8 +100,20 @@ export const getSystemPluginsAndLoadThem = async (refresh = false) => {
         const children = systemPlugins.filter((item) => item.parentId === plugin.id);
         const list = [plugin, ...children];
         list.forEach((item) => {
-          item.isActive = pluginConfig.isActive ?? false;
-          item.inputConfig = pluginConfig.inputConfig ?? [];
+          item.isActive =
+            pluginConfig.isActive ?? pluginConfig.pluginId.startsWith(PluginSourceEnum.community)
+              ? true
+              : false;
+          // 合并配置项值
+          item.inputConfig = item.inputConfig
+            ? item.inputConfig.map((config) => {
+                const val = pluginConfig.inputConfig?.find((item) => item.key === config.key);
+                return {
+                  ...config,
+                  value: val?.value
+                };
+              })
+            : [];
           item.originCost = pluginConfig.originCost ?? 0;
           item.currentCost = pluginConfig.currentCost ?? 0;
           item.hasTokenFee = pluginConfig.hasTokenFee ?? false;
@@ -127,23 +140,6 @@ export const getSystemPluginsAndLoadThem = async (refresh = false) => {
     systemPlugins.sort((a, b) => (a.pluginOrder ?? 0) - (b.pluginOrder ?? 0));
 
     global.systemPlugins = systemPlugins;
-
-    // Init system plugins to DB
-    const pluginIds = pluginConfigs.map((plugin) => plugin.pluginId);
-    const missingPlugins = systemPlugins.filter((plugin) => !pluginIds.includes(plugin.id));
-    if (missingPlugins.length > 0) {
-      await MongoSystemPlugin.insertMany(
-        missingPlugins.map((plugin) => ({
-          pluginId: plugin.id,
-          isActive: plugin.isActive,
-          inputConfig: plugin.inputConfig,
-          originCost: plugin.originCost,
-          currentCost: plugin.currentCost,
-          hasTokenFee: plugin.hasTokenFee,
-          pluginOrder: plugin.pluginOrder
-        }))
-      );
-    }
 
     return cloneDeep(global.systemPlugins);
   } catch (error) {

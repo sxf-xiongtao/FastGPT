@@ -26,7 +26,8 @@ async function handler(
     plugins.map((plugin, index) => ({
       updateOne: {
         filter: { pluginId: plugin.pluginId },
-        update: { $set: { pluginOrder: index } }
+        update: { $set: { pluginOrder: index } },
+        upsert: true
       }
     }))
   );

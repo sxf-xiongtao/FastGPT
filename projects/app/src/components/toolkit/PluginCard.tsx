@@ -7,7 +7,7 @@ import { DraggableProvided, DraggableStateSnapshot } from '@fastgpt/web/componen
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import MyBox from '@fastgpt/web/components/common/MyBox';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'next-i18next';
 
 const PluginCard = ({
   plugin,

@@ -21,7 +21,7 @@ import { useConfirm } from '@fastgpt/web/hooks/useConfirm';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
 import DndDrag, { Draggable } from '@fastgpt/web/components/common/DndDrag/index';
 import { FlowNodeTemplateTypeEnum } from '@fastgpt/global/core/workflow/constants';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'next-i18next';
 
 const defaultEmptyGroup = {
   groupId: '',

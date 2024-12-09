@@ -33,7 +33,7 @@ import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
 import { useConfirm } from '@fastgpt/web/hooks/useConfirm';
 import MyNumberInput from '@fastgpt/web/components/common/Input/NumberInput';
 import type { PluginGroupSchemaType } from '@fastgpt/service/core/app/plugin/type';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'next-i18next';
 
 export const defaultCustomPluginForm: EditCustomPluginType = {
   templateType: '',
