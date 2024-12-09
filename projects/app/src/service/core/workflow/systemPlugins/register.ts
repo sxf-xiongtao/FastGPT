@@ -128,6 +128,23 @@ export const getSystemPluginsAndLoadThem = async (refresh = false) => {
 
     global.systemPlugins = systemPlugins;
 
+    // Init system plugins to DB
+    const pluginIds = pluginConfigs.map((plugin) => plugin.pluginId);
+    const missingPlugins = systemPlugins.filter((plugin) => !pluginIds.includes(plugin.id));
+    if (missingPlugins.length > 0) {
+      await MongoSystemPlugin.insertMany(
+        missingPlugins.map((plugin) => ({
+          pluginId: plugin.id,
+          isActive: plugin.isActive,
+          inputConfig: plugin.inputConfig,
+          originCost: plugin.originCost,
+          currentCost: plugin.currentCost,
+          hasTokenFee: plugin.hasTokenFee,
+          pluginOrder: plugin.pluginOrder
+        }))
+      );
+    }
+
     return cloneDeep(global.systemPlugins);
   } catch (error) {
     global.systemPlugins = [];
