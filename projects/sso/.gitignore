@@ -3,3 +3,8 @@ dist
 *.js
 node_modules
 .env.local
+
+# certificats
+*.crt
+*.key
+*.pem

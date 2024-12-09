@@ -11,4 +11,10 @@ export type GetUserInfoFn = (code: string) => Promise<{
   contact: string;
 }>;
 
-export type CallbackFn = ({ req: Request, redirect_uri }) => Promise<{ redirectUrl }>;
+export type CallbackFn = (data: { req: Request }) => Promise<{ redirectUrl }>;
+
+export type AssertFn = (data: {
+  SAMLResponse: string;
+  RelayState: string;
+}) => Promise<{ redirectUrl: string }>;
+export type GetMetaDataFn = () => Promise<string>;

@@ -21,3 +21,13 @@ SSO_TARGET_URL=第三方系统跳转地址
 ```
 
 其他环境变量根据不同提供商要求填写
+
+## SAML2.0 证书配置
+使用SAML2.0时，需要配置SP证书和IdP证书。
+
+第一次使用时需要手动生成SP证书，如以下命令：
+
+```bash
+openssl req -x509 -newkey rsa:2048 -keyout sp.key -out sp.crt -days 365 -nodes
+```
+此命令将创建一个私钥文件sp.key和证书文件sp.crt。有效期为365天。

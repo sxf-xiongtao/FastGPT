@@ -8,8 +8,8 @@ COPY . .
 # 安装依赖
 RUN --mount=type=cache,target=/root/.bun \
     for i in $(seq 1 3); do \
-        bun i && break || \
-        sleep 5; \
+    bun i && break || \
+    sleep 5; \
     done
 
 # 构建
@@ -20,8 +20,8 @@ FROM oven/bun:1.1.34-alpine AS runner
 WORKDIR /app
 
 RUN apk add --no-cache\
-  curl ca-certificates\
-  && update-ca-certificates
+    curl ca-certificates\
+    && update-ca-certificates
 
 # copy running files
 COPY --from=builder /app/node_modules/ ./node_modules/

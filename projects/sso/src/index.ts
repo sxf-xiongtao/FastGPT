@@ -4,19 +4,35 @@ import { getErrText } from './utils';
 import { test_getUserInfo, test_redirectFn } from './provider/test';
 import { leapmotor_getUserInfo, leapmotor_redirectFn } from './provider/leapmotor';
 import { aecc_callbackFn, aecc_getUserInfo, aecc_redirectFn } from './provider/aecc';
+import { hebamr_redirectFn, hebamr_getUserInfo } from 'provider/hebamr';
 import { initGlobalStore } from 'global';
-import { CallbackFn, GetUserInfoFn, RedirectFn } from 'type';
+import { AssertFn, CallbackFn, GetMetaDataFn, GetUserInfoFn, RedirectFn } from 'type';
+import {
+  initTestSaml,
+  testSaml_assertFn,
+  testSaml_getMetadata,
+  testSaml_getUserInfo,
+  testSaml_redirectFn
+} from 'provider/testSaml';
 
 const providerMap: {
   [key: string]: {
     getUserInfo: GetUserInfoFn;
     redirectFn: RedirectFn;
     callbackFn?: CallbackFn;
+    getMetaData?: GetMetaDataFn;
+    assertFn?: AssertFn;
   };
 } = {
   test: {
     redirectFn: test_redirectFn,
     getUserInfo: test_getUserInfo
+  },
+  testSaml: {
+    redirectFn: testSaml_redirectFn,
+    getUserInfo: testSaml_getUserInfo,
+    getMetaData: testSaml_getMetadata,
+    assertFn: testSaml_assertFn
   },
   leapmotor: {
     redirectFn: leapmotor_redirectFn,
@@ -26,11 +42,16 @@ const providerMap: {
     redirectFn: aecc_redirectFn,
     callbackFn: aecc_callbackFn,
     getUserInfo: aecc_getUserInfo
+  },
+  hebamr: {
+    redirectFn: hebamr_redirectFn,
+    getUserInfo: hebamr_getUserInfo
   }
 };
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 3030;
 
 function getProvider() {
@@ -69,23 +90,69 @@ app.get('/login/oauth/authorize', async (req, res) => {
   }
 });
 
-app.get('/login/oauth/callback', async (req, res) => {
-  const privider = getProvider();
-  if (!privider) {
+app.get('/login/saml/metadata.xml', async (req, res) => {
+  const provider = getProvider();
+  if (!provider) {
     return res.status(400).json({ error: 'provider is required' });
   }
-  const { callbackFn } = privider;
+  const { getMetaData } = provider;
+
+  if (!getMetaData) {
+    return res.status(400).json({ error: 'getMetaData is required' });
+  }
+
+  try {
+    const metadata = await getMetaData();
+    res.set('Content-Type', 'application/xml');
+    res.send(metadata);
+  } catch (error) {
+    res.status(500).json({
+      message: getErrText(error)
+    });
+  }
+});
+
+// 用作处理特殊的重定向请求
+app.get('/login/oauth/callback', async (req, res) => {
+  const provider = getProvider();
+  if (!provider) {
+    return res.status(400).json({ error: 'provider is required' });
+  }
+  const { callbackFn } = provider;
+
   if (!callbackFn) {
     return res.status(400).json({ error: 'callbackFn is required' });
   }
 
-  const { redirect_uri } = req.query as { redirect_uri: string };
-  if (!redirect_uri) {
-    return res.status(400).json({ error: 'redirect_uri is required' });
+  try {
+    const { redirectUrl } = await callbackFn({ req });
+    res.redirect(redirectUrl);
+  } catch (error) {
+    res.status(500).json({
+      message: getErrText(error)
+    });
+  }
+});
+
+app.post('/login/saml/assert', async (req, res) => {
+  const { SAMLResponse, RelayState } = req.body as {
+    SAMLResponse: string;
+    RelayState: string;
+  };
+  const provider = getProvider();
+  if (!provider) {
+    return res.status(400).json({ error: 'provider is required' });
+  }
+  const { assertFn } = provider;
+  if (!assertFn) {
+    return res.status(400).json({ error: 'assertFn is required' });
+  }
+  if (!SAMLResponse) {
+    return res.status(400).json({ error: 'SAMLResponse and RelayState is required' });
   }
 
   try {
-    const { redirectUrl } = await callbackFn({ req, redirect_uri });
+    const { redirectUrl } = await assertFn({ SAMLResponse, RelayState });
     res.redirect(redirectUrl);
   } catch (error) {
     res.status(500).json({
@@ -126,9 +193,12 @@ app.get('/login/oauth/access_token', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log('Provider', process.env.SSO_PROVIDER);
+  const provider = process.env.SSO_PROVIDER;
+  console.log('Provider', provider);
 
   console.log(`SSO server is running on http://localhost:${PORT}`);
-
   initGlobalStore();
+  if (provider === 'testSaml') {
+    initTestSaml();
+  }
 });

@@ -2,11 +2,20 @@ import axios from 'axios';
 import xml2js from 'xml2js';
 import { RedirectFn, GetUserInfoFn, CallbackFn } from '../type.d';
 import { getTmpValue, setTmpValue } from 'global';
+import { Request } from 'express';
+
+const global = globalThis as typeof globalThis & {
+  aecc_redirect_uri: string | undefined;
+};
+
+const getService = (req: Request) =>
+  new URL(`${req.protocol}://${req.get('host')}/login/oauth/callback`);
 
 export const aecc_redirectFn: RedirectFn = async ({ req, redirect_uri }) => {
-  const service = new URL(`${req.protocol}://${req.get('host')}/login/oauth/callback`);
-  service.searchParams.set('redirect_uri', redirect_uri);
+  const service = getService(req);
 
+  // 缓存 redirect_uri，用于二次跳转
+  global.aecc_redirect_uri = redirect_uri;
   // Target URL e.g. http://example.com/CAS/login
   const targetUrl = process.env.SSO_TARGET_URL as string;
   const url = new URL(targetUrl);
@@ -15,16 +24,19 @@ export const aecc_redirectFn: RedirectFn = async ({ req, redirect_uri }) => {
   return { redirectUrl: url.toString() };
 };
 
-export const aecc_callbackFn: CallbackFn = async ({ req, redirect_uri }) => {
+export const aecc_callbackFn: CallbackFn = async ({ req }) => {
   const { ticket } = req.query as { ticket: string };
-  const service = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
+  const service = getService(req);
+
   if (!ticket) {
     return Promise.reject('Invalid ticket');
   }
-
+  const redirect_uri = global.aecc_redirect_uri;
+  if (!redirect_uri) {
+    return Promise.reject('Invalid redirect_uri');
+  }
   // 二次跳转
   const url = `${redirect_uri}?code=${ticket}`;
-  service.searchParams.delete('ticket');
 
   setTmpValue(ticket, service.toString());
 
