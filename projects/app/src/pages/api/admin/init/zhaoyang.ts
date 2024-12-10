@@ -8,8 +8,6 @@ import { connectionMongo } from '@fastgpt/service/common/mongo';
 interface OldPluginType {
   pluginId: string;
   customConfig: {
-    intro: string;
-    userGuide: string;
     associatedPlugin?: {
       _id: string;
       avatar: string;
@@ -20,43 +18,48 @@ interface OldPluginType {
 
 async function migratePluginAssociations() {
   const plugins = await MongoSystemPlugin.find({
-    $or: [
-      { 'customConfig.associatedPlugin': { $exists: true } },
-      { 'customConfig.intro': { $exists: true } }
-    ]
+    'customConfig.associatedPlugin': { $exists: true }
   }).lean();
 
   console.log(`找到 ${plugins.length} 个需要迁移的插件`);
 
-  const updateResults = await Promise.all(
-    plugins.map((plugin) => {
+  const updateResults = [];
+  const errors = [];
+
+  for (const plugin of plugins) {
+    try {
       const typedPlugin = plugin as OldPluginType;
       const associatedPluginId = typedPlugin.customConfig?.associatedPlugin?._id;
-      const intro = typedPlugin.customConfig?.intro;
-      const userGuide = typedPlugin.customConfig?.userGuide;
 
       const updateObj: any = {};
       if (associatedPluginId) {
         updateObj['customConfig.associatedPluginId'] = associatedPluginId;
         updateObj['$unset'] = { 'customConfig.associatedPlugin': 1 };
       }
-      // if (intro || userGuide) {
-      //   updateObj['customConfig.userGuide'] = `${intro ? intro + '\n\n' : ''}${userGuide || ''}`;
-      //   if (intro) {
-      //     if (!updateObj['$unset']) updateObj['$unset'] = {};
-      //     updateObj['$unset']['customConfig.intro'] = 1;
-      //   }
-      // }
 
-      if (Object.keys(updateObj).length === 0) return;
+      if (Object.keys(updateObj).length === 0) continue;
 
-      return MongoSystemPlugin.updateOne({ pluginId: typedPlugin.pluginId }, updateObj);
-    })
-  );
+      const result = await MongoSystemPlugin.updateOne(
+        { pluginId: typedPlugin.pluginId },
+        updateObj
+      );
+
+      console.log(`成功更新插件: ${typedPlugin.pluginId}`);
+      updateResults.push(result);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(`处理插件时出错:`, errorMessage);
+      errors.push({
+        pluginId: (plugin as OldPluginType).pluginId,
+        error: errorMessage
+      });
+    }
+  }
 
   return {
     total: plugins.length,
-    updated: updateResults.filter(Boolean).length
+    updated: updateResults.filter(Boolean).length,
+    errors: errors.length > 0 ? errors : undefined
   };
 }
 
