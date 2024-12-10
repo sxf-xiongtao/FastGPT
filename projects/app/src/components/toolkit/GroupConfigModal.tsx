@@ -25,7 +25,7 @@ import { useTranslation } from 'next-i18next';
 
 const defaultEmptyGroup = {
   groupId: '',
-  groupAvatar: 'common/navbar/pluginLight',
+  groupAvatar: 'core/app/type/pluginLight',
   groupName: '',
   groupTypes: [],
   groupOrder: 0
