@@ -250,7 +250,7 @@ export function formatFormData2ConfigStore({
       feConfigs: formatFeConfig,
       systemEnv,
       subPlans: {
-        planDescriptionUrl: subPlans.planDescriptionUrl ?? 'https://cloud.tryfastgpt.ai/price',
+        planDescriptionUrl: subPlans.planDescriptionUrl ?? '',
         [SubTypeEnum.standard]: standardSubPlanJson,
         [SubTypeEnum.extraDatasetSize]: {
           price: subPlans.extraDatasetSizePrice || 0
