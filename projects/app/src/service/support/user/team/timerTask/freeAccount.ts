@@ -86,6 +86,7 @@ const checkUsageTime = async (plan: TeamSubSchema, clearDay: Date, oldDateInform
 };
 
 const clearFreeAccount = async (teamId: string) => {
+  // if (process.env.CLEAR_FREE_ACCOUNT !== 'true') return;
   // get all dataset
   // const datasets = await MongoDataset.find({ teamId }, '_id teamId').lean();
   // await mongoSessionRun(async (session) => {

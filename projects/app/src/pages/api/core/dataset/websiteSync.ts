@@ -22,6 +22,7 @@ import { checkTeamWebSyncPermission } from '@/service/support/permission/teamLim
 import { MongoBill } from '@/service/support/wallet/bill/schema';
 import { WritePermissionVal } from '@fastgpt/global/support/permission/constant';
 import { crawlDynamicWebsite } from '@/service/common/crawler/crawlDynamicWebsite';
+import { addDays } from 'date-fns';
 
 // config
 const maxCrawlPage = process.env.MAX_CRAWL_PAGE ? parseInt(process.env.MAX_CRAWL_PAGE) : 200;
@@ -128,7 +129,10 @@ async function createCollectionAndPushData(props: {
             trainingType: TrainingModeEnum.chunk,
             chunkSize,
             rawLink: item.url,
-            metadata: {}
+            metadata: {
+              webPageSelector: dataset.websiteConfig?.selector?.trim() || ''
+            },
+            nextSyncTime: dataset.autoSync ? addDays(new Date(), 1) : undefined
           }
         ],
         { session }

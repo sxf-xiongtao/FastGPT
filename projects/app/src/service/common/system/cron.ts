@@ -1,11 +1,12 @@
 import { setCron } from '@fastgpt/service/common/system/cron';
 import { startTrainingProcess } from '@/service/core/dataset/training/utils';
-import { clearExpiredSubPlan, updateStandardPlan } from './cronTask';
+import { clearExpiredSubPlan } from './cronTask';
 import { checkTimerLock } from '@fastgpt/service/common/system/timerLock/utils';
 import { TimerIdEnum } from '@fastgpt/service/common/system/timerLock/constants';
 import { notifyAllExpireSoon } from '@/service/support/user/team/timerTask/expireSoon';
 import { checkFreeAccount } from '@/service/support/user/team/timerTask/freeAccount';
 import { addLog } from '@fastgpt/service/common/system/log';
+import { syncCollectionTask } from '@/service/core/dataset/sync';
 
 const setTrainingCron = () => {
   setCron('*/1 * * * *', () => {
@@ -66,9 +67,17 @@ const freeAccountCron = () => {
   });
 };
 
+// 每小时扫描一遍
+const syncCollectionCron = () => {
+  setCron('15 */1 * * *', async () => {
+    await syncCollectionTask();
+  });
+};
+
 export const startCron = () => {
   setTrainingCron();
   updateSubPlanCron();
   planNotifyCron();
   freeAccountCron();
+  syncCollectionCron();
 };

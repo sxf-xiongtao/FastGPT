@@ -50,7 +50,7 @@ export const lackOfPointsTemplate = ({ name }: { name: string }) => {
 export const FreeCleanTemplate = ({ name, day }: { name: string; day: string }) => {
   return {
     title: `知识库即将清理通知`,
-    content: `由于您的团队【${name}】近期无任何使用记录。根据免费版套餐协议，系统将在 ${day} 天后自动清理您的知识库，请及时关注。`
+    content: `由于您的团队【${name}】近期无打开系统记录。根据免费版套餐协议，系统将在 ${day} 天后自动清理您的知识库，请及时关注。`
   };
 };
 
