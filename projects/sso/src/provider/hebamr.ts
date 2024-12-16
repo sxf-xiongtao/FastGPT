@@ -1,14 +1,19 @@
 import axios from 'axios';
 import { RedirectFn, GetUserInfoFn } from '../type.d';
 
-export const hebamr_redirectFn: RedirectFn = async ({ redirect_uri }) => {
+export const hebamr_redirectFn: RedirectFn = async ({ redirect_uri, state }) => {
   const targetUrl = process.env.SSO_TARGET_URL as string;
   const appId = process.env.HEBAMR_APP_ID as string;
-  if (!appId) {
+  const clientId = process.env.HEBAMR_CLIENT_ID as string;
+  if (!appId || !clientId) {
     return Promise.reject('HEBAMR_APP_ID is required');
   }
+  redirect_uri = `${redirect_uri}?state=${state}`;
   const url = new URL(targetUrl);
+  const randomCode = Math.random().toString(16).substring(2);
   url.searchParams.set('app_id', appId);
+  url.searchParams.set('client_id', clientId);
+  url.searchParams.set('random_code', randomCode);
   url.searchParams.set('redirect_uri', redirect_uri);
 
   return { redirectUrl: url.toString() };

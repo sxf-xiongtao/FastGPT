@@ -8,3 +8,5 @@ node_modules
 *.crt
 *.key
 *.pem
+
+docker

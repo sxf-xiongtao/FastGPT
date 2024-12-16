@@ -3,6 +3,7 @@
 .env.*.local
 dist
 
+docker
 Dockerfile
 .dockerignore
 node_modules
