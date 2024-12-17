@@ -2,7 +2,7 @@ import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema
 import { getProInitData } from '../init';
 import { MongoSystemPlugin } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
 import { getSystemPluginCb } from '../core/workflow/systemPlugins/register';
-import { throttle } from 'lodash';
+import { debounce } from 'lodash';
 
 export const startMongoWatch = async () => {
   reloadConfigWatch();
@@ -27,7 +27,7 @@ const refetchSystemPlugins = () => {
 
   changeStream.on(
     'change',
-    throttle(async (change) => {
+    debounce(async (change) => {
       try {
         console.log('refresh system plugins');
         getSystemPluginCb(true);

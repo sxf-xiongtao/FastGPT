@@ -5,6 +5,7 @@ import { adminCert } from '@/service/support/permission/adminCert';
 import { MongoSystemPlugin } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
 import { PluginSourceEnum } from '@fastgpt/global/core/plugin/constants';
+import { getSystemPluginCb } from '@/service/core/workflow/systemPlugins/register';
 
 export type createPluginQuery = {};
 
@@ -60,6 +61,9 @@ async function handler(
       userGuide
     }
   });
+
+  // 重新获取插件
+  await getSystemPluginCb(true);
 
   return {};
 }

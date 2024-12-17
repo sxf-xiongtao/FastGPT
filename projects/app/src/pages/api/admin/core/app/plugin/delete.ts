@@ -2,6 +2,7 @@ import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/nex
 import { NextAPI } from '@/service/middleware/entry';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { MongoSystemPlugin } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
+import { getSystemPluginCb } from '@/service/core/workflow/systemPlugins/register';
 
 export type deletePluginQuery = { id: string };
 
@@ -16,6 +17,9 @@ async function handler(
   await adminCert({ req, authToken: true });
 
   await MongoSystemPlugin.deleteOne({ pluginId: req.query.id });
+
+  // 重新获取插件
+  await getSystemPluginCb(true);
 
   return {};
 }

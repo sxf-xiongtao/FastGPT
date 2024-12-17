@@ -31,7 +31,8 @@ async function handler(
       }
     }))
   );
-  getSystemPluginCb(true);
+
+  await getSystemPluginCb(true);
 
   return {};
 }

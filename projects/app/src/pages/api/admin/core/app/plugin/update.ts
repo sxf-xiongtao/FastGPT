@@ -8,6 +8,7 @@ import { adminCert } from '@/service/support/permission/adminCert';
 import { MongoSystemPlugin } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
 import { isEqual } from 'lodash';
+import { getSystemPluginCb } from '@/service/core/workflow/systemPlugins/register';
 
 export type updatePluginQuery = {};
 
@@ -84,6 +85,9 @@ async function handler(
     // 系统插件只更新基础字段
     await MongoSystemPlugin.updateOne({ pluginId }, baseUpdateFields, { upsert: true });
   }
+
+  // 重新获取插件
+  await getSystemPluginCb(true);
 
   return {};
 }
