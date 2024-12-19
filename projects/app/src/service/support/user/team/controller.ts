@@ -83,6 +83,7 @@ export async function createTeam({
   ownerId,
   notificationAccount,
   name,
+  memberName = 'Owner',
   avatar,
   defaultTeam = false,
   session
@@ -111,7 +112,7 @@ export async function createTeam({
         {
           teamId: team._id,
           userId: ownerId,
-          name: 'Owner',
+          name: memberName,
           role: TeamMemberRoleEnum.owner,
           status: TeamMemberStatusEnum.active,
           defaultTeam
@@ -207,6 +208,7 @@ export async function getAndCreateUserDefaultTeam({
   ownerId,
   notificationAccount,
   teamName = 'My Team',
+  memberName,
   teamAvatar = LOGO_ICON,
   session
 }: {
@@ -214,6 +216,7 @@ export async function getAndCreateUserDefaultTeam({
   notificationAccount?: string;
   teamName?: string;
   teamAvatar?: string;
+  memberName?: string;
   session: ClientSession;
 }): Promise<TeamTmbItemType> {
   const tmb = (await MongoTeamMember.findOne({
@@ -226,6 +229,7 @@ export async function getAndCreateUserDefaultTeam({
       ownerId,
       name: teamName,
       avatar: teamAvatar,
+      memberName,
       defaultTeam: true,
       notificationAccount,
       session

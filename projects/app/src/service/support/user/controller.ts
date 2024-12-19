@@ -20,6 +20,7 @@ type UserProps = {
   fastgpt_sem?: {
     keyword: string;
   };
+  sourceDomain?: string;
 };
 
 /* create user and team */
@@ -28,10 +29,17 @@ export async function createUserByUsername({
   password,
   phonePrefix,
   avatar,
+
+  teamName,
+  memberName,
+
   inviterId,
   notificationAccount,
-  fastgpt_sem
+  fastgpt_sem,
+  sourceDomain
 }: UserProps & {
+  teamName?: string;
+  memberName?: string;
   password: string;
 }): Promise<UserType> {
   await authMaxUsers();
@@ -43,16 +51,18 @@ export async function createUserByUsername({
           username,
           avatar,
           password,
-          inviterId: inviterId && Types.ObjectId.isValid(inviterId) ? inviterId : undefined,
           phonePrefix,
-          fastgpt_sem
+          inviterId: inviterId && Types.ObjectId.isValid(inviterId) ? inviterId : undefined,
+          fastgpt_sem,
+          sourceDomain
         }
       ],
       { session }
     );
 
     // username: email;phone;git-xxx;google-xxx
-    const teamName = (() => {
+    const formatTeamName = (() => {
+      if (teamName) return teamName;
       const splitUsername = username.split('-');
       if (splitUsername.length > 1) {
         return splitUsername[1];
@@ -62,7 +72,8 @@ export async function createUserByUsername({
     const team = await getAndCreateUserDefaultTeam({
       ownerId: user._id,
       notificationAccount,
-      teamName: `${teamName.slice(0, 10)}的团队`,
+      teamName: `${formatTeamName.slice(0, 10)} Team`,
+      memberName,
       teamAvatar: avatar,
       session
     });
@@ -110,9 +121,19 @@ export async function getUserDetail(tmbId?: string, userId?: string): Promise<Us
 export async function usernameLogin({
   username,
   avatar,
+  notificationAccount,
+  phonePrefix,
+
+  teamName,
+  memberName,
+
   inviterId,
-  notificationAccount
-}: UserProps) {
+  fastgpt_sem,
+  sourceDomain
+}: UserProps & {
+  teamName?: string;
+  memberName?: string;
+}) {
   // try to login
   const user = await MongoUser.findOne({ username }, '_id lastLoginTmbId');
 
@@ -124,7 +145,14 @@ export async function usernameLogin({
       password: hashStr(password),
       avatar,
       notificationAccount,
-      inviterId: inviterId && Types.ObjectId.isValid(inviterId) ? inviterId : undefined
+      phonePrefix,
+
+      teamName,
+      memberName,
+
+      inviterId,
+      fastgpt_sem,
+      sourceDomain
     });
     // send default password inform
     sendInform2OneUser({

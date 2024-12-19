@@ -105,7 +105,7 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
       maxRunTimes: WORKFLOW_MAX_RUN_TIMES
     });
 
-    const responseContent = assistantResponses
+    let responseContent = assistantResponses
       .map((response) => {
         return response.text?.content;
       })
@@ -141,8 +141,11 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
       }
     });
 
+    if (responseContent.length === 0) {
+      responseContent = 'This is default reply';
+    }
     const replyResult = await replyCallback(responseContent);
-    console.log(replyResult, '--=-=');
+    addLog.info('Reply result', { responseContent, replyResult: replyResult.data });
 
     const { totalPoints } = pushChatUsage({
       appName: app.name,

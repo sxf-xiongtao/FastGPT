@@ -9,7 +9,6 @@ import {
   DatasetSourceReadTypeEnum,
   TrainingModeEnum
 } from '@fastgpt/global/core/dataset/constants';
-import { hashStr } from '@fastgpt/global/common/string/tools';
 import { readDatasetSourceRawText } from '@fastgpt/service/core/dataset/read';
 import { NextAPI } from '@/service/middleware/entry';
 import { ApiRequestProps } from '@fastgpt/service/type/next';

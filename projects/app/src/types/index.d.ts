@@ -70,6 +70,10 @@ export type SystemConfigType = {
       appID: string;
       appSecret: string;
     };
+    dingtalk?: {
+      clientId: string;
+      secret: string;
+    };
   };
   pay?: {
     wx?: {

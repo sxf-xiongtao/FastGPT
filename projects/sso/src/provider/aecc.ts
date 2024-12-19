@@ -43,6 +43,16 @@ export const aecc_callbackFn: CallbackFn = async ({ req }) => {
   return { redirectUrl: url };
 };
 
+function test() {
+  const data =
+    "\n\n<cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>\n\t<cas:authenticationSuccess>\n\t\t<cas:user>59800978</cas:user>\n\t\t\n\t\t \n\n\t\t\t\n\t\t\n\n\n\t</cas:authenticationSuccess>\n</cas:serviceResponse>";
+  const parser = new xml2js.Parser();
+  parser.parseStringPromise(data).then((result) => {
+    const user = result['cas:serviceResponse']['cas:authenticationSuccess'][0]['cas:user'][0];
+    console.log(result, user);
+  });
+}
+
 export const aecc_getUserInfo: GetUserInfoFn = async (code: string) => {
   const validateUrl = process.env.AECC_SERVICE_VALIDATE_URL as string;
   const service = getTmpValue<string>(code);
@@ -58,13 +68,15 @@ export const aecc_getUserInfo: GetUserInfoFn = async (code: string) => {
       }
     });
 
+    console.log('got response: ', { data });
+
     const parser = new xml2js.Parser();
     const result = await parser.parseStringPromise(data);
-    if (!result.cas.authenticationSuccess || !result.cas.authenticationSuccess[0].user[0]) {
-      return Promise.reject('Invalid ticket or unauthorized');
-    }
 
-    const user: string = result.cas.authenticationSuccess[0].user[0];
+    const user = result['cas:serviceResponse']['cas:authenticationSuccess'][0]['cas:user'][0];
+    if (!user) {
+      return Promise.reject('Verify failed, got empty user in response');
+    }
 
     return {
       username: user,

@@ -9,6 +9,7 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { InvoiceStatusEnum } from '@fastgpt/global/support/wallet/bill/invoice/constants';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
+import { addLog } from '@fastgpt/service/common/system/log';
 
 export type finishQuery = {};
 
@@ -56,6 +57,11 @@ async function handler(
             cid: getNanoid()
           }
         ]
+      });
+
+      addLog.info('开票完成', {
+        name: invoice.teamName,
+        emailAddress: invoice.emailAddress
       });
     });
   } catch (error) {

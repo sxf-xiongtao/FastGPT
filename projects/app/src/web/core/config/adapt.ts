@@ -100,6 +100,10 @@ export function formatConfigStore2FormSchema({
         clientId: fastgptPro?.auth?.google?.clientId || '',
         secret: fastgptPro?.auth?.google?.secret || ''
       },
+      dingtalk: {
+        clientId: fastgptPro?.auth?.dingtalk?.clientId || '',
+        secret: fastgptPro?.auth?.dingtalk?.secret || ''
+      },
       microsoft: {
         clientId: fastgptPro?.auth?.microsoft?.clientId || '',
         secret: fastgptPro?.auth?.microsoft?.secret || '',
@@ -166,7 +170,8 @@ export function formatFormData2ConfigStore({
 }: ConfigFormType): ConfigStoreType {
   const { feConfigs, systemEnv, concatMd, scripts, limit, sso, navbar } = siteSettings;
   const { llmModels, vectorModels, reRankModels, audioSpeechModels, whisperModel } = modelSettings;
-  const { email, phone, github, wechat, google, fastLogin, sms, microsoft } = loginSettings;
+  const { email, phone, github, wechat, dingtalk, google, fastLogin, sms, microsoft } =
+    loginSettings;
   const { censor } = securitySettings;
   const { wx, subPlans } = paySettings;
 
@@ -178,6 +183,7 @@ export function formatFormData2ConfigStore({
     oauth: {
       github: github?.clientId,
       google: google?.clientId,
+      dingtalk: dingtalk?.clientId,
       wechat: wechat?.appID,
       microsoft: microsoft?.clientId
         ? {
@@ -232,6 +238,7 @@ export function formatFormData2ConfigStore({
     phone,
     github,
     wechat,
+    dingtalk,
     google,
     microsoft,
     sms

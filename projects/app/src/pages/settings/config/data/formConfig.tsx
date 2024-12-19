@@ -467,6 +467,45 @@ export const getUserFormConfig = (): FormConfig => {
             }
           }
         },
+        wechat: {
+          key: 'loginSettings.wechat',
+          type: 'object',
+          title: '微信服务号登录',
+          properties: {
+            appID: {
+              key: 'loginSettings.wechat.appID',
+              type: 'string',
+              title: 'AppID',
+              description:
+                '服务号的 Appid。微信服务号的验证地址填写：商业版域名//api/support/user/account/login/wx/callback'
+            },
+            appSecret: {
+              key: 'loginSettings.wechat.appSecret',
+              type: 'string',
+              title: 'AppSecret',
+              description: '服务号的 Secret'
+            }
+          }
+        },
+        dingtalk: {
+          key: 'loginSettings.dingtalk',
+          type: 'object',
+          title: '钉钉登录配置',
+          properties: {
+            clientId: {
+              key: 'loginSettings.dingtalk.clientId',
+              type: 'string',
+              title: 'Client ID',
+              description: '钉钉应用的 Client ID'
+            },
+            secret: {
+              key: 'loginSettings.dingtalk.secret',
+              type: 'string',
+              title: 'Client Secret',
+              description: '钉钉应用的 Client Secret'
+            }
+          }
+        },
         github: {
           key: 'loginSettings.github',
           type: 'object',
@@ -500,26 +539,6 @@ export const getUserFormConfig = (): FormConfig => {
               key: 'loginSettings.google.secret',
               type: 'string',
               title: 'Google Secret'
-            }
-          }
-        },
-        wechat: {
-          key: 'loginSettings.wechat',
-          type: 'object',
-          title: '微信服务号登录',
-          properties: {
-            appID: {
-              key: 'loginSettings.wechat.appID',
-              type: 'string',
-              title: 'AppID',
-              description:
-                '服务号的 Appid。微信服务号的验证地址填写：商业版域名//api/support/user/account/login/wx/callback'
-            },
-            appSecret: {
-              key: 'loginSettings.wechat.appSecret',
-              type: 'string',
-              title: 'AppSecret',
-              description: '服务号的 Secret'
             }
           }
         },
@@ -574,6 +593,12 @@ export const getUserFormConfig = (): FormConfig => {
               key: 'siteSettings.sso.icon',
               title: 'SSO 登录按钮的图标',
               type: 'image'
+            },
+            autoLogin: {
+              key: 'siteSettings.sso.autoLogin',
+              title: 'SSO 自动跳转',
+              type: 'boolean',
+              description: '开启后，用户进入登录页面，将会自动触发 SSO 登录，无需手动点击。'
             }
           }
         },

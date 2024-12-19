@@ -9,22 +9,29 @@ import { usernameLogin } from '@/service/support/user/controller';
 import { OAuthEnum } from '@fastgpt/global/support/user/constant';
 import type { OauthLoginProps } from '@fastgpt/global/support/user/api';
 import { UserErrEnum } from '@fastgpt/global/common/error/code/user';
+import { trackBaiduConversion } from '@/service/common/tracking/baidu';
+import { pushTrack } from '@fastgpt/service/common/middle/tracks/utils';
 
 type OauthResponse = {
   username: string;
   avatarUrl?: string;
   concat?: string;
+  phonePrefix?: number;
+  teamName?: string;
+  memberName?: string;
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     await connectToDatabase();
-    const { type, code, inviterId, callbackUrl } = req.body as OauthLoginProps;
+    const { type, code, callbackUrl, inviterId, bd_vid, fastgpt_sem, sourceDomain } =
+      req.body as OauthLoginProps;
 
-    const { username, avatarUrl, concat } = await (async () => {
+    const { username, avatarUrl, concat, phonePrefix, teamName, memberName } = await (async () => {
       if (type === OAuthEnum.github) return authGithub(code);
       if (type === OAuthEnum.google) return authGoogle(code, callbackUrl);
       if (type === OAuthEnum.microsoft) return authMicrosoft(code, callbackUrl);
+      if (type === OAuthEnum.dingtalk) return authDingtalk(code);
       if (type === OAuthEnum.sso) return authSso(code);
       return Promise.reject('type error');
     })();
@@ -33,7 +40,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       username,
       avatar: avatarUrl,
       notificationAccount: concat,
-      inviterId
+      phonePrefix,
+      teamName,
+      memberName,
+
+      inviterId,
+      fastgpt_sem,
+      sourceDomain
+    });
+
+    // 百度转化
+    bd_vid && trackBaiduConversion(bd_vid);
+    pushTrack.login({
+      type,
+      uid: user._id,
+      teamId: user.team.teamId,
+      tmbId: user.team.tmbId
     });
 
     setCookie(res, token);
@@ -65,8 +87,10 @@ export async function authGithub(code: string): Promise<OauthResponse> {
 
   const { data } = await axios.get<{
     login: string;
+    name?: string;
     avatar_url: string;
     email?: string;
+    notification_email?: string;
   }>('https://api.github.com/user', {
     headers: {
       Authorization: `Bearer ${access_token}`
@@ -78,7 +102,9 @@ export async function authGithub(code: string): Promise<OauthResponse> {
   return {
     avatarUrl: data.avatar_url,
     username,
-    concat: data.email
+    teamName: data.name,
+    memberName: data.name,
+    concat: data.notification_email || data.email
   };
 }
 
@@ -102,7 +128,55 @@ export async function authGoogle(code: string, callbackUrl: string): Promise<Oau
   return {
     avatarUrl: picture,
     username,
+    memberName: email,
     concat: email
+  };
+}
+
+export async function authDingtalk(code: string): Promise<OauthResponse> {
+  const { data } = await axios.post<{
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: number;
+    corpId: string;
+  }>('https://api.dingtalk.com/v1.0/oauth2/userAccessToken', {
+    clientId: global.systemConfig?.auth?.dingtalk?.clientId,
+    clientSecret: global.systemConfig?.auth?.dingtalk?.secret,
+    code,
+    grantType: 'authorization_code'
+  });
+
+  if (!data.accessToken) {
+    throw new Error('Fail to get dingtalk access token');
+  }
+
+  const { data: userData } = await axios.get<{
+    nick: string;
+    avatarUrl: string;
+    mobile: string;
+    openId: string;
+    unionId: string;
+    email: string;
+    stateCode: string;
+  }>('https://api.dingtalk.com/v1.0/contact/users/me', {
+    headers: {
+      'x-acs-dingtalk-access-token': data.accessToken
+    }
+  });
+
+  if (!userData.openId) {
+    throw new Error('Fail to get dingtalk user info');
+  }
+
+  const username = `dingtalk-${userData.openId}`;
+
+  return {
+    avatarUrl: userData.avatarUrl ?? '',
+    username,
+    concat: userData.mobile,
+    phonePrefix: Number(userData.stateCode),
+    teamName: userData.nick,
+    memberName: userData.nick
   };
 }
 
@@ -146,7 +220,7 @@ export async function authMicrosoft(code: string, callbackUrl: string): Promise<
   };
 }
 
-/* 
+/*
   通用 SSO 登录封装
 */
 export async function authSso(code: string): Promise<OauthResponse> {

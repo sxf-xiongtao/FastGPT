@@ -31,6 +31,7 @@ export type ConfigFormType = {
       title?: string;
       icon?: string;
       url?: string;
+      autoLogin?: boolean;
     };
     concatMd: string;
     scripts?: string;
@@ -57,6 +58,7 @@ export type ConfigFormType = {
     sms: NonNullable<SystemConfigType['auth']>['sms'];
     github: NonNullable<SystemConfigType['auth']>['github'];
     wechat: NonNullable<SystemConfigType['auth']>['wechat'];
+    dingtalk: NonNullable<SystemConfigType['auth']>['dingtalk'];
     google: NonNullable<SystemConfigType['auth']>['google'];
     microsoft: NonNullable<SystemConfigType['auth']>['microsoft'];
     fastLogin: string;

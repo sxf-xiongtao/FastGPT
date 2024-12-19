@@ -26,9 +26,7 @@ const InvoiceSchema = new Schema({
     default: () => new Date(),
     required: true
   },
-  finishTime: {
-    type: Date
-  },
+  finishTime: Date,
   file: {
     type: Buffer,
     required: false
