@@ -43,7 +43,8 @@ async function handler(
     emailAddress,
     unifiedCreditCode,
     needSpecialInvoice,
-    teamName
+    teamName,
+    contactPhone
   } = req.body;
   const { teamId } = await authMember({ req, authToken: true, per: ManagePermissionVal });
   const totalAmount = await getBillIdListTotalAmount(billIdList, teamId);
@@ -70,7 +71,8 @@ async function handler(
           unifiedCreditCode,
           needSpecialInvoice,
           teamName,
-          billIdList
+          billIdList,
+          contactPhone
         }
       ],
       {

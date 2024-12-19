@@ -34,6 +34,9 @@ export const teamInvoiceTitleScheme = {
     required: true,
     default: false
   },
+  contactPhone: {
+    type: String
+  },
   emailAddress: {
     type: String,
     required: true
