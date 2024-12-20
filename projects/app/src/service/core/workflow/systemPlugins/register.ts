@@ -1,6 +1,6 @@
 import { PluginSourceEnum } from '@fastgpt/global/core/plugin/constants';
 import { SystemPluginResponseType } from '@fastgpt/plugins/type';
-import { isProduction } from '@fastgpt/service/common/system/constants';
+import { isProduction } from '@fastgpt/global/common/system/constants';
 import { SystemPluginTemplateItemType } from '@fastgpt/global/core/workflow/type';
 import { getCommunityCb, getCommunityPlugins } from '@fastgpt/plugins/register';
 import { cloneDeep } from 'lodash';

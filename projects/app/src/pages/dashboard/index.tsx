@@ -1,25 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import dayjs from 'dayjs';
-import { Box, Center, Divider, GridItem, HStack, Spinner, VStack } from '@chakra-ui/react';
-
+import { Box, Flex, Grid, GridItem, HStack } from '@chakra-ui/react';
 import {
-  Area,
-  AreaChart,
+  Line,
+  LineChart,
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis
+  YAxis,
+  Legend
 } from 'recharts';
-import Icons from '@/components/Icons';
 import { GET } from '@/service/common/request';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import BoxCard from '@/components/common/BoxContainer/Card';
+import FillRowTabs from '@fastgpt/web/components/common/Tabs/FillRowTabs';
+import type { IconNameType } from '@fastgpt/web/components/common/Icon/type';
+import MyIcon from '@fastgpt/web/components/common/Icon';
+import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
 
-type fetchChatData = {
+type FetchChatData = {
+  date: string;
   count: number;
   total?: number;
-  date: string;
   increase?: number;
   increaseRate?: string;
 };
@@ -28,10 +31,9 @@ type chatDataType = {
   date: string;
   userCount: number;
   userIncrease?: number;
-  userIncreaseRate?: string;
   payCount: number;
   chatCount: number;
-  chatIncrease?: number;
+  totalPoints: number;
 };
 
 type TNumbers = {
@@ -40,165 +42,208 @@ type TNumbers = {
   usersCount: number;
 };
 
-export default function DashBoard() {
-  const [chartData, setChartData] = useState<chatDataType[]>([]);
-  const [numbers, setNumbers] = useState<TNumbers>();
+const DataItem = ({
+  icon,
+  title,
+  count = 0,
+  bg
+}: {
+  icon: IconNameType;
+  title: string;
+  count?: number;
+  bg: string;
+}) => {
+  return (
+    <HStack bg={bg} px={8} py={3} borderRadius={'lg'} spacing={5}>
+      <MyIcon name={icon} w={'2rem'} h={'2rem'} />
+      <Box>
+        <Box>{title}</Box>
+        <Box fontSize={'xl'} fontWeight={'bold'}>
+          {count}
+        </Box>
+      </Box>
+    </HStack>
+  );
+};
 
-  useEffect(() => {
-    const fetchChartData = async () => {
-      const [userResponse, payResponse, chatResponse]: fetchChatData[][] = await Promise.all([
-        GET(`admin/routes/dashboard/getUserFormData`, {}).then((res: any) => res.countResult),
-        GET(`admin/routes/dashboard/getPaysFormData`, {}).then((res: any) => res.countResult),
-        GET(`admin/routes/dashboard/getChatFormData`, {}).then((res: any) => res.countResult)
+export default function DashBoard() {
+  const { data: datas, loading: isLoadingGetNumbers } = useRequest2(
+    () => GET<TNumbers>(`/admin/routes/dashboard/getNumbers`),
+    {
+      manual: false
+    }
+  );
+
+  const [dateRange, setDateRange] = useState<string>('7');
+  const { data: chartData = [], loading: isLoadingChart } = useRequest2(
+    async () => {
+      const [userResponse, payResponse, chatResponse, pointResponse] = await Promise.all([
+        GET<FetchChatData[]>(`admin/routes/dashboard/getUserFormData`, {
+          day: dateRange
+        }),
+        GET<FetchChatData[]>(`admin/routes/dashboard/getPaysFormData`, { day: dateRange }),
+        GET<FetchChatData[]>(`admin/routes/dashboard/getChatFormData`, {
+          day: dateRange
+        }),
+        GET<FetchChatData[]>(`admin/routes/dashboard/getPointUsages`, { day: dateRange })
       ]);
 
       const data = userResponse.map((item, i) => {
         const pay = payResponse.find((payItem) => payItem.date === item.date);
         const chat = chatResponse.find((chatItem) => chatItem.date === item.date);
+        const point = pointResponse.find((pointItem) => pointItem.date === item.date);
 
         return {
           date: dayjs(item.date).format('MM/DD'),
           userCount: item.count,
           userIncrease: item.increase,
-          userIncreaseRate: item.increaseRate,
           payCount: pay ? pay.count / PRICE_SCALE : 0,
-          chatCount: chat ? chat.count : 0
+          chatCount: chat ? chat.count : 0,
+          totalPoints: point ? +point.count.toFixed(2) : 0
         };
       });
-      setChartData(data);
-    };
+      return data;
+    },
+    {
+      manual: false,
+      refreshDeps: [dateRange]
+    }
+  );
 
-    const fetchNumbers = async () => {
-      const res: TNumbers = await GET(`/admin/routes/dashboard/getNumbers`);
-      setNumbers(res);
-    };
-
-    fetchChartData();
-    fetchNumbers();
-  }, []);
+  const isLoading = isLoadingGetNumbers || isLoadingChart;
 
   return (
-    <BoxCard>
-      <Box>
-        <Box className="w-full text-[20px] font-normal text-[#405169] mb-2">信息总览</Box>
-        <Divider />
-        <HStack gap={6} className="w-full my-4">
-          <GridItem flex={1} className="border-r">
-            <DataItem
-              icon={<Icons type="user" />}
-              title={'用户'}
-              count={numbers?.usersCount || 0}
-            />
-          </GridItem>
-          <GridItem flex={1} className="border-r">
-            <DataItem
-              icon={<Icons type="dataset" />}
-              title={'知识库'}
-              count={numbers?.datasetsCount || 0}
-            />
-          </GridItem>
-          <GridItem flex={1}>
-            <DataItem icon={<Icons type="app" />} title={'应用'} count={numbers?.appsCount || 0} />
-          </GridItem>
-        </HStack>
-        <Divider />
-      </Box>
+    <BoxCard isLoading={isLoading}>
+      {/* Header time range select */}
+      <Flex justify={'space-between'}>
+        <Box fontSize={'lg'} fontWeight={'bold'}>
+          统计数据
+        </Box>
+      </Flex>
+      {/* Data card */}
+      <Grid mt={2} templateColumns={['1fr', 'repeat(3, 1fr)']} gap={6}>
+        <GridItem flex={1}>
+          <DataItem
+            icon={'support/user/userLight'}
+            title={'用户总数'}
+            count={datas?.usersCount}
+            bg={'#EDFAFF'}
+          />
+        </GridItem>
+        <GridItem flex={1}>
+          <DataItem
+            icon={'core/dataset/datasetLight'}
+            title={'知识库总数'}
+            count={datas?.datasetsCount}
+            bg={'#F0EEFF'}
+          />
+        </GridItem>
+        <GridItem flex={1}>
+          <DataItem
+            icon={'core/app/aiLight'}
+            title={'应用总数'}
+            count={datas?.appsCount}
+            bg={'#F0F4FF'}
+          />
+        </GridItem>
+      </Grid>
 
-      <Box
-        className="bg-white my-2 w-full px-6 py-8"
-        style={{ boxShadow: '0px 2px 10px  rgba(76, 141, 235, 0.1)' }}
-      >
-        <span className="w-full text-[20px] font-normal text-[#405169] mb-2">趋势图</span>
+      {/* charts */}
+      <Box mt={5}>
+        <Flex mb={4} justify={'space-between'}>
+          <Box fontSize={'lg'} fontWeight={'bold'}>
+            趋势图
+          </Box>
+          <Box>
+            <FillRowTabs
+              list={[
+                { label: '近7天', value: '7' },
+                { label: '近30天', value: '30' },
+                { label: '近90天', value: '90' }
+              ]}
+              value={dateRange}
+              onChange={setDateRange}
+            />
+          </Box>
+        </Flex>
         <UserChart data={chartData} />
       </Box>
     </BoxCard>
   );
 }
 
-const DataItem = React.memo((props: { icon: React.ReactElement; title: string; count: number }) => {
-  return (
-    <Box className="flex">
-      <div className="w-12 h-12 flex justify-center items-center border rounded-full mr-2">
-        {props.icon}
-      </div>
-      <div className="text-[#4E5969]">
-        <div className="font-bold text-lg">{props.title}</div>
-        <div className="text-lg">{props.count}</div>
-      </div>
-    </Box>
-  );
-});
-
-DataItem.displayName = 'DataItem';
-
 const CustomTooltip = ({ active, payload }: any) => {
   const data = payload?.[0]?.payload as chatDataType;
   if (active && data) {
     return (
-      <div
-        style={{
-          background: 'white',
-          padding: '5px 8px',
-          borderRadius: '8px',
-          boxShadow: '2px 2px 5px rgba(0,0,0,0.2)'
-        }}
-      >
-        <p className="label">
-          日期: <strong>{data.date}</strong>
-        </p>
-        <p className="label">
-          用户总数: <strong>{data.userCount}</strong>
-        </p>
-        <p className="label">
-          今日用户增长数量: <strong>{data.userIncrease}</strong>
-        </p>
-        <p className="label">
-          今日对话数量: <strong>{data.chatCount}</strong>
-        </p>
-        <p className="label">
-          今日支付: <strong>{data.payCount}</strong>元
-        </p>
-      </div>
+      <Box bg={'white'} p={3} borderRadius={'md'} boxShadow={'base'}>
+        <Box fontWeight={'bold'} color={'black'}>
+          {data.date}
+        </Box>
+        <HStack>
+          <Box>用户总数:</Box>
+          <Box fontWeight={'bold'}>{data.userCount}</Box>
+        </HStack>
+        <HStack>
+          <Box>今日用户增长数量:</Box>
+          <Box fontWeight={'bold'}>{data.userIncrease}</Box>
+        </HStack>
+        <HStack>
+          <Box>今日对话数量:</Box>
+          <Box fontWeight={'bold'}>{data.chatCount}</Box>
+        </HStack>
+        <HStack>
+          <Box>今日积分消耗:</Box>
+          <Box fontWeight={'bold'}>{data.totalPoints}</Box>
+        </HStack>
+        <HStack>
+          <Box>今日支付:</Box>
+          <Box fontWeight={'bold'}>{data.payCount}元</Box>
+        </HStack>
+      </Box>
     );
   }
   return null;
 };
 
 const UserChart = ({ data }: { data: chatDataType[] }) => {
+  const [hiddenLines, setHiddenLines] = useState<Record<string, boolean>>({});
+
+  const list = [
+    { name: '用户总数', dataKey: 'userCount', stroke: '#11B6FC' },
+    { name: '支付数量', dataKey: 'payCount', stroke: '#E2A5FF' },
+    { name: '对话数量', dataKey: 'chatCount', stroke: '#13C4B9' },
+    { name: '积分消耗', dataKey: 'totalPoints', stroke: '#FDB022' }
+  ];
   return (
     <ResponsiveContainer width="100%" height={360} className="mt-4">
-      <AreaChart
-        width={730}
-        height={250}
-        data={data}
-        margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-      >
+      <LineChart data={data} margin={{ top: 10, right: 30, left: 20, bottom: 0 }}>
         <XAxis dataKey="date" />
         <YAxis />
         <CartesianGrid strokeDasharray="3 3" />
         <Tooltip content={<CustomTooltip />} />
-        <Area
-          type="monotone"
-          dataKey="userCount"
-          stroke="#40C6FF"
-          strokeWidth={1.5}
-          fill="#F0F4FF"
+        <Legend
+          onClick={(e) => {
+            setHiddenLines((prev) => ({
+              ...prev,
+              // @ts-ignore
+              [e.dataKey]: !prev[e.dataKey]
+            }));
+          }}
         />
-        <Area
-          type="monotone"
-          dataKey="payCount"
-          stroke="#E2A5FF"
-          strokeWidth={1.5}
-          fill="#FAF1FF"
-        />
-        <Area
-          type="monotone"
-          dataKey="chatCount"
-          stroke="#72E4D6"
-          strokeWidth={1.5}
-          fill="#EAFEFB"
-        />
-      </AreaChart>
+        {list.map((item) => (
+          <Line
+            key={item.dataKey}
+            type="monotone"
+            name={item.name}
+            dataKey={item.dataKey}
+            stroke={item.stroke}
+            strokeWidth={1.5}
+            dot={false}
+            hide={hiddenLines[item.dataKey]}
+          />
+        ))}
+      </LineChart>
     </ResponsiveContainer>
   );
 };

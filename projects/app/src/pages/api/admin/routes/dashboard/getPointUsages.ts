@@ -1,12 +1,12 @@
-import { adminCert } from '@/service/support/permission/adminCert';
-import { NextApiResponse } from 'next';
-import { MongoChatItem } from '@fastgpt/service/core/chat/chatItemSchema';
 import { getDashboardDataStartTime } from '@/service/admin/common/dashboard/utils';
 import { NextAPI } from '@/service/middleware/entry';
+import { adminCert } from '@/service/support/permission/adminCert';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
+import { NextApiResponse } from 'next';
 import { GetDataChartsQuery } from './type';
+import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
 
-export type GetChatFormDataResponse = {
+export type GetPointUsagesResponse = {
   date: Date;
   count: number;
 }[];
@@ -14,18 +14,12 @@ export type GetChatFormDataResponse = {
 async function handler(
   req: ApiRequestProps<{}, GetDataChartsQuery>,
   res: NextApiResponse
-): Promise<GetChatFormDataResponse> {
+): Promise<GetPointUsagesResponse> {
   await adminCert({ req, authToken: true });
   const day = Number(req.query.day);
 
-  // 获取对话总数
-  const chatsRaw = await MongoChatItem.aggregate([
-    {
-      $match: {
-        obj: 'Human',
-        time: { $gte: getDashboardDataStartTime(day) }
-      }
-    },
+  const data = await MongoUsage.aggregate([
+    { $match: { time: { $gte: getDashboardDataStartTime(day) } } },
     {
       $group: {
         _id: {
@@ -33,7 +27,8 @@ async function handler(
           month: { $month: '$time' },
           day: { $dayOfMonth: '$time' }
         },
-        count: { $sum: 1 }
+        // 添加 totalPoints 的统计
+        count: { $sum: '$totalPoints' }
       }
     },
     {
@@ -46,14 +41,7 @@ async function handler(
     { $sort: { date: 1 } }
   ]);
 
-  const chatCount = chatsRaw.map((item) => {
-    return {
-      date: item.date,
-      count: item.count
-    };
-  });
-
-  return chatCount;
+  return data;
 }
 
 export default NextAPI(handler);

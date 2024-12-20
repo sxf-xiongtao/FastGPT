@@ -1,6 +1,4 @@
-import { jsonRes } from '@fastgpt/service/common/response';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { connectToDatabase } from '@/service/mongo';
+import { NextApiResponse } from 'next';
 import { MongoUserAuth } from '@/service/support/user/auth/schema';
 import axios from 'axios';
 import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
@@ -8,6 +6,9 @@ import { usernameLogin } from '@/service/support/user/controller';
 import { WxLoginProps } from '@fastgpt/global/support/user/api';
 import { setCookie } from '@fastgpt/service/support/permission/controller';
 import { getWechatLoginConfig } from '@/service/support/user/login/wx';
+import { NextAPI } from '@/service/middleware/entry';
+import { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { UserType } from '@fastgpt/global/support/user/type';
 
 export async function authWechat(openid: string) {
   const { APP_ID, APP_SECRET } = await getWechatLoginConfig();
@@ -31,40 +32,40 @@ export async function authWechat(openid: string) {
   };
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    const { code, inviterId } = req.query as WxLoginProps;
-
-    if (!code) {
-      throw new Error('code is required');
+async function handler(
+  req: ApiRequestProps<{}, WxLoginProps>,
+  res: NextApiResponse
+): Promise<
+  | {
+      user: UserType;
+      token: string;
     }
+  | undefined
+> {
+  const { code, inviterId } = req.query;
 
-    await connectToDatabase();
-
-    const verifyInfo = await MongoUserAuth.findOne({
-      key: code,
-      type: UserAuthTypeEnum.wxLogin
-    });
-
-    if (!verifyInfo?.openid) {
-      throw new Error('Not found code');
-    }
-    const { username, avatarUrl } = await authWechat(verifyInfo.openid);
-
-    const { user, token } = await usernameLogin({
-      username,
-      avatar: avatarUrl,
-      inviterId
-    });
-
-    setCookie(res, token);
-    jsonRes(res, {
-      data: { user, token }
-    });
-  } catch (error) {
-    jsonRes(res, {
-      code: 500,
-      error
-    });
+  if (!code) {
+    return;
   }
+
+  const verifyInfo = await MongoUserAuth.findOne({
+    key: code,
+    type: UserAuthTypeEnum.wxLogin
+  });
+
+  if (!verifyInfo?.openid) {
+    return;
+  }
+  const { username, avatarUrl } = await authWechat(verifyInfo.openid);
+
+  const { user, token } = await usernameLogin({
+    username,
+    avatar: avatarUrl,
+    inviterId
+  });
+
+  setCookie(res, token);
+  return { user, token };
 }
+
+export default NextAPI(handler);

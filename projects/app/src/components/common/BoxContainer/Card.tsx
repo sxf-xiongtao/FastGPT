@@ -1,4 +1,5 @@
 import { Box, BoxProps } from '@chakra-ui/react';
+import MyBox from '@fastgpt/web/components/common/MyBox';
 import React from 'react';
 
 const BoxCard = ({
@@ -6,9 +7,10 @@ const BoxCard = ({
   ...props
 }: BoxProps & {
   children: React.ReactNode;
+  isLoading?: boolean;
 }) => {
   return (
-    <Box
+    <MyBox
       px={[4, 6]}
       py={[4, 6]}
       borderRadius={['md', 'lg']}
@@ -17,7 +19,7 @@ const BoxCard = ({
       {...props}
     >
       {children}
-    </Box>
+    </MyBox>
   );
 };
 

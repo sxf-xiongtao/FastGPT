@@ -21,7 +21,7 @@ import { sendInform2OneUser } from '../../inform/controller';
 let deleteUser = 0;
 export const checkFreeAccount = async (expiredDay: number = 30, oldDateInform?: number) => {
   // 检查是否开启了订阅模式
-  if (!systemUseTeamPlanning()) {
+  if (!systemUseTeamPlanning() || process.env.CLEAR_FREE_ACCOUNT !== 'true') {
     return;
   }
 
@@ -31,7 +31,7 @@ export const checkFreeAccount = async (expiredDay: number = 30, oldDateInform?: 
     {
       type: SubTypeEnum.standard,
       /*  当前时间 8 月 7 日，过期时间 30 天，举例： 
-          清理时间为：7 月 7 日，获取 7 月 17 日前的数据
+          清理时间为：7 月 7 日，则获取 7 月 17 日前，7 月 2 日后的数据
           如果过期时间在 7 月 7 日之前，说明超过 1 个月没有登录过了（登录会重置套餐）
       */
       expiredTime: { $lte: addDays(clearDay, 10), $gte: addDays(clearDay, -5) },
@@ -52,7 +52,7 @@ const checkUsageTime = async (plan: TeamSubSchema, clearDay: Date, oldDateInform
   const expiredTime = plan.expiredTime;
 
   try {
-    // 还有订阅内容，忽略
+    // 如果团队还有其他订阅内容，也不删除
     const extraPlan = await MongoTeamSub.findOne(
       {
         teamId: teamId,
@@ -86,20 +86,23 @@ const checkUsageTime = async (plan: TeamSubSchema, clearDay: Date, oldDateInform
 };
 
 const clearFreeAccount = async (teamId: string) => {
-  // if (process.env.CLEAR_FREE_ACCOUNT !== 'true') return;
-  // get all dataset
-  // const datasets = await MongoDataset.find({ teamId }, '_id teamId').lean();
-  // await mongoSessionRun(async (session) => {
-  //   // delete dataset data
-  //   await delDatasetRelevantData({ datasets, session });
-  //   await MongoDataset.deleteMany(
-  //     {
-  //       teamId
-  //     },
-  //     { session }
-  //   );
-  // });
-  console.log('清除不活跃用户知识库', ++deleteUser, teamId);
+  try {
+    // get all dataset
+    // const datasets = await MongoDataset.find({ teamId }, '_id teamId').lean();
+    // await mongoSessionRun(async (session) => {
+    //   // delete dataset data
+    //   await delDatasetRelevantData({ datasets, session });
+    //   await MongoDataset.deleteMany(
+    //     {
+    //       teamId
+    //     },
+    //     { session }
+    //   );
+    // });
+    console.log('清除不活跃用户知识库', ++deleteUser, teamId);
+  } catch (error) {
+    addLog.error(`清除不活跃用户知识库异常: ${teamId}`, error);
+  }
 };
 
 const notifyOneFreeClean = (teamId: string, day: number) => {

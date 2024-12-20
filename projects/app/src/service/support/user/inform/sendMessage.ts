@@ -8,6 +8,7 @@ import { RequireOnlyOne } from '@fastgpt/global/common/type/utils';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { SendInformTemplateCodeEnum } from '@fastgpt/global/support/user/inform/constants';
 import axios from 'axios';
+import { retryFn } from '@fastgpt/global/common/system/utils';
 
 export type SendEmailProps = {
   email: string;
@@ -134,56 +135,58 @@ export async function sendMessage<Key extends SendInformTemplateCodeEnum>({
     return Promise.reject('Wrong teamId or target');
   }
 
-  const { target, name } = await (async () => {
-    if (teamId) {
-      const team = (await MongoTeam.findById(teamId).lean())!;
+  return retryFn(async () => {
+    const { target, name } = await (async () => {
+      if (teamId) {
+        const team = (await MongoTeam.findById(teamId).lean())!;
+
+        return {
+          target: team?.notificationAccount,
+          name: team.name
+        };
+      }
 
       return {
-        target: team?.notificationAccount,
-        name: team.name
+        target: targetParam,
+        name: targetParam
       };
+    })();
+
+    if (!target) {
+      return;
     }
 
-    return {
-      target: targetParam,
-      name: targetParam
-    };
-  })();
+    const { emailTemplate, smsTemplateCode } = getMessageTemplate(templateCode);
 
-  if (!target) {
-    return;
-  }
-
-  const { emailTemplate, smsTemplateCode } = getMessageTemplate(templateCode);
-
-  if (target.includes('@') && emailTemplate) {
-    console.log({
-      teamId,
-      ...emailTemplate?.({ name, ...templateParam }),
-      email: target
-    });
-    await sendEmail({
-      ...emailTemplate({ name, ...templateParam }),
-      email: target
-    });
-  } else if (smsTemplateCode) {
-    // 去除所有空格
-    const formatName = name ? name.replace(/ /g, '') : 'FastGPT用户';
-    console.log({
-      templateCode: smsTemplateCode(),
-      templateParam: {
-        name: formatName,
-        ...templateParam
-      },
-      phone: target
-    });
-    await sendSms({
-      templateCode: smsTemplateCode(),
-      templateParam: {
-        name: formatName,
-        ...templateParam
-      },
-      phone: target
-    });
-  }
+    if (target.includes('@') && emailTemplate) {
+      addLog.info('sendEmail', {
+        teamId,
+        ...emailTemplate?.({ name, ...templateParam }),
+        email: target
+      });
+      await sendEmail({
+        ...emailTemplate({ name, ...templateParam }),
+        email: target
+      });
+    } else if (smsTemplateCode) {
+      // 去除所有空格
+      const formatName = name ? name.replace(/ /g, '') : 'FastGPT用户';
+      addLog.info('sendSms', {
+        templateCode: smsTemplateCode(),
+        templateParam: {
+          name: formatName,
+          ...templateParam
+        },
+        phone: target
+      });
+      await sendSms({
+        templateCode: smsTemplateCode(),
+        templateParam: {
+          name: formatName,
+          ...templateParam
+        },
+        phone: target
+      });
+    }
+  });
 }
