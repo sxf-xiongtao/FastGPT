@@ -2,7 +2,7 @@ import { Box, Button, Flex, HStack, Input, Textarea } from '@chakra-ui/react';
 import React from 'react';
 import { useConfirm } from '@fastgpt/web/hooks/useConfirm';
 import { useRequest } from '@fastgpt/web/hooks/useRequest';
-import { serviceSideProps } from '@/web/common/i18n';
+import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
 import {
   getSystemMsgModal,
   postSendSystemMsg,

@@ -18,7 +18,7 @@ import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import MyModal from '@fastgpt/web/components/common/MyModal';
 import { getDatasets } from '@/web/admin/datasets/api';
 import BoxCard from '@/components/common/BoxContainer/Card';
-import { serviceSideProps } from '@/web/common/i18n';
+import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
 import { useRouter } from 'next/router';
 import { type InferGetServerSidePropsType } from 'next';
 
@@ -42,12 +42,12 @@ const DatasetTable = ({ FE_URL }: InferGetServerSidePropsType<typeof getServerSi
 
   return (
     <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
-      <HStack px={8}>
+      <HStack pb={4}>
         <Box className="text-2xl font-bold text-[#405169]">知识库列表</Box>
         <Box className="flex-grow"></Box>
       </HStack>
 
-      <ScrollData position={'relative'} h={'100%'} py={[0, 5]} px={[3, 8]}>
+      <ScrollData position={'relative'} h={'100%'}>
         <TableContainer>
           <Table>
             <Thead>

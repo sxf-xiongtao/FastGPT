@@ -7,7 +7,7 @@ import { SystemPluginTemplateItemType } from '@fastgpt/global/core/workflow/type
 import dynamic from 'next/dynamic';
 import { defaultCustomPluginForm } from '../../components/toolkit/CustomPluginConfig';
 import type { EditCustomPluginType } from '@/global/core/workflow/plugin/type.d';
-import { serviceSideProps } from '@/web/common/i18n';
+import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { useToast } from '@fastgpt/web/hooks/useToast';
 import { useRouter } from 'next/router';
@@ -15,6 +15,7 @@ import DndDrag, { Draggable } from '@fastgpt/web/components/common/DndDrag';
 import QuestionTip from '@fastgpt/web/components/common/MyTooltip/QuestionTip';
 import EmptyTip from '@fastgpt/web/components/common/EmptyTip';
 import { useTranslation } from 'next-i18next';
+import MyBox from '@fastgpt/web/components/common/MyBox';
 
 const CustomPluginConfig = dynamic(() => import('../../components/toolkit/CustomPluginConfig'), {
   ssr: false
@@ -45,10 +46,18 @@ const SystemPlugin = () => {
     );
   };
 
-  const { data: plugins = [], run: refreshPlugins } = useRequest2(getSystemPlugins, {
+  const {
+    data: plugins = [],
+    run: refreshPlugins,
+    loading: loadingPlugins
+  } = useRequest2(getSystemPlugins, {
     manual: false
   });
-  const { data: groups = [], run: refreshGroups } = useRequest2(getPluginGroups, {
+  const {
+    data: groups = [],
+    run: refreshGroups,
+    loading: loadingGroups
+  } = useRequest2(getPluginGroups, {
     manual: false
   });
 
@@ -78,7 +87,7 @@ const SystemPlugin = () => {
   }, [currentGroup, plugins]);
 
   return (
-    <>
+    <MyBox isLoading={loadingPlugins || loadingGroups}>
       <Flex alignItems={'center'}>
         <Flex flex={'1'} overflow={'auto'}>
           {groups?.map((group) => {
@@ -234,7 +243,7 @@ const SystemPlugin = () => {
           onSuccess={refreshGroups}
         />
       )}
-    </>
+    </MyBox>
   );
 };
 

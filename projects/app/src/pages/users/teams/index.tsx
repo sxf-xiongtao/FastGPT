@@ -12,8 +12,7 @@ import {
   HStack,
   InputGroup,
   Input,
-  InputLeftElement,
-  useMediaQuery
+  InputLeftElement
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import MyIcon from '@fastgpt/web/components/common/Icon';
@@ -23,11 +22,12 @@ import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tool
 import EditTeamModal from './components/EditTeamModal';
 import { getTeams } from '@/web/admin/users/api';
 import BoxCard from '@/components/common/BoxContainer/Card';
-import { serviceSideProps } from '@/web/common/i18n';
+import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
+import { useSystem } from '@fastgpt/web/hooks/useSystem';
 
 const TeamTable = () => {
   const [search, setSearch] = useState<string>();
-  const [isMobile] = useMediaQuery('(max-width: 768px)');
+  const { isPc } = useSystem();
 
   const {
     data: teams,
@@ -46,10 +46,10 @@ const TeamTable = () => {
 
   return (
     <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
-      <HStack px={!isMobile ? 8 : 0} pb={!isMobile ? 0 : 4}>
-        {!isMobile && <Box className="text-2xl font-bold text-[#405169]">团队列表</Box>}
+      <HStack pb={4}>
+        {isPc && <Box className="text-2xl font-bold text-[#405169]">团队列表</Box>}
         <Box className="flex-grow"></Box>
-        <InputGroup w={'350px'}>
+        <InputGroup w={['100%', '250px']}>
           <InputLeftElement h={'full'}>
             <MyIcon name="common/searchLight" w={4} color={'myGray.400'} />
           </InputLeftElement>
@@ -61,7 +61,7 @@ const TeamTable = () => {
         </InputGroup>
       </HStack>
 
-      <ScrollData position={'relative'} h={'100%'} py={[0, 5]} px={[3, 8]}>
+      <ScrollData position={'relative'} h={'100%'}>
         <TableContainer>
           <Table>
             <Thead>

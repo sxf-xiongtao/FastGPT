@@ -117,7 +117,7 @@ const LIST = [
   }
 ];
 
-export default function Navbar() {
+export default function Navbar({ onClose }: { onClose?: () => void }) {
   const router = useRouter();
   const [expandItems, setExpandItems] = useState<string[]>([]);
 
@@ -131,6 +131,7 @@ export default function Navbar() {
     } else {
       router.push(item.activeLink);
     }
+    onClose?.();
   };
 
   const handleSubItemClick = (subItem: any) => {

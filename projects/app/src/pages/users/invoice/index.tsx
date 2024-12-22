@@ -30,7 +30,7 @@ import { useCallback, useState } from 'react';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 import { useSelectFile } from '@fastgpt/web/common/file/hooks/useSelectFile';
 import { InvoiceStatusEnum } from '@fastgpt/global/support/wallet/bill/invoice/constants';
-import { serviceSideProps } from '@/web/common/i18n';
+import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
 
 const InvoiceManageTable = () => {
   const { isPc } = useSystem();
@@ -56,14 +56,14 @@ const InvoiceManageTable = () => {
 
   return (
     <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
-      <HStack px={isPc ? 8 : 0} pb={isPc ? 0 : 4}>
+      <HStack pb={4}>
         {isPc && (
           <Box fontSize={'2xl'} fontWeight={'bold'}>
             开票申请
           </Box>
         )}
         <Box className="flex-grow"></Box>
-        <InputGroup w={'350px'}>
+        <InputGroup w={['100%', '250px']}>
           <InputLeftElement h={'full'}>
             <MyIcon name="common/searchLight" w={4} color={'myGray.400'} />
           </InputLeftElement>
@@ -75,7 +75,7 @@ const InvoiceManageTable = () => {
         </InputGroup>
       </HStack>
 
-      <ScrollData position={'relative'} h={'100%'} py={[0, 5]} px={[3, 8]}>
+      <ScrollData position={'relative'} h={'100%'}>
         <TableContainer>
           <Table>
             <Thead>

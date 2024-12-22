@@ -27,7 +27,7 @@ import { useSystem } from '@fastgpt/web/hooks/useSystem';
 import { SystemLogType } from '@fastgpt/service/common/system/log/type';
 import { getSystemLogList } from '@/web/admin/common/api';
 import { LogLevelEnum } from '@fastgpt/service/common/system/log/constant';
-import { serviceSideProps } from '@/web/common/i18n';
+import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
 
 const LogTable = () => {
   const { isPc } = useSystem();
@@ -54,7 +54,7 @@ const LogTable = () => {
 
   return (
     <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
-      <HStack px={[0, 8]} pb={[0, 4]}>
+      <HStack pb={4}>
         {isPc && <Box className="text-2xl font-bold text-[#405169]">日志记录表</Box>}
         <Box className="flex-grow"></Box>
         <InputGroup w={'350px'}>
@@ -69,7 +69,7 @@ const LogTable = () => {
         </InputGroup>
       </HStack>
 
-      <ScrollData position={'relative'} h={'100%'} overflow={'overlay'} py={[0, 5]} px={[3, 8]}>
+      <ScrollData position={'relative'} h={'100%'} overflow={'overlay'}>
         <TableContainer>
           <Table>
             <Thead>

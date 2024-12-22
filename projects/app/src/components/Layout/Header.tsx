@@ -1,6 +1,4 @@
 import { Avatar, Box, Divider, Flex, HStack } from '@chakra-ui/react';
-import MyPopover from '@fastgpt/web/components/common/MyPopover';
-import LicenseData from './LicenseData';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { useRouter } from 'next/router';
 import MyImage from '@fastgpt/web/components/common/Image/MyImage';
@@ -8,6 +6,10 @@ import Navbar from './Navbar';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
 import { getLicenseData } from '@/web/admin/common/api';
+import dynamic from 'next/dynamic';
+
+const LicenseData = dynamic(() => import('./LicenseData'), { ssr: false });
+const MyPopover = dynamic(() => import('@fastgpt/web/components/common/MyPopover'), { ssr: false });
 
 export default function Header() {
   const { isPc } = useSystem();
@@ -25,8 +27,16 @@ export default function Header() {
       borderColor={'myGray.200'}
       px={[3, 6]}
       alignItems={'center'}
+      zIndex={10}
     >
-      {!isPc && (
+      {isPc ? (
+        <Flex flex={1} alignItems={'center'} gap={3}>
+          <MyImage src="/icon/admin.svg" alt="admin" w={'1.5rem'} />
+          <Box fontWeight={'bold'} fontSize={'lg'}>
+            Admin
+          </Box>
+        </Flex>
+      ) : (
         <>
           <Flex justifyContent={'space-between'} alignItems={'center'} userSelect={'none'}>
             <MyPopover
@@ -40,19 +50,13 @@ export default function Header() {
             >
               {({ onClose }) => (
                 <Box p={2} overflow={'auto'} maxH={'60vh'}>
-                  <Navbar />
+                  <Navbar onClose={onClose} />
                 </Box>
               )}
             </MyPopover>
           </Flex>
           <Box flex={1} />
         </>
-      )}
-      {isPc && (
-        <Flex flex={1} alignItems={'center'} fontWeight={'extrabold'} gap={3}>
-          <MyImage src="/icon/admin.svg" alt="admin" w={7} h={7} />
-          Admin
-        </Flex>
       )}
 
       <MyPopover

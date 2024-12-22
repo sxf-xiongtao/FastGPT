@@ -18,6 +18,7 @@ import FillRowTabs from '@fastgpt/web/components/common/Tabs/FillRowTabs';
 import type { IconNameType } from '@fastgpt/web/components/common/Icon/type';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
+import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
 
 type FetchChatData = {
   date: string;
@@ -247,3 +248,11 @@ const UserChart = ({ data }: { data: chatDataType[] }) => {
     </ResponsiveContainer>
   );
 };
+
+export async function getServerSideProps(content: any) {
+  return {
+    props: {
+      ...(await serviceSideProps(content))
+    }
+  };
+}

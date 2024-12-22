@@ -32,10 +32,11 @@ import MyModal from '@fastgpt/web/components/common/MyModal';
 import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import { getPays } from '@/web/admin/pays/api';
 import BoxCard from '@/components/common/BoxContainer/Card';
-import { serviceSideProps } from '@/web/common/i18n';
+import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
+import { useSystem } from '@fastgpt/web/hooks/useSystem';
 
-const billTypeList: { label: string; value: BillTypeEnum | 'ALL' }[] = [
-  { label: '全部', value: 'ALL' },
+const billTypeList: { label: string; value: BillTypeEnum | '' }[] = [
+  { label: '全部', value: '' },
   { label: '余额充值', value: BillTypeEnum.balance },
   { label: '套餐订阅', value: BillTypeEnum.standSubPlan },
   { label: '知识库扩容', value: BillTypeEnum.extraDatasetSub },
@@ -94,14 +95,14 @@ const billPayWayMap = {
 };
 
 const BillTable = () => {
-  const [billType, setBillType] = useState<BillTypeEnum | 'ALL'>('ALL');
   const [username, setUsername] = useState<string>();
+  const [billType, setBillType] = useState<BillTypeEnum | ''>('');
+  const [billStatus, setBillStatus] = useState<BillStatusEnum | ''>(BillStatusEnum.SUCCESS);
   const [billDetail, setBillDetail] = useState<BillSchemaType>();
-  const [isMobile] = useMediaQuery('(max-width: 768px)');
+  const { isPc } = useSystem();
 
   const {
     data: bills,
-    setData: setBills,
     isLoading,
     ScrollData
   } = usePagination({
@@ -109,19 +110,19 @@ const BillTable = () => {
     pageSize: 20,
     params: {
       type: billType,
-      status: BillStatusEnum.SUCCESS,
+      status: billStatus,
       username
     },
     type: 'scroll',
-    refreshDeps: [billType, username]
+    refreshDeps: [billType, billStatus, username]
   });
 
   return (
     <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
-      <HStack px={!isMobile ? 8 : 0} pb={!isMobile ? 0 : 4}>
-        {!isMobile && <Box className="text-2xl font-bold text-[#405169]">支付记录</Box>}
+      <HStack pb={4}>
+        {isPc && <Box className="text-2xl font-bold text-[#405169]">支付记录</Box>}
         <Box className="flex-grow"></Box>
-        <InputGroup w={350}>
+        <InputGroup w={['100%', '250px']}>
           <InputLeftElement h={'full'}>
             <MyIcon name="common/searchLight" w={4} color={'myGray.400'} />
           </InputLeftElement>
@@ -133,15 +134,16 @@ const BillTable = () => {
         </InputGroup>
       </HStack>
 
-      <ScrollData position={'relative'} h={'100%'} py={[0, 5]} px={[3, 8]}>
+      <ScrollData position={'relative'} flex={1}>
         <TableContainer>
           <Table>
             <Thead>
               <Tr>
-                <Th>#</Th>
-                <Th>用户名</Th>
+                <Th>时间</Th>
+                <Th>团队ID</Th>
+                <Th>充值的成员名</Th>
                 <Th>
-                  <MySelect<BillTypeEnum | 'ALL'>
+                  <MySelect<BillTypeEnum | ''>
                     list={billTypeList}
                     value={billType}
                     size={'sm'}
@@ -151,22 +153,36 @@ const BillTable = () => {
                     w={'130px'}
                   ></MySelect>
                 </Th>
-                <Th>时间</Th>
                 <Th>金额</Th>
+                <Th>
+                  <MySelect<BillStatusEnum | ''>
+                    list={[
+                      { label: '全部', value: '' },
+                      { label: '成功', value: BillStatusEnum.SUCCESS },
+                      { label: '未支付', value: BillStatusEnum.NOTPAY }
+                    ]}
+                    value={billStatus}
+                    size={'sm'}
+                    onchange={(e) => {
+                      setBillStatus(e);
+                    }}
+                    w={'130px'}
+                  ></MySelect>
+                </Th>
                 <Th></Th>
               </Tr>
             </Thead>
             <Tbody fontSize={'sm'}>
               {bills.map((item, i) => (
-                <Tr key={i}>
-                  <Td>{i + 1}</Td>
-                  {/* @ts-ignore */}
-                  <Td>{item.username}</Td>
-                  <Td>{billTypeMap[item.type]?.label}</Td>
+                <Tr key={item._id}>
                   <Td>
                     {item.createTime ? dayjs(item.createTime).format('YYYY/MM/DD HH:mm:ss') : '-'}
                   </Td>
+                  <Td>{item.teamId}</Td>
+                  <Td>{item.username}</Td>
+                  <Td>{billTypeMap[item.type]?.label}</Td>
                   <Td>{formatStorePrice2Read(item.price)}元</Td>
+                  <Td>{item.status}</Td>
                   <Td>
                     <Button variant={'whiteBase'} size={'sm'} onClick={() => setBillDetail(item)}>
                       详情

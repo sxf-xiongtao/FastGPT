@@ -12,7 +12,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { PayFormConfig } from './data/formConfig';
 import BoxCard from '@/components/common/BoxContainer/Card';
 import MyTag from '@fastgpt/web/components/common/Tag/index';
-import { serviceSideProps } from '@/web/common/i18n';
+import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
+import { useSystem } from '@fastgpt/web/hooks/useSystem';
 
 let defaultStandardValue =
   '{"free":{"name":"免费版","price":0,"pointPrice":0,"totalPoints":100,"maxTeamMember":1,"maxAppAmount":10,"maxDatasetAmount":10,"chatHistoryStoreDuration":30,"maxDatasetSize":600,"trainingWeight":1,"permissionCustomApiKey":false,"permissionCustomCopyright":false,"permissionWebsiteSync":false,"permissionReRank":false},"experience":{"name":"体验版","price":59,"pointPrice":30,"totalPoints":3000,"maxTeamMember":3,"maxAppAmount":30,"maxDatasetAmount":30,"chatHistoryStoreDuration":180,"maxDatasetSize":5000,"trainingWeight":2,"permissionCustomApiKey":true,"permissionCustomCopyright":false,"permissionWebsiteSync":true,"permissionReRank":true},"team":{"name":"团队版","price":399,"pointPrice":200,"totalPoints":20000,"maxTeamMember":10,"maxAppAmount":100,"maxDatasetAmount":100,"chatHistoryStoreDuration":360,"maxDatasetSize":40000,"trainingWeight":3,"permissionCustomApiKey":true,"permissionCustomCopyright":true,"permissionWebsiteSync":true,"permissionReRank":true},"enterprise":{"name":"企业版","price":999,"pointPrice":600,"totalPoints":60000,"maxTeamMember":100,"maxAppAmount":500,"maxDatasetAmount":500,"chatHistoryStoreDuration":720,"maxDatasetSize":150000,"trainingWeight":4,"permissionCustomApiKey":true,"permissionCustomCopyright":true,"permissionWebsiteSync":true,"permissionReRank":true}}';
@@ -37,7 +38,7 @@ export const ModelSettings = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [titles, setTitles] = useState<Array<titleType>>([]);
   const [activeTitle, setActiveTitle] = useState('');
-  const [isMobile] = useMediaQuery('(max-width: 768px)');
+  const { isPc } = useSystem();
 
   const [openPlan, setOpenPlan] = useState<boolean>(false);
 
@@ -281,7 +282,7 @@ export const ModelSettings = () => {
       <Flex
         flex={'0 0 200px'}
         flexDirection={'column'}
-        position={isMobile ? 'absolute' : 'relative'}
+        position={isPc ? 'relative' : 'absolute'}
         gap={4}
       >
         <BoxCard

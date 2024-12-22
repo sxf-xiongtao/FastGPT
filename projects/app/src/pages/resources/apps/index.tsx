@@ -18,7 +18,7 @@ import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import { getApps } from '@/web/admin/apps/api';
 import MyModal from '@fastgpt/web/components/common/MyModal';
 import BoxCard from '@/components/common/BoxContainer/Card';
-import { serviceSideProps } from '@/web/common/i18n';
+import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
 import { type InferGetServerSidePropsType } from 'next';
 
 const AppTable = ({ FE_URL }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -40,11 +40,11 @@ const AppTable = ({ FE_URL }: InferGetServerSidePropsType<typeof getServerSidePr
 
   return (
     <BoxCard display={'flex'} flexDirection={'column'} h={'100%'}>
-      <HStack px={8}>
+      <HStack pb={4}>
         <Box className="text-2xl font-bold text-[#405169]">应用列表</Box>
         <Box className="flex-grow"></Box>
       </HStack>
-      <ScrollData position={'relative'} h={'100%'} py={[0, 5]} px={[3, 8]}>
+      <ScrollData position={'relative'} h={'100%'}>
         <TableContainer>
           <Table>
             <Thead>

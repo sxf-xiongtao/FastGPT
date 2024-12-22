@@ -13,6 +13,10 @@ import 'tailwindcss/tailwind.css';
 import 'nprogress/nprogress.css';
 import '@/styles/reset.scss';
 import '@/styles/default.scss';
+import SystemStoreContextProvider from '@fastgpt/web/context/useSystem';
+import { AppProps } from 'next/app';
+import { NextPage } from 'next';
+import { ReactElement } from 'react';
 
 //Binding events.
 Router.events.on('routeChangeStart', () => NProgress.start());
@@ -31,7 +35,16 @@ const queryClient = new QueryClient({
   }
 });
 
-function App({ Component, pageProps }: any) {
+type NextPageWithLayout = NextPage & {
+  setLayout?: (page: ReactElement) => JSX.Element;
+};
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout;
+};
+
+function App({ Component, pageProps }: AppPropsWithLayout) {
+  const setLayout = Component.setLayout || ((page) => <>{page}</>);
+
   return (
     <>
       <Head>
@@ -40,11 +53,11 @@ function App({ Component, pageProps }: any) {
       </Head>
 
       <QueryClientProvider client={queryClient}>
-        <ChakraProvider theme={theme}>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </ChakraProvider>
+        <SystemStoreContextProvider device={pageProps.deviceSize}>
+          <ChakraProvider theme={theme}>
+            <Layout>{setLayout(<Component {...pageProps} />)}</Layout>
+          </ChakraProvider>
+        </SystemStoreContextProvider>
       </QueryClientProvider>
     </>
   );

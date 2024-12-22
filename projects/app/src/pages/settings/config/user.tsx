@@ -13,6 +13,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { getUserFormConfig } from './data/formConfig';
 import BoxCard from '@/components/common/BoxContainer/Card';
 import MyTag from '@fastgpt/web/components/common/Tag/index';
+import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
+import { useSystem } from '@fastgpt/web/hooks/useSystem';
 
 interface formLevel {
   key: string;
@@ -32,7 +34,7 @@ const UserSetting = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [titles, setTitles] = useState<Array<titleType>>([]);
   const [activeTitle, setActiveTitle] = useState('');
-  const [isMobile] = useMediaQuery('(max-width: 768px)');
+  const { isPc } = useSystem();
 
   const { toast } = useToast();
 
@@ -237,7 +239,7 @@ const UserSetting = () => {
       <Flex
         flex={'0 0 200px'}
         flexDirection={'column'}
-        position={isMobile ? 'absolute' : 'relative'}
+        position={isPc ? 'relative' : 'absolute'}
         gap={4}
       >
         <BoxCard
@@ -326,3 +328,11 @@ const UserSetting = () => {
 };
 
 export default UserSetting;
+
+export async function getServerSideProps(content: any) {
+  return {
+    props: {
+      ...(await serviceSideProps(content))
+    }
+  };
+}

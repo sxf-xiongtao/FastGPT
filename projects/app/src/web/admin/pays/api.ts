@@ -1,6 +1,5 @@
 import { POST } from '@/service/common/request';
-import { PagingData } from '@/types';
-import { BillSchemaType } from '@fastgpt/global/support/wallet/bill/type';
+import type { GetPaysBody, GetPaysResponse } from '@/pages/api/admin/routes/pays/getPays';
 
-export const getPays = (data: any) =>
-  POST<PagingData<BillSchemaType>>('/admin/routes/pays/getPays', data);
+export const getPays = (data: GetPaysBody) =>
+  POST<GetPaysResponse>('/admin/routes/pays/getPays', data);
