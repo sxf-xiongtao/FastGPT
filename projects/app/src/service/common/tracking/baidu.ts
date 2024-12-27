@@ -9,7 +9,7 @@ interface BaiduConversionConfig {
 const config: BaiduConversionConfig = {
   token: process.env.BAIDU_CONVERSION_TOKEN || '',
   endpoint: 'https://ocpc.baidu.com/ocpcapi/api/uploadConvertData',
-  baseUrl: 'https://fastgpt.sealos.run/'
+  baseUrl: process.env.BAIDU_CONVERSION_BASE_URL || ''
 };
 
 export const trackBaiduConversion = async (bd_vid: string) => {
