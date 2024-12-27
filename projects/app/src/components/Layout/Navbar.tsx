@@ -84,7 +84,7 @@ const LIST = [
     ]
   },
   {
-    activeLink: '/settings',
+    activeLink: '/settings/config',
     name: '系统配置',
     icon: 'common/settingLight',
     subItems: [
@@ -96,7 +96,12 @@ const LIST = [
       {
         activeLink: '/settings/config/model',
         name: '模型配置',
-        icon: 'common/modal'
+        icon: 'common/model'
+      },
+      {
+        activeLink: '/settings/config/thirdParty',
+        name: '第三方提供商',
+        icon: 'common/thirdParty'
       },
       {
         activeLink: '/settings/config/user',
@@ -111,9 +116,21 @@ const LIST = [
     ]
   },
   {
-    activeLink: '/toolkit',
-    name: '工具箱',
-    icon: 'common/toolkit'
+    activeLink: '/settings/templates',
+    name: '模板 & 工具',
+    icon: 'common/layer',
+    subItems: [
+      {
+        activeLink: '/settings/templates/app',
+        name: '模板市场',
+        icon: 'common/templateMarket'
+      },
+      {
+        activeLink: '/settings/templates/toolkit',
+        name: '工具箱',
+        icon: 'common/toolkit'
+      }
+    ]
   }
 ];
 

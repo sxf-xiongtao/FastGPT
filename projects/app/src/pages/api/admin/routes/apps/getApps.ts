@@ -4,6 +4,7 @@ import { MongoApp } from '@fastgpt/service/core/app/schema';
 import { PagingData } from '@/types';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { adminCert } from '@/service/support/permission/adminCert';
+import { UserModelSchema } from '@fastgpt/global/support/user/type';
 
 type AppType = {
   id: string;
@@ -37,7 +38,9 @@ async function handler(
     _id: {
       $in: tmbIdList
     }
-  }).populate('userId');
+  })
+    .populate<{ user: UserModelSchema }>('user')
+    .lean();
 
   const newRecords: AppType[] = await Promise.all(
     apps.map(async (app) => {
@@ -45,10 +48,9 @@ async function handler(
         id: app._id.toString(),
         name: app.name,
         intro: app.intro,
-        userId:
-          (tmbList.find((tmb) => String(tmb._id) === String(app.tmbId))?.userId as any)?._id || '',
+        userId: tmbList.find((tmb) => String(tmb._id) === String(app.tmbId))?.user?._id || '',
         username:
-          (tmbList.find((tmb) => String(tmb._id) === String(app.tmbId))?.userId as any)?.username ||
+          tmbList.find((tmb) => String(tmb._id) === String(app.tmbId))?.user?.username ||
           '这人被删了'
       };
     })

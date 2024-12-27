@@ -14,10 +14,7 @@ import {
   TeamMemberItemType,
   TeamMemberSchema
 } from '@fastgpt/global/support/user/team/type';
-import type {
-  TeamMemberWithTeamAndUserSchema,
-  TeamMemberWithUserSchema
-} from '@fastgpt/global/support/user/team/type.d';
+import type { TeamMemberWithTeamAndUserSchema } from '@fastgpt/global/support/user/team/type.d';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { MongoOpenApi } from '@fastgpt/service/support/openapi/schema';
 import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
@@ -37,6 +34,8 @@ import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/membe
 import { DefaultGroupName } from '@fastgpt/global/support/user/team/group/constant';
 import { getGroupsByTmbId } from '@fastgpt/service/support/permission/memberGroup/controllers';
 import { GroupMemberRole } from '@fastgpt/global/support/permission/memberGroup/constant';
+import { UserModelSchema } from '@fastgpt/global/support/user/type';
+import { TeamSchema } from '@fastgpt/global/support/user/team/type';
 
 /* -------- format --------- */
 export async function teamMemberSchema2TeamItemType(
@@ -44,27 +43,31 @@ export async function teamMemberSchema2TeamItemType(
 ): Promise<TeamTmbItemType> {
   const per = await getResourcePermission({
     resourceType: PerResourceTypeEnum.team,
-    teamId: data.teamId._id,
+    teamId: data.teamId,
     tmbId: data._id
   });
 
   return {
-    userId: String(data.userId._id),
-    teamId: String(data.teamId._id),
-    teamName: data.teamId.name,
+    userId: String(data.userId),
+    teamId: String(data.teamId),
+    teamName: data.team.name,
     memberName: data.name,
-    avatar: data.teamId.avatar,
-    balance: data.teamId.balance,
+    avatar: data.team.avatar,
+    balance: data.team.balance,
     tmbId: String(data._id),
-    teamDomain: data.teamId.teamDomain,
+    teamDomain: data.team.teamDomain,
     role: data.role,
     status: data.status,
     defaultTeam: data.defaultTeam,
-    lafAccount: data.teamId.lafAccount,
     permission: new TeamPermission({
       per: per ?? TeamDefaultPermissionVal,
       isOwner: data.role === TeamMemberRoleEnum.owner
-    })
+    }),
+    notificationAccount: data.team.notificationAccount,
+
+    lafAccount: data.team.lafAccount,
+    openaiAccount: data.team.openaiAccount,
+    externalWorkflowVariables: data.team.externalWorkflowVariables
   };
 }
 
@@ -183,18 +186,24 @@ export async function getUserTeams(data: {
   if (!data.userId && !data.tmbId) {
     return Promise.reject('userId or tmbId is required');
   }
-  const members = (await MongoTeamMember.find(data)
+  const members = await MongoTeamMember.find(data)
     .sort({ defaultTeam: -1 })
-    .populate('teamId userId')) as TeamMemberWithTeamAndUserSchema[];
-  return await Promise.all(members.map(teamMemberSchema2TeamItemType));
+    .populate<{
+      team: TeamSchema;
+      user: UserModelSchema;
+    }>('team user')
+    .lean();
+  return Promise.all(members.map(teamMemberSchema2TeamItemType));
 }
 
 /* ----------- get team ---------- */
 export async function getTeamByTmbId(tmbId: string) {
-  const tmb = (await MongoTeamMember.findById({
+  const tmb = await MongoTeamMember.findById({
     _id: tmbId,
     status: notLeaveStatus
-  }).populate('teamId userId')) as TeamMemberWithTeamAndUserSchema;
+  })
+    .populate<{ team: TeamSchema; user: UserModelSchema }>('team user')
+    .lean();
 
   if (!tmb) {
     return Promise.reject(TeamErrEnum.unAuthTeam);
@@ -219,10 +228,12 @@ export async function getAndCreateUserDefaultTeam({
   memberName?: string;
   session: ClientSession;
 }): Promise<TeamTmbItemType> {
-  const tmb = (await MongoTeamMember.findOne({
+  const tmb = await MongoTeamMember.findOne({
     userId: ownerId,
     defaultTeam: true
-  }).populate('teamId userId')) as TeamMemberWithTeamAndUserSchema;
+  })
+    .populate<{ team: TeamSchema; user: UserModelSchema }>('team user')
+    .lean();
 
   if (!tmb) {
     return createTeam({
@@ -263,10 +274,10 @@ export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType
       teamId: teamId,
       resourceType: PerResourceTypeEnum.team
     }),
-    (await MongoTeamMember.find({
+    await MongoTeamMember.find({
       teamId,
       status: notLeaveStatus
-    }).populate('userId')) as TeamMemberWithUserSchema[]
+    }).populate<{ user: UserModelSchema }>('user')
   ]);
 
   return members.map((member) => {
@@ -285,11 +296,11 @@ export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType
       TeamDefaultPermissionVal;
 
     return {
-      userId: member.userId._id,
+      userId: member.userId,
       tmbId: member._id,
       teamId: member.teamId,
       memberName: member.name,
-      avatar: member.userId.avatar,
+      avatar: member.user.avatar,
       role: member.role,
       status: member.status,
       permission: new TeamPermission({
@@ -314,7 +325,7 @@ export async function getTeamMember({
     MongoTeamMember.findOne({
       teamId,
       _id: tmbId
-    }).populate('userId') as Promise<TeamMemberWithUserSchema>,
+    }).populate<{ user: UserModelSchema }>('user'),
     MongoTeam.findById(teamId),
     getResourcePermission({
       resourceType: PerResourceTypeEnum.team,
@@ -332,11 +343,11 @@ export async function getTeamMember({
   }
 
   return {
-    userId: member.userId._id,
+    userId: member.userId,
     tmbId: member._id,
     teamId: member.teamId,
     memberName: member.name,
-    avatar: member.userId.avatar,
+    avatar: member.user.avatar,
     role: member.role,
     status: member.status,
     permission: new TeamPermission({

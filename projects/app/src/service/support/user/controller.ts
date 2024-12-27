@@ -89,7 +89,6 @@ export async function createUserByUsername({
     avatar: user.avatar,
     timezone: user.timezone,
     promotionRate: user.promotionRate,
-    openaiAccount: user.openaiAccount,
     team: team,
     permission: new TeamPermission({
       isOwner: true
@@ -111,7 +110,6 @@ export async function getUserDetail(tmbId?: string, userId?: string): Promise<Us
     avatar: user.avatar,
     timezone: user.timezone,
     promotionRate: user.promotionRate,
-    openaiAccount: user.openaiAccount,
     team,
     permission: team.permission
   };

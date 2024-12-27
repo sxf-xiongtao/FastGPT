@@ -45,13 +45,13 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
 }: outLinkInvokeChatProps<T>) {
   try {
     // Get app workflow config
-    const [app, { nodes, chatConfig, edges }, { user }] = await Promise.all([
+    const [app, { nodes, chatConfig, edges }, { timezone, externalProvider }] = await Promise.all([
       MongoApp.findById(outLinkConfig.appId).lean(),
       getAppLatestVersion(outLinkConfig.appId),
       getUserChatInfoAndAuthTeamPoints(outLinkConfig.tmbId)
     ]);
 
-    if (!nodes || !user || !chatConfig || !app) {
+    if (!nodes || !chatConfig || !app) {
       return Promise.reject('Invalid chat');
     }
 
@@ -93,7 +93,8 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
         tmbId: outLinkConfig.tmbId
       },
       uid: chatUserId || outLinkConfig.tmbId,
-      user,
+      timezone,
+      externalProvider,
       chatId,
       variables: {},
       histories,

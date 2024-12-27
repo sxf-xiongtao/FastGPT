@@ -49,11 +49,6 @@ export const getFormConfig = (): FormConfig => {
               type: 'boolean',
               title: '展示聊天空白页（都关闭即可）'
             },
-            show_openai_account: {
-              key: 'siteSettings.feConfigs.show_openai_account',
-              type: 'boolean',
-              title: '展示用户可填自己的 openapi 账号'
-            },
             show_promotion: {
               key: 'siteSettings.feConfigs.show_promotion',
               type: 'boolean',
@@ -172,13 +167,6 @@ export const getFormConfig = (): FormConfig => {
               key: 'siteSettings.systemEnv.tokenWorkers',
               type: 'number',
               title: 'token计算最大进程（通常多少并发设置多少）'
-            },
-
-            lafEnv: {
-              key: 'siteSettings.feConfigs.lafEnv',
-              type: 'string',
-              title: 'laf 环境的地址',
-              description: 'laf 环境，例如 https://laf.dev'
             }
           }
         },
@@ -362,6 +350,39 @@ export const PayFormConfig: FormConfig = {
               '按微信教程拿到这几个文件，txt打开key\n![](https://oss.laf.dev/lk63dw-fastgpt/wx_private_key.png)'
           }
         }
+      }
+    }
+  }
+};
+
+export const ThirdPartyFormConfig: FormConfig = {
+  externalProviderSettings: {
+    key: 'externalProviderSettings',
+    type: 'object',
+    title: '第三方账号配置',
+    properties: {
+      userAccount: {
+        key: 'externalProviderSettings.userAccount',
+        type: 'boolean',
+        title: '允许用户配置账号',
+        properties: {
+          openAI: {
+            key: 'siteSettings.feConfigs.show_openai_account',
+            type: 'boolean',
+            title: 'OpenAI/OneAPI 账号'
+          },
+          laf: {
+            key: 'siteSettings.feConfigs.lafEnv',
+            type: FieldTypeEnum.thirdPartyAccountItem,
+            title: 'laf 账号',
+            description: '请输入 laf 地址'
+          }
+        }
+      },
+      externalProviderWorkflowVariables: {
+        key: 'externalProviderSettings.externalProviderWorkflowVariables',
+        type: FieldTypeEnum.thirdPartyVariables,
+        title: '自定义工作流变量'
       }
     }
   }

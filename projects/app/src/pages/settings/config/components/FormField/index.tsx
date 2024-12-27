@@ -9,6 +9,8 @@ import dynamic from 'next/dynamic';
 import { compressImgFileAndUpload } from '@/web/common/file/utils';
 import MyImage from '@fastgpt/web/components/common/Image/MyImage';
 import NavbarItems from './NavbarItems';
+import ThirdPartyAccountItem from './ThirdPartyAccountItem';
+import ThirdPartyVariables from './ThirdPartyVariables';
 
 const StandardPlans = dynamic(() => import('./StandardPlans'));
 
@@ -33,9 +35,8 @@ const FormField = ({
   if (type === 'boolean') {
     return (
       <Flex alignItems={'center'} w={'90%'} my={3}>
-        <FormLabel title={title} description={description} mb={2} />
+        <FormLabel title={title} description={description} mb={2} minW={'240px'} />
         <Switch
-          className="ml-4"
           isChecked={value}
           onChange={(e) => {
             onChange(e.target.checked);
@@ -142,6 +143,21 @@ const FormField = ({
     return (
       <Box>
         <NavbarItems value={value} onChange={onChange} title={title} description={description} />
+      </Box>
+    );
+  }
+  if (type === FieldTypeEnum.thirdPartyAccountItem) {
+    return (
+      <Flex>
+        <FormLabel title={title} mb={2} minW={'240px'} />
+        <ThirdPartyAccountItem value={value} onChange={onChange} description={description} />
+      </Flex>
+    );
+  }
+  if (type === FieldTypeEnum.thirdPartyVariables) {
+    return (
+      <Box>
+        <ThirdPartyVariables value={value} onChange={onChange} title={title} />
       </Box>
     );
   }

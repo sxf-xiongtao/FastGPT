@@ -1,4 +1,6 @@
 export enum FieldTypeEnum {
   StandardPlans = 'StandardPlans',
-  NavbarItems = 'NavbarItems'
+  NavbarItems = 'NavbarItems',
+  thirdPartyAccountItem = 'thirdPartyAccountItem',
+  thirdPartyVariables = 'thirdPartyVariables'
 }

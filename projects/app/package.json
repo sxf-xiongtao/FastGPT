@@ -20,6 +20,7 @@
     "@fastgpt/global": "workspace:*",
     "@fastgpt/plugins": "workspace:*",
     "@fastgpt/service": "workspace:*",
+    "@fastgpt/templates": "workspace:*",
     "@fastgpt/web": "workspace:*",
     "@peculiar/x509": "^1.9.5",
     "@tanstack/react-query": "^4.24.10",

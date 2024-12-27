@@ -11,7 +11,6 @@ import { delay } from '@fastgpt/global/common/system/utils';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
-import { TeamMemberWithUserSchema } from '@fastgpt/global/support/user/team/type';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { SubTypeEnum, subModeMap } from '@fastgpt/global/support/wallet/sub/constants';
 import { addMonths } from 'date-fns';
@@ -19,6 +18,7 @@ import { ClientSession } from '@fastgpt/service/common/mongo';
 import { NextAPI } from '@/service/middleware/entry';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { getStandardPlanConfig, sortStandPlans } from '@fastgpt/service/support/wallet/sub/utils';
+import { UserModelSchema } from '@fastgpt/global/support/user/type';
 
 /* 校验支付结果 */
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -39,12 +39,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const orderTmbId = payOrder.tmbId;
 
   // find inviter
-  const tmb = (await MongoTeamMember.findById(orderTmbId, 'userId').populate(
-    'userId',
-    'inviterId'
-  )) as TeamMemberWithUserSchema;
-  const inviter = tmb?.userId?.inviterId
-    ? await MongoUser.findById(tmb.userId.inviterId, 'promotionRate')
+  const tmb = await MongoTeamMember.findById(orderTmbId, 'userId')
+    .populate<{
+      user: UserModelSchema;
+    }>('user', 'inviterId')
+    .lean();
+  const inviter = tmb?.user?.inviterId
+    ? await MongoUser.findById(tmb.user.inviterId, 'promotionRate')
     : null;
 
   // check pay result
@@ -71,11 +72,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         await dealWithSuccessOrder(payOrder, session);
 
         // 增加邀请者的默认的团队收益
-        if (inviter) {
+        if (inviter && tmb) {
           const amount = (payOrder.price * inviter.promotionRate) / 100;
           createOnePromotion({
             userId: inviter._id,
-            objUId: tmb.userId._id,
+            objUId: tmb?.userId,
             type: 'pay',
             amount
           });

@@ -1,7 +1,10 @@
 import { NavbarItemType } from '@/pages/settings/config/components/FormField/NavbarItems';
 import { SystemConfigType } from '@/types';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
-import { FastGPTConfigFileType } from '@fastgpt/global/common/system/types';
+import {
+  FastGPTConfigFileType,
+  ExternalProviderWorkflowVarType
+} from '@fastgpt/global/common/system/types';
 import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 
 export type ConfigStoreType = {
@@ -74,5 +77,8 @@ export type ConfigFormType = {
   };
   securitySettings: {
     censor?: SystemConfigType['censor'];
+  };
+  externalProviderSettings: {
+    externalProviderWorkflowVariables: ExternalProviderWorkflowVarType[];
   };
 };

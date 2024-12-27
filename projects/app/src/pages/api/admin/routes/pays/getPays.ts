@@ -8,7 +8,7 @@ import { NextAPI } from '@/service/middleware/entry';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { PagingData } from '@/types';
 import { BillSchemaType } from '@fastgpt/global/support/wallet/bill/type';
-import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
+import { UserModelSchema } from '@fastgpt/global/support/user/type';
 
 export type GetPaysBody = {
   pageNum: number;
@@ -61,15 +61,13 @@ async function handler(
   const newRecords = await Promise.all(
     records.map(async (record) => {
       const tmbId = record.tmbId;
-      const tmb = await MongoTeamMember.findOne({ _id: tmbId }, 'userId').populate(
-        'userId',
-        'username'
-      );
+      const tmb = await MongoTeamMember.findOne({ _id: tmbId }, 'userId')
+        .populate<{ user: UserModelSchema }>('user', 'username')
+        .lean();
 
       return {
         ...record,
-        // @ts-ignore
-        username: tmb?.userId?.username || ''
+        username: tmb?.user?.username || ''
       };
     })
   );

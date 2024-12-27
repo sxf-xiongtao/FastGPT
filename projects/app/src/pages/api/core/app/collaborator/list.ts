@@ -33,22 +33,22 @@ async function handler(req: NextApiRequest): Promise<CollaboratorItemType[]> {
   const clbsWithInfo = clbs
     .map((item) => {
       return {
-        tmbId: item.tmbId._id,
+        tmbId: item.tmb._id,
         teamId: item.teamId,
         permission: new AppPermission({ per: item.permission }),
-        name: item.tmbId.name,
-        avatar: item.tmbId.userId.avatar
+        name: item.tmb.name,
+        avatar: item.tmb.user.avatar
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name));
 
   const groupsWithInfo = groups.map((item) => {
     return {
-      groupId: item.groupId._id,
+      groupId: item.group._id,
       teamId: item.teamId,
       permission: new AppPermission({ per: item.permission }),
-      name: item.groupId.name,
-      avatar: item.groupId.avatar
+      name: item.group.name,
+      avatar: item.group.avatar
     };
   });
 

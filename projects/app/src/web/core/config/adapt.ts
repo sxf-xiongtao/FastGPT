@@ -157,6 +157,9 @@ export function formatConfigStore2FormSchema({
         BAIDU_TEXT_CENSOR_CLIENTSECRET: fastgptPro?.censor?.BAIDU_TEXT_CENSOR_CLIENTSECRET || '',
         customCensorURL: fastgptPro?.censor?.customCensorURL || ''
       }
+    },
+    externalProviderSettings: {
+      externalProviderWorkflowVariables: fastgpt?.feConfigs?.externalProviderWorkflowVariables || []
     }
   };
 }
@@ -166,7 +169,8 @@ export function formatFormData2ConfigStore({
   modelSettings,
   loginSettings,
   paySettings,
-  securitySettings
+  securitySettings,
+  externalProviderSettings
 }: ConfigFormType): ConfigStoreType {
   const { feConfigs, systemEnv, concatMd, scripts, limit, sso, navbar } = siteSettings;
   const { llmModels, vectorModels, reRankModels, audioSpeechModels, whisperModel } = modelSettings;
@@ -174,6 +178,7 @@ export function formatFormData2ConfigStore({
     loginSettings;
   const { censor } = securitySettings;
   const { wx, subPlans } = paySettings;
+  const { externalProviderWorkflowVariables } = externalProviderSettings;
 
   const formatFeConfig = {
     ...feConfigs,
@@ -230,7 +235,8 @@ export function formatFormData2ConfigStore({
       }
       return ['email'];
     })() as ['email' | 'phone'],
-    navbarItems: Array.isArray(navbar) ? navbar : []
+    navbarItems: Array.isArray(navbar) ? navbar : [],
+    externalProviderWorkflowVariables
   };
 
   const formatLoginSettings = {
