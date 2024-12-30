@@ -12,27 +12,31 @@ export const pushAutoTrainingUsage = async ({
   teamId,
   tmbId,
   model,
-  tokens,
+  inputTokens,
+  outputTokens,
   billId
 }: {
   teamId: string;
   tmbId: string;
   model: string;
-  tokens: number;
+  inputTokens: number;
+  outputTokens: number;
   billId: string;
 }) => {
   // 计算价格
   const { totalPoints } = formatModelChars2Points({
     model,
     modelType: ModelTypeEnum.llm,
-    tokens
+    inputTokens,
+    outputTokens
   });
   concatUsage({
     billId,
     teamId,
     tmbId,
     totalPoints,
-    tokens,
+    inputTokens,
+    outputTokens,
     listIndex: 2
   });
 
@@ -70,7 +74,8 @@ export const pushChatUsage = ({
       moduleName: item.moduleName,
       amount: item.totalPoints || 0,
       model: item.model,
-      tokens: item.tokens
+      inputTokens: item.inputTokens,
+      outputTokens: item.outputTokens
     }))
   });
 

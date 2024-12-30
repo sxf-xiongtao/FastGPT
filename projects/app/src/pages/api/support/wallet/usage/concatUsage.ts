@@ -32,7 +32,8 @@ export const concatUsage = async ({
   billId,
   totalPoints = 0,
   listIndex,
-  tokens = 0
+  inputTokens = 0,
+  outputTokens = 0
 }: ConcatUsageProps) => {
   // 没有Id，或者不符合 mongoose ObjectId
   if (!billId || !Types.ObjectId.isValid(billId)) return;
@@ -41,7 +42,8 @@ export const concatUsage = async ({
     {
       billId,
       listIndex,
-      tokens,
+      inputTokens,
+      outputTokens,
       totalPoints
     }
   ]);

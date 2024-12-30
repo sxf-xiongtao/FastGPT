@@ -168,21 +168,23 @@ export const concatBillTimer = async () => {
 
     // concat same billId
     const map = new Map<string, ConcatBillQueueItemType>();
-    list.forEach(({ billId, totalPoints, tokens, listIndex }) => {
+    list.forEach(({ billId, totalPoints, inputTokens, outputTokens, listIndex }) => {
       const id = `${billId}-${listIndex}`;
       const data = map.get(id);
       if (data) {
         map.set(id, {
           billId,
           totalPoints: data.totalPoints + totalPoints,
-          tokens: data.tokens + tokens,
+          inputTokens: data.inputTokens + inputTokens,
+          outputTokens: data.outputTokens + outputTokens,
           listIndex
         });
       } else {
         map.set(id, {
           billId,
           totalPoints,
-          tokens,
+          inputTokens,
+          outputTokens,
           listIndex
         });
       }
@@ -191,14 +193,15 @@ export const concatBillTimer = async () => {
     const concatList = Array.from(map).map(([_, data]) => data);
 
     for await (const item of concatList) {
-      const { billId, listIndex, totalPoints, tokens } = item;
+      const { billId, listIndex, totalPoints, inputTokens, outputTokens } = item;
       try {
         await MongoUsage.findByIdAndUpdate(billId, {
           $inc: {
             totalPoints,
             ...(listIndex !== undefined && {
               [`list.${listIndex}.amount`]: totalPoints,
-              [`list.${listIndex}.tokens`]: tokens
+              [`list.${listIndex}.inputTokens`]: inputTokens,
+              [`list.${listIndex}.outputTokens`]: outputTokens
             })
           }
         });
