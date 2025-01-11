@@ -4,6 +4,7 @@ import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
 import { connectToDatabase } from '@/service/mongo';
 import type { PostLoginProps } from '@fastgpt/global/support/user/api.d';
+import { getUserDetail } from '@fastgpt/service/support/user/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -34,7 +35,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       throw new Error('密码错误');
     }
 
-    const token = createJWT(user);
+    const userDetail = await getUserDetail({
+      tmbId: user?.lastLoginTmbId,
+      userId: user._id
+    });
+
+    const token = createJWT(userDetail);
     setCookie(res, token);
 
     jsonRes(res, {

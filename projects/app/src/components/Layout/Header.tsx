@@ -5,8 +5,8 @@ import MyImage from '@fastgpt/web/components/common/Image/MyImage';
 import Navbar from './Navbar';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
-import { getLicenseData } from '@/web/admin/common/api';
 import dynamic from 'next/dynamic';
+import { useUserStore } from '@/web/support/user/useUserStore';
 
 const LicenseData = dynamic(() => import('./LicenseData'), { ssr: false });
 const MyPopover = dynamic(() => import('@fastgpt/web/components/common/MyPopover'), { ssr: false });
@@ -14,8 +14,9 @@ const MyPopover = dynamic(() => import('@fastgpt/web/components/common/MyPopover
 export default function Header() {
   const { isPc } = useSystem();
   const router = useRouter();
+  const { initLicenseData, licenseData } = useUserStore();
 
-  const { data: licenseData } = useRequest2(getLicenseData, {
+  useRequest2(initLicenseData, {
     manual: false
   });
 

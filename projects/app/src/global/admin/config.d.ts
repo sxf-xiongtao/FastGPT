@@ -64,6 +64,7 @@ export type ConfigFormType = {
     dingtalk: NonNullable<SystemConfigType['auth']>['dingtalk'];
     google: NonNullable<SystemConfigType['auth']>['google'];
     microsoft: NonNullable<SystemConfigType['auth']>['microsoft'];
+    wecom: NonNullable<SystemConfigType['auth']>['wecom'];
     fastLogin: string;
   };
   paySettings: {

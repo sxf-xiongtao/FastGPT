@@ -5,7 +5,7 @@ import { connectToDatabase } from '@/service/mongo';
 import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
 import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
 import { authCode } from '@/service/support/user/auth/controller';
-import { getUserDetail } from '@/service/support/user/controller';
+import { getUserDetail } from '@fastgpt/service/support/user/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -39,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     if (!user) {
       throw new Error('更新用户信息失败');
     }
-    const userInfo = await getUserDetail(tmbId, user._id);
+    const userInfo = await getUserDetail({ tmbId, userId: user._id });
 
     const token = createJWT(userInfo);
     setCookie(res, token);

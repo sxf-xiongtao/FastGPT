@@ -12,6 +12,7 @@ export const adminCert = async ({ req }: any) => {
     if (user && user.username !== 'root') {
       return Promise.reject(ERROR_ENUM.unAuthorization);
     }
+    return result;
   } catch (error) {
     throw error;
   }

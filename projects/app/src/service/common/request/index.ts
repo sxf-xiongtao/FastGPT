@@ -4,7 +4,6 @@ import axios, {
   AxiosResponse,
   AxiosProgressEvent
 } from 'axios';
-// import { clearToken, getToken } from '@/web/support/user/auth';
 import { TOKEN_ERROR_CODE } from '@fastgpt/global/common/error/errorCode';
 import { getWebReqUrl } from '@fastgpt/web/common/system/utils';
 
@@ -39,11 +38,6 @@ const clearToken = () => {
   }
 };
 
-const getToken = () => {
-  if (typeof window === 'undefined') return '';
-  return localStorage.getItem(tokenKey) || '';
-};
-
 function requestStart({ url, maxQuantity }: { url: string; maxQuantity?: number }) {
   if (!maxQuantity) return;
   const item = maxQuantityMap[url];
@@ -74,10 +68,6 @@ function requestFinish({ url }: { url: string }) {
  * 请求开始
  */
 function startInterceptors(config: InternalAxiosRequestConfig): InternalAxiosRequestConfig {
-  if (config.headers) {
-    config.headers.token = getToken();
-  }
-
   return config;
 }
 
@@ -113,9 +103,11 @@ function responseError(err: any) {
     return Promise.reject({ message: err });
   }
   // 有报错响应
-  if (err?.code in TOKEN_ERROR_CODE) {
-    clearToken();
-    window.location.replace(`/login`);
+  if (err?.code in TOKEN_ERROR_CODE || err?.response?.data?.code in TOKEN_ERROR_CODE) {
+    if (window.location.pathname !== '/login') {
+      clearToken();
+      window.location.replace(getWebReqUrl(`/login`));
+    }
     return Promise.reject({ message: 'token过期，重新登录' });
   }
   if (err?.response?.data) {

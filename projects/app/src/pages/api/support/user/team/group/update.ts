@@ -13,6 +13,7 @@ import {
 import { getTeamMembers } from '@/service/support/user/team/controller';
 import { concat } from 'lodash';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
+import { refreshSourceAvatar } from '@fastgpt/service/common/file/image/controller';
 
 export type GroupUpdateQuery = {};
 export type GroupUpdateBody = putUpdateGroupData;
@@ -98,7 +99,7 @@ async function handler(
   })();
 
   await mongoSessionRun(async (session) => {
-    await MongoMemberGroupModel.updateOne(
+    const group = await MongoMemberGroupModel.findOneAndUpdate(
       {
         _id: groupId,
         teamId,
@@ -112,6 +113,7 @@ async function handler(
         session
       }
     );
+    await refreshSourceAvatar(avatar, group?.avatar, session);
 
     if (!memberList) return;
     // delete all the group members and then add the new ones

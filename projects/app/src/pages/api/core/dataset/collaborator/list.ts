@@ -6,6 +6,7 @@ import { DatasetPermission } from '@fastgpt/global/support/permission/dataset/co
 import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { DatasetTypeEnum } from '@fastgpt/global/core/dataset/constants';
 import { getClbsAndGroupsWithInfo } from '@fastgpt/service/support/permission/controller';
+import { DEFAULT_ORG_AVATAR } from '@fastgpt/global/common/system/constants';
 
 async function handler(
   req: ApiRequestProps<
@@ -24,7 +25,7 @@ async function handler(
     per: ReadPermissionVal
   });
 
-  const [clbs, groups] = await (async () => {
+  const [clbs, groups, orgs] = await (async () => {
     const isFolder = dataset.type === DatasetTypeEnum.folder;
     const isInherit = dataset.inheritPermission;
     const isRoot = !dataset.parentId;
@@ -61,7 +62,15 @@ async function handler(
     };
   });
 
-  return [...clbsWithInfo, ...groupsWithInfo];
+  const orgsWithInfo = orgs.map((item) => ({
+    orgId: item.org._id,
+    teamId: item.teamId,
+    permission: new DatasetPermission({ per: item.permission }),
+    name: item.org.name,
+    avatar: item.org.avatar || DEFAULT_ORG_AVATAR
+  }));
+
+  return [...clbsWithInfo, ...groupsWithInfo, ...orgsWithInfo];
 }
 
 export default NextAPI(handler);

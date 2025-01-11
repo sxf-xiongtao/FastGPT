@@ -21,12 +21,19 @@ import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 import { DatasetErrEnum } from '@fastgpt/global/common/error/code/dataset';
 import { getGroupsByTmbId } from '@fastgpt/service/support/permission/memberGroup/controllers';
 import { ResourcePermissionType } from '@fastgpt/global/support/permission/type';
+import { getOrgsByTmbId } from '@fastgpt/service/support/permission/org/controllers';
 
 async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
   // Authorization
-  const { datasetId, members: tmbIds = [], groups: groupIds = [], permission } = req.body;
+  const {
+    datasetId,
+    members: tmbIds = [],
+    groups: groupIds = [],
+    orgs: orgIds = [],
+    permission
+  } = req.body;
 
-  if (tmbIds === undefined && groupIds === undefined) {
+  if (tmbIds === undefined && groupIds === undefined && orgIds === undefined) {
     return Promise.reject(CommonErrEnum.missingParams);
   }
 
@@ -56,6 +63,11 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
       return Promise.reject(DatasetErrEnum.unAuthDataset);
     }
 
+    const myOrgIds = (await getOrgsByTmbId({ teamId, tmbId })).map((item) => String(item.orgId));
+    if (orgIds?.some((orgId) => myOrgIds.includes(orgId)) && !myPer.isOwner) {
+      return Promise.reject(DatasetErrEnum.unAuthDataset);
+    }
+
     // can not update admin's permission unless I am owner
     if (new DatasetPermission({ per: permission }).hasManagePer && !myPer.isOwner) {
       return Promise.reject(DatasetErrEnum.unAuthDataset);
@@ -68,11 +80,12 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
       clbOrGroups.some((clb) => {
         const oldPer = new DatasetPermission({ per: clb.permission });
         const newPer = new DatasetPermission({ per: permission });
-        const updatedClbAndGroups = [...tmbIds, ...groupIds];
+        const updatedClbAndGroups = [...tmbIds, ...groupIds, ...orgIds];
         if (
-          oldPer.hasManagePer !== newPer.hasManagePer && // manage permission changed
-          (updatedClbAndGroups.includes(String(clb.tmbId)) || // clb is updated
-            updatedClbAndGroups.includes(String(clb.groupId))) // clb is updated
+          (oldPer.hasManagePer !== newPer.hasManagePer && // manage permission changed
+            (updatedClbAndGroups.includes(String(clb.tmbId)) || // clb is updated
+              updatedClbAndGroups.includes(String(clb.groupId)))) ||
+          updatedClbAndGroups.includes(String(clb.orgId)) // clb is updated
         ) {
           return true;
         }
@@ -119,6 +132,10 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
           groupId,
           permission
         })),
+        ...orgIds?.map((orgId) => ({
+          orgId,
+          permission
+        })),
         ...FolderClbsAndGroups.filter(
           (item) => !!item.tmbId && !tmbIds?.includes(String(item.tmbId))
         ).map((item) => ({
@@ -130,6 +147,12 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
         ).map((item) => ({
           groupId: item.groupId!,
           permission: groupIds?.includes(String(item.groupId)) ? permission : item.permission
+        })),
+        ...FolderClbsAndGroups.filter(
+          (item) => !!item.orgId && !orgIds?.includes(String(item.orgId))
+        ).map((item) => ({
+          orgId: item.orgId!,
+          permission: orgIds?.includes(String(item.orgId)) ? permission : item.permission
         }))
       );
 
@@ -167,13 +190,21 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
             resourceType: PerResourceTypeEnum.dataset,
             tmbId,
             permission
+          })),
+          ...orgIds?.map((orgId) => ({
+            teamId,
+            resourceId: datasetId,
+            resourceType: PerResourceTypeEnum.dataset,
+            orgId,
+            permission
           }))
         );
 
         const unchangedClbsAndGroups = parentClbsAndGroups.filter(
           (item) =>
             (!!item.tmbId && !tmbIds?.includes(String(item.tmbId))) || // parent's tmbIds
-            (!!item.groupId && !groupIds?.includes(String(item.groupId))) // parent's groupIds
+            (!!item.groupId && !groupIds?.includes(String(item.groupId))) || // parent's groupIds
+            (!!item.orgId && !orgIds?.includes(String(item.orgId))) // parent's orgIds
         );
 
         await MongoResourcePermission.create(
@@ -183,6 +214,7 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
             resourceType: PerResourceTypeEnum.dataset,
             ...(item.tmbId && { tmbId: item.tmbId }),
             ...(item.groupId && { groupId: item.groupId }),
+            ...(item.orgId && { orgId: item.orgId }),
             permission: item.permission
           })),
           { session }
@@ -197,6 +229,7 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
       teamId,
       tmbIdList: tmbIds,
       groupIdList: groupIds,
+      orgIdList: orgIds,
       permission
     });
   });

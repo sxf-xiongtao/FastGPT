@@ -11,25 +11,27 @@ let list: string[] = ['dalle3'];
 
 /* Get plugins */
 export const getSystemPlugins = async () => {
-  const communityPlugins = getCommunityPlugins();
+  const communityPlugins = await getCommunityPlugins();
 
-  const commercialPlugins = list.map<SystemPluginTemplateItemType>((name) => {
-    const config = require(`./src/${name}/template.json`);
+  const commercialPlugins = await Promise.all(
+    list.map<Promise<SystemPluginTemplateItemType>>(async (name) => {
+      const config = (await import(`./src/${name}/template.json`))?.default;
 
-    const isFolder = list.find((item) => item.startsWith(`${name}/`));
-    const parentIdList = name.split('/').slice(0, -1);
-    const parentId =
-      parentIdList.length > 0 ? `${PluginSourceEnum.commercial}-${parentIdList.join('/')}` : null;
+      const isFolder = list.find((item) => item.startsWith(`${name}/`));
+      const parentIdList = name.split('/').slice(0, -1);
+      const parentId =
+        parentIdList.length > 0 ? `${PluginSourceEnum.commercial}-${parentIdList.join('/')}` : null;
 
-    return {
-      ...config,
-      id: `${PluginSourceEnum.commercial}-${name}`,
-      isActive: false,
-      isFolder,
-      parentId,
-      isOfficial: true
-    };
-  });
+      return {
+        ...config,
+        id: `${PluginSourceEnum.commercial}-${name}`,
+        isActive: false,
+        isFolder,
+        parentId,
+        isOfficial: true
+      };
+    })
+  );
 
   // 从数据库里加载插件配置
   const dbPlugins = (await MongoSystemPlugin.find({ customConfig: { $exists: true } })).map(

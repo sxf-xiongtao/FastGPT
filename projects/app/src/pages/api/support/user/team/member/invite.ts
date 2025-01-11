@@ -13,8 +13,6 @@ import { authMember } from '@/service/support/permission/team/auth';
 import { NextAPI } from '@/service/middleware/entry';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
-import { addMemberToGroup } from '@/service/support/permission/group/controllers';
-import { getTeamDefaultGroup } from '@fastgpt/service/support/permission/memberGroup/controllers';
 
 async function handler(
   req: ApiRequestProps<InviteMemberProps>,
@@ -73,6 +71,8 @@ async function handler(
             teamId
           },
           {
+            teamId,
+            userId: user.userId,
             name: user.username.slice(0, 10),
             status: TeamMemberStatusEnum.waiting
           },

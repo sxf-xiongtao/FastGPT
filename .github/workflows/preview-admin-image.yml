@@ -41,7 +41,7 @@ jobs:
 
       - name: Set DOCKER_REPO_TAGGED based on PR number
         run: |
-          echo "DOCKER_REPO_TAGGED=ghcr.io/${{ github.repository_owner }}/fastgpt-pro-pr:${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+          echo "DOCKER_REPO_TAGGED=ghcr.io/${{ github.repository_owner }}/fastgpt-pro-pr:${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
 
       - name: Build and publish image
         env:

@@ -50,8 +50,8 @@ const BillSchema = new Schema({
 });
 
 try {
-  BillSchema.index({ status: 1, createTime: 1 }, { background: true });
-  BillSchema.index({ teamId: 1, status: 1, type: 1, createTime: 1 }, { background: true });
+  BillSchema.index({ status: 1, createTime: 1 });
+  BillSchema.index({ teamId: 1, status: 1, type: 1, createTime: 1 });
 } catch (error) {
   console.log(error);
 }

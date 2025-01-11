@@ -37,6 +37,9 @@ import { MongoPromotionRecord } from '@fastgpt/service/support/activity/promotio
 import { MongoTmpData } from '@fastgpt/service/support/tmpData/schema';
 import { MongoTeamInvoiceTitle } from '@/service/support/user/team/invoiceAccount/teamInvoiceSchema';
 import { MongoInvoice } from '@/service/support/wallet/bill/invoiceSchema';
+import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
+import { MongoOrgMemberModel } from '@fastgpt/service/support/permission/org/orgMemberSchema';
+import { MongoDatasetDataText } from '@fastgpt/service/core/dataset/data/dataTextSchema';
 
 export type syncIndexQuery = {};
 
@@ -61,6 +64,8 @@ async function handler(
     MongoResourcePermission.syncIndexes();
     MongoGroupMemberModel.syncIndexes();
     MongoMemberGroupModel.syncIndexes();
+    MongoOrgModel.syncIndexes();
+    MongoOrgMemberModel.syncIndexes();
     MongoUsage.syncIndexes();
     MongoFrequencyLimit.syncIndexes();
     MongoOpenApi.syncIndexes();
@@ -76,6 +81,7 @@ async function handler(
     MongoDataset.syncIndexes();
     MongoDatasetCollection.syncIndexes();
     MongoDatasetData.syncIndexes();
+    MongoDatasetDataText.syncIndexes();
     MongoDatasetTraining.syncIndexes();
     MongoImage.syncIndexes();
     MongoTTSBuffer.syncIndexes();

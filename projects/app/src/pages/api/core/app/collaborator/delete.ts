@@ -1,25 +1,25 @@
-import type { NextApiRequest } from 'next';
 import { NextAPI } from '@/service/middleware/entry';
-import { authApp } from '@fastgpt/service/support/permission/app/auth';
-import {
-  PerResourceTypeEnum,
-  ManagePermissionVal
-} from '@fastgpt/global/support/permission/constant';
-import { AppCollaboratorDeleteParams } from '@fastgpt/global/core/app/collaborator';
-import {
-  syncChildrenPermission,
-  syncCollaborators
-} from '@fastgpt/service/support/permission/inheritPermission';
-import { MongoApp } from '@fastgpt/service/core/app/schema';
+import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
+import type { AppCollaboratorDeleteParams } from '@fastgpt/global/core/app/collaborator';
 import { AppFolderTypeList } from '@fastgpt/global/core/app/constants';
+import {
+  ManagePermissionVal,
+  PerResourceTypeEnum
+} from '@fastgpt/global/support/permission/constant';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { MongoApp } from '@fastgpt/service/core/app/schema';
+import { authApp } from '@fastgpt/service/support/permission/app/auth';
 import {
   delResourcePermission,
   getResourceClbsAndGroups
 } from '@fastgpt/service/support/permission/controller';
-import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
+import {
+  syncChildrenPermission,
+  syncCollaborators
+} from '@fastgpt/service/support/permission/inheritPermission';
+import type { NextApiRequest } from 'next';
 
-/* 
+/*
   1. 继承态目录：需要将继承态关闭，删除 1 个协作者，同步其子目录协作者
   2. 继承态应用：需要将继承态关闭，同步父的 defaultPermission, 协作者复制父目录
   3. 非继承态目录：删除 1 个协作者，同步其子目录协作者
@@ -27,9 +27,9 @@ import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 */
 async function handler(req: NextApiRequest) {
   // Authorization
-  const { appId, tmbId, groupId } = req.query as AppCollaboratorDeleteParams;
+  const { appId, tmbId, groupId, orgId } = req.query as AppCollaboratorDeleteParams;
 
-  if (tmbId === undefined && groupId === undefined) {
+  if (tmbId === undefined && groupId === undefined && orgId === undefined) {
     return Promise.reject(CommonErrEnum.missingParams);
   }
 
@@ -55,6 +55,7 @@ async function handler(req: NextApiRequest) {
         teamId,
         tmbId,
         groupId,
+        orgId,
         resourceId: app._id,
         session
       });
@@ -66,7 +67,10 @@ async function handler(req: NextApiRequest) {
         resourceType: PerResourceTypeEnum.app,
         resourceModel: MongoApp,
         collaborators: folderClbsAndGroups.filter(
-          (item) => String(item.tmbId) !== tmbId && String(item.groupId) !== groupId
+          (item) =>
+            String(item.tmbId) !== tmbId &&
+            String(item.groupId) !== groupId &&
+            String(item.orgId) !== orgId
         ),
         session
       });
@@ -87,7 +91,10 @@ async function handler(req: NextApiRequest) {
           teamId,
           resourceId: app._id,
           collaborators: parentClbsAndGroups.filter(
-            (item) => String(item.tmbId) !== tmbId && String(item.groupId) !== groupId
+            (item) =>
+              String(item.tmbId) !== tmbId &&
+              String(item.groupId) !== groupId &&
+              String(item.orgId) !== orgId
           ),
           session
         });
@@ -101,13 +108,21 @@ async function handler(req: NextApiRequest) {
                 resourceId: app._id,
                 session
               }
-            : {
-                resourceType: PerResourceTypeEnum.app,
-                teamId,
-                groupId: groupId!,
-                resourceId: app._id,
-                session
-              }
+            : groupId
+              ? {
+                  resourceType: PerResourceTypeEnum.app,
+                  teamId,
+                  groupId: groupId,
+                  resourceId: app._id,
+                  session
+                }
+              : {
+                  resourceType: PerResourceTypeEnum.app,
+                  teamId,
+                  orgId: orgId!,
+                  resourceId: app._id,
+                  session
+                }
         );
       }
     }

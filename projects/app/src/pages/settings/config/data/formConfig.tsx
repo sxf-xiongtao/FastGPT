@@ -527,6 +527,31 @@ export const getUserFormConfig = (): FormConfig => {
             }
           }
         },
+        wecom: {
+          type: 'object',
+          key: 'loginSettings.wecom',
+          title: '企业微信登录',
+          properties: {
+            corpid: {
+              key: 'loginSettings.wecom.corpid',
+              type: 'string',
+              title: '企业微信应用 CorpID',
+              description: '对应企业微信企业的「CorpID」'
+            },
+            agentid: {
+              key: 'loginSettings.wecom.agentid',
+              type: 'string',
+              title: '企业微信应用 AgentId',
+              description: '对应企业微信应用的「AgentId」'
+            },
+            secret: {
+              key: 'loginSettings.wecom.secret',
+              type: 'string',
+              title: '企业微信应用 Secret',
+              description: '对应企业微信应用的「Secret」'
+            }
+          }
+        },
         github: {
           key: 'loginSettings.github',
           type: 'object',
@@ -593,6 +618,7 @@ export const getUserFormConfig = (): FormConfig => {
             }
           }
         },
+
         sso: {
           key: 'siteSettings.sso',
           type: 'object',

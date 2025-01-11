@@ -11,7 +11,7 @@ module.exports = {
   jsxBracketSameLine: false,
   arrowParens: 'always',
   rangeStart: 0,
-  rangeEnd: Infinity,
+  rangeEnd: Number.POSITIVE_INFINITY,
   requirePragma: false,
   insertPragma: false,
   proseWrap: 'preserve',

@@ -74,6 +74,11 @@ export type SystemConfigType = {
       clientId: string;
       secret: string;
     };
+    wecom?: {
+      corpid: string;
+      secret: string;
+      agentid: string;
+    };
   };
   pay?: {
     wx?: {

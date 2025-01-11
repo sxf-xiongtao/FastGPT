@@ -32,6 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       if (type === OAuthEnum.google) return authGoogle(code, callbackUrl);
       if (type === OAuthEnum.microsoft) return authMicrosoft(code, callbackUrl);
       if (type === OAuthEnum.dingtalk) return authDingtalk(code);
+      if (type === OAuthEnum.wecom) return authWecom(code);
       if (type === OAuthEnum.sso) return authSso(code);
       return Promise.reject('type error');
     })();
@@ -220,6 +221,50 @@ export async function authMicrosoft(code: string, callbackUrl: string): Promise<
   };
 }
 
+export async function authWecom(code: string): Promise<OauthResponse> {
+  // const getInfoURL = 'https://qyapi.weixin.qq.com/cgi-bin/auth/getuserinfo';
+  // const getDetailedInfoURL = 'https://qyapi.weixin.qq.com/cgi-bin/user/get';
+
+  // 1. get access_token
+  const getAccessTokenURL = new URL('https://qyapi.weixin.qq.com/cgi-bin/gettoken');
+
+  const corpid = global.systemConfig?.auth?.wecom?.corpid;
+  const secret = global.systemConfig?.auth?.wecom?.secret;
+  if (!corpid || !secret) {
+    throw new Error('corpid or secret is required');
+  }
+  getAccessTokenURL.searchParams.set('corpid', corpid);
+  getAccessTokenURL.searchParams.set('corpsecret', secret);
+
+  const res = await axios.get(getAccessTokenURL.toString());
+  const { access_token } = res.data;
+  if (!access_token) {
+    return Promise.reject('Fail to get wechat access token');
+  }
+  // 2. get userid
+  const getInfoURL = new URL('https://qyapi.weixin.qq.com/cgi-bin/auth/getuserinfo');
+  getInfoURL.searchParams.set('code', code);
+  getInfoURL.searchParams.set('access_token', access_token);
+
+  const { data } = await axios.get<{ userid: string; errmsg?: string }>(getInfoURL.toString());
+
+  const userid = data.userid;
+  if (!userid) {
+    return Promise.reject(data.errmsg || 'Fail to get wechat userid');
+  }
+  // 3. get userInfo
+  const getDetailedInfoURL = new URL('https://qyapi.weixin.qq.com/cgi-bin/user/get');
+  getDetailedInfoURL.searchParams.set('access_token', access_token);
+  getDetailedInfoURL.searchParams.set('userid', userid);
+
+  const { data: userInfo } = await axios.get(getDetailedInfoURL.toString());
+
+  return {
+    username: 'wecom-' + userid,
+    concat: userInfo.mobile || userInfo.email || '',
+    avatarUrl: userInfo.avatar || ''
+  };
+}
 /*
   通用 SSO 登录封装
 */

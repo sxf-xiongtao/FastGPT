@@ -20,7 +20,7 @@ import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 
 async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>) {
   // Authorization
-  const { datasetId, tmbId, groupId } = req.query;
+  const { datasetId, tmbId, groupId, orgId } = req.query;
 
   const { teamId, dataset } = await authDataset({
     req,
@@ -43,6 +43,7 @@ async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>
         teamId,
         tmbId,
         groupId,
+        orgId,
         resourceId: dataset._id,
         session
       });
@@ -77,6 +78,7 @@ async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>
           teamId,
           tmbId,
           groupId,
+          orgId,
           resourceId: dataset._id,
           session
         });

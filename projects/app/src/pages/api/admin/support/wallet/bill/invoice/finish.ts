@@ -3,7 +3,7 @@ import { NextAPI } from '@/service/middleware/entry';
 import { MongoInvoice } from '@/service/support/wallet/bill/invoiceSchema';
 import { sendEmail } from '@/service/support/user/inform/sendMessage';
 import { getUploadModel } from '@fastgpt/service/common/file/multer';
-import { readFileSync } from 'fs';
+import fs from 'fs';
 import { removeFilesByPaths } from '@fastgpt/service/common/file/utils';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { InvoiceStatusEnum } from '@fastgpt/global/support/wallet/bill/invoice/constants';
@@ -30,7 +30,7 @@ async function handler(
     const { file, metadata } = await upload.doUpload(req, res);
     filePaths.push(file.path);
 
-    const fileData = readFileSync(file.path);
+    const fileData = await fs.promises.readFile(file.path);
 
     const invoice = await MongoInvoice.findById(metadata.invoiceId);
 

@@ -1,29 +1,30 @@
-import type { NextApiRequest } from 'next';
 import { NextAPI } from '@/service/middleware/entry';
+import type { NextApiRequest } from 'next';
 
-import { authApp } from '@fastgpt/service/support/permission/app/auth';
-import {
-  PerResourceTypeEnum,
-  ManagePermissionVal
-} from '@fastgpt/global/support/permission/constant';
-import { UpdateAppCollaboratorBody } from '@fastgpt/global/core/app/collaborator';
-import { AppPermission } from '@fastgpt/global/support/permission/app/controller';
-import { AppFolderTypeList } from '@fastgpt/global/core/app/constants';
-import {
-  syncChildrenPermission,
-  UpdateCollaboratorItem
-} from '@fastgpt/service/support/permission/inheritPermission';
-import { getResourceClbsAndGroups } from '@fastgpt/service/support/permission/controller';
-import { MongoApp } from '@fastgpt/service/core/app/schema';
-import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { updateResourcePermission } from '@/service/support/permission/controller';
-import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
-import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 import { AppErrEnum } from '@fastgpt/global/common/error/code/app';
+import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
+import type { UpdateAppCollaboratorBody } from '@fastgpt/global/core/app/collaborator';
+import { AppFolderTypeList } from '@fastgpt/global/core/app/constants';
+import { AppPermission } from '@fastgpt/global/support/permission/app/controller';
+import {
+  ManagePermissionVal,
+  PerResourceTypeEnum
+} from '@fastgpt/global/support/permission/constant';
+import type { ResourcePermissionType } from '@fastgpt/global/support/permission/type';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { MongoApp } from '@fastgpt/service/core/app/schema';
+import { authApp } from '@fastgpt/service/support/permission/app/auth';
+import { getResourceClbsAndGroups } from '@fastgpt/service/support/permission/controller';
+import {
+  type UpdateCollaboratorItem,
+  syncChildrenPermission
+} from '@fastgpt/service/support/permission/inheritPermission';
 import { getGroupsByTmbId } from '@fastgpt/service/support/permission/memberGroup/controllers';
-import { ResourcePermissionType } from '@fastgpt/global/support/permission/type';
+import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
+import { getOrgsByTmbId } from '@fastgpt/service/support/permission/org/controllers';
 
-/* 
+/*
   增加或修改协作者
   1. 继承态目录：关闭继承态，更新新的协作者，同步其子目录协作者
   2. 继承态应用：关闭继承态，复制父级协作者，并更新新的协作者
@@ -36,11 +37,12 @@ async function handler(req: NextApiRequest) {
     appId,
     permission,
     members: tmbIds = [],
-    groups: groupIds = []
+    groups: groupIds = [],
+    orgs: orgIds = []
   } = req.body as UpdateAppCollaboratorBody;
 
   // check params
-  if (tmbIds === undefined && groupIds === undefined) {
+  if (tmbIds === undefined && groupIds === undefined && orgIds === undefined) {
     return Promise.reject(CommonErrEnum.missingParams);
   }
 
@@ -70,6 +72,11 @@ async function handler(req: NextApiRequest) {
       return Promise.reject(AppErrEnum.unAuthApp);
     }
 
+    const myOrgIds = (await getOrgsByTmbId({ teamId, tmbId })).map((item) => String(item.orgId));
+    if (orgIds?.some((orgId) => myOrgIds.includes(orgId)) && !myPer.isOwner) {
+      return Promise.reject(AppErrEnum.unAuthApp);
+    }
+
     // can not update admin's permission unless I am owner
     if (new AppPermission({ per: permission }).hasManagePer && !myPer.isOwner) {
       return Promise.reject(AppErrEnum.unAuthApp);
@@ -82,11 +89,12 @@ async function handler(req: NextApiRequest) {
       clbOrGroups.some((clb) => {
         const oldPer = new AppPermission({ per: clb.permission });
         const newPer = new AppPermission({ per: permission });
-        const updatedClbAndGroups = [...tmbIds, ...groupIds];
+        const updatedClbAndGroups = [...tmbIds, ...groupIds, orgIds];
         if (
           oldPer.hasManagePer !== newPer.hasManagePer && // manage permission changed
           (updatedClbAndGroups.includes(String(clb.tmbId)) || // clb is updated
-            updatedClbAndGroups.includes(String(clb.groupId))) // clb is updated
+            updatedClbAndGroups.includes(String(clb.groupId)) ||
+            updatedClbAndGroups.includes(String(clb.orgId))) // clb is updated
         ) {
           return true;
         }
@@ -133,6 +141,10 @@ async function handler(req: NextApiRequest) {
           groupId,
           permission
         })),
+        ...orgIds.map((orgId) => ({
+          orgId,
+          permission
+        })),
         ...FolderClbsAndGroups.filter(
           (item) => !!item.tmbId && !tmbIds.includes(String(item.tmbId))
         ).map((item) => ({
@@ -144,6 +156,12 @@ async function handler(req: NextApiRequest) {
         ).map((item) => ({
           groupId: item.groupId!,
           permission: groupIds?.includes(String(item.groupId)) ? permission : item.permission
+        })),
+        ...FolderClbsAndGroups.filter(
+          (item) => !!item.orgId && !orgIds?.includes(String(item.orgId))
+        ).map((item) => ({
+          orgId: item.orgId!,
+          permission: orgIds?.includes(String(item.orgId)) ? permission : item.permission
         }))
       );
 
@@ -178,11 +196,18 @@ async function handler(req: NextApiRequest) {
             tmbId,
             permission
           })),
-          ...groupIds?.map((groupId) => ({
+          ...groupIds.map((groupId) => ({
             teamId,
             resourceId: appId,
             resourceType: PerResourceTypeEnum.app,
             groupId,
+            permission
+          })),
+          ...orgIds.map((orgId) => ({
+            teamId,
+            resourceId: appId,
+            resourceType: PerResourceTypeEnum.app,
+            orgId,
             permission
           }))
         );
@@ -190,7 +215,8 @@ async function handler(req: NextApiRequest) {
         const unchangedClbsAndGroups = parentClbsAndGroups.filter(
           (item) =>
             (!!item.tmbId && !tmbIds.includes(String(item.tmbId))) || // parent's tmbIds
-            (!!item.groupId && !groupIds.includes(String(item.groupId))) // parent's groupIds
+            (!!item.groupId && !groupIds.includes(String(item.groupId))) || // parent's groupIds
+            (!!item.orgId && !orgIds.includes(String(item.orgId))) // parent's orgIds
         );
 
         // 先创建未变更的协作者（内容不变）
@@ -220,6 +246,7 @@ async function handler(req: NextApiRequest) {
       teamId,
       tmbIdList: tmbIds,
       groupIdList: groupIds,
+      orgIdList: orgIds,
       permission
     });
   });

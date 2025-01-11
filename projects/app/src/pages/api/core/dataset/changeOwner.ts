@@ -1,15 +1,17 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
-import { authApp } from '@fastgpt/service/support/permission/app/auth';
-import { OwnerPermissionVal } from '@fastgpt/global/support/permission/constant';
-import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
-import { AppErrEnum } from '@fastgpt/global/common/error/code/app';
+import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 import { changeOwner } from '@/service/core/changeOwner';
+import { authDataset } from '@fastgpt/service/support/permission/dataset/auth';
+import { OwnerPermissionVal } from '@fastgpt/global/support/permission/constant';
+import { AppErrEnum } from '@fastgpt/global/common/error/code/app';
+import { DatasetErrEnum } from '@fastgpt/global/common/error/code/dataset';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 
 export type AppChangeOwnerQuery = {};
 export type AppChangeOwnerBody = {
   ownerId: string;
-  appId: string;
+  datasetId: string;
 };
 export type AppChangeOwnerResponse = any;
 
@@ -17,30 +19,36 @@ async function handler(
   req: ApiRequestProps<AppChangeOwnerBody, AppChangeOwnerQuery>,
   _res: ApiResponseType<any>
 ): Promise<AppChangeOwnerResponse> {
-  const { ownerId, appId } = req.body;
+  const { ownerId, datasetId } = req.body;
+  if (!datasetId || !ownerId) {
+    return Promise.reject(CommonErrEnum.missingParams);
+  }
 
-  const { app } = await authApp({
+  const { dataset } = await authDataset({
     req,
-    appId,
+    datasetId,
     authToken: true,
     per: OwnerPermissionVal
   });
 
-  const oldOwnerId = app.tmbId; // the old owner id before changing
+  if (!dataset) {
+    return Promise.reject(DatasetErrEnum.unExist);
+  }
+
+  const oldOwnerId = dataset.tmbId; // the old owner id before changing
   const newOwner = await MongoTeamMember.findById(ownerId); // the new owner
 
   // it is forbidden to change the owner to a user who is not in the same team
-  if (!newOwner || String(newOwner.teamId) !== String(app.teamId)) {
+  if (!newOwner || String(newOwner.teamId) !== String(dataset.teamId)) {
     return Promise.reject(AppErrEnum.invalidOwner);
   }
 
-  // get the apps, whose ownerID are the oldOwnerId.
   return changeOwner({
-    changeOwnerType: 'app',
-    resourceId: app._id,
+    changeOwnerType: 'dataset',
+    resourceId: dataset._id,
     newOwnerId: ownerId,
     oldOwnerId: oldOwnerId,
-    teamId: app.teamId
+    teamId: dataset.teamId
   });
 }
 

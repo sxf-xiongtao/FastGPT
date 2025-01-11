@@ -13,8 +13,8 @@ import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { POST } from '@/service/common/request';
 import { hashStr } from '@fastgpt/global/common/string/tools';
 import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
-import { useTranslation } from 'next-i18next';
 import { useToast } from '@fastgpt/web/hooks/useToast';
+import { useUserStore } from '@/web/support/user/useUserStore';
 
 type FormData = {
   account: string;
@@ -26,7 +26,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { initLicenseData } = useUserStore();
 
   const {
     register,
@@ -42,16 +42,16 @@ const Login = () => {
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
-      const response: any = await POST(`/admin/support/user/login`, {
+      const response = await POST<any>(`/admin/support/user/login`, {
         username: data.account,
         password: hashStr(data.password)
       });
 
       if (response.token) {
-        localStorage.setItem('token', response.token);
+        initLicenseData();
         router.push('/dashboard');
         toast({
-          title: '登录成功',
+          title: '登录成功!',
           status: 'success'
         });
       }

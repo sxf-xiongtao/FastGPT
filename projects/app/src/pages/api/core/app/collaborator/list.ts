@@ -1,11 +1,12 @@
-import type { NextApiRequest } from 'next';
 import { NextAPI } from '@/service/middleware/entry';
-import { authApp } from '@fastgpt/service/support/permission/app/auth';
-import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
-import { CollaboratorItemType } from '@fastgpt/global/support/permission/collaborator';
-import { AppPermission } from '@fastgpt/global/support/permission/app/controller';
+import { DEFAULT_ORG_AVATAR } from '@fastgpt/global/common/system/constants';
 import { AppFolderTypeList } from '@fastgpt/global/core/app/constants';
+import { AppPermission } from '@fastgpt/global/support/permission/app/controller';
+import type { CollaboratorItemType } from '@fastgpt/global/support/permission/collaborator';
+import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
+import { authApp } from '@fastgpt/service/support/permission/app/auth';
 import { getClbsAndGroupsWithInfo } from '@fastgpt/service/support/permission/controller';
+import type { NextApiRequest } from 'next';
 
 // get app's collaborator list (members and groups)
 async function handler(req: NextApiRequest): Promise<CollaboratorItemType[]> {
@@ -18,16 +19,15 @@ async function handler(req: NextApiRequest): Promise<CollaboratorItemType[]> {
     per: ReadPermissionVal
   });
 
-  const [clbs, groups] = await (async () => {
+  const [clbs, groups, orgs] = await (async () => {
     const isFolder = AppFolderTypeList.includes(app.type);
     const isInherit = app.inheritPermission;
     const isRoot = !app.parentId;
 
     if (isFolder || !isInherit || isRoot) {
       return getClbsAndGroupsWithInfo({ resourceId: app._id, resourceType: 'app', teamId });
-    } else {
-      return getClbsAndGroupsWithInfo({ resourceId: app.parentId, resourceType: 'app', teamId });
     }
+    return getClbsAndGroupsWithInfo({ resourceId: app.parentId, resourceType: 'app', teamId });
   })();
 
   const clbsWithInfo = clbs
@@ -52,7 +52,15 @@ async function handler(req: NextApiRequest): Promise<CollaboratorItemType[]> {
     };
   });
 
-  return [...clbsWithInfo, ...groupsWithInfo];
+  const orgsWithInfo = orgs.map((item) => ({
+    orgId: item.org._id,
+    teamId: item.teamId,
+    permission: new AppPermission({ per: item.permission }),
+    name: item.org.name,
+    avatar: item.org.avatar || DEFAULT_ORG_AVATAR
+  }));
+
+  return [...clbsWithInfo, ...groupsWithInfo, ...orgsWithInfo];
 }
 
 export default NextAPI(handler);
