@@ -7,6 +7,7 @@ import { useSystem } from '@fastgpt/web/hooks/useSystem';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
 import dynamic from 'next/dynamic';
 import { useUserStore } from '@/web/support/user/useUserStore';
+import { postLoginout } from '@/web/support/user/api';
 
 const LicenseData = dynamic(() => import('./LicenseData'), { ssr: false });
 const MyPopover = dynamic(() => import('@fastgpt/web/components/common/MyPopover'), { ssr: false });
@@ -14,7 +15,7 @@ const MyPopover = dynamic(() => import('@fastgpt/web/components/common/MyPopover
 export default function Header() {
   const { isPc } = useSystem();
   const router = useRouter();
-  const { initLicenseData, licenseData } = useUserStore();
+  const { initLicenseData, clearLicenseData, licenseData } = useUserStore();
 
   useRequest2(initLicenseData, {
     manual: false
@@ -60,44 +61,48 @@ export default function Header() {
         </>
       )}
 
-      <MyPopover
-        trigger="hover"
-        Trigger={
-          <HStack>
-            <Box fontSize={'sm'}>{licenseData?.company}</Box>
-            <Avatar src="/icon/user.svg" w={9} h={9} />
-          </HStack>
-        }
-        placement="bottom-end"
-        w={'192px'}
-      >
-        {({ onClose }) => (
-          <Box>
-            <LicenseData licenseData={licenseData} />
-            <Divider />
-            <Flex
-              px={1}
-              py={2}
-              mx={4}
-              mt={1}
-              mb={2}
-              cursor={'pointer'}
-              rounded={'xs'}
-              fontWeight={'medium'}
-              fontSize={'sm'}
-              _hover={{ bg: 'myGray.05', color: 'primary.600' }}
-              onClick={() => {
-                localStorage.removeItem('token');
-                router.push('/login');
-                onClose();
-              }}
-            >
-              <MyIcon name="support/account/loginoutLight" w={'18px'} mr={2} />
-              退出登录
-            </Flex>
-          </Box>
-        )}
-      </MyPopover>
+      {licenseData && (
+        <MyPopover
+          trigger="hover"
+          Trigger={
+            <HStack>
+              <Box fontSize={'sm'}>{licenseData?.company}</Box>
+              <Avatar src="/icon/user.svg" w={9} h={9} />
+            </HStack>
+          }
+          placement="bottom-end"
+          w={'192px'}
+        >
+          {({ onClose }) => (
+            <Box>
+              <LicenseData licenseData={licenseData} />
+              <Divider />
+              <Flex
+                px={1}
+                py={2}
+                mx={4}
+                mt={1}
+                mb={2}
+                cursor={'pointer'}
+                rounded={'xs'}
+                fontWeight={'medium'}
+                fontSize={'sm'}
+                _hover={{ bg: 'myGray.05', color: 'primary.600' }}
+                onClick={() => {
+                  postLoginout().then(() => {
+                    clearLicenseData();
+                    router.replace('/login');
+                    onClose();
+                  });
+                }}
+              >
+                <MyIcon name="support/account/loginoutLight" w={'18px'} mr={2} />
+                退出登录
+              </Flex>
+            </Box>
+          )}
+        </MyPopover>
+      )}
     </Flex>
   );
 }

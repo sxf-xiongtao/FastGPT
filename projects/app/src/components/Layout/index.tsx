@@ -3,11 +3,21 @@ import { Box, Flex } from '@chakra-ui/react';
 import Navbar from './Navbar';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 import Header from './Header';
+import { useRouter } from 'next/router';
+
+const unLoginPage: Record<string, boolean> = {
+  '/users/invoice': true
+};
 
 const Layout = ({ children }: { children: JSX.Element }) => {
+  const router = useRouter();
   const { isPc } = useSystem();
 
-  return (
+  const isUnLoginPage = unLoginPage[router.pathname];
+  console.log(isUnLoginPage, '---==');
+  return isUnLoginPage ? (
+    <Box p={5}>{children}</Box>
+  ) : (
     <>
       <Flex h={'100%'} bg={'myGray.100'} flexDirection={'column'}>
         <Header />

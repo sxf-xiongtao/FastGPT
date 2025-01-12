@@ -7,17 +7,28 @@ import { immer } from 'zustand/middleware/immer';
 type State = {
   licenseData?: LicenseDataType;
   initLicenseData: () => Promise<void>;
+  clearLicenseData: () => void;
 };
 
 export const useUserStore = create<State>()(
   devtools(
     immer((set, get) => ({
       licenseData: undefined,
+      clearLicenseData: () => {
+        set((state) => {
+          state.licenseData = undefined;
+        });
+      },
       initLicenseData: async () => {
         try {
           const licenseData = await getLicenseData();
-          set({ licenseData });
+          set((state) => {
+            state.licenseData = licenseData;
+          });
         } catch (error) {
+          set((state) => {
+            state.licenseData = undefined;
+          });
           console.error(error);
         }
       }
