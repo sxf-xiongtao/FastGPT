@@ -29,9 +29,9 @@ import { PluginSourceEnum } from '@fastgpt/global/core/plugin/constants';
 import { useTranslation } from 'next-i18next';
 import { useConfirm } from '@fastgpt/web/hooks/useConfirm';
 import FillRowTabs from '@fastgpt/web/components/common/Tabs/FillRowTabs';
-import { WorkflowTemplateBasicType } from '@fastgpt/global/core/workflow/type';
 import { AppTemplateSchemaType, TemplateTypeSchemaType } from '@fastgpt/global/core/app/type';
 import dynamic from 'next/dynamic';
+import { getAppType } from '@fastgpt/global/core/app/utils';
 
 export const defaultTemplate: AppTemplateSchemaType = {
   templateId: '',
@@ -248,7 +248,7 @@ const TemplateConfigModal = ({
   useEffect(() => {
     try {
       const workflow = JSON.parse(workflowStr);
-      setValue('type', getTemplateType(workflow));
+      setValue('type', getAppType(workflow));
     } catch (err) {
       console.error('获取应用类型失败:', err);
     }
@@ -357,8 +357,8 @@ const TemplateConfigModal = ({
                 <Flex
                   align={'center'}
                   justify={'center'}
-                  w={'31rem'}
-                  h={'17.5rem'}
+                  w={'full'}
+                  h={'136px'}
                   borderRadius={'md'}
                   border={'1px dashed'}
                   borderColor={'myGray.400'}
@@ -480,16 +480,3 @@ const TemplateConfigModal = ({
 export default dynamic(() => Promise.resolve(TemplateConfigModal), {
   ssr: false
 });
-
-const getTemplateType = (workflow?: WorkflowTemplateBasicType) => {
-  if (!workflow) return '';
-  if (!Array.isArray(workflow.nodes)) return '';
-
-  if (workflow.nodes.some((node) => node.flowNodeType === 'workflowStart')) {
-    return 'advanced';
-  }
-  if (workflow.nodes.some((node) => node.flowNodeType === 'pluginInput')) {
-    return 'plugin';
-  }
-  return '';
-};
