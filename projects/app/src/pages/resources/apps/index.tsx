@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   Button,
   Table,
@@ -28,8 +28,7 @@ const AppTable = ({ FE_URL }: InferGetServerSidePropsType<typeof getServerSidePr
     data: apps,
     isLoading,
     ScrollData
-  } = usePagination({
-    api: getApps,
+  } = usePagination(getApps, {
     pageSize: 20,
     type: 'scroll'
   });

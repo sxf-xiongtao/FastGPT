@@ -138,7 +138,9 @@ export function formatConfigStore2FormSchema({
       wecom: {
         corpid: fastgptPro?.auth?.wecom?.corpid || '',
         secret: fastgptPro?.auth?.wecom?.secret || '',
-        agentid: fastgptPro?.auth?.wecom?.agentid || ''
+        agentid: fastgptPro?.auth?.wecom?.agentid || '',
+        syncSecret: fastgptPro?.auth?.wecom?.syncSecret || '',
+        isSync: fastgptPro?.auth?.wecom?.isSync || false
       },
       fastLogin: JSON.stringify(fastgptPro.fastLogin || {}, null, 2)
     },
@@ -196,9 +198,8 @@ export function formatFormData2ConfigStore({
       dingtalk: dingtalk?.clientId,
       wechat: wechat?.appID,
       wecom:
-        wecom?.secret && wecom?.corpid && wecom?.agentid
+        wecom?.corpid && wecom?.agentid
           ? {
-              secret: wecom?.secret,
               corpid: wecom?.corpid,
               agentid: wecom?.agentid
             }
@@ -214,6 +215,9 @@ export function formatFormData2ConfigStore({
     sso,
     register_method: (() => {
       const methods = [];
+      if (loginSettings.wecom?.isSync) {
+        methods.push('sync');
+      }
       if (loginSettings?.email?.register) {
         methods.push('email');
       }
@@ -221,7 +225,7 @@ export function formatFormData2ConfigStore({
         methods.push('phone');
       }
       return methods;
-    })() as ['email' | 'phone'],
+    })() as ['email' | 'phone' | 'sync'],
     login_method: (() => {
       const methods = [];
       if (loginSettings?.email?.register) {

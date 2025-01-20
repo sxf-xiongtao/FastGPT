@@ -6,11 +6,12 @@ import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSc
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
 import { NextAPI } from '@/service/middleware/entry';
-import { PagingData } from '@/types';
 import { MongoDatasetData } from '@fastgpt/service/core/dataset/data/schema';
 import { getVectorCountByDatasetId } from '@fastgpt/service/common/vectorStore/controller';
+import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
 
-export type GetDatasetsResponseData = PagingData<{
+export type GetDatasetsResponseData = PaginationResponse<{
   id: string;
   teamId: string;
   name: string;
@@ -23,17 +24,14 @@ export type GetDatasetsResponseData = PagingData<{
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   await adminCert({ req, authToken: true });
 
-  const { pageNum = 1, pageSize = 20 } = req.body as {
-    pageNum: number;
-    pageSize: number;
-  };
+  const { offset, pageSize } = parsePaginationRequest(req);
 
   const match = {};
 
   const [records, total] = await Promise.all([
     MongoDataset.find(match, 'name intro teamId tmbId', { ...readFromSecondary })
       .sort({ createTime: -1 })
-      .skip((pageNum - 1) * pageSize)
+      .skip(offset)
       .limit(pageSize),
     MongoDataset.countDocuments(match, { ...readFromSecondary })
   ]);
@@ -119,9 +117,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   jsonRes(res, {
     data: {
-      pageNum,
-      pageSize,
-      data: datasets,
+      list: datasets,
       total
     }
   });

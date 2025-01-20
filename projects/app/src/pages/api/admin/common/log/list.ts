@@ -4,14 +4,14 @@ import { adminCert } from '@/service/support/permission/adminCert';
 import { LogLevelEnum } from '@fastgpt/service/common/system/log/constant';
 import { getMongoLog } from '@fastgpt/service/common/system/log/schema';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
+import { PaginationProps } from '@fastgpt/web/common/fetch/type';
+import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
 export type listQuery = {};
 
-export type listBody = {
-  pageNum: number;
-  pageSize: number;
+export type listBody = PaginationProps<{
   search?: string;
   logLevel?: LogLevelEnum[];
-};
+}>;
 
 export type listResponse = {};
 
@@ -20,7 +20,8 @@ async function handler(
   res: ApiResponseType<any>
 ): Promise<listResponse> {
   await adminCert({ req, authToken: true });
-  const { pageNum = 1, pageSize = 10, search, logLevel = [3] } = req.body;
+  const { search, logLevel = [3] } = req.body;
+  const { offset, pageSize } = parsePaginationRequest(req);
   const match = {
     level: {
       $in: logLevel
@@ -30,7 +31,7 @@ async function handler(
   const [records, total] = await Promise.all([
     getMongoLog()
       .find(match, undefined, {
-        skip: (pageNum - 1) * pageSize,
+        skip: offset,
         limit: pageSize,
         ...readFromSecondary
       })

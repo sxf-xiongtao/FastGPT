@@ -30,8 +30,7 @@ const DatasetTable = ({ FE_URL }: InferGetServerSidePropsType<typeof getServerSi
     data: datasets,
     isLoading,
     ScrollData
-  } = usePagination({
-    api: getDatasets,
+  } = usePagination(getDatasets, {
     pageSize: 20,
     type: 'scroll'
   });

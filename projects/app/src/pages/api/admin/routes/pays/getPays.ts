@@ -6,26 +6,26 @@ import { BillStatusEnum, BillTypeEnum } from '@fastgpt/global/support/wallet/bil
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { NextAPI } from '@/service/middleware/entry';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
-import { PagingData } from '@/types';
 import { BillSchemaType } from '@fastgpt/global/support/wallet/bill/type';
 import { UserModelSchema } from '@fastgpt/global/support/user/type';
+import { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
 
-export type GetPaysBody = {
-  pageNum: number;
-  pageSize: number;
+export type GetPaysBody = PaginationProps<{
   type?: BillTypeEnum;
   status?: BillStatusEnum;
   username: string;
-};
-export type GetPaysResponse = PagingData<BillSchemaType & { username: string }>;
+}>;
+export type GetPaysResponse = PaginationResponse<BillSchemaType & { username: string }>;
 
 async function handler(
   req: ApiRequestProps<GetPaysBody>,
-  res: NextApiResponse
+  _res: NextApiResponse
 ): Promise<GetPaysResponse> {
   await adminCert({ req, authToken: true });
 
-  const { pageNum = 1, pageSize = 20, type, status, username } = req.body;
+  const { type, status, username } = req.body;
+  const { offset, pageSize } = parsePaginationRequest(req);
 
   const match = await (async () => {
     if (username) {
@@ -50,11 +50,7 @@ async function handler(
   })();
 
   const [records, total] = await Promise.all([
-    MongoBill.find(match)
-      .sort({ createTime: -1 })
-      .skip((pageNum - 1) * pageSize)
-      .limit(pageSize)
-      .lean(),
+    MongoBill.find(match).sort({ createTime: -1 }).skip(offset).limit(pageSize).lean(),
     MongoBill.countDocuments(match)
   ]);
 
@@ -73,9 +69,7 @@ async function handler(
   );
 
   return {
-    pageNum,
-    pageSize,
-    data: newRecords,
+    list: newRecords,
     total
   };
 }

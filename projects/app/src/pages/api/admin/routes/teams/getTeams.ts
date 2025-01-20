@@ -5,8 +5,8 @@ import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
-import { PagingData } from '@/types';
 import { UserModelSchema } from '@fastgpt/global/support/user/type';
+import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
 
 type Team = {
   id: string;
@@ -17,7 +17,7 @@ type Team = {
   owner: UserModelSchema;
 };
 
-export type getTeamsResponse = PagingData<Team>;
+export type getTeamsResponse = PaginationResponse<Team>;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

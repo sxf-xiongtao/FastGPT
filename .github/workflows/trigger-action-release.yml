@@ -1,0 +1,29 @@
+name: Release fastgpt-pro images
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  trigger-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get tag
+        id: get_tag
+        run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.GH_PAT }}
+          repository: labring-actions/fastgpt-pro-action
+          event-type: release
+          client-payload: |
+            {
+              "ref": "${{ github.ref }}",
+              "sha": "${{ github.sha }}",
+              "tag": "${{ steps.get_tag.outputs.TAG }}",
+              "release_name": "${{ steps.get_tag.outputs.TAG }}",
+              "release_body": "自动打包"
+            }

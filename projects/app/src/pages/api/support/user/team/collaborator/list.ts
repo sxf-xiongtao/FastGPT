@@ -39,7 +39,7 @@ async function handler(
           isOwner: item.tmb.role === TeamMemberRoleEnum.owner
         }),
         name: item.tmb.name,
-        avatar: item.tmb.user.avatar
+        avatar: item.tmb.avatar
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name));

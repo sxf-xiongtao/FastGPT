@@ -1,8 +1,8 @@
 import { ClientSession } from '@fastgpt/service/common/mongo';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
-import { findAppAndAllChildren } from '@fastgpt/service/core/app/controller';
 import { MongoApp } from '@fastgpt/service/core/app/schema';
 import { findDatasetAndAllChildren } from '@fastgpt/service/core/dataset/controller';
+import { findAppAndAllChildren } from '@fastgpt/service/core/app/controller';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { MongoOpenApi } from '@fastgpt/service/support/openapi/schema';
 import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';

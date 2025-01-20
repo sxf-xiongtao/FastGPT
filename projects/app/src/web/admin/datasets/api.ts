@@ -1,6 +1,6 @@
 import { POST } from '@/service/common/request';
-import { RequestPaging } from '@/types';
 import type { GetDatasetsResponseData } from '@/pages/api/admin/routes/datasets/getDatasets';
+import { PaginationProps } from '@fastgpt/web/common/fetch/type';
 
-export const getDatasets = (data: RequestPaging) =>
+export const getDatasets = (data: PaginationProps) =>
   POST<GetDatasetsResponseData>('/admin/routes/datasets/getDatasets', data);

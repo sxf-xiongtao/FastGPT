@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   Table,
   Thead,
@@ -34,8 +34,7 @@ const TeamTable = () => {
     isLoading,
     ScrollData,
     getData
-  } = usePagination({
-    api: getTeams,
+  } = usePagination(getTeams, {
     pageSize: 20,
     params: {
       search

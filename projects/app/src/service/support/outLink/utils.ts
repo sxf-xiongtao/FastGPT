@@ -89,6 +89,10 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
       mode: 'chat',
       runningAppInfo: {
         id: String(app._id),
+        teamId: app.teamId,
+        tmbId: app.tmbId
+      },
+      runningUserInfo: {
         teamId: outLinkConfig.teamId,
         tmbId: outLinkConfig.tmbId
       },

@@ -7,6 +7,7 @@ import { MongoDatasetCollectionTags } from '@fastgpt/service/core/dataset/tag/sc
 import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { replaceRegChars } from '@fastgpt/global/common/string/tools';
+import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
 
 export type GetDatasetTagsProps = PaginationProps<{
   datasetId: string;
@@ -16,7 +17,8 @@ export type GetDatasetTagsProps = PaginationProps<{
 async function handler(
   req: ApiRequestProps<GetDatasetTagsProps, {}>
 ): Promise<PaginationResponse<DatasetTagType>> {
-  let { datasetId, pageSize, offset, searchText } = req.body;
+  let { datasetId, searchText } = req.body;
+  const { offset, pageSize } = parsePaginationRequest(req);
   if (!datasetId) {
     return Promise.reject(CommonErrEnum.missingParams);
   }

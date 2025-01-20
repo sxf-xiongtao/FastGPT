@@ -14,7 +14,7 @@ const Layout = ({ children }: { children: JSX.Element }) => {
   const { isPc } = useSystem();
 
   const isUnLoginPage = unLoginPage[router.pathname];
-  console.log(isUnLoginPage, '---==');
+
   return isUnLoginPage ? (
     <Box p={5}>{children}</Box>
   ) : (

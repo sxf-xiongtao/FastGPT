@@ -128,6 +128,7 @@ export const useFeishuDatasetRequest = ({ feishuServer }: { feishuServer: Feishu
         parentId: file.parent_token,
         name: file.name,
         type: file.type === 'folder' ? ('folder' as const) : ('file' as const),
+        hasChild: file.type === 'folder',
         updateTime: new Date(file.modified_time * 1000),
         createTime: new Date(file.created_time * 1000)
       }));

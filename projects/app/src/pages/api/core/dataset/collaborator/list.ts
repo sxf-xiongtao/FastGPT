@@ -47,7 +47,7 @@ async function handler(
         teamId: item.teamId,
         permission: new DatasetPermission({ per: item.permission }),
         name: item.tmb.name,
-        avatar: item.tmb.user.avatar
+        avatar: item.tmb.avatar
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name));

@@ -42,12 +42,13 @@ async function handler(
 
   // 查找插件
   const plugin = await MongoSystemPlugin.findOne({ pluginId });
-  if (!plugin) {
-    return Promise.reject('plugin not found');
-  }
+  // if (!plugin) {
+  //   return Promise.reject('plugin not found');
+  // }
 
   // 基础更新字段
   const baseUpdateFields = {
+    pluginId,
     isActive: updateFields.isActive,
     inputConfig: updateFields.inputConfig,
     originCost: updateFields.originCost,
@@ -56,7 +57,7 @@ async function handler(
   };
 
   // 如果是自定义插件,需要更新 customConfig
-  if (plugin.customConfig) {
+  if (plugin && plugin.customConfig) {
     const isUpdateVersion =
       !isEqual(plugin.customConfig.workflow, updateFields.workflow) ||
       plugin.customConfig.name !== updateFields.name ||

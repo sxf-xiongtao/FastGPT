@@ -11,6 +11,7 @@ import type { OauthLoginProps } from '@fastgpt/global/support/user/api';
 import { UserErrEnum } from '@fastgpt/global/common/error/code/user';
 import { trackBaiduConversion } from '@/service/common/tracking/baidu';
 import { pushTrack } from '@fastgpt/service/common/middle/tracks/utils';
+import { wecomUserPrefix } from '@/global/support/user/constants';
 
 type OauthResponse = {
   username: string;
@@ -260,7 +261,7 @@ export async function authWecom(code: string): Promise<OauthResponse> {
   const { data: userInfo } = await axios.get(getDetailedInfoURL.toString());
 
   return {
-    username: 'wecom-' + userid,
+    username: `${wecomUserPrefix}-${userid}`,
     concat: userInfo.mobile || userInfo.email || '',
     avatarUrl: userInfo.avatar || ''
   };

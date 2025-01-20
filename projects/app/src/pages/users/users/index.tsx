@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
   Button,
   Table,
@@ -14,8 +14,7 @@ import {
   HStack,
   InputGroup,
   Input,
-  InputLeftElement,
-  useMediaQuery
+  InputLeftElement
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import MyIcon from '@fastgpt/web/components/common/Icon';
@@ -40,8 +39,7 @@ const UserTable = () => {
     isLoading,
     ScrollData,
     getData
-  } = usePagination({
-    api: getUsers,
+  } = usePagination(getUsers, {
     pageSize: 20,
     params: {
       username: search

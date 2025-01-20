@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   Button,
   Table,
@@ -14,8 +14,7 @@ import {
   HStack,
   InputGroup,
   Input,
-  InputLeftElement,
-  useMediaQuery
+  InputLeftElement
 } from '@chakra-ui/react';
 import type { BillSchemaType } from '@fastgpt/global/support/wallet/bill/type.d';
 import dayjs from 'dayjs';
@@ -105,13 +104,12 @@ const BillTable = () => {
     data: bills,
     isLoading,
     ScrollData
-  } = usePagination({
-    api: getPays,
+  } = usePagination(getPays, {
     pageSize: 20,
     params: {
-      type: billType,
-      status: billStatus,
-      username
+      type: billType === '' ? undefined : billType,
+      status: billStatus === '' ? undefined : billStatus,
+      username: username ?? ''
     },
     type: 'scroll',
     refreshDeps: [billType, billStatus, username]

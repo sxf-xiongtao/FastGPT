@@ -1,12 +1,26 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { authCert } from '@fastgpt/service/support/permission/auth/common';
-import { getTeamMembers } from '@/service/support/user/team/controller';
+import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
+import { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import { getTeamMembersPaged } from '@/service/support/user/team/controller';
+import { TeamMemberItemType } from '@fastgpt/global/support/user/team/type';
+import { authCert } from '@fastgpt/service/support/permission/auth/common';
+import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
 
-async function handler(req: NextApiRequest, _res: NextApiResponse) {
+export type MemberListQuery = PaginationProps;
+export type MemberListBody = {};
+export type MemberListResponse = PaginationResponse<TeamMemberItemType>;
+
+async function handler(
+  req: ApiRequestProps<MemberListBody, MemberListQuery>,
+  _res: ApiResponseType<any>
+): Promise<MemberListResponse> {
   const { teamId } = await authCert({ req, authToken: true });
+  const { offset, pageSize } = parsePaginationRequest(req);
 
-  return getTeamMembers(teamId);
+  return getTeamMembersPaged({
+    teamId,
+    offset,
+    pageSize
+  });
 }
-
 export default NextAPI(handler);

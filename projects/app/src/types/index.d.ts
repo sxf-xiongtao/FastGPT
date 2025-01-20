@@ -7,20 +7,6 @@ import {
   SystemEnvType
 } from '@fastgpt/global/common/system/types';
 
-export type PagingData<T = never> = {
-  pageNum: number;
-  pageSize: number;
-  data: T[];
-  total?: number;
-};
-
-export type PagingParams<T = Record<string, any>> = {
-  pageNum: number;
-  pageSize: number;
-} & T;
-
-export type RequestPaging = { pageNum: number; pageSize: number; [key]: any };
-
 export type SystemConfigType = {
   // license: string;
   censor?: {
@@ -78,6 +64,8 @@ export type SystemConfigType = {
       corpid: string;
       secret: string;
       agentid: string;
+      syncSecret: string;
+      isSync: boolean;
     };
   };
   pay?: {

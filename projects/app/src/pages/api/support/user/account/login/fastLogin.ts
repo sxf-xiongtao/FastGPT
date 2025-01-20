@@ -5,7 +5,15 @@ import { connectToDatabase } from '@/service/mongo';
 import { setCookie } from '@fastgpt/service/support/permission/controller';
 import { usernameLogin } from '@/service/support/user/controller';
 import type { FastLoginProps } from '@fastgpt/global/support/user/api';
-import { FastLoginAuthResponse } from '@/global/user/login/api';
+
+type FastLoginAuthResponse = {
+  success: boolean;
+  message: string;
+  data: {
+    username: string;
+    avatar?: string;
+  };
+};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {

@@ -37,7 +37,7 @@ async function handler(req: NextApiRequest): Promise<CollaboratorItemType[]> {
         teamId: item.teamId,
         permission: new AppPermission({ per: item.permission }),
         name: item.tmb.name,
-        avatar: item.tmb.user.avatar
+        avatar: item.tmb.avatar
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name));

@@ -530,7 +530,7 @@ export const getUserFormConfig = (): FormConfig => {
         wecom: {
           type: 'object',
           key: 'loginSettings.wecom',
-          title: '企业微信登录',
+          title: '企业微信配置',
           properties: {
             corpid: {
               key: 'loginSettings.wecom.corpid',
@@ -549,6 +549,19 @@ export const getUserFormConfig = (): FormConfig => {
               type: 'string',
               title: '企业微信应用 Secret',
               description: '对应企业微信应用的「Secret」'
+            },
+            syncSecret: {
+              key: 'loginSettings.wecom.syncSecret',
+              type: 'string',
+              title: '企业微信通讯录同步助手的Secret',
+              description: '用于访问企业微信通讯录'
+            },
+            isSync: {
+              key: 'loginSettings.wecom.isSync',
+              type: 'boolean',
+              title: '是否开启从企业微信同步用户',
+              description:
+                '开启后，将无法使用注册功能。将每 24 小时从企业微信同步一次用户信息，也可以在前端手动进行同步。'
             }
           }
         },

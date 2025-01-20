@@ -37,12 +37,9 @@ const LogTable = () => {
 
   const {
     data: logs,
-    setData: setLogs,
     isLoading,
-    ScrollData,
-    getData
-  } = usePagination({
-    api: getSystemLogList,
+    ScrollData
+  } = usePagination(getSystemLogList, {
     pageSize: 20,
     params: {
       search,
@@ -173,7 +170,7 @@ function LevelPopover({
         </Flex>
       }
     >
-      {({ onClose }) => {
+      {() => {
         return (
           <>
             {options.map((l: LogLevelEnum) => {

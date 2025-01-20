@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
-import { getTeamMember, removeUser } from '@/service/support/user/team/controller';
+import { getTeamMember } from '@/service/support/user/team/controller';
 import { DelMemberProps } from '@fastgpt/global/support/user/team/controller';
 import { authMemberPermission } from '@/service/support/permission/team/auth';
 import {
@@ -8,8 +8,9 @@ import {
   OwnerPermissionVal
 } from '@fastgpt/global/support/permission/constant';
 import { NextAPI } from '@/service/middleware/entry';
+import { removeUserFromTeam } from '@/service/support/user/controller';
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, _res: NextApiResponse) {
   const { tmbId: memberId } = req.query as DelMemberProps;
   const { teamId, tmbId } = await authCert({ req, authToken: true });
 
@@ -25,7 +26,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     await authMemberPermission({ teamId, tmbId, permission: ManagePermissionVal });
   }
 
-  await removeUser({
+  await removeUserFromTeam({
     teamId,
     memberId
   });

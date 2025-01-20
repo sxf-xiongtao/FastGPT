@@ -4,22 +4,18 @@ import { connectToDatabase } from '@/service/mongo';
 import { MongoBill } from '@/service/support/wallet/bill/schema';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
-import type { PagingData } from '@/types';
 import { BillSchemaType } from '@fastgpt/global/support/wallet/bill/type';
 import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
+import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const {
-      pageNum = 1,
-      pageSize = 20,
-      type
-    } = req.body as {
-      pageNum: number;
-      pageSize: number;
+    const { type } = req.body as {
       type?: BillTypeEnum;
     };
+    const { offset, pageSize } = parsePaginationRequest(req);
     await connectToDatabase();
     const { teamId } = await authUserPer({ req, authToken: true, per: ReadPermissionVal });
 
@@ -34,16 +30,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         ...readFromSecondary
       })
         .sort({ createTime: -1 })
-        .skip((pageNum - 1) * pageSize)
+        .skip(offset)
         .limit(pageSize),
       MongoBill.countDocuments(match, { ...readFromSecondary })
     ]);
 
-    jsonRes<PagingData<BillSchemaType>>(res, {
+    jsonRes<PaginationResponse<BillSchemaType>>(res, {
       data: {
-        pageNum,
-        pageSize,
-        data: records,
+        list: records,
         total
       }
     });

@@ -98,54 +98,61 @@ export const useYuqueDatasetRequest = ({ yuqueServer }: { yuqueServer: YuqueServ
     let files: APIFileItem[] = [];
 
     if (!parentId) {
-      const data = await request<yuqueRepoListResponse>(
-        `/api/v2/groups/${yuqueServer.userId}/repos`,
-        {},
-        'GET'
-      );
+      const limit = 100;
+      let offset = 0;
+      let allData: yuqueRepoListResponse = [];
 
-      files = data.map((item) => {
+      while (true) {
+        const data = await request<yuqueRepoListResponse>(
+          `/api/v2/groups/${yuqueServer.userId}/repos`,
+          {
+            offset,
+            limit
+          },
+          'GET'
+        );
+
+        if (!data || data.length === 0) break;
+
+        allData = [...allData, ...data];
+        if (data.length < limit) break;
+
+        offset += limit;
+      }
+
+      files = allData.map((item) => {
         return {
           id: item.id,
           name: item.name,
           parentId: null,
           type: 'folder',
           updateTime: item.updated_at,
-          createTime: item.created_at
+          createTime: item.created_at,
+          hasChild: true
         };
       });
     } else {
-      let offset = 0;
       if (typeof parentId === 'number') {
         const data = await request<yuqueTocListResponse>(
           `/api/v2/repos/${parentId}/toc`,
-          {
-            offset,
-            limit: 100
-          },
+          {},
           'GET'
         );
 
         return data
-          .filter((item) => !item.parent_uuid)
+          .filter((item) => !item.parent_uuid && item.type !== 'LINK')
           .map((item) => ({
             id: `${parentId}-${item.id}-${item.uuid}`,
             name: item.title,
             parentId: item.parent_uuid,
             type: item.type === 'TITLE' ? ('folder' as const) : ('file' as const),
             updateTime: new Date(),
-            createTime: new Date()
+            createTime: new Date(),
+            hasChild: !!item.child_uuid
           }));
       } else {
-        const [repoId, uuid, parentUuid] = parentId.split('-');
-        const data = await request<yuqueTocListResponse>(
-          `/api/v2/repos/${repoId}/toc`,
-          {
-            offset,
-            limit: 100
-          },
-          'GET'
-        );
+        const [repoId, uuid, parentUuid] = parentId.split(/-(.*?)-(.*)/);
+        const data = await request<yuqueTocListResponse>(`/api/v2/repos/${repoId}/toc`, {}, 'GET');
 
         return data
           .filter((item) => item.parent_uuid === parentUuid)
@@ -155,7 +162,8 @@ export const useYuqueDatasetRequest = ({ yuqueServer }: { yuqueServer: YuqueServ
             parentId: item.parent_uuid,
             type: item.type === 'TITLE' ? ('folder' as const) : ('file' as const),
             updateTime: new Date(),
-            createTime: new Date()
+            createTime: new Date(),
+            hasChild: !!item.child_uuid
           }));
       }
     }
@@ -170,7 +178,7 @@ export const useYuqueDatasetRequest = ({ yuqueServer }: { yuqueServer: YuqueServ
   };
 
   const getFileContent = async ({ apiFileId }: { apiFileId: string }) => {
-    const [parentId, fileId] = apiFileId.split('-');
+    const [parentId, fileId] = apiFileId.split(/-(.*?)-(.*)/);
 
     const data = await request<{ body: string }>(
       `/api/v2/repos/${parentId}/docs/${fileId}`,
@@ -182,7 +190,7 @@ export const useYuqueDatasetRequest = ({ yuqueServer }: { yuqueServer: YuqueServ
   };
 
   const getFilePreviewUrl = async ({ apiFileId }: { apiFileId: string }) => {
-    const [parentId, fileId] = apiFileId.split('-');
+    const [parentId, fileId] = apiFileId.split(/-(.*?)-(.*)/);
 
     const { slug: parentSlug } = await request<{ slug: string }>(
       `/api/v2/repos/${parentId}`,

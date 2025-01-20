@@ -10,6 +10,7 @@ import { AppDefaultPermissionVal } from '@fastgpt/global/support/permission/app/
 import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
 import { AppPermission } from '@fastgpt/global/support/permission/app/controller';
 import { AppTypeEnum } from '@fastgpt/global/core/app/constants';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -36,20 +37,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
       .lean();
 
+    const tmbList = await MongoTeamMember.find({
+      teamId,
+      _id: { $in: apps.map((app) => app.tmbId) }
+    }).lean();
+
     jsonRes<AppListItemType[]>(res, {
-      data: apps.map((app) => ({
-        _id: app._id,
-        tmbId: app.tmbId,
-        name: app.name,
-        avatar: app.avatar,
-        intro: app.intro,
-        updateTime: app.updateTime,
-        isOwner: false,
-        defaultPermission: AppDefaultPermissionVal,
-        type: app.type,
-        permission: new AppPermission({ per: ReadPermissionVal }),
-        inheritPermission: app.inheritPermission
-      }))
+      data: apps.map((app) => {
+        const tmb = tmbList.find((tmb) => String(tmb._id) === String(app.tmbId))!;
+        return {
+          _id: app._id,
+          tmbId: app.tmbId,
+          name: app.name,
+          avatar: app.avatar,
+          intro: app.intro,
+          updateTime: app.updateTime,
+          isOwner: false,
+          defaultPermission: AppDefaultPermissionVal,
+          type: app.type,
+          permission: new AppPermission({ per: ReadPermissionVal }),
+          inheritPermission: app.inheritPermission,
+          sourceMember: {
+            name: tmb.name,
+            avatar: tmb.avatar,
+            status: tmb.status
+          }
+        };
+      })
     });
   } catch (err) {
     jsonRes(res, {

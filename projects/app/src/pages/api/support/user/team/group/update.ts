@@ -10,9 +10,6 @@ import {
   authGroupMemberRole,
   getGroupMembersByGroupId
 } from '@fastgpt/service/support/permission/memberGroup/controllers';
-import { getTeamMembers } from '@/service/support/user/team/controller';
-import { concat } from 'lodash';
-import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { refreshSourceAvatar } from '@fastgpt/service/common/file/image/controller';
 
 export type GroupUpdateQuery = {};
@@ -76,22 +73,6 @@ async function handler(
         role: ['admin', 'owner']
       });
     })();
-
-    // check if the new admin/owner active
-    // get all active members
-    if (isRoleChanged) {
-      const activeMembers = (await getTeamMembers(teamId))
-        .filter((item) => item.status === 'active')
-        .map((item) => String(item.tmbId));
-
-      if (
-        concat(newAdminList, newOwner).some(
-          (item) => item && !activeMembers.includes(String(item.tmbId))
-        )
-      ) {
-        return Promise.reject(TeamErrEnum.userNotActive);
-      }
-    }
 
     return {
       teamId

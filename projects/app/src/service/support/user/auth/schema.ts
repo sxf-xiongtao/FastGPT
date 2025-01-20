@@ -1,6 +1,6 @@
 import { connectionMongo, getMongoModel, type Model } from '@fastgpt/service/common/mongo';
 const { Schema, model, models } = connectionMongo;
-import { UserAuthSchemaType } from '@/global/user/auth/type.d';
+import { UserAuthSchemaType } from '@/global/support/user/auth/type';
 import { userAuthTypeMap } from '@fastgpt/global/support/user/auth/constants';
 
 /* 

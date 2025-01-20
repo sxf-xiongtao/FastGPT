@@ -12,8 +12,7 @@ import {
   HStack,
   InputGroup,
   Input,
-  InputLeftElement,
-  useMediaQuery
+  InputLeftElement
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import MyIcon from '@fastgpt/web/components/common/Icon';
@@ -50,8 +49,7 @@ const PlanTable = () => {
     isLoading,
     ScrollData,
     getData
-  } = usePagination({
-    api: getPlans,
+  } = usePagination(getPlans, {
     pageSize: 20,
     params: {
       search
