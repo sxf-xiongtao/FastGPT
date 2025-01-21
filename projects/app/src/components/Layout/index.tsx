@@ -4,6 +4,7 @@ import Navbar from './Navbar';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 import Header from './Header';
 import { useRouter } from 'next/router';
+import { useUserStore } from '@/web/support/user/useUserStore';
 
 const unLoginPage: Record<string, boolean> = {
   '/users/invoice': true
@@ -12,10 +13,11 @@ const unLoginPage: Record<string, boolean> = {
 const Layout = ({ children }: { children: JSX.Element }) => {
   const router = useRouter();
   const { isPc } = useSystem();
+  const { licenseData } = useUserStore();
 
   const isUnLoginPage = unLoginPage[router.pathname];
 
-  return isUnLoginPage ? (
+  return isUnLoginPage && !licenseData ? (
     <Box p={5}>{children}</Box>
   ) : (
     <>

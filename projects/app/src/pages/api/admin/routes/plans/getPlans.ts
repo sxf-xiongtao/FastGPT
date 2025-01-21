@@ -5,76 +5,69 @@ import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
-import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
+import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import { NextAPI } from '@/service/middleware/entry';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    await connectToDatabase();
-    await adminCert({ req, authToken: true });
+type ResponseType = PaginationResponse<any>;
 
-    const {
-      pageNum = 1,
-      pageSize = 20,
-      search
-    } = req.body as {
-      pageNum: number;
-      pageSize: number;
-      search: string;
-    };
+async function handler(req: NextApiRequest, res: NextApiResponse): Promise<ResponseType> {
+  await adminCert({ req, authToken: true });
 
-    const users = await MongoUser.find({
-      username: new RegExp(search, 'i')
-    });
-    const teams = await MongoTeam.find({ ownerId: { $in: users.map((user) => user._id) } });
+  const {
+    pageNum = 1,
+    pageSize = 20,
+    search
+  } = req.body as {
+    pageNum: number;
+    pageSize: number;
+    search: string;
+  };
 
-    const [records, total] = await Promise.all([
-      MongoTeamSub.find({ teamId: { $in: teams.map((team) => team._id) } })
-        .sort({ startTime: -1 })
-        .skip((pageNum - 1) * pageSize)
-        .limit(pageSize),
-      MongoTeamSub.countDocuments({ teamId: { $in: teams.map((team) => team._id) } })
-    ]);
+  const users = await MongoUser.find({
+    username: new RegExp(search, 'i')
+  });
+  const teams = await MongoTeam.find({ ownerId: { $in: users.map((user) => user._id) } });
 
-    const plans = await Promise.all(
-      records.map(async (plan) => {
-        const team = await MongoTeam.findOne({
-          _id: plan.teamId
-        });
+  const [records, total] = await Promise.all([
+    MongoTeamSub.find({ teamId: { $in: teams.map((team) => team._id) } })
+      .sort({ startTime: -1 })
+      .skip((pageNum - 1) * pageSize)
+      .limit(pageSize),
+    MongoTeamSub.countDocuments({ teamId: { $in: teams.map((team) => team._id) } })
+  ]);
 
-        if (!team) return Promise.reject('团队不存在');
+  const plans = await Promise.all(
+    records.map(async (plan) => {
+      const team = await MongoTeam.findOne({
+        _id: plan.teamId
+      });
 
-        const owner = await MongoUser.findOne({
-          _id: team?.ownerId
-        });
+      if (!team) return Promise.reject('团队不存在');
 
-        return {
-          id: plan._id,
-          type: plan.type,
-          level: plan.currentSubLevel,
-          totalPoints: plan.totalPoints,
-          surplusPoints: plan.surplusPoints,
-          extraDatasetSize: plan.currentExtraDatasetSize,
-          startTime: plan.startTime,
-          expiredTime: plan.expiredTime,
-          teamName: team?.name,
-          teamId: plan.teamId,
-          userName: owner?.username
-        };
-      })
-    );
+      const owner = await MongoUser.findOne({
+        _id: team?.ownerId
+      });
 
-    jsonRes(res, {
-      data: {
-        pageNum,
-        pageSize,
-        data: plans,
-        total
-      }
-    });
-  } catch (err) {
-    jsonRes(res, {
-      code: 500,
-      error: err
-    });
-  }
+      return {
+        id: plan._id,
+        type: plan.type,
+        level: plan.currentSubLevel,
+        totalPoints: plan.totalPoints,
+        surplusPoints: plan.surplusPoints,
+        extraDatasetSize: plan.currentExtraDatasetSize,
+        startTime: plan.startTime,
+        expiredTime: plan.expiredTime,
+        teamName: team?.name,
+        teamId: plan.teamId,
+        userName: owner?.username
+      };
+    })
+  );
+
+  return {
+    list: plans,
+    total
+  };
 }
+
+export default NextAPI(handler);

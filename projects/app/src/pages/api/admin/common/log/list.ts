@@ -4,8 +4,9 @@ import { adminCert } from '@/service/support/permission/adminCert';
 import { LogLevelEnum } from '@fastgpt/service/common/system/log/constant';
 import { getMongoLog } from '@fastgpt/service/common/system/log/schema';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
-import { PaginationProps } from '@fastgpt/web/common/fetch/type';
+import { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
+import { SystemLogType } from '@fastgpt/service/common/system/log/type';
 export type listQuery = {};
 
 export type listBody = PaginationProps<{
@@ -13,7 +14,7 @@ export type listBody = PaginationProps<{
   logLevel?: LogLevelEnum[];
 }>;
 
-export type listResponse = {};
+export type listResponse = PaginationResponse<SystemLogType>;
 
 async function handler(
   req: ApiRequestProps<listBody, listQuery>,
@@ -39,7 +40,7 @@ async function handler(
     getMongoLog().countDocuments(match, { ...readFromSecondary })
   ]);
   return {
-    data: records,
+    list: records,
     total
   };
 }

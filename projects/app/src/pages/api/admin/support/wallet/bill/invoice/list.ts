@@ -4,6 +4,8 @@ import { MongoInvoice } from '@/service/support/wallet/bill/invoiceSchema';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
+import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import { InvoiceSchemaType } from '@fastgpt/global/support/wallet/bill/type';
 
 export type listQuery = {};
 
@@ -13,7 +15,7 @@ export type listBody = {
   search?: string;
 };
 
-export type listResponse = {};
+export type listResponse = PaginationResponse<InvoiceSchemaType>;
 
 async function handler(
   req: ApiRequestProps<listBody, listQuery>,
@@ -55,7 +57,7 @@ async function handler(
   ]);
 
   return {
-    data: records,
+    list: records,
     total
   };
 }
