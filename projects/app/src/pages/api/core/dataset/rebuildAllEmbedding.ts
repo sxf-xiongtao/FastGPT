@@ -36,7 +36,7 @@ async function handler(
   const datasets = await MongoDataset.find({ teamId }).lean();
   for await (const dataset of datasets) {
     const datasetId = String(dataset._id);
-    const vectorModel = getVectorModel(dataset.vectorModel);
+    const vectorModel = getVectorModel(dataset.vectorModel).name;
     const [rebuilding, training] = await Promise.all([
       MongoDatasetData.findOne({ teamId, rebuilding: true }),
       MongoDatasetTraining.findOne({ teamId })
@@ -56,6 +56,22 @@ async function handler(
     });
 
     // update vector model and dataset.data rebuild field
+    await mongoSessionRun(async (session) => {
+      await MongoDatasetData.updateMany(
+        {
+          teamId,
+          datasetId
+        },
+        {
+          $set: {
+            rebuilding: true
+          }
+        },
+        {
+          session
+        }
+      );
+    });
     // get 10 init dataset.data
     const max = global.systemEnv?.vectorMaxProcess || 10;
     const arr = new Array(max * 2).fill(0);
