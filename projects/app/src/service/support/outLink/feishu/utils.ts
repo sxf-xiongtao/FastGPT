@@ -4,7 +4,7 @@ import axios from 'axios';
 import crypto from 'crypto';
 import { retryRun } from '@fastgpt/global/common/fn/utils';
 
-const feishuBotBaseURL = process.env.FEISHU_BOT_BASE_URL || 'https://open.feishu.cn';
+const feishuBotBaseURL = process.env.FEISHU_BASE_URL || 'https://open.feishu.cn';
 const getTenantURL = `${feishuBotBaseURL}/open-apis/auth/v3/tenant_access_token/internal`;
 const replyURL = (message_id: string) =>
   `${feishuBotBaseURL}/open-apis/im/v1/messages/${message_id}/reply`;

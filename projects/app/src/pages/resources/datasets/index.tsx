@@ -146,7 +146,7 @@ function AppDetailModal({ app, onClose }: { app: any; onClose: () => void }) {
 }
 
 export async function getServerSideProps(content: any) {
-  const FE_URL = process.env.FE_URL;
+  const FE_URL = process.env.FE_DOMAIN;
   return {
     props: {
       ...(await serviceSideProps(content)),

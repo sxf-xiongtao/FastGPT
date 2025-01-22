@@ -24,7 +24,7 @@ type feishuFileListResponse = {
   next_page_token: string;
 };
 
-const feishuBaseUrl = process.env.FEISHU_DATASET_BASE_URL || 'https://open.feishu.cn';
+const feishuBaseUrl = process.env.FEISHU_BASE_URL || 'https://open.feishu.cn';
 
 export const useFeishuDatasetRequest = ({ feishuServer }: { feishuServer: FeishuServer }) => {
   const instance = axios.create({
