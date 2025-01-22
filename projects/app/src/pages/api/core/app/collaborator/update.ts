@@ -231,6 +231,9 @@ async function handler(req: NextApiRequest) {
             ...(item.groupId && {
               groupId: item.groupId
             }),
+            ...(item.orgId && {
+              orgId: item.orgId
+            }),
             permission: item.permission
           })),
           { session }

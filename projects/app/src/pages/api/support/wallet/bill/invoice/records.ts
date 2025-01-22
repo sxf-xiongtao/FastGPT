@@ -3,12 +3,14 @@ import { NextAPI } from '@/service/middleware/entry';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
 import { MongoInvoice } from '@/service/support/wallet/bill/invoiceSchema';
+import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import { InvoiceSchemaType } from '@fastgpt/global/support/wallet/bill/type';
 
 export type recordsQuery = {};
 
 export type recordsBody = { pageNum: number; pageSize: number };
 
-export type recordsResponse = {};
+export type recordsResponse = PaginationResponse<InvoiceSchemaType>;
 
 async function handler(
   req: ApiRequestProps<recordsBody, recordsQuery>,
@@ -28,7 +30,7 @@ async function handler(
   ]);
 
   return {
-    data: records,
+    list: records,
     total
   };
 }

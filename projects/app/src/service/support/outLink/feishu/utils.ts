@@ -3,9 +3,11 @@ import { getTmpData, setTmpData } from '@fastgpt/service/support/tmpData/control
 import axios from 'axios';
 import crypto from 'crypto';
 import { retryRun } from '@fastgpt/global/common/fn/utils';
-const getTenantURL = 'https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal';
+
+const feishuBotBaseURL = process.env.FEISHU_BOT_BASE_URL || 'https://open.feishu.cn';
+const getTenantURL = `${feishuBotBaseURL}/open-apis/auth/v3/tenant_access_token/internal`;
 const replyURL = (message_id: string) =>
-  `https://open.feishu.cn/open-apis/im/v1/messages/${message_id}/reply`;
+  `${feishuBotBaseURL}/open-apis/im/v1/messages/${message_id}/reply`;
 
 // refer: https://open.feishu.cn/document/server-docs/event-subscription-guide/event-subscription-configure-/encrypt-key-encryption-configuration-case#679e4309
 // the following code is copied from the above link
