@@ -18,7 +18,9 @@ const Layout = ({ children }: { children: JSX.Element }) => {
   const isUnLoginPage = unLoginPage[router.pathname];
 
   return isUnLoginPage && !licenseData ? (
-    <Box p={5}>{children}</Box>
+    <Box p={5} h={'100%'} overflow={'auto'}>
+      {children}
+    </Box>
   ) : (
     <>
       <Flex h={'100%'} bg={'myGray.100'} flexDirection={'column'}>
