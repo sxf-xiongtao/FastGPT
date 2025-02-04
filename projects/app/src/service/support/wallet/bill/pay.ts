@@ -61,7 +61,10 @@ export class WXPay {
         out_trade_no: payId
       });
 
-      return JSON.parse(res.data);
+      return JSON.parse(res.data) as {
+        trade_state: 'SUCCESS' | 'CLOSED';
+        trade_state_desc: string;
+      };
     } catch (error) {
       return Promise.reject(error);
     }

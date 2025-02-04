@@ -5,7 +5,7 @@ import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { TrainingModeEnum } from '@fastgpt/global/core/dataset/constants';
 import { UsageSourceEnum } from '@fastgpt/global/support/wallet/usage/constants';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
-import { getVectorModel, getLLMModel } from '@fastgpt/service/core/ai/model';
+import { getEmbeddingModel, getLLMModel } from '@fastgpt/service/core/ai/model';
 import { MongoDatasetData } from '@fastgpt/service/core/dataset/data/schema';
 import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
 import { createTrainingUsage } from '@fastgpt/service/support/wallet/usage/controller';
@@ -36,7 +36,7 @@ async function handler(
   const datasets = await MongoDataset.find({ teamId }).lean();
   for await (const dataset of datasets) {
     const datasetId = String(dataset._id);
-    const vectorModel = getVectorModel(dataset.vectorModel).name;
+    const vectorModel = getEmbeddingModel(dataset.vectorModel).model;
     const [rebuilding, training] = await Promise.all([
       MongoDatasetData.findOne({ teamId, rebuilding: true }),
       MongoDatasetTraining.findOne({ teamId })
@@ -51,7 +51,7 @@ async function handler(
       tmbId,
       appName: '数据库重建索引',
       billSource: UsageSourceEnum.training,
-      vectorModel: getVectorModel(dataset.vectorModel)?.name,
+      vectorModel: getEmbeddingModel(dataset.vectorModel)?.name,
       agentModel: getLLMModel(dataset.agentModel)?.name
     });
 

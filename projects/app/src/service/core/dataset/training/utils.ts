@@ -5,6 +5,9 @@ import { sendInform2OneUser } from '@/service/support/user/inform/controller';
 import { generateAutoTraining } from './autoTrainingProcess';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { InformLevelEnum } from '@fastgpt/global/support/user/inform/constants';
+import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
+import { DatasetTrainingSchemaType } from '@fastgpt/global/core/dataset/type';
+import { TrainingModeEnum } from '@fastgpt/global/core/dataset/constants';
 
 export const startTrainingProcess = () => {
   generateAutoTraining();
@@ -31,4 +34,20 @@ export const checkTeamAiPointsAndLock = async (teamId: string) => {
     }
     return false;
   }
+};
+
+export const createDatasetTrainingMongoWatch = () => {
+  const changeStream = MongoDatasetTraining.watch();
+
+  changeStream.on('change', async (change) => {
+    try {
+      if (change.operationType === 'insert') {
+        const fullDocument = change.fullDocument as DatasetTrainingSchemaType;
+        const { mode } = fullDocument;
+        if (mode === TrainingModeEnum.auto) {
+          generateAutoTraining();
+        }
+      }
+    } catch (error) {}
+  });
 };

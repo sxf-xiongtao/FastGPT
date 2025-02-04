@@ -48,13 +48,6 @@ export type ConfigFormType = {
     };
     navbar?: NavbarItemType[];
   };
-  modelSettings: {
-    llmModels: string;
-    vectorModels: string;
-    reRankModels: string;
-    audioSpeechModels: string;
-    whisperModel: string;
-  };
   loginSettings: {
     email: NonNullable<SystemConfigType['auth']>['email'];
     phone: NonNullable<SystemConfigType['auth']>['phone'];

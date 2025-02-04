@@ -1,7 +1,6 @@
 import type { NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { connectToDatabase } from '@/service/mongo';
 import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
 import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
@@ -14,6 +13,7 @@ import { trackBaiduConversion } from '@/service/common/tracking/baidu';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { AccountRegisterBody } from '@fastgpt/global/support/user/login/api';
 import { NextAPI } from '@/service/middleware/entry';
+import { UserErrEnum } from '@fastgpt/global/common/error/code/user';
 
 async function handler(req: ApiRequestProps<AccountRegisterBody>, res: NextApiResponse<any>) {
   const { username, code, password, inviterId, bd_vid, fastgpt_sem, sourceDomain } = req.body;
@@ -35,7 +35,7 @@ async function handler(req: ApiRequestProps<AccountRegisterBody>, res: NextApiRe
   });
 
   if (authRepeat) {
-    throw new Error('该用户已被注册');
+    return Promise.reject(UserErrEnum.userExist);
   }
 
   // 商业版用户数量相知

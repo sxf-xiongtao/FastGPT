@@ -1,0 +1,8 @@
+{
+  "tasks": {
+    "export": "deno run --allow-read=./data --allow-write=./data --allow-run=\"mongoexport,sleep\" index.ts --mode=export",
+    "rewrite": "deno run --allow-read=./data --allow-write=./data --allow-run=\"mongoexport,sleep\" index.ts --mode=exportRewrite",
+    "import": "deno run --allow-read=./data --allow-run=\"mongoimport,sleep\" import.ts --mode=import",
+    "build": "deno compile --allow-read=./data --allow-write=./data --allow-run=\"mongoexport,mongoimport,sleep\" --output ./dist/migrator index.ts"
+  }
+}

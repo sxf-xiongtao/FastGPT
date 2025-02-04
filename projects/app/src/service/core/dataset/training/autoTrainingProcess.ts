@@ -1,7 +1,7 @@
 import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
 import { pushAutoTrainingUsage } from '@/service/support/wallet/usage/push';
 import { TrainingModeEnum } from '@fastgpt/global/core/dataset/constants';
-import { getAIApi } from '@fastgpt/service/core/ai/config';
+import { createChatCompletion } from '@fastgpt/service/core/ai/config';
 import type { ChatCompletionMessageParam } from '@fastgpt/global/core/ai/type.d';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { splitText2Chunks } from '@fastgpt/global/common/string/textSplitter';
@@ -19,7 +19,7 @@ import { countGptMessagesTokens } from '@fastgpt/service/common/string/tiktoken/
 import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
 import { pushDataListToTrainingQueueByCollectionId } from '@fastgpt/service/core/dataset/training/controller';
 import { loadRequestMessages } from '@fastgpt/service/core/chat/utils';
-import { llmCompletionsBodyFormat } from '@fastgpt/service/core/ai/utils';
+import { llmCompletionsBodyFormat, llmStreamResponseToText } from '@fastgpt/service/core/ai/utils';
 
 const reduceQueue = () => {
   global.autoTrainingLen = global.autoTrainingLen > 0 ? global.autoTrainingLen - 1 : 0;
@@ -44,7 +44,7 @@ export async function generateAutoTraining(): Promise<any> {
         {
           mode: TrainingModeEnum.auto,
           retryCount: { $gte: 0 },
-          lockTime: { $lte: addMinutes(new Date(), -6) }
+          lockTime: { $lte: addMinutes(new Date(), -10) }
         },
         {
           lockTime: new Date(),
@@ -115,21 +115,18 @@ export async function generateAutoTraining(): Promise<any> {
       }
     ];
 
-    const ai = getAIApi({
-      timeout: 600000
-    });
-    const chatResponse = await ai.chat.completions.create(
-      llmCompletionsBodyFormat(
+    const { response: chatResponse } = await createChatCompletion({
+      body: llmCompletionsBodyFormat(
         {
           model: modelData.model,
           temperature: 0.3,
           messages: await loadRequestMessages({ messages, useVision: false }),
-          stream: false
+          stream: true
         },
         modelData
       )
-    );
-    const answer = chatResponse.choices?.[0].message?.content || '';
+    });
+    const answer = await llmStreamResponseToText(chatResponse);
 
     const splitIndexResult = formatSplitText2Index(answer, text); // 格式化后的索引
 

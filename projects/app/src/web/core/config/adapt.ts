@@ -6,16 +6,7 @@ export function formatConfigStore2FormSchema({
   fastgpt,
   fastgptPro
 }: ConfigStoreType): ConfigFormType {
-  const {
-    feConfigs,
-    systemEnv,
-    subPlans = {},
-    llmModels = [],
-    vectorModels = [],
-    reRankModels = [],
-    audioSpeechModels = [],
-    whisperModel = []
-  } = fastgpt || { feConfigs: {}, systemEnv: {} };
+  const { feConfigs, systemEnv, subPlans = {} } = fastgpt || { feConfigs: {}, systemEnv: {} };
 
   // 初始化配置
   const {
@@ -83,13 +74,6 @@ export function formatConfigStore2FormSchema({
         pgHNSWEfSearch,
         ...systemEnvProps
       }
-    },
-    modelSettings: {
-      llmModels: JSON.stringify(llmModels, null, 2),
-      vectorModels: JSON.stringify(vectorModels, null, 2),
-      reRankModels: JSON.stringify(reRankModels, null, 2),
-      audioSpeechModels: JSON.stringify(audioSpeechModels, null, 2),
-      whisperModel: JSON.stringify(whisperModel, null, 2)
     },
     loginSettings: {
       github: {
@@ -173,14 +157,12 @@ export function formatConfigStore2FormSchema({
 
 export function formatFormData2ConfigStore({
   siteSettings,
-  modelSettings,
   loginSettings,
   paySettings,
   securitySettings,
   externalProviderSettings
 }: ConfigFormType): ConfigStoreType {
   const { feConfigs, systemEnv, concatMd, scripts, limit, sso, navbar } = siteSettings;
-  const { llmModels, vectorModels, reRankModels, audioSpeechModels, whisperModel } = modelSettings;
   const { email, phone, github, wechat, dingtalk, google, fastLogin, sms, microsoft, wecom } =
     loginSettings;
   const { censor } = securitySettings;
@@ -289,12 +271,7 @@ export function formatFormData2ConfigStore({
         [SubTypeEnum.extraPoints]: {
           price: subPlans.extraPointsPrice || 0
         }
-      },
-      llmModels: JSON.parse(llmModels),
-      vectorModels: JSON.parse(vectorModels),
-      reRankModels: JSON.parse(reRankModels),
-      audioSpeechModels: JSON.parse(audioSpeechModels),
-      whisperModel: JSON.parse(whisperModel)
+      }
     },
     [SystemConfigsTypeEnum.fastgptPro]: {
       auth: formatLoginSettings,

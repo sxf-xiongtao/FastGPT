@@ -84,7 +84,8 @@ COPY --from=maindeps /app/node_modules/@zilliz/milvus2-sdk-node ./node_modules/@
 COPY --from=builder /app/projects/app/package.json ./package.json 
 # copy config
 COPY ./projects/app/data/config.json /app/data/config.json
-
+# copy models
+COPY ./FastGPT/packages/service/core/ai/config/provider /app/FastGPT/packages/service/core/ai/config/provider
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1

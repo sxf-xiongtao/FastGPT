@@ -3,7 +3,7 @@ import { ChatNodeUsageType } from '@fastgpt/global/support/wallet/bill/type';
 import { CreateUsageProps } from '@fastgpt/global/support/wallet/usage/api';
 import { UsageSourceEnum } from '@fastgpt/global/support/wallet/usage/constants';
 import { addLog } from '@fastgpt/service/common/system/log';
-import { ModelTypeEnum } from '@fastgpt/service/core/ai/model';
+import { ModelTypeEnum } from '@fastgpt/global/core/ai/model';
 import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
 import { formatModelChars2Points } from '@fastgpt/service/support/wallet/usage/utils';
 import { pushReduceTeamAiPointsTask } from '../controller';

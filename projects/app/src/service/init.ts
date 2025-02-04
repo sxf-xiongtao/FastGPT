@@ -6,6 +6,7 @@ import { DatasetStatusEnum } from '@fastgpt/global/core/dataset/constants';
 import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema';
 import { initFastGPTConfig } from '@fastgpt/service/common/system/tools';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
+import { loadSystemModels } from '@fastgpt/service/core/ai/config/utils';
 
 export const getProInitData = async () => {
   try {
@@ -19,7 +20,8 @@ export const getProInitData = async () => {
         type: SystemConfigsTypeEnum.fastgptPro
       }).sort({
         createTime: -1
-      })
+      }),
+      loadSystemModels()
     ]);
 
     // concat config
@@ -34,12 +36,7 @@ export const getProInitData = async () => {
     console.log({
       feConfigs: global.feConfigs,
       systemEnv: global.systemEnv,
-      subPlans: global.subPlans,
-      llmModels: global.llmModels,
-      vectorModels: global.vectorModels,
-      reRankModels: global.reRankModels,
-      audioSpeechModels: global.audioSpeechModels,
-      whisperModel: global.whisperModel
+      subPlans: global.subPlans
     });
     console.log(global.systemConfig);
   } catch (error) {

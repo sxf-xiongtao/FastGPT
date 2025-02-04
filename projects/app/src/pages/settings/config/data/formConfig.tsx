@@ -143,9 +143,7 @@ export const getFormConfig = (): FormConfig => {
             chatApiKey: {
               key: 'siteSettings.systemEnv.chatApiKey',
               type: 'string',
-              title: 'OneAPI 密钥(会覆盖环境变量配置的)',
-              description:
-                '可以是 openai 的，也可以是 oneapi 的\n此处逻辑：优先走 ONEAPI_URL，如果填写了 ONEAPI_URL，key 也需要是 ONEAPI 的 key'
+              title: 'OneAPI 密钥(会覆盖环境变量配置的)'
             },
             vectorMaxProcess: {
               key: 'siteSettings.systemEnv.vectorMaxProcess',
@@ -216,32 +214,6 @@ export default function Dom() {
 }
 
 export const ModelFormConfig: FormConfig = {
-  modelSettings: {
-    key: 'modelSettings',
-    title: '模型设置',
-    type: 'object',
-    properties: {
-      llmModels: {
-        key: 'modelSettings.llmModels',
-        title: 'LLM大语言模型',
-        description: '用于对话、分类、内容提取等',
-        type: 'json'
-      },
-      vectorModels: {
-        key: 'modelSettings.vectorModels',
-        title: '向量模型',
-        description: '用于知识库的索引',
-        type: 'json'
-      },
-      reRankModels: { key: 'modelSettings.reRankModels', title: '重排模型', type: 'json' },
-      audioSpeechModels: {
-        key: 'modelSettings.audioSpeechModels',
-        title: '语音播放模型',
-        type: 'json'
-      },
-      whisperModel: { key: 'modelSettings.whisperModel', title: '语音输入模型', type: 'json' }
-    }
-  },
   censor: {
     key: 'securitySettings.censor',
     type: 'object',

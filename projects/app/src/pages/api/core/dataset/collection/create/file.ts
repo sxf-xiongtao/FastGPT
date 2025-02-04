@@ -20,7 +20,7 @@ import { predictDataLimitLength } from '@fastgpt/global/core/dataset/utils';
 import { pushDataListToTrainingQueue } from '@fastgpt/service/core/dataset/training/controller';
 import { createTrainingUsage } from '@fastgpt/service/support/wallet/usage/controller';
 import { UsageSourceEnum } from '@fastgpt/global/support/wallet/usage/constants';
-import { getDatasetModel, getVectorModel } from '@fastgpt/service/core/ai/model';
+import { getDatasetModel, getEmbeddingModel } from '@fastgpt/service/core/ai/model';
 import { BucketNameEnum } from '@fastgpt/global/common/file/constants';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { MongoImage } from '@fastgpt/service/common/file/image/schema';
@@ -128,7 +128,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         tmbId,
         appName: collectionName,
         billSource: UsageSourceEnum.training,
-        vectorModel: getVectorModel(dataset.vectorModel)?.name,
+        vectorModel: getEmbeddingModel(dataset.vectorModel)?.name,
         agentModel: getDatasetModel(dataset.agentModel)?.name
       });
 

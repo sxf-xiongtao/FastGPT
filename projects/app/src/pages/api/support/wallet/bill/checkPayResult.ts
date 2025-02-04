@@ -19,6 +19,7 @@ import { NextAPI } from '@/service/middleware/entry';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { getStandardPlanConfig, sortStandPlans } from '@fastgpt/service/support/wallet/sub/utils';
 import { UserModelSchema } from '@fastgpt/global/support/user/type';
+import { useIPFrequencyLimit } from '@fastgpt/service/common/middle/reqFrequencyLimit';
 
 /* 校验支付结果 */
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -36,27 +37,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return Promise.reject('订单已结算');
   }
 
-  const orderTmbId = payOrder.tmbId;
-
-  // find inviter
-  const tmb = await MongoTeamMember.findById(orderTmbId, 'userId')
-    .populate<{
-      user: UserModelSchema;
-    }>('user', 'inviterId')
-    .lean();
-  const inviter = tmb?.user?.inviterId
-    ? await MongoUser.findById(tmb.user.inviterId, 'promotionRate')
-    : null;
-
   // check pay result
   const wxPay = new WXPay();
   const payRes = await wxPay.getPayResult(payOrder.orderId);
 
   //  重点检查：支付成功
   if (payRes.trade_state === 'SUCCESS') {
-    return mongoSessionRun(async (session) => {
+    const payResult = await mongoSessionRun(async (session) => {
       // 更新订单状态. 如果没有合适的订单，说明订单重复了
-      const updateRes = await MongoBill.updateOne(
+      const updateRes = await MongoBill.findOneAndUpdate(
         {
           _id: payId,
           status: 'NOTPAY'
@@ -65,26 +54,43 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           status: 'SUCCESS'
         },
         {
-          session
+          session,
+          new: true
         }
       );
-      if (updateRes.modifiedCount === 1) {
-        await dealWithSuccessOrder(payOrder, session);
-
-        // 增加邀请者的默认的团队收益
-        if (inviter && tmb) {
-          const amount = (payOrder.price * inviter.promotionRate) / 100;
-          createOnePromotion({
-            userId: inviter._id,
-            objUId: tmb?.userId,
-            type: 'pay',
-            amount
-          });
-        }
-
-        return '支付成功';
+      if (!updateRes) {
+        return Promise.reject('Bill not found');
       }
+      await dealWithSuccessOrder(updateRes, session);
+
+      return updateRes;
     });
+
+    // 增加邀请者的默认的团队收益
+    try {
+      // 1. 找到充值的人
+      const orderTmbId = payResult.tmbId;
+      // 2. 找到充值的人的邀请者
+      const tmb = await MongoTeamMember.findById(orderTmbId, 'userId')
+        .populate<{
+          user: UserModelSchema;
+        }>('user', 'inviterId')
+        .lean();
+      const inviter = tmb?.user?.inviterId
+        ? await MongoUser.findById(tmb.user.inviterId, 'promotionRate')
+        : null;
+      // 3. 增加邀请者的默认的团队收益
+      if (inviter && tmb) {
+        const amount = (payResult.price * inviter.promotionRate) / 100;
+        await createOnePromotion({
+          userId: inviter._id,
+          objUId: tmb?.userId,
+          type: 'pay',
+          amount
+        });
+      }
+    } catch (error) {}
+    return '支付成功';
   }
 
   // 校验下是否超过一天
@@ -102,7 +108,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   return Promise.reject(payRes?.trade_state_desc || '订单无效');
 }
 
-export default NextAPI(handler);
+export default NextAPI(
+  useIPFrequencyLimit({ id: 'check-pay-result', seconds: 1, limit: 1, force: true }),
+  handler
+);
 
 export const dealWithSuccessOrder = async (payOrder: BillSchemaType, session: ClientSession) => {
   // Add balance to team

@@ -2,31 +2,20 @@
 import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
 import { addDays } from 'date-fns';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
-import { Types } from '@fastgpt/service/common/mongo';
-import { UsageSourceEnum } from '@fastgpt/global/support/wallet/usage/constants';
 import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
 import { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
-import { UsageListItemType } from '@fastgpt/global/support/wallet/usage/type';
+import { UsageItemType } from '@fastgpt/global/support/wallet/usage/type';
+import { GetUsageProps } from '@fastgpt/global/support/wallet/usage/api';
+import { replaceRegChars } from '@fastgpt/global/common/string/tools';
+import { addSourceMember } from '@fastgpt/service/support/user/utils';
 
 export type GetUsageQuery = {};
-export type GetUsageBody = PaginationProps<{
-  dateStart: Date;
-  dateEnd: Date;
-  source?: `${UsageSourceEnum}`;
-  teamMemberId: string;
-}>;
-export type GetUsageResponse = PaginationResponse<{
-  id: string;
-  source: `${UsageSourceEnum}`;
-  time: Date;
-  totalPoints: number;
-  appName: string;
-  list: UsageListItemType[];
-}>;
+export type GetUsageBody = PaginationProps<GetUsageProps>;
+export type GetUsageResponse = PaginationResponse<UsageItemType>;
 
 async function handler(
   req: ApiRequestProps<GetUsageBody, GetUsageQuery>,
@@ -35,8 +24,9 @@ async function handler(
   const {
     dateStart = addDays(new Date(), -7),
     dateEnd = new Date(),
-    source,
-    teamMemberId
+    sources,
+    teamMemberIds,
+    projectName
   } = req.body;
 
   const { offset, pageSize } = parsePaginationRequest(req);
@@ -48,37 +38,53 @@ async function handler(
   });
 
   const where = {
-    teamId: new Types.ObjectId(teamId),
-    ...(permission.hasManagePer && teamMemberId ? { tmbId: teamMemberId } : { tmbId }),
-    ...(source && { source }),
+    teamId,
     time: {
       $gte: new Date(dateStart),
       $lte: new Date(dateEnd)
-    }
+    },
+    // 非管理员只能看自己。管理员可以看所有人或者指定人。
+    ...(permission.hasManagePer
+      ? teamMemberIds
+        ? {
+            tmbId: { $in: teamMemberIds }
+          }
+        : {}
+      : { tmbId }),
+    ...(sources && { source: sources }),
+    ...(projectName && { appName: { $regex: new RegExp(`${replaceRegChars(projectName)}`, 'i') } })
   };
 
   // get bill record and total by record
-  const [bills, total] = await Promise.all([
+  const [usages, total] = await Promise.all([
     MongoUsage.find(where, undefined, {
       ...readFromSecondary
     })
-      .sort({ time: -1 })
+      .sort({ _id: -1 })
       .skip(offset)
-      .limit(pageSize),
+      .limit(pageSize)
+      .lean(),
     MongoUsage.countDocuments(where, {
       ...readFromSecondary
     })
   ]);
 
+  const usagesWithMember = await addSourceMember({
+    list: usages
+  });
+
   return {
-    list: bills.map((bill) => ({
-      id: bill._id,
-      source: bill.source,
-      time: bill.time,
-      totalPoints: bill.totalPoints,
-      appName: bill.appName,
-      list: bill.list
-    })),
+    list: usagesWithMember.map((usage) => {
+      return {
+        id: usage._id,
+        source: usage.source,
+        time: usage.time,
+        totalPoints: usage.totalPoints,
+        appName: usage.appName,
+        sourceMember: usage.sourceMember,
+        list: usage.list
+      };
+    }),
     total
   };
 }

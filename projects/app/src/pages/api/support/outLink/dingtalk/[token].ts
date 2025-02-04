@@ -76,6 +76,14 @@ async function handler(
   // verify signature
   const timestamp = req.headers['timestamp'] as string;
   const sign = req.headers['sign'] as string;
+  addLog.info('signature verification: ', { sign, timestamp });
+
+  if (!timestamp || !sign) {
+    addLog.warn('signature verification failed: unexpected undefined timestamp or sign.');
+    // skip for invalid request or test
+    return;
+  }
+
   if (!verifySignature(sign, timestamp, clientSecret)) {
     addLog.warn('signature verification failed', { sign, timestamp, clientSecret });
     return Promise.reject('signature verification failed');
