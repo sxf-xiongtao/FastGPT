@@ -42,7 +42,7 @@ jobs:
                 owner,
                 repo,
                 tag_name: tag,
-                name: `Release ${tag}`,
+                name: `${tag}`,
                 body: `Auto-generated release for ${tag}`,
                 draft: false,
                 prerelease: false
