@@ -1,5 +1,6 @@
 import { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
+import { FastGPTFeConfigsType } from '@fastgpt/global/common/system/types';
 import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 
 export function formatConfigStore2FormSchema({
@@ -169,7 +170,7 @@ export function formatFormData2ConfigStore({
   const { wx, subPlans } = paySettings;
   const { externalProviderWorkflowVariables } = externalProviderSettings;
 
-  const formatFeConfig = {
+  const formatFeConfig: FastGPTFeConfigsType = {
     ...feConfigs,
     concatMd,
     scripts: scripts ? JSON.parse(scripts) : [],
@@ -229,10 +230,14 @@ export function formatFormData2ConfigStore({
       return methods;
     })() as ['email' | 'phone'],
     bind_notification_method: (() => {
-      if (loginSettings?.sms?.BIND_NOTIFICATION) {
-        return ['email', 'phone'];
+      const methods = [];
+      if (email?.smtp) {
+        methods.push('email');
       }
-      return ['email'];
+      if (loginSettings?.sms?.BIND_NOTIFICATION) {
+        methods.push('phone');
+      }
+      return methods;
     })() as ['email' | 'phone'],
     navbarItems: Array.isArray(navbar) ? navbar : [],
     externalProviderWorkflowVariables

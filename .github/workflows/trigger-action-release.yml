@@ -13,17 +13,43 @@ jobs:
         id: get_tag
         run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
-      - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v2
+      - name: Create Tag and Release in Target Repo
+        uses: actions/github-script@v6
         with:
-          token: ${{ secrets.GH_PAT }}
-          repository: labring-actions/fastgpt-pro-action
-          event-type: release
-          client-payload: |
-            {
-              "ref": "${{ github.ref }}",
-              "sha": "${{ github.sha }}",
-              "tag": "${{ steps.get_tag.outputs.TAG }}",
-              "release_name": "${{ steps.get_tag.outputs.TAG }}",
-              "release_body": "自动打包"
+          github-token: ${{ secrets.GH_PAT }}
+          script: |
+            const tag = '${{ steps.get_tag.outputs.TAG }}';
+            const [owner, repo] = 'labring-actions/fastgpt-pro-action'.split('/');
+
+            try {
+              // Get the latest commit SHA from the target repository
+              const { data: ref } = await github.rest.repos.getBranch({
+                owner,
+                repo,
+                branch: 'main'
+              });
+              
+              // Create the tag
+              await github.rest.git.createRef({
+                owner,
+                repo,
+                ref: `refs/tags/${tag}`,
+                sha: ref.commit.sha
+              });
+              
+              // Create a release
+              await github.rest.repos.createRelease({
+                owner,
+                repo,
+                tag_name: tag,
+                name: `Release ${tag}`,
+                body: `Auto-generated release for ${tag}`,
+                draft: false,
+                prerelease: false
+              });
+              
+              console.log(`Successfully created tag and release ${tag} in ${owner}/${repo}`);
+            } catch (error) {
+              console.log(`Error creating tag or release: ${error.message}`);
+              core.setFailed(error.message);
             }
