@@ -150,7 +150,7 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
       responseContent = 'This is default reply';
     }
     const replyResult = await replyCallback(responseContent);
-    addLog.info('Reply result', { responseContent, replyResult: replyResult.data });
+    addLog.info('Reply result', { responseContent, replyResult: replyResult?.data });
 
     const { totalPoints } = pushChatUsage({
       appName: app.name,
