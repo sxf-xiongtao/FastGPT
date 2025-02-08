@@ -1,6 +1,6 @@
 import { setCron } from '@fastgpt/service/common/system/cron';
 import { startTrainingProcess } from '@/service/core/dataset/training/utils';
-import { clearExpiredSubPlan } from './cronTask';
+import { clearExpiredSubPlan, syncMemberAndOrg } from './cronTask';
 import { checkTimerLock } from '@fastgpt/service/common/system/timerLock/utils';
 import { TimerIdEnum } from '@fastgpt/service/common/system/timerLock/constants';
 import { notifyAllExpireSoon } from '@/service/support/user/team/timerTask/expireSoon';
@@ -74,10 +74,20 @@ const syncCollectionCron = () => {
   });
 };
 
+const syncMemberAndOrgCron = () => {
+  // 0:00 every day
+  setCron('0 0 * * *', async () => {
+    if (systemConfig.auth?.wecom?.isSync) {
+      await syncMemberAndOrg();
+    }
+  });
+};
+
 export const startCron = () => {
   setTrainingCron();
   updateSubPlanCron();
   planNotifyCron();
   freeAccountCron();
   syncCollectionCron();
+  syncMemberAndOrgCron();
 };

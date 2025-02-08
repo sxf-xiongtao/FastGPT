@@ -22,12 +22,51 @@ type Department = {
   department_leader: Array<string>;
 };
 
-const getDepartmentListURL = 'https://qyapi.weixin.qq.com/cgi-bin/department/list';
-const getUserIdListURL = 'https://qyapi.weixin.qq.com/cgi-bin/user/list_id';
+type AccessToken = {
+  value: string;
+  expire: number;
+};
+/** 获取 Access Token, refer to: https://developer.work.weixin.qq.com/document/path/91039 */
 const getAccessTokenURL = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken';
 
-async function getAccessToken({ corpid, secret }: { corpid: string; secret: string }) {
-  const { data } = await axios.request<{ errcode: number; errmsg: string; access_token: string }>({
+/** 获取 Department 列表, refer to: https://developer.work.weixin.qq.com/document/path/90208 */
+const getDepartmentListURL = 'https://qyapi.weixin.qq.com/cgi-bin/department/list';
+
+/** 获取 User 列表, refer to: https://developer.work.weixin.qq.com/document/path/96067
+ * **仅支持通过“通讯录同步secret”调用** */
+const getUserIdListURL = 'https://qyapi.weixin.qq.com/cgi-bin/user/list_id';
+
+/** 获取 User 详情, refer to: https://developer.work.weixin.qq.com/document/path/90196 */
+const getUserDetailURL = 'https://qyapi.weixin.qq.com/cgi-bin/user/get';
+
+/** Cached Access Token */
+const access_token: {
+  normal?: AccessToken;
+  sync?: AccessToken;
+} = {};
+
+async function getAccessToken({
+  corpid,
+  secret,
+  isSyncSecret
+}: {
+  corpid: string;
+  secret: string;
+  isSyncSecret?: boolean;
+}) {
+  if (isSyncSecret && access_token.sync && access_token.sync.expire > Date.now()) {
+    return access_token.sync.value;
+  }
+  if (!isSyncSecret && access_token.normal && access_token.normal.expire > Date.now()) {
+    return access_token.normal.value;
+  }
+  // otherwise, get a new access token
+  const { data } = await axios.request<{
+    errcode: number;
+    errmsg: string;
+    access_token: string;
+    expires_in: number;
+  }>({
     url: getAccessTokenURL,
     method: 'POST',
     data: {
@@ -35,9 +74,16 @@ async function getAccessToken({ corpid, secret }: { corpid: string; secret: stri
       corpsecret: secret
     }
   });
+
   if (!data.access_token) {
     return Promise.reject(data.errmsg);
   }
+
+  const expire = Date.now() + data.expires_in * 1000 - 10000; // 10s before expiration
+  access_token[isSyncSecret ? 'sync' : 'normal'] = {
+    value: data.access_token,
+    expire
+  };
   return data.access_token;
 }
 
@@ -71,7 +117,8 @@ async function getUserIdList({
   syncSecret: string;
   access_token?: string;
 }) {
-  const access_token = passedToken || (await getAccessToken({ corpid, secret: syncSecret }));
+  const access_token =
+    passedToken || (await getAccessToken({ corpid, secret: syncSecret, isSyncSecret: true }));
 
   const { data } = await axios.request<{
     errmsg: string;
@@ -98,6 +145,29 @@ async function getUserIdList({
   return data.dept_user;
 }
 
+async function getUserDetail({ userId, access_token }: { userId: string; access_token: string }) {
+  const {
+    data: { errcode, errmsg, name }
+  } = await axios.request<{
+    errcode: number;
+    errmsg: string;
+    name: string;
+  }>({
+    url: getUserDetailURL,
+    method: 'GET',
+    params: {
+      userid: userId,
+      access_token
+    }
+  });
+  if (errcode) {
+    return Promise.reject(errmsg);
+  }
+  return {
+    name
+  };
+}
+
 /** Sync the org and user from wecom
  * @param teamId. The Team will be overwitten to the org and user.
  * @param corpid. The corpid of wecom.
@@ -118,6 +188,18 @@ export async function wecomOrgSync({ teamId, corpid, secret, syncSecret }: Wecom
   }
 
   if (userIdList.length === 0) return Promise.reject('获取用户列表异常');
+  const userids = Array.from(userMap.keys());
+  const usernameMap: Map<string, string> = new Map();
+  for await (const userid of userids) {
+    const detail = await getUserDetail({
+      access_token: await getAccessToken({
+        corpid,
+        secret
+      }),
+      userId: userid
+    });
+    usernameMap.set(userid, detail.name || userid);
+  }
 
   await mongoSessionRun(async (session) => {
     // sync user
@@ -126,7 +208,7 @@ export async function wecomOrgSync({ teamId, corpid, secret, syncSecret }: Wecom
       source: 'wecom',
       latestUserList: Array.from(userMap.keys()).map((userid) => ({
         userid,
-        name: userid
+        name: usernameMap.get(userid) || userid
       })),
       session
     });
