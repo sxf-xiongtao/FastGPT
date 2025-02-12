@@ -120,7 +120,7 @@ const PluginCard = ({
       <Box w={1 / 10} pl={8}>
         <Box
           as={'span'}
-          onClick={(e) => {
+          onClick={(e: React.MouseEvent) => {
             e.stopPropagation();
             e.preventDefault();
             const newPlugin = {
@@ -136,7 +136,7 @@ const PluginCard = ({
       <Box w={1 / 10} pl={8}>
         <Box
           as={'span'}
-          onClick={(e) => {
+          onClick={(e: React.MouseEvent) => {
             e.stopPropagation();
             e.preventDefault();
             const newPlugin = {

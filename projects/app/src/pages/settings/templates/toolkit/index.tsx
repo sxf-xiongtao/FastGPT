@@ -201,7 +201,7 @@ const SystemPlugin = () => {
           }}
           dataList={localPlugins}
         >
-          {(provided) => (
+          {({ provided }) => (
             <Flex
               gap={1}
               flexDirection={'column'}

@@ -141,7 +141,7 @@ const AppTemplate = () => {
             }}
             dataList={localTemplates}
           >
-            {(provided) => (
+            {({ provided }) => (
               <Flex
                 gap={1}
                 flexDirection={'column'}

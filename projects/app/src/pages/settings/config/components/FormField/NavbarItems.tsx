@@ -92,7 +92,7 @@ const NavbarItems = ({
           }}
           dataList={navbarList}
         >
-          {(provided) => (
+          {({ provided }) => (
             <Flex
               gap={1}
               flexDirection={'column'}

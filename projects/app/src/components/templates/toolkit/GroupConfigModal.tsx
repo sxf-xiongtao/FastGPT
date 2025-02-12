@@ -174,7 +174,7 @@ const GroupConfigModal = ({
           }}
           dataList={localGroups}
         >
-          {(provided) => (
+          {({ provided }) => (
             <Flex
               {...provided.droppableProps}
               ref={provided.innerRef}
@@ -347,7 +347,7 @@ const GroupConfigModal = ({
                             }}
                             dataList={item.groupTypes}
                           >
-                            {(provided) => (
+                            {({ provided }) => (
                               <Box {...provided.droppableProps} ref={provided.innerRef}>
                                 {opendGroups.includes(item.groupId) &&
                                   item.groupTypes.map((type, index) => {

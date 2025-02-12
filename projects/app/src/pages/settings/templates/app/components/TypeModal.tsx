@@ -102,7 +102,7 @@ const TemplateTypeModal = ({
           }}
           dataList={localTypes}
         >
-          {(provided) => (
+          {({ provided }) => (
             <Flex
               {...provided.droppableProps}
               ref={provided.innerRef}
