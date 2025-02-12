@@ -897,6 +897,9 @@ importers:
       i18next:
         specifier: 23.11.5
         version: 23.11.5
+      json5:
+        specifier: ^2.2.3
+        version: 2.2.3
       jsonwebtoken:
         specifier: ^9.0.0
         version: 9.0.2

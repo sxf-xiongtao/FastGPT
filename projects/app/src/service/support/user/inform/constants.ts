@@ -46,21 +46,21 @@ const MessageTemplateMap = {
     emailTemplate: RegisterTemplate,
     smsTemplateCode: () => global.systemConfig?.auth?.sms?.REGISTER,
     getInformTemplate: undefined,
-    lockMinutes: 3,
+    lockMinutes: 1,
     isSendQueue: false
   },
   [SendInformTemplateCodeEnum.RESET_PASSWORD]: {
     emailTemplate: ResetPasswordTemplate,
     smsTemplateCode: () => global.systemConfig?.auth?.sms?.RESET_PASSWORD,
     getInformTemplate: undefined,
-    lockMinutes: 3,
+    lockMinutes: 1,
     isSendQueue: false
   },
   [SendInformTemplateCodeEnum.BIND_NOTIFICATION]: {
     emailTemplate: NotificationBindTemplate,
     smsTemplateCode: () => global.systemConfig?.auth?.sms?.BIND_NOTIFICATION,
     getInformTemplate: undefined,
-    lockMinutes: 3,
+    lockMinutes: 1,
     isSendQueue: false
   },
   [SendInformTemplateCodeEnum.LACK_OF_POINTS]: {

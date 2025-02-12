@@ -5,9 +5,10 @@ import { POST } from '@/service/common/request';
 import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
 
 export const getUsers = (data: any) =>
-  POST<AdminGetUsersResponse>('/admin/routes/users/getUsers', data);
+  POST<AdminGetUsersResponse>('/admin/routes/users/getUsers', data, { maxQuantity: 1 });
 
-export const getTeams = (data: any) => POST<getTeamsResponse>('/admin/routes/teams/getTeams', data);
+export const getTeams = (data: any) =>
+  POST<getTeamsResponse>('/admin/routes/teams/getTeams', data, { maxQuantity: 1 });
 
 export const getPlans = (data: any) =>
-  POST<PaginationResponse<PlanType>>('/admin/routes/plans/getPlans', data);
+  POST<PaginationResponse<PlanType>>('/admin/routes/plans/getPlans', data, { maxQuantity: 1 });

@@ -6,6 +6,7 @@ import axios, {
 } from 'axios';
 import { TOKEN_ERROR_CODE } from '@fastgpt/global/common/error/errorCode';
 import { getWebReqUrl } from '@fastgpt/web/common/system/utils';
+import { getNanoid } from '@fastgpt/global/common/string/tools';
 
 interface ConfigType {
   headers?: { [key: string]: string };
@@ -22,10 +23,11 @@ interface ResponseDataType {
 
 const maxQuantityMap: Record<
   string,
-  {
-    amount: number;
-    sign: AbortController;
-  }
+  | undefined
+  | {
+      id: string;
+      sign: AbortController;
+    }[]
 > = {};
 
 const tokenKey = 'token';
@@ -39,26 +41,35 @@ const clearToken = () => {
 };
 
 function requestStart({ url, maxQuantity }: { url: string; maxQuantity?: number }) {
-  if (!maxQuantity) return;
+  if (!maxQuantity) return {};
   const item = maxQuantityMap[url];
+  const id = getNanoid();
+  const sign = new AbortController();
 
-  if (item) {
-    if (item.amount >= maxQuantity && item.sign) {
-      item.sign.abort();
-      delete maxQuantityMap[url];
+  if (item && item.length > 0) {
+    if (item.length >= maxQuantity) {
+      const firstSign = item.shift();
+      firstSign?.sign.abort();
     }
+    item.push({ id, sign });
   } else {
-    maxQuantityMap[url] = {
-      amount: 1,
-      sign: new AbortController()
-    };
+    maxQuantityMap[url] = [{ id, sign }];
   }
+  return {
+    id,
+    abortSignal: sign?.signal
+  };
 }
-function requestFinish({ url }: { url: string }) {
+function requestFinish({ signId, url }: { signId?: string; url: string }) {
   const item = maxQuantityMap[url];
   if (item) {
-    item.amount--;
-    if (item.amount <= 0) {
+    if (signId) {
+      const index = item.findIndex((item) => item.id === signId);
+      if (index !== -1) {
+        item.splice(index, 1);
+      }
+    }
+    if (item.length <= 0) {
       delete maxQuantityMap[url];
     }
   }
@@ -142,7 +153,7 @@ function request(
     }
   }
 
-  requestStart({ url, maxQuantity });
+  const { id: signId, abortSignal } = requestStart({ url, maxQuantity });
 
   return instance
     .request({
@@ -151,12 +162,12 @@ function request(
       method,
       data: ['POST', 'PUT'].includes(method) ? data : null,
       params: !['POST', 'PUT'].includes(method) ? data : null,
-      signal: cancelToken?.signal,
+      signal: cancelToken?.signal || abortSignal,
       ...config // 用户自定义配置，可以覆盖前面的配置
     })
     .then((res) => checkRes(res.data))
     .catch((err) => responseError(err))
-    .finally(() => requestFinish({ url }));
+    .finally(() => requestFinish({ signId, url }));
 }
 
 /**

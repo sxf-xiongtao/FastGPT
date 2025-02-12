@@ -81,7 +81,7 @@ async function handler(
       type: UserAuthTypeEnum.captcha
     },
     {
-      code: answer,
+      code: answer.toLowerCase(),
       createTime: new Date() // reset time
     },
     {

@@ -14,7 +14,7 @@ export const authCode = async ({
   const result = await MongoUserAuth.findOne({
     key: username,
     type,
-    code: { $regex: new RegExp(code, 'i') }
+    code: code.toLowerCase()
   });
 
   if (!result) {

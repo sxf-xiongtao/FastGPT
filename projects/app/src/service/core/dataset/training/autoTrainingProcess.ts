@@ -13,7 +13,6 @@ import {
 import type { PushDatasetDataChunkProps } from '@fastgpt/global/core/dataset/api.d';
 import { getLLMModel } from '@fastgpt/service/core/ai/model';
 import { checkTeamAiPointsAndLock } from './utils';
-import { checkInvalidChunkAndLock } from '@fastgpt/service/core/dataset/training/utils';
 import { addMinutes } from 'date-fns';
 import { countGptMessagesTokens } from '@fastgpt/service/common/string/tiktoken/index';
 import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
@@ -171,11 +170,8 @@ export async function generateAutoTraining(): Promise<any> {
     reduceQueue();
     generateAutoTraining();
   } catch (err: any) {
+    addLog.error(`[Auto Training Queue] Error`, err);
     reduceQueue();
-
-    if (await checkInvalidChunkAndLock({ err, data, errText: '文本理解模型调用失败' })) {
-      return generateAutoTraining();
-    }
 
     setTimeout(() => {
       generateAutoTraining();

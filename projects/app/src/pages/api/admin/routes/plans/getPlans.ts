@@ -1,6 +1,4 @@
-import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
-import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';

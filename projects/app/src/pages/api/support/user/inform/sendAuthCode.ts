@@ -10,6 +10,7 @@ import { sendMessage } from '@/service/support/user/inform/sendMessage';
 import { getMessageTemplate } from '@/service/support/user/inform/constants';
 import { checkTimerLock } from '@fastgpt/service/common/system/timerLock/utils';
 import { authCode } from '@/service/support/user/auth/controller';
+import { i18nT } from '@fastgpt/web/i18n/utils';
 
 const nanoid = customAlphabet('123456789', 6);
 
@@ -70,7 +71,7 @@ async function handler(
       lockMinuted: lockMinutes
     }))
   ) {
-    return Promise.reject('请勿频繁获取验证码');
+    return Promise.reject(i18nT('common:error.send_auth_code_too_frequently'));
   }
 
   // 创建 auth 记录
