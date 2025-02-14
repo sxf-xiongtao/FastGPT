@@ -26,7 +26,6 @@ RUN apk add --no-cache\
 # copy running files
 COPY --from=builder /app/node_modules/ ./node_modules/
 COPY --from=builder /app/dist/ ./dist/
-COPY sp.key sp.crt ./
 
 ENV NODE_ENV=production
 ENV PORT=3000
