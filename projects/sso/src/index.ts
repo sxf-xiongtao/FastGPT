@@ -14,6 +14,13 @@ import {
   testSaml_getUserInfo,
   testSaml_redirectFn
 } from 'provider/testSaml';
+import {
+  init_bjsf,
+  bjsf_assertFn,
+  bjsf_getMetadata,
+  bjsf_getUserInfo,
+  bjsf_redirectFn
+} from 'provider/bjsf';
 
 const providerMap: {
   [key: string]: {
@@ -46,6 +53,12 @@ const providerMap: {
   hebamr: {
     redirectFn: hebamr_redirectFn,
     getUserInfo: hebamr_getUserInfo
+  },
+  bjsf: {
+    redirectFn: bjsf_redirectFn,
+    getUserInfo: bjsf_getUserInfo,
+    getMetaData: bjsf_getMetadata,
+    assertFn: bjsf_assertFn
   }
 };
 
@@ -69,6 +82,18 @@ app.get('/login/oauth/authorize', async (req, res) => {
     return res.status(400).json({ error: 'provider is required' });
   }
   const { redirectFn } = provider;
+
+  if (process.env.REDIRECT) {
+    // if current hostname is not equal to HOSTNAME, redirect to HOSTNAME with the same path
+    if (process.env.HOSTNAME) {
+      const hostname = new URL(process.env.HOSTNAME).hostname;
+      if (req.hostname !== hostname) {
+        const redirectUrl = new URL(req.originalUrl, process.env.HOSTNAME);
+        res.redirect(redirectUrl.toString());
+        return;
+      }
+    }
+  }
 
   const { redirect_uri, state } = req.query as {
     redirect_uri: string;
@@ -200,5 +225,7 @@ app.listen(PORT, () => {
   initGlobalStore();
   if (provider === 'testSaml') {
     initTestSaml();
+  } else if (provider === 'bjsf') {
+    init_bjsf();
   }
 });

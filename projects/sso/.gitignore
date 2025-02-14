@@ -4,10 +4,5 @@ dist
 node_modules
 .env.local
 
-# certificats
-*.crt
-*.key
-*.pem
-
 # private images
 docker
