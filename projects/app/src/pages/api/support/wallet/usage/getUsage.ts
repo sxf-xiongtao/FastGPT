@@ -51,7 +51,7 @@ async function handler(
           }
         : {}
       : { tmbId }),
-    ...(sources && { source: sources }),
+    ...(sources && { source: { $in: sources } }),
     ...(projectName && { appName: { $regex: new RegExp(`${replaceRegChars(projectName)}`, 'i') } })
   };
 

@@ -40,7 +40,7 @@ async function handler(
           }
         : {}
       : { tmbId }),
-    ...(sources && { source: sources })
+    ...(sources && { source: { $in: sources } })
   };
 
   const data = (await MongoUsage.aggregate([
@@ -71,7 +71,6 @@ async function handler(
   const endDate = dayjs(dateEnd);
 
   while (currentDate.isBefore(endDate)) {
-    console.log(data[0], currentDate);
     concatData.push({
       date: currentDate.toDate(),
       totalPoints:
