@@ -1,6 +1,6 @@
 import type { Agent } from 'http';
 import type { Pool } from 'pg';
-import type { ConcatBillQueueItemType } from '@/global/support/wallet/bill/type.d';
+import type { ConcatBillQueueItemType } from '@fastgpt/service/support/wallet/usage/type';
 import {
   FastGPTConfigFileType,
   FastGPTFeConfigsType,

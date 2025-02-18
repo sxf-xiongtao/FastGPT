@@ -2,7 +2,7 @@ import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { delay } from '@fastgpt/global/common/system/utils';
 import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
-import type { ConcatBillQueueItemType } from '@/global/support/wallet/bill/type.d';
+import type { ConcatBillQueueItemType } from '@fastgpt/service/support/wallet/usage/type';
 import { ClientSession } from '@fastgpt/service/common/mongo';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
@@ -51,6 +51,7 @@ export async function updateTeamBalance({
     }
   }
 }
+
 export const incTeamAiPoints = async ({
   teamId,
   totalPoints,
@@ -113,18 +114,6 @@ export const incTeamAiPoints = async ({
   }
 };
 
-export const pushReduceTeamAiPointsTask = ({
-  teamId,
-  totalPoints
-}: {
-  teamId: string;
-  totalPoints: number;
-}) => {
-  global.reduceAiPointsQueue.push({
-    teamId: String(teamId),
-    totalPoints
-  });
-};
 export const reduceAiPointsTimer = async () => {
   if (global.reduceAiPointsQueue.length > 0) {
     const list = global.reduceAiPointsQueue.slice();
@@ -152,15 +141,12 @@ export const reduceAiPointsTimer = async () => {
       }
     }
 
-    console.log('reduce ai points account:', list.length);
+    addLog.info(`Reduce ai points account: ${list.length}`);
   }
   await delay(batchUpdateTime);
   reduceAiPointsTimer();
 };
 
-export const pushConcatBillTask = (data: ConcatBillQueueItemType[]) => {
-  global.concatBillQueue.push(...data);
-};
 export const concatBillTimer = async () => {
   if (global.concatBillQueue.length > 0) {
     const list = global.concatBillQueue.slice();
@@ -209,7 +195,7 @@ export const concatBillTimer = async () => {
         addLog.error('Concat bill error', error);
       }
     }
-    console.log('concat bill timer:', list.length);
+    addLog.info(`Concat bill timer: ${list.length}`);
   }
 
   await delay(batchUpdateTime);

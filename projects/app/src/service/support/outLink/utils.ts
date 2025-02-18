@@ -17,7 +17,7 @@ import { getUserChatInfoAndAuthTeamPoints } from '@fastgpt/service/support/permi
 import { NextApiResponse } from 'next';
 import { authOutLinkLimit } from './auth';
 import { addOutLinkUsage } from '@fastgpt/service/support/outLink/tools';
-import { pushChatUsage } from '../wallet/usage/push';
+import { createChatUsage } from '@fastgpt/service/support/wallet/usage/controller';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { getErrText } from '@fastgpt/global/common/error/utils';
 import { getUsageSourceByPublishChannel } from '@fastgpt/global/support/wallet/usage/tools';
@@ -152,7 +152,7 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
     const replyResult = await replyCallback(responseContent);
     addLog.info('Reply result', { responseContent, replyResult: replyResult?.data });
 
-    const { totalPoints } = pushChatUsage({
+    const { totalPoints } = createChatUsage({
       appName: app.name,
       appId: app._id,
       teamId: outLinkConfig.teamId,

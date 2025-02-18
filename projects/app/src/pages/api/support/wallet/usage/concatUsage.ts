@@ -3,12 +3,8 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { connectToDatabase } from '@/service/mongo';
 import { ConcatUsageProps } from '@fastgpt/global/support/wallet/usage/api.d';
 import { addLog } from '@fastgpt/service/common/system/log';
-import {
-  pushConcatBillTask,
-  pushReduceTeamAiPointsTask
-} from '@/service/support/wallet/controller';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
-import { Types } from '@fastgpt/service/common/mongo';
+import { concatUsage } from '@fastgpt/service/support/wallet/usage/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -26,26 +22,3 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     jsonRes(res);
   }
 }
-
-export const concatUsage = async ({
-  teamId,
-  billId,
-  totalPoints = 0,
-  listIndex,
-  inputTokens = 0,
-  outputTokens = 0
-}: ConcatUsageProps) => {
-  // 没有Id，或者不符合 mongoose ObjectId
-  if (!billId || !Types.ObjectId.isValid(billId)) return;
-
-  pushConcatBillTask([
-    {
-      billId,
-      listIndex,
-      inputTokens,
-      outputTokens,
-      totalPoints
-    }
-  ]);
-  pushReduceTeamAiPointsTask({ teamId, totalPoints });
-};
