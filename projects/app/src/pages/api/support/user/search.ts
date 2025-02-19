@@ -133,7 +133,7 @@ async function handler(
           .lean()
       : []
   ]);
-  console.log(groups);
+
   return {
     members: [...members].map((item) => ({
       tmbId: item._id,
