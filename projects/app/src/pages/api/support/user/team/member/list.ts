@@ -6,7 +6,9 @@ import { TeamMemberItemType } from '@fastgpt/global/support/user/team/type';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
 
-export type MemberListQuery = PaginationProps;
+export type MemberListQuery = PaginationProps<{
+  withLeaved?: boolean;
+}>;
 export type MemberListBody = {};
 export type MemberListResponse = PaginationResponse<TeamMemberItemType>;
 
@@ -16,11 +18,13 @@ async function handler(
 ): Promise<MemberListResponse> {
   const { teamId } = await authCert({ req, authToken: true });
   const { offset, pageSize } = parsePaginationRequest(req);
+  const { withLeaved } = req.query;
 
   return getTeamMembersPaged({
     teamId,
     offset,
-    pageSize
+    pageSize,
+    withLeaved
   });
 }
 export default NextAPI(handler);

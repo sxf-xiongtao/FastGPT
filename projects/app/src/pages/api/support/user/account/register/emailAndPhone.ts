@@ -48,7 +48,8 @@ async function handler(req: ApiRequestProps<AccountRegisterBody>, res: NextApiRe
     phonePrefix: 86, // 目前只支持国内的
     inviterId,
     fastgpt_sem,
-    sourceDomain
+    sourceDomain,
+    createDefaultTeam: true
   });
 
   const token = createJWT(user);

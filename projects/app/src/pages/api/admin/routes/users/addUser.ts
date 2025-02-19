@@ -29,7 +29,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const user = await createUserByUsername({
       username,
-      password
+      password,
+      createDefaultTeam: true
     });
 
     jsonRes(res, {

@@ -75,8 +75,8 @@ const syncCollectionCron = () => {
 };
 
 const syncMemberAndOrgCron = () => {
-  // 0:00 every day
-  setCron('0 0 * * *', async () => {
+  const cron = process.env.SYNC_MEMBER_CRON || '0 0 * * *';
+  setCron(cron, async () => {
     if (systemConfig.auth?.wecom?.isSync) {
       await syncMemberAndOrg();
     }

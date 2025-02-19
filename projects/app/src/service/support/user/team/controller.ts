@@ -32,6 +32,7 @@ import { DefaultGroupName } from '@fastgpt/global/support/user/team/group/consta
 import { UserModelSchema } from '@fastgpt/global/support/user/type';
 import { TeamSchema } from '@fastgpt/global/support/user/team/type';
 import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import { Types } from 'mongoose';
 
 /* -------- format --------- */
 export async function teamMemberSchema2TeamItemType(
@@ -306,7 +307,10 @@ export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType
       permission: new TeamPermission({
         per,
         isOwner
-      })
+      }),
+      contact: member.user.contact,
+      createTime: member.createTime,
+      updateTime: member.updateTime
     };
   });
 }
@@ -314,11 +318,13 @@ export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType
 export async function getTeamMembersPaged({
   teamId,
   offset,
-  pageSize
+  pageSize,
+  withLeaved = false
 }: {
   teamId: string;
   offset: number;
   pageSize: number;
+  withLeaved?: boolean;
 }): Promise<PaginationResponse<TeamMemberItemType>> {
   const [groups, permissions, members, total] = await Promise.all([
     getGroupsByTeamId(teamId),
@@ -326,17 +332,47 @@ export async function getTeamMembersPaged({
       teamId: teamId,
       resourceType: PerResourceTypeEnum.team
     }),
-    await MongoTeamMember.find(
+    MongoTeamMember.aggregate([
       {
-        teamId,
-        status: notLeaveStatus
+        $match: {
+          teamId: new Types.ObjectId(teamId),
+          ...(withLeaved ? {} : { status: notLeaveStatus })
+        }
       },
-      undefined,
+      { $skip: offset },
+      { $limit: pageSize },
       {
-        skip: offset,
-        limit: pageSize
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'user'
+        }
+      },
+      {
+        $addFields: {
+          statusOrder: {
+            $switch: {
+              branches: [
+                { case: { $eq: ['$status', 'active'] }, then: 1 },
+                { case: { $eq: ['$status', 'waiting'] }, then: 2 },
+                { case: { $eq: ['$status', 'reject'] }, then: 3 },
+                { case: { $eq: ['$status', 'leave'] }, then: 4 }
+              ],
+              default: 5 // 如果有其他状态，可以给一个默认值
+            }
+          }
+        }
+      },
+      {
+        $sort: { statusOrder: 1 }
+      },
+      {
+        $project: {
+          statusOrder: 0
+        }
       }
-    ).populate<{ user: UserModelSchema }>('user'),
+    ]),
     MongoTeamMember.countDocuments({ teamId, status: notLeaveStatus })
   ]);
 
@@ -366,7 +402,10 @@ export async function getTeamMembersPaged({
       permission: new TeamPermission({
         per,
         isOwner
-      })
+      }),
+      contact: member.user[0].contact,
+      createTime: member.createTime,
+      updateTime: member.updateTime
     };
   });
 
@@ -418,7 +457,10 @@ export async function getTeamMember({
     permission: new TeamPermission({
       per: per ?? TeamDefaultPermissionVal,
       isOwner: member.role === TeamMemberRoleEnum.owner
-    })
+    }),
+    createTime: member.createTime,
+    updateTime: member.updateTime,
+    contact: member.user.contact
   };
 }
 /** remove user from team

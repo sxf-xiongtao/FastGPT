@@ -24,6 +24,9 @@ import { GroupMemberRole } from '@fastgpt/global/support/permission/memberGroup/
 import { changeOwner } from '@/service/core/changeOwner';
 import { getGroupsByTmbId } from '@fastgpt/service/support/permission/memberGroup/controllers';
 import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
+import { getIsSyncUser } from '@/global/support/user/constants';
+import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
+import { TeamReadPermissionVal } from '@fastgpt/global/support/permission/user/constant';
 
 type UserProps = {
   username: string;
@@ -37,7 +40,12 @@ type UserProps = {
   sourceDomain?: string;
 };
 
-/* create user and team */
+/**
+ * create user and team
+ * if createDefaultTeam is true, will create a default team.
+ * if defaultTeamIdList is not empty, will create a default team with the id list.
+ * if defaultTeamIdList is empty, will join the root team.
+ * */
 export async function createUserByUsername({
   username,
   password,
@@ -50,15 +58,19 @@ export async function createUserByUsername({
   inviterId,
   notificationAccount,
   fastgpt_sem,
-  sourceDomain
+  sourceDomain,
+  createDefaultTeam,
+  defaultTeamIdList
 }: UserProps & {
   teamName?: string;
   memberName?: string;
   password: string;
+  createDefaultTeam?: boolean;
+  defaultTeamIdList?: string[];
 }): Promise<UserType> {
   await authMaxUsers();
-
   const { user, tmb } = await mongoSessionRun(async (session) => {
+    //1. create user
     const [user] = await MongoUser.create(
       [
         {
@@ -73,27 +85,61 @@ export async function createUserByUsername({
       { session }
     );
 
-    // username: email;phone;git-xxx;google-xxx
-    const formatTeamName = (() => {
-      if (teamName) return teamName;
-      const splitUsername = username.split('-');
-      if (splitUsername.length > 1) {
-        return splitUsername[1];
+    //2. create or join team
+    const tmb = await (async () => {
+      if (createDefaultTeam) {
+        // username: email;phone;git-xxx;google-xxx
+        const formatTeamName = (() => {
+          if (teamName) return teamName;
+          const splitUsername = username.split('-');
+          if (splitUsername.length > 1) {
+            return splitUsername[1];
+          }
+          return splitUsername[0];
+        })();
+        const tmb = await getAndCreateUserDefaultTeam({
+          ownerId: user._id,
+          notificationAccount,
+          teamName: `${formatTeamName.slice(0, 10)} Team`,
+          memberName,
+          teamAvatar: avatar,
+          session
+        });
+        if (!defaultTeamIdList) return tmb;
       }
-      return splitUsername[0];
+      if (defaultTeamIdList) {
+        const teams = await MongoTeam.find({ _id: { $in: defaultTeamIdList } }, '_id');
+        if (!teams.length) return Promise.reject('default team not exist');
+        const tmbs = await MongoTeamMember.create(
+          teams.map((team) => ({
+            teamId: team._id,
+            userId: user._id,
+            name: memberName,
+            status: TeamMemberStatusEnum.active,
+            createTime: new Date()
+          })),
+          { session }
+        );
+        return {
+          ...tmbs[0].toObject(),
+          memberName: memberName ?? user.username,
+          userId: user._id,
+          teamId: tmbs[0].teamId,
+          teamName: teams[0].name,
+          tmbId: tmbs[0]._id,
+          teamDomain: teams[0].teamDomain,
+          permission: new TeamPermission({
+            per: TeamReadPermissionVal
+          })
+        };
+      }
+
+      return Promise.reject(
+        'no team create or join team, please check the createDefaultTeam and defaultTeamIdList'
+      );
     })();
-    const tmb = await getAndCreateUserDefaultTeam({
-      ownerId: user._id,
-      notificationAccount,
-      teamName: `${formatTeamName.slice(0, 10)} Team`,
-      memberName,
-      teamAvatar: avatar,
-      session
-    });
-    return {
-      user,
-      tmb
-    };
+
+    return { user, tmb };
   });
 
   return {
@@ -121,13 +167,17 @@ export async function usernameLogin({
 
   inviterId,
   fastgpt_sem,
-  sourceDomain
+  sourceDomain,
+  createDefaultTeam,
+  defaultTeamIdList
 }: UserProps & {
   teamName?: string;
   memberName?: string;
+  createDefaultTeam: boolean;
+  defaultTeamIdList?: string[];
 }) {
   // try to login
-  const user = await MongoUser.findOne({ username }, '_id lastLoginTmbId');
+  const user = await MongoUser.findOne({ username });
 
   // register
   if (!user) {
@@ -144,7 +194,9 @@ export async function usernameLogin({
 
       inviterId,
       fastgpt_sem,
-      sourceDomain
+      sourceDomain,
+      defaultTeamIdList,
+      createDefaultTeam
     });
     // send default password inform
     sendInform2OneUser({
@@ -156,12 +208,20 @@ export async function usernameLogin({
         content: `您的初始密码为: ${password}`
       }
     });
-    const token = createJWT(user);
 
     return {
       user,
-      token
+      token: createJWT(user)
     };
+  }
+
+  if (getIsSyncUser()) {
+    if (notificationAccount) {
+      user.contact = notificationAccount;
+      await user.save();
+    }
+  } else {
+    if (!user.contact) user.contact = notificationAccount || '';
   }
 
   // login
@@ -440,21 +500,20 @@ export async function removeUserFromTeam({
       }
     );
     // Delete group member
-    await MongoGroupMemberModel.deleteMany(
-      {
-        tmbId: memberTmbId
-      },
-      { session }
-    );
-
+    // await MongoGroupMemberModel.deleteMany(
+    //   {
+    //     tmbId: memberTmbId
+    //   },
+    //   { session }
+    // );
     // Delete org member
-    await MongoOrgMemberModel.deleteMany(
-      {
-        teamId,
-        tmbId: memberTmbId
-      },
-      { session }
-    );
+    // await MongoOrgMemberModel.deleteMany(
+    //   {
+    //     teamId,
+    //     tmbId: memberTmbId
+    //   },
+    //   { session }
+    // );
 
     // Transfer permission
     await changeOwner({
@@ -483,8 +542,9 @@ export async function removeUserFromTeam({
       { session }
     );
 
-    // Update member status is leave
+    // Update member status to leave
     removeTmb.status = TeamMemberStatusEnum.leave;
+    removeTmb.updateTime = new Date();
     await removeTmb.save({ session });
   };
 

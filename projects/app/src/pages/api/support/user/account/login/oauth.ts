@@ -11,7 +11,9 @@ import type { OauthLoginProps } from '@fastgpt/global/support/user/api';
 import { UserErrEnum } from '@fastgpt/global/common/error/code/user';
 import { trackBaiduConversion } from '@/service/common/tracking/baidu';
 import { pushTrack } from '@fastgpt/service/common/middle/tracks/utils';
-import { wecomUserPrefix } from '@/global/support/user/constants';
+import { getIsSyncUser, wecomUserPrefix } from '@/global/support/user/constants';
+import { MongoUser } from '@fastgpt/service/support/user/schema';
+import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 
 type OauthResponse = {
   username: string;
@@ -48,7 +50,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
       inviterId,
       fastgpt_sem,
-      sourceDomain
+      sourceDomain,
+      ...(getIsSyncUser()
+        ? {
+            createDefaultTeam: false,
+            defaultTeamIdList: await (async () => {
+              const root = await MongoUser.findOne({ username: 'root' });
+              const rootTeam = await MongoTeam.findOne({ ownerId: root!._id });
+              return [String(rootTeam!._id)];
+            })()
+          }
+        : {
+            createDefaultTeam: true
+          })
     });
 
     // 百度转化
@@ -247,23 +261,37 @@ export async function authWecom(code: string): Promise<OauthResponse> {
   getInfoURL.searchParams.set('code', code);
   getInfoURL.searchParams.set('access_token', access_token);
 
-  const { data } = await axios.get<{ userid: string; errmsg?: string }>(getInfoURL.toString());
+  const { data } = await axios.get<{ userid: string; errmsg?: string; user_ticket: string }>(
+    getInfoURL.toString()
+  );
+  const user_ticket = data.user_ticket;
 
   const userid = data.userid;
   if (!userid) {
     return Promise.reject(data.errmsg || 'Fail to get wechat userid');
   }
   // 3. get userInfo
-  const getDetailedInfoURL = new URL('https://qyapi.weixin.qq.com/cgi-bin/user/get');
+  const getDetailedInfoURL = new URL('https://qyapi.weixin.qq.com/cgi-bin/auth/getuserdetail');
   getDetailedInfoURL.searchParams.set('access_token', access_token);
-  getDetailedInfoURL.searchParams.set('userid', userid);
 
-  const { data: userInfo } = await axios.get(getDetailedInfoURL.toString());
+  const { data: userDetail } = await axios.post(getDetailedInfoURL.toString(), {
+    user_ticket
+  });
+
+  // 4. get username
+  const getUsernameURL = new URL('https://qyapi.weixin.qq.com/cgi-bin/user/get');
+  getUsernameURL.searchParams.set('access_token', access_token);
+  getUsernameURL.searchParams.set('userid', userid);
+
+  const {
+    data: { name }
+  } = await axios.get(getUsernameURL.toString());
 
   return {
     username: `${wecomUserPrefix}-${userid}`,
-    concat: userInfo.mobile || userInfo.email || '',
-    avatarUrl: userInfo.avatar || ''
+    concat: userDetail.mobile || userDetail.email || '',
+    avatarUrl: userDetail.avatar || '',
+    memberName: name
   };
 }
 /*
