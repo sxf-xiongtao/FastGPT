@@ -27,6 +27,7 @@ import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/membe
 import { getIsSyncUser } from '@/global/support/user/constants';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { TeamReadPermissionVal } from '@fastgpt/global/support/permission/user/constant';
+import { addLog } from '@fastgpt/service/common/system/log';
 
 type UserProps = {
   username: string;
@@ -66,7 +67,7 @@ export async function createUserByUsername({
   memberName?: string;
   password: string;
   createDefaultTeam?: boolean;
-  defaultTeamIdList?: string[];
+  defaultTeamIdList?: string[]; // invite user to register/Sync user
 }): Promise<UserType> {
   await authMaxUsers();
   const { user, tmb } = await mongoSessionRun(async (session) => {
@@ -79,7 +80,8 @@ export async function createUserByUsername({
           phonePrefix,
           inviterId: inviterId && Types.ObjectId.isValid(inviterId) ? inviterId : undefined,
           fastgpt_sem,
-          sourceDomain
+          sourceDomain,
+          contact: notificationAccount
         }
       ],
       { session }
@@ -103,6 +105,7 @@ export async function createUserByUsername({
           teamName: `${formatTeamName.slice(0, 10)} Team`,
           memberName,
           teamAvatar: avatar,
+          memberAvatar: avatar,
           session
         });
         if (!defaultTeamIdList) return tmb;
@@ -215,13 +218,20 @@ export async function usernameLogin({
     };
   }
 
-  if (getIsSyncUser()) {
+  try {
     if (notificationAccount) {
-      user.contact = notificationAccount;
-      await user.save();
+      if (getIsSyncUser()) {
+        user.contact = notificationAccount;
+        await user.save();
+      } else if (!user.contact) {
+        user.contact = notificationAccount;
+        await user.save();
+      }
     }
-  } else {
-    if (!user.contact) user.contact = notificationAccount || '';
+  } catch (error) {
+    addLog.warn('usernameLogin user contact update error', {
+      error
+    });
   }
 
   // login

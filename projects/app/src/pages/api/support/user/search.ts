@@ -110,6 +110,7 @@ async function handler(
             name: regex,
             teamId
           },
+          undefined,
           {
             ...readFromSecondary
           }
@@ -120,9 +121,10 @@ async function handler(
     searchGroups
       ? MongoMemberGroupModel.find(
           {
-            name: regex,
-            teamId
+            teamId,
+            name: regex
           },
+          undefined,
           {
             ...readFromSecondary
           }
@@ -131,7 +133,7 @@ async function handler(
           .lean()
       : []
   ]);
-
+  console.log(groups);
   return {
     members: [...members].map((item) => ({
       tmbId: item._id,

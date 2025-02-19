@@ -9,6 +9,8 @@ import { UserModelSchema } from '@fastgpt/global/support/user/type';
 import { OrgType } from '@fastgpt/global/support/user/team/org/type';
 import { generateCsv } from '@fastgpt/service/common/file/csv';
 import format from 'date-fns/format';
+import { useIPFrequencyLimit } from '@fastgpt/service/common/middle/reqFrequencyLimit';
+import { OwnerPermissionVal } from '@fastgpt/global/support/permission/constant';
 
 export type TeamMemberExportQuery = {};
 export type TeamMemberExportBody = {};
@@ -25,7 +27,7 @@ async function handler(
   req: ApiRequestProps<TeamMemberExportBody, TeamMemberExportQuery>,
   res: ApiResponseType<any>
 ): Promise<TeamMemberExportResponse> {
-  const { teamId } = await authUserPer({ req, authToken: true, per: TeamManagePermissionVal });
+  const { teamId } = await authUserPer({ req, authToken: true, per: OwnerPermissionVal });
   // 1. get members
   const members = (await MongoTeamMember.find({ teamId }).populate('user').lean()) as Array<
     TeamMemberSchema & { user: UserModelSchema }
@@ -54,4 +56,12 @@ async function handler(
   res.end();
   return {};
 }
-export default NextAPI(handler);
+
+export default NextAPI(
+  useIPFrequencyLimit({
+    id: 'export-members',
+    seconds: 60,
+    limit: 1
+  }),
+  handler
+);

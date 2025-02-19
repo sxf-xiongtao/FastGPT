@@ -5,6 +5,7 @@ import {
   GetUsageDashboardResponseItem
 } from '@fastgpt/global/support/wallet/usage/api';
 import { Types } from '@fastgpt/service/common/mongo';
+import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
@@ -43,27 +44,32 @@ async function handler(
     ...(sources && { source: { $in: sources } })
   };
 
-  const data = (await MongoUsage.aggregate([
-    { $match: where },
+  const data = (await MongoUsage.aggregate(
+    [
+      { $match: where },
+      {
+        $group: {
+          _id: {
+            year: { $year: '$time' },
+            month: { $month: '$time' },
+            day: { $dayOfMonth: '$time' }
+          },
+          totalPoints: { $sum: '$totalPoints' }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          date: { $dateFromParts: { year: '$_id.year', month: '$_id.month', day: '$_id.day' } },
+          totalPoints: 1
+        }
+      },
+      { $sort: { date: 1 } }
+    ],
     {
-      $group: {
-        _id: {
-          year: { $year: '$time' },
-          month: { $month: '$time' },
-          day: { $dayOfMonth: '$time' }
-        },
-        totalPoints: { $sum: '$totalPoints' }
-      }
-    },
-    {
-      $project: {
-        _id: 0,
-        date: { $dateFromParts: { year: '$_id.year', month: '$_id.month', day: '$_id.day' } },
-        totalPoints: 1
-      }
-    },
-    { $sort: { date: 1 } }
-  ])) as GetUsageDashboardResponseItem[];
+      ...readFromSecondary
+    }
+  )) as GetUsageDashboardResponseItem[];
 
   // Generate complete date range
   const concatData: GetUsageDashboardResponseItem[] = [];
