@@ -25,7 +25,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           ...fastgpt,
           feConfigs: {
             ...fastgpt.feConfigs,
-            show_git: !!process.env.SHOW_GIT
+            show_git: !!process.env.SHOW_GIT,
+            show_workorder: !!process.env.WORKORDER_BASE_URL
           }
         }
       }),

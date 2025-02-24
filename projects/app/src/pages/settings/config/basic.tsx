@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Flex, useMediaQuery } from '@chakra-ui/react';
+import { Box, Button, Flex } from '@chakra-ui/react';
 import { useToast } from '@fastgpt/web/hooks/useToast';
 import { throttle } from '@/utils/tools';
 import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';

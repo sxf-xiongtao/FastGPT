@@ -15,6 +15,7 @@ export function formatConfigStore2FormSchema({
     show_team_chat = false,
     show_openai_account = false,
     show_promotion = false,
+    show_workorder = false,
     favicon = '',
     concatMd = '',
     docUrl = 'https://doc.tryfastgpt.ai',
@@ -47,6 +48,7 @@ export function formatConfigStore2FormSchema({
   return {
     siteSettings: {
       feConfigs: {
+        show_workorder,
         show_emptyChat,
         show_team_chat,
         show_openai_account,

@@ -15,6 +15,7 @@ export type ConfigStoreType = {
 export type ConfigFormType = {
   siteSettings: {
     feConfigs: {
+      show_workorder: boolean;
       show_emptyChat: boolean;
       show_team_chat: boolean;
       show_openai_account: boolean;
