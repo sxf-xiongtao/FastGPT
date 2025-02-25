@@ -21,6 +21,7 @@ import {
   bjsf_getUserInfo,
   bjsf_redirectFn
 } from 'provider/bjsf';
+import { TCL_getUserInfo, tcl_redirectFn } from 'provider/tcl';
 
 const providerMap: {
   [key: string]: {
@@ -59,6 +60,10 @@ const providerMap: {
     getUserInfo: bjsf_getUserInfo,
     getMetaData: bjsf_getMetadata,
     assertFn: bjsf_assertFn
+  },
+  tcl: {
+    redirectFn: tcl_redirectFn,
+    getUserInfo: TCL_getUserInfo
   }
 };
 
