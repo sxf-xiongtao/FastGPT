@@ -1,9 +1,8 @@
 name: Preview fastgpt-admin in pr
 on:
   pull_request_target:
-    paths:
-      - 'projects/app/**'
-      - 'FastGPT/packages/**'
+    - 'projects/**'
+    - 'FastGPT/packages/**'
   workflow_dispatch:
 
 jobs:
