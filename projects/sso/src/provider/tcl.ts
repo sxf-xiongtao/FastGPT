@@ -6,7 +6,7 @@ export const tcl_redirectFn: RedirectFn = async ({ state }) => {
 
   // 解析 redirect_uri，然后给他带上 state，redirect_uri本身可能已经是带参数的
   const url = new URL(targetUrl);
-  url.searchParams.set('state', state);
+  // url.searchParams.set('state', state);
   const redirectUrl = url.toString();
 
   return { redirectUrl };
@@ -21,7 +21,7 @@ export const TCL_getUserInfo: GetUserInfoFn = async (code: string) => {
 
   const { data } = await axios.request({
     url: TOKENURL,
-    method: 'get',
+    method: 'post',
     params: {
       code,
       client_id: CLIENT_ID,
@@ -30,6 +30,7 @@ export const TCL_getUserInfo: GetUserInfoFn = async (code: string) => {
       redirect_uri: REDIRECT_URI
     }
   });
+
   const access_token = data.access_token;
   const { data: userInfo } = await axios.request<{
     id: string;
