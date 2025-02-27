@@ -147,12 +147,13 @@ export default function Navbar({ onClose }: { onClose?: () => void }) {
       }
     } else {
       router.push(item.activeLink);
+      onClose?.();
     }
-    onClose?.();
   };
 
   const handleSubItemClick = (subItem: any) => {
     router.push(subItem.activeLink);
+    onClose?.();
   };
 
   return (
