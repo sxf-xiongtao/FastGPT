@@ -66,18 +66,33 @@ export async function changeOwner({
 
     // 1. update resources' owner
     if (resourceId) {
-      await Model.updateOne(
-        {
-          _id: resourceId
-        },
-        {
-          tmbId: newOwnerId,
-          inheritPermission: false
-        },
-        {
-          session
-        }
-      );
+      if (changeOwnerType === 'app') {
+        await MongoApp.updateOne(
+          {
+            _id: resourceId
+          },
+          {
+            tmbId: newOwnerId,
+            inheritPermission: false
+          },
+          {
+            session
+          }
+        );
+      } else {
+        await MongoDataset.updateOne(
+          {
+            _id: resourceId
+          },
+          {
+            tmbId: newOwnerId,
+            inheritPermission: false
+          },
+          {
+            session
+          }
+        );
+      }
     }
 
     // 2. Update other resources' owner

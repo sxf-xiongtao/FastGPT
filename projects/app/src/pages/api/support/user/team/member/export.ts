@@ -1,12 +1,10 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
-import { TeamManagePermissionVal } from '@fastgpt/global/support/permission/user/constant';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
-import { TeamMemberSchema } from '@fastgpt/global/support/user/team/type';
 import { UserModelSchema } from '@fastgpt/global/support/user/type';
-import { OrgType } from '@fastgpt/global/support/user/team/org/type';
+import { OrgMemberSchemaType } from '@fastgpt/global/support/user/team/org/type';
 import { generateCsv } from '@fastgpt/service/common/file/csv';
 import format from 'date-fns/format';
 import { useIPFrequencyLimit } from '@fastgpt/service/common/middle/reqFrequencyLimit';
@@ -29,10 +27,16 @@ async function handler(
 ): Promise<TeamMemberExportResponse> {
   const { teamId } = await authUserPer({ req, authToken: true, per: OwnerPermissionVal });
   // 1. get members
-  const members = (await MongoTeamMember.find({ teamId }).populate('user').lean()) as Array<
-    TeamMemberSchema & { user: UserModelSchema }
-  >;
-  const orgs = (await MongoOrgModel.find({ teamId }).lean()) as OrgType[];
+  const members = await MongoTeamMember.find({ teamId })
+    .populate<{
+      user: UserModelSchema;
+    }>('user')
+    .lean();
+  const orgs = await MongoOrgModel.find({ teamId })
+    .populate<{
+      members: OrgMemberSchemaType[];
+    }>('members')
+    .lean();
   // 2. prepare data
   const headers = ['账号', '用户名', '联系方式', '部门', '加入时间', '更新时间', '状态'];
   const data = members.map((member) => {
