@@ -2,9 +2,9 @@ import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/nex
 import { NextAPI } from '@/service/middleware/entry';
 import { parseHeaderCert } from '@fastgpt/service/support/permission/controller';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { sign } from 'jsonwebtoken';
 import { StandardSubLevelEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import { getTeamPlanStatus } from '@fastgpt/service/support/wallet/sub/utils';
 
 export type WorkorderCreateQuery = {};
 export type WorkorderCreateBody = {};
@@ -32,21 +32,25 @@ async function handler(
   }
   const { userId, teamId } = await parseHeaderCert({ req, authToken: true });
   const user = await MongoUser.findOne({ _id: userId }).lean();
-  const teamsub = await MongoTeamSub.findOne({
-    teamId
-  }).lean();
+  // const teamsub = await MongoTeamSub.findOne({
+  //   teamId
+  // }).lean();
   const domain = req.headers.host || '';
 
-  if (!user || !teamsub) {
+  if (!user) {
     return Promise.reject('User not found');
   }
+
+  const teamPlan = await getTeamPlanStatus({ teamId });
 
   const payload: PayloadType = {
     username: user.username,
     userId: user._id,
     teamId,
     domain,
-    level: Object.keys(StandardSubLevelEnum).indexOf(teamsub.currentSubLevel)
+    level: Object.keys(StandardSubLevelEnum).indexOf(
+      teamPlan.standard?.currentSubLevel ?? StandardSubLevelEnum.free
+    )
   };
 
   const token = sign(payload, workorder_jwt_secret, {
