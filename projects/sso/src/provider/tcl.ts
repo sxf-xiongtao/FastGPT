@@ -31,12 +31,11 @@ export const TCL_getUserInfo: GetUserInfoFn = async (code: string) => {
     }
   });
 
-  const access_token = data.access_token;
+  // ret: access_token=xxxxx&expires_in=
+  const access_token = data.split('&')[0].split('=')[1];
   const { data: userInfo } = await axios.request<{
     id: string;
-    attributes: {
-      [key: string]: string;
-    }[];
+    attributes: any;
   }>({
     url: GET_USER_INFO_URL,
     method: 'get',
@@ -44,18 +43,36 @@ export const TCL_getUserInfo: GetUserInfoFn = async (code: string) => {
       access_token
     }
   });
-
-  const attributes = {} as Record<string, string>;
-
-  userInfo.attributes.forEach((attr) => {
-    const key = Object.keys(attr)[0];
-    const value = attr[key];
-    attributes[key] = value;
-  });
+  // userInfo return sample:
+  // {
+  //   "attributes": [
+  //     {
+  //       "uid": "38753"
+  //     },
+  //     {
+  //       "smart-type": "E1"
+  //     },
+  //     {
+  //       "smart-csot-loginname": "zhoushuchang"
+  //     },
+  //     {
+  //       "mail": "zhoushuchang@tcl.com"
+  //     },
+  //     {
+  //       "mobile": "1336548141"
+  //     }
+  //   ],
+  //   "id": "38753"
+  // }
+  const uid = userInfo.attributes.find((item: any) => Object.keys(item).includes('uid')).uid;
+  const mobile = userInfo.attributes.find((item: any) =>
+    Object.keys(item).includes('mobile')
+  ).mobile;
+  const mail = userInfo.attributes.find((item: any) => Object.keys(item).includes('mail')).mail;
 
   return {
-    username: 'tcl-' + attributes['uid'],
+    username: 'tcl-' + uid,
     avatar: '',
-    contact: attributes['mobile'] || attributes['mail']
+    contact: mobile || mail
   };
 };
