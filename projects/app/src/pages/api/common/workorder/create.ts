@@ -4,7 +4,7 @@ import { parseHeaderCert } from '@fastgpt/service/support/permission/controller'
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { sign } from 'jsonwebtoken';
 import { StandardSubLevelEnum } from '@fastgpt/global/support/wallet/sub/constants';
-import { getTeamPlanStatus } from '@fastgpt/service/support/wallet/sub/utils';
+import { getTeamStandPlan } from '@fastgpt/service/support/wallet/sub/utils';
 
 export type WorkorderCreateQuery = {};
 export type WorkorderCreateBody = {};
@@ -41,7 +41,7 @@ async function handler(
     return Promise.reject('User not found');
   }
 
-  const teamPlan = await getTeamPlanStatus({ teamId });
+  const teamPlan = await getTeamStandPlan({ teamId });
 
   const payload: PayloadType = {
     username: user.username,
