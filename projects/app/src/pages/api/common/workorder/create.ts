@@ -57,7 +57,7 @@ async function handler(
     expiresIn: '7d'
   });
 
-  const url = `${workorder_base_url}/workorder/create?token=${token}`;
+  const url = `${workorder_base_url}/workorders?token=${token}`;
 
   return {
     redirectUrl: url
