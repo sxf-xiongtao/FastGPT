@@ -1,5 +1,5 @@
 // import '../../../../__mocks__/base';
-// import { getTestRequest } from '@/test/utils';
+// import { getTestRequest } from '@fastgpt/service/test/utils'; ;
 // import handler from './delete';
 // import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
 // import { root } from '@/pages/api/__mocks__/db/init';

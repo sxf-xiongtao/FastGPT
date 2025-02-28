@@ -4,13 +4,7 @@ import { TrainingModeEnum } from '@fastgpt/global/core/dataset/constants';
 import { createChatCompletion } from '@fastgpt/service/core/ai/config';
 import type { ChatCompletionMessageParam } from '@fastgpt/global/core/ai/type.d';
 import { addLog } from '@fastgpt/service/common/system/log';
-import { splitText2Chunks } from '@fastgpt/global/common/string/textSplitter';
-import { replaceVariable } from '@fastgpt/global/common/string/tools';
-import {
-  AUTO_TRAINING_PROMPT,
-  AUTO_TRAINING_SPLIT_CHAT
-} from '@/global/core/ai/prompt/autoTraining';
-import type { PushDatasetDataChunkProps } from '@fastgpt/global/core/dataset/api.d';
+import { getAutoTrainingPrompt } from '@/global/core/ai/prompt/autoTraining';
 import { getLLMModel } from '@fastgpt/service/core/ai/model';
 import { checkTeamAiPointsAndLock } from './utils';
 import { addMinutes } from 'date-fns';
@@ -18,12 +12,27 @@ import { countGptMessagesTokens } from '@fastgpt/service/common/string/tiktoken/
 import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
 import { pushDataListToTrainingQueueByCollectionId } from '@fastgpt/service/core/dataset/training/controller';
 import { loadRequestMessages } from '@fastgpt/service/core/chat/utils';
-import { llmCompletionsBodyFormat, llmStreamResponseToText } from '@fastgpt/service/core/ai/utils';
+import {
+  llmCompletionsBodyFormat,
+  llmStreamResponseToAnswerText
+} from '@fastgpt/service/core/ai/utils';
+import { formatSplitText2Index } from './utils';
+import { DatasetErrEnum } from '@fastgpt/global/common/error/code/dataset';
 
 const reduceQueue = () => {
   global.autoTrainingLen = global.autoTrainingLen > 0 ? global.autoTrainingLen - 1 : 0;
 
   return global.autoTrainingLen === 0;
+};
+const returnQueue = (delay = 0) => {
+  reduceQueue();
+  if (delay) {
+    setTimeout(() => {
+      generateAutoTraining();
+    }, delay);
+  } else {
+    generateAutoTraining();
+  }
 };
 
 export async function generateAutoTraining(): Promise<any> {
@@ -90,21 +99,19 @@ export async function generateAutoTraining(): Promise<any> {
     return;
   }
   if (error) {
-    reduceQueue();
-    return generateAutoTraining();
+    return returnQueue();
   }
   addLog.info(`[Auto Training Queue] Start`);
 
   // auth balance
   if (!(await checkTeamAiPointsAndLock(data.teamId))) {
-    reduceQueue();
-    return generateAutoTraining();
+    return returnQueue();
   }
 
   try {
     const startTime = Date.now();
     const modelData = getLLMModel(data.model);
-    const prompt = replaceVariable(AUTO_TRAINING_PROMPT, { text });
+    const prompt = getAutoTrainingPrompt({ text });
 
     // request LLM to get QA
     const messages: ChatCompletionMessageParam[] = [
@@ -125,7 +132,7 @@ export async function generateAutoTraining(): Promise<any> {
         modelData
       )
     });
-    const answer = await llmStreamResponseToText(chatResponse);
+    const answer = await llmStreamResponseToAnswerText(chatResponse);
 
     const splitIndexResult = formatSplitText2Index(answer, text); // 格式化后的索引
 
@@ -135,79 +142,45 @@ export async function generateAutoTraining(): Promise<any> {
       usage: chatResponse.usage
     });
 
-    // get vector and insert
-    const { insertLen } = await pushDataListToTrainingQueueByCollectionId({
-      teamId: data.teamId,
-      tmbId: data.tmbId,
-      collectionId: data.collectionId,
-      trainingMode: TrainingModeEnum.chunk,
-      data: [
-        {
-          ...splitIndexResult,
-          chunkIndex: data.chunkIndex
-        }
-      ],
-      billId: data.billId
-    });
-
-    // delete data from training
-    await MongoDatasetTraining.findByIdAndDelete(data._id);
-
-    // add bill
-    if (insertLen > 0) {
-      pushAutoTrainingUsage({
+    try {
+      // get vector and insert
+      await pushDataListToTrainingQueueByCollectionId({
         teamId: data.teamId,
         tmbId: data.tmbId,
-        inputTokens: await countGptMessagesTokens(messages),
-        outputTokens: await countGptMessagesTokens([{ role: 'assistant', content: answer }]),
-        billId: data.billId,
-        model: modelData.model
+        collectionId: data.collectionId,
+        trainingMode: TrainingModeEnum.chunk,
+        data: [
+          {
+            ...splitIndexResult,
+            chunkIndex: data.chunkIndex
+          }
+        ],
+        billId: data.billId
       });
-    } else {
-      addLog.info(`[Auto Training Queue] Result 0:`, { answer });
+
+      // delete data from training
+      await MongoDatasetTraining.findByIdAndDelete(data._id);
+    } catch (error) {
+      if (error === DatasetErrEnum.unExistCollection) {
+        await MongoDatasetTraining.findByIdAndDelete(data._id);
+      }
+      addLog.error(`[Auto Training Queue] Insert data error`, error);
+      return returnQueue();
     }
 
-    reduceQueue();
-    generateAutoTraining();
+    // add bill
+    pushAutoTrainingUsage({
+      teamId: data.teamId,
+      tmbId: data.tmbId,
+      inputTokens: await countGptMessagesTokens(messages),
+      outputTokens: await countGptMessagesTokens([{ role: 'assistant', content: answer }]),
+      billId: data.billId,
+      model: modelData.model
+    });
+
+    return returnQueue();
   } catch (err: any) {
     addLog.error(`[Auto Training Queue] Error`, err);
-    reduceQueue();
-
-    setTimeout(() => {
-      generateAutoTraining();
-    }, 1000);
+    returnQueue(1000);
   }
-}
-
-/**
- * 检查文本是否按格式返回
- */
-function formatSplitText2Index(answer: string, rawText: string): PushDatasetDataChunkProps {
-  const arr = answer.split(AUTO_TRAINING_SPLIT_CHAT);
-
-  const result = {
-    q: rawText,
-    a: '',
-    indexes: arr.map((item) => {
-      // remove start :
-      item = item.trim();
-      if (item.startsWith(':')) {
-        item = item.slice(1);
-      }
-      return {
-        defaultIndex: false,
-        text: item
-      };
-    })
-  };
-
-  const { chunks } = splitText2Chunks({ text: rawText, chunkLen: 512 });
-  result.indexes.push(
-    ...chunks.map((item) => ({
-      defaultIndex: false,
-      text: item
-    }))
-  );
-
-  return result;
 }

@@ -1,5 +1,5 @@
 // import '../../../../__mocks__/base';
-// import { getTestRequest } from '@/test/utils';
+// import { getTestRequest } from '@fastgpt/service/test/utils'; ;
 // import handler from './create';
 // import { root } from '@/pages/api/__mocks__/db/init';
 // import { RequestResponse } from '@/pages/api/__mocks__/type';

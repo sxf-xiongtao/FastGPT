@@ -1,5 +1,5 @@
 // import '../../../../__mocks__/base';
-// import { getTestRequest } from '@/test/utils';
+// import { getTestRequest } from '@fastgpt/service/test/utils'; ;
 // import handler from './update';
 // import { root } from '@/pages/api/__mocks__/db/init';
 // import { PerResourceTypeEnum } from '@fastgpt/global/support/permission/constant';
