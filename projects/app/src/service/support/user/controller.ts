@@ -324,7 +324,7 @@ export async function syncUser({ teamId, latestUserList, source, session }: Sync
             password: getNanoid()
           }
         ],
-        { session }
+        { session, ordered: true }
       );
 
       // create tmb
@@ -339,7 +339,7 @@ export async function syncUser({ teamId, latestUserList, source, session }: Sync
             defaultTeam: true
           }
         ],
-        { session }
+        { session, ordered: true }
       );
     }
   };
@@ -408,7 +408,7 @@ export async function syncOrg({ teamId, latestOrgList: orgs, session }: syncOrgP
           path: org.path
         }
       ],
-      { session }
+      { session, ordered: true }
     );
     // 3.2 add members
     for (const tmbId of org.tmbIds) {
@@ -420,7 +420,7 @@ export async function syncOrg({ teamId, latestOrgList: orgs, session }: syncOrgP
             tmbId
           }
         ],
-        { session }
+        { session, ordered: true }
       );
     }
 
@@ -442,7 +442,7 @@ export async function syncOrg({ teamId, latestOrgList: orgs, session }: syncOrgP
         resourceType: per.resourceType,
         resourceId: per.resourceId
       })),
-      { session }
+      { session, ordered: true }
     );
   }
 }

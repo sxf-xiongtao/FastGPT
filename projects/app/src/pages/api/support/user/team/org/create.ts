@@ -46,7 +46,7 @@ async function handler(
           path: getOrgChildrenPath(parent)
         }
       ],
-      { session }
+      { session, ordered: true }
     );
   });
 }

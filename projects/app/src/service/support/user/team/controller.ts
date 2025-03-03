@@ -105,7 +105,7 @@ export async function createTeam({
           defaultPermission: TeamDefaultPermissionVal
         }
       ],
-      { session }
+      { session, ordered: true }
     );
     // create team member
     const [tmb] = await MongoTeamMember.create(
@@ -120,7 +120,7 @@ export async function createTeam({
           avatar: memberAvatar
         }
       ],
-      { session }
+      { session, ordered: true }
     );
 
     await MongoMemberGroupModel.create(
@@ -131,7 +131,7 @@ export async function createTeam({
           avatar: team.avatar
         }
       ],
-      { session }
+      { session, ordered: true }
     );
 
     // create sub plan

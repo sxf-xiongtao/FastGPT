@@ -53,7 +53,8 @@ async function handler(
         }
       ],
       {
-        session
+        session,
+        ordered: true
       }
     );
 
@@ -65,7 +66,7 @@ async function handler(
           role: 'owner'
         }
       ],
-      { session }
+      { session, ordered: true }
     );
   });
 

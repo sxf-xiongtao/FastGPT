@@ -7,7 +7,6 @@ import { TeamManagePermissionVal } from '@fastgpt/global/support/permission/user
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { TeamDefaultPermissionVal } from '@fastgpt/global/support/permission/user/constant';
-import { getTmbInfoByTmbId } from '@fastgpt/service/support/user/team/controller';
 import { TeamPermission } from '@fastgpt/global/support/permission/user/controller';
 import { UpdateClbPermissionProps } from '@fastgpt/global/support/permission/collaborator';
 import { PermissionValueType } from '@fastgpt/global/support/permission/type';

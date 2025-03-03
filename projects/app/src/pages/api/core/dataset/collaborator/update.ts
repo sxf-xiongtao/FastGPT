@@ -54,9 +54,9 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
     if (isRoot) return;
 
     // can not update own permission
-    if (tmbIds.includes(tmbId)) {
-      return Promise.reject(DatasetErrEnum.unAuthDataset);
-    }
+    // if (tmbIds.includes(tmbId)) {
+    //   return Promise.reject(DatasetErrEnum.unAuthDataset);
+    // }
     // can not update my group's permission unless I am owner
     const myGroupIds = (await getGroupsByTmbId({ tmbId, teamId })).map((item) => String(item._id));
     if (groupIds.some((groupId) => myGroupIds.includes(groupId)) && !myPer.isOwner) {

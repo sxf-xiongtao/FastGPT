@@ -46,6 +46,6 @@ export const createStandardSubBill = async ({
         }
       }
     ],
-    { session }
+    { session, ordered: true }
   );
 };

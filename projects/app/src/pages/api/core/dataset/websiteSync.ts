@@ -135,7 +135,7 @@ async function createCollectionAndPushData(props: {
             nextSyncTime: dataset.autoSync ? addDays(new Date(), 1) : undefined
           }
         ],
-        { session }
+        { session, ordered: true }
       );
 
       // insert to training queue
@@ -154,7 +154,7 @@ async function createCollectionAndPushData(props: {
           a: '',
           chunkIndex: i
         })),
-        { session }
+        { session, ordered: true }
       );
     });
   } catch (err) {

@@ -78,7 +78,7 @@ async function handler(
           }
         }
       ],
-      { session }
+      { session, ordered: true }
     );
 
     await MongoTeamSub.create(
@@ -93,7 +93,7 @@ async function handler(
           surplusPoints: points
         }
       ],
-      { session }
+      { session, ordered: true }
     );
   });
 

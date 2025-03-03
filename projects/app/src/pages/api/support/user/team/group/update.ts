@@ -110,7 +110,7 @@ async function handler(
         tmbId: item.tmbId,
         role: item.role
       })),
-      { session }
+      { session, ordered: true }
     );
   });
 

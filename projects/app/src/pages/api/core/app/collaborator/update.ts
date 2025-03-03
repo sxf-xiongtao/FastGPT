@@ -63,9 +63,9 @@ async function handler(req: NextApiRequest) {
     if (isRoot) return;
 
     // can not update own permission
-    if (tmbIds?.includes(tmbId)) {
-      return Promise.reject(AppErrEnum.unAuthApp);
-    }
+    // if (tmbIds?.includes(tmbId)) {
+    //   return Promise.reject(AppErrEnum.unAuthApp);
+    // }
     // can not update my group's permission unless I am owner
     const myGroupIds = (await getGroupsByTmbId({ tmbId, teamId })).map((item) => String(item._id));
     if (groupIds?.some((groupId) => myGroupIds.includes(groupId)) && !myPer.isOwner) {

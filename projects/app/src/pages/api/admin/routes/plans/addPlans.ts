@@ -82,16 +82,24 @@ async function handler(req: ApiRequestProps<AddTeamPlanBody>, res: NextApiRespon
     }
 
     await mongoSessionRun(async (session) => {
-      result = await MongoTeamSub.create({
-        teamId,
-        type,
-        startTime,
-        expiredTime,
-        price: price * PRICE_SCALE,
-        currentSubLevel: level,
-        totalPoints,
-        surplusPoints
-      });
+      result = await MongoTeamSub.create(
+        [
+          {
+            teamId,
+            type,
+            startTime,
+            expiredTime,
+            price: price * PRICE_SCALE,
+            currentSubLevel: level,
+            totalPoints,
+            surplusPoints
+          }
+        ],
+        {
+          session,
+          ordered: true
+        }
+      );
       await reComputeStandPlans(teamId, session);
     });
   }

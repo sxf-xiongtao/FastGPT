@@ -76,7 +76,8 @@ async function handler(
         }
       ],
       {
-        session
+        session,
+        ordered: true
       }
     );
 

@@ -38,7 +38,7 @@ async function handler(
         orgId,
         tmbId: item.tmbId
       })),
-      { session }
+      { session, ordered: true }
     );
   });
 }
