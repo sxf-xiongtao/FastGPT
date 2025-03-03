@@ -148,12 +148,17 @@ export const getFormConfig = (): FormConfig => {
             vectorMaxProcess: {
               key: 'siteSettings.systemEnv.vectorMaxProcess',
               type: 'number',
-              title: '向量训练最大进程'
+              title: '知识库索引最大处理进程'
             },
             qaMaxProcess: {
               key: 'siteSettings.systemEnv.qaMaxProcess',
               type: 'number',
-              title: 'QA训练最大进程'
+              title: '文件理解模型最大处理进程'
+            },
+            vlmMaxProcess: {
+              key: 'siteSettings.systemEnv.vlmMaxProcess',
+              type: 'number',
+              title: '图片理解模型最大处理进程'
             },
             pgHNSWEfSearch: {
               key: 'siteSettings.systemEnv.pgHNSWEfSearch',
@@ -165,6 +170,33 @@ export const getFormConfig = (): FormConfig => {
               key: 'siteSettings.systemEnv.tokenWorkers',
               type: 'number',
               title: 'token计算最大进程（通常多少并发设置多少）'
+            }
+          }
+        },
+        pdfParse: {
+          key: 'siteSettings.systemEnv',
+          type: 'object',
+          title: 'PDF 解析配置',
+          properties: {
+            customPdfParseUrl: {
+              key: 'siteSettings.systemEnv.customPdfParse.url',
+              type: 'string',
+              title: '自定义 PDF 解析地址'
+            },
+            customPdfParseKey: {
+              key: 'siteSettings.systemEnv.customPdfParse.key',
+              type: 'string',
+              title: '自定义 PDF 解析密钥'
+            },
+            customPdfParseDoc2xKey: {
+              key: 'siteSettings.systemEnv.customPdfParse.doc2xKey',
+              type: 'string',
+              title: 'Doc2x pdf 解析密钥（比自定义 PDF 解析优先级低）'
+            },
+            customPdfParsePrice: {
+              key: 'siteSettings.systemEnv.customPdfParse.price',
+              type: 'number',
+              title: '自定义 PDF 解析价格(n 积分/页)'
             }
           }
         },

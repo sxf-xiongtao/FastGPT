@@ -6,8 +6,7 @@ import type {
 import { createCollectionAndInsertData } from '@fastgpt/service/core/dataset/collection/controller';
 import {
   DatasetCollectionTypeEnum,
-  DatasetSourceReadTypeEnum,
-  TrainingModeEnum
+  DatasetSourceReadTypeEnum
 } from '@fastgpt/global/core/dataset/constants';
 import { readDatasetSourceRawText } from '@fastgpt/service/core/dataset/read';
 import { NextAPI } from '@/service/middleware/entry';
@@ -19,16 +18,7 @@ async function handler(req: ApiRequestProps<ExternalFileCreateDatasetCollectionP
   insertLen: number;
   results: PushDatasetDataResponse;
 }> {
-  let {
-    externalFileUrl,
-    externalFileId,
-    filename,
-    trainingType = TrainingModeEnum.chunk,
-    chunkSize = 512,
-    chunkSplitter,
-    qaPrompt,
-    ...body
-  } = req.body;
+  let { externalFileUrl, externalFileId, filename, customPdfParse, ...body } = req.body;
 
   if (!externalFileId) {
     return Promise.reject('Missing externalFileId');
@@ -49,9 +39,11 @@ async function handler(req: ApiRequestProps<ExternalFileCreateDatasetCollectionP
   // 1. read file
   const rawText = await readDatasetSourceRawText({
     teamId,
+    tmbId,
     type: DatasetSourceReadTypeEnum.externalFile,
     sourceId: externalFileUrl,
     isQAImport: false,
+    customPdfParse,
     externalFileId
   });
 
@@ -70,10 +62,7 @@ async function handler(req: ApiRequestProps<ExternalFileCreateDatasetCollectionP
       },
 
       // special metadata
-      trainingType,
-      chunkSize,
-      chunkSplitter,
-      qaPrompt,
+      customPdfParse,
 
       externalFileUrl,
       externalFileId

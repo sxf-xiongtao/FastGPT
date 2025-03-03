@@ -1,4 +1,4 @@
-import { retryRun } from '@fastgpt/global/common/fn/utils';
+import { retryFn } from '@fastgpt/global/common/system/utils';
 import axios from 'axios';
 import crypto from 'crypto';
 
@@ -17,7 +17,7 @@ export async function replyMessage({
   replyContent: string;
   title?: string;
 }) {
-  return retryRun(() =>
+  return retryFn(() =>
     axios.post(webhook, {
       msgtype: 'markdown',
       markdown: {

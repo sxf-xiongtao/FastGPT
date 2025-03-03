@@ -10,14 +10,12 @@ import { checkTeamAiPointsAndLock } from './utils';
 import { addMinutes } from 'date-fns';
 import { countGptMessagesTokens } from '@fastgpt/service/common/string/tiktoken/index';
 import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
-import { pushDataListToTrainingQueueByCollectionId } from '@fastgpt/service/core/dataset/training/controller';
 import { loadRequestMessages } from '@fastgpt/service/core/chat/utils';
 import {
   llmCompletionsBodyFormat,
   llmStreamResponseToAnswerText
 } from '@fastgpt/service/core/ai/utils';
 import { formatSplitText2Index } from './utils';
-import { DatasetErrEnum } from '@fastgpt/global/common/error/code/dataset';
 
 const reduceQueue = () => {
   global.autoTrainingLen = global.autoTrainingLen > 0 ? global.autoTrainingLen - 1 : 0;
@@ -59,19 +57,14 @@ export async function generateAutoTraining(): Promise<any> {
           $inc: { retryCount: -1 }
         }
       )
-        .select({
-          _id: 1,
-          userId: 1,
-          teamId: 1,
-          tmbId: 1,
-          datasetId: 1,
-          collectionId: 1,
-          q: 1,
-          model: 1,
-          chunkIndex: 1,
-          billId: 1,
-          prompt: 1
-        })
+        .populate<{
+          dataset: { vectorModel: string };
+        }>([
+          {
+            path: 'dataset',
+            select: 'vectorModel '
+          }
+        ])
         .lean();
 
       // task preemption
@@ -85,7 +78,7 @@ export async function generateAutoTraining(): Promise<any> {
         text: data.q
       };
     } catch (error) {
-      addLog.error(`[Auto Training Queue] Error`, error);
+      addLog.error(`[Auto index queue] Error`, error);
       return {
         error: true
       };
@@ -94,14 +87,14 @@ export async function generateAutoTraining(): Promise<any> {
 
   if (done || !data) {
     if (reduceQueue()) {
-      addLog.info(`[Auto Training Queue] Done`);
+      addLog.info(`[Auto index queue] Done`);
     }
     return;
   }
   if (error) {
     return returnQueue();
   }
-  addLog.info(`[Auto Training Queue] Start`);
+  addLog.info(`[Auto index queue] Start`);
 
   // auth balance
   if (!(await checkTeamAiPointsAndLock(data.teamId))) {
@@ -110,17 +103,32 @@ export async function generateAutoTraining(): Promise<any> {
 
   try {
     const startTime = Date.now();
+    // 1. Get model
     const modelData = getLLMModel(data.model);
-    const prompt = getAutoTrainingPrompt({ text });
+    if (!modelData) {
+      addLog.info(`[Auto index queue] Model not found: ${data.model}`);
+      await MongoDatasetTraining.updateOne(
+        { _id: data._id },
+        {
+          $set: {
+            mode: TrainingModeEnum.chunk,
+            model: data.dataset.vectorModel,
+            lockTime: new Date('2000/1/1'),
+            retryCount: 5
+          }
+        }
+      );
+      return returnQueue();
+    }
 
-    // request LLM to get QA
+    // 2. request LLM to get response
+    const prompt = getAutoTrainingPrompt({ text });
     const messages: ChatCompletionMessageParam[] = [
       {
         role: ChatCompletionRequestMessageRoleEnum.User,
         content: prompt
       }
     ];
-
     const { response: chatResponse } = await createChatCompletion({
       body: llmCompletionsBodyFormat(
         {
@@ -134,41 +142,25 @@ export async function generateAutoTraining(): Promise<any> {
     });
     const answer = await llmStreamResponseToAnswerText(chatResponse);
 
-    const splitIndexResult = formatSplitText2Index(answer, text); // 格式化后的索引
+    // 3. Format answer to indexes and concat
+    const autoIndexResult = formatSplitText2Index(answer, text); // 格式化后的索引
+    const newIndexes = data.indexes.concat(autoIndexResult);
 
-    addLog.info(`[Auto Training Queue] Finish`, {
-      time: `${(Date.now() - startTime) / 1000}s`,
-      splitLength: splitIndexResult.indexes?.length,
-      usage: chatResponse.usage
-    });
-
-    try {
-      // get vector and insert
-      await pushDataListToTrainingQueueByCollectionId({
-        teamId: data.teamId,
-        tmbId: data.tmbId,
-        collectionId: data.collectionId,
-        trainingMode: TrainingModeEnum.chunk,
-        data: [
-          {
-            ...splitIndexResult,
-            chunkIndex: data.chunkIndex
-          }
-        ],
-        billId: data.billId
-      });
-
-      // delete data from training
-      await MongoDatasetTraining.findByIdAndDelete(data._id);
-    } catch (error) {
-      if (error === DatasetErrEnum.unExistCollection) {
-        await MongoDatasetTraining.findByIdAndDelete(data._id);
+    // 4. Update training data to chunk queue
+    await MongoDatasetTraining.updateOne(
+      { _id: data._id },
+      {
+        $set: {
+          mode: TrainingModeEnum.chunk,
+          model: data.dataset.vectorModel,
+          lockTime: new Date('2000/1/1'),
+          retryCount: 5,
+          indexes: newIndexes
+        }
       }
-      addLog.error(`[Auto Training Queue] Insert data error`, error);
-      return returnQueue();
-    }
+    );
 
-    // add bill
+    // 5. Push bill
     pushAutoTrainingUsage({
       teamId: data.teamId,
       tmbId: data.tmbId,
@@ -176,6 +168,12 @@ export async function generateAutoTraining(): Promise<any> {
       outputTokens: await countGptMessagesTokens([{ role: 'assistant', content: answer }]),
       billId: data.billId,
       model: modelData.model
+    });
+
+    addLog.info(`[Auto index queue] Finish`, {
+      time: `${(Date.now() - startTime) / 1000}s`,
+      indexLen: newIndexes.length,
+      usage: chatResponse.usage
     });
 
     return returnQueue();
