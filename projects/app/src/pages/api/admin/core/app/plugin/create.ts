@@ -20,6 +20,7 @@ export type createPluginBody = {
   inputConfig: SystemPluginTemplateItemType['inputConfig'];
   associatedPluginId?: string;
   userGuide?: string;
+  author?: string;
 };
 
 export type createPluginResponse = {};
@@ -39,7 +40,8 @@ async function handler(
     currentCost,
     hasTokenFee,
     associatedPluginId,
-    userGuide
+    userGuide,
+    author
   } = req.body;
 
   const pluginId = `${PluginSourceEnum.commercial}-${getNanoid(12)}`;
@@ -58,7 +60,8 @@ async function handler(
       version: getNanoid(),
       templateType,
       associatedPluginId,
-      userGuide
+      userGuide,
+      author
     }
   });
 

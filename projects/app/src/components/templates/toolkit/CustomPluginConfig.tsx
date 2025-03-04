@@ -149,7 +149,8 @@ const CustomPluginConfig = ({
         originCost: data.originCost,
         currentCost: data.currentCost,
         associatedPluginId: data.associatedPluginId,
-        userGuide: data.userGuide
+        userGuide: data.userGuide,
+        author: data.author
       };
 
       if (formatData.pluginId) {
@@ -255,7 +256,7 @@ const CustomPluginConfig = ({
                 <Input
                   pl={associatedPluginId ? 8 : 4}
                   fontSize={'14px'}
-                  placeholder="输入插件名查找插件"
+                  placeholder="输入插件名或 appId 查找插件"
                   value={currentPlugin?.name}
                   onChange={(e) => {
                     setSearchKey(e.target.value);
@@ -328,6 +329,14 @@ const CustomPluginConfig = ({
               </Box>
             </HStack>
             <HStack mt={3}>
+              <Box flex={'0 0 140px'} fontSize={'sm'} fontWeight={'medium'}>
+                作者名称
+              </Box>
+              <Box flex={1}>
+                <Input placeholder="默认为系统名" {...register('author')} />
+              </Box>
+            </HStack>
+            <HStack mt={3}>
               <Box flex={1} fontSize={'sm'} fontWeight={'medium'}>
                 是否启用
               </Box>
@@ -360,7 +369,7 @@ const CustomPluginConfig = ({
               {...register('userGuide')}
               placeholder={'使用 markdown 语法'}
               bg={'myGray.50'}
-              minH={'392px'}
+              minH={'432px'}
             />
           </Box>
         </Flex>

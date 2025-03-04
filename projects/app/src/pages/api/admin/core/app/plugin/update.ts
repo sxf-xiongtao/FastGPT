@@ -29,6 +29,7 @@ export type updatePluginBody = {
   templateType?: string;
   associatedPluginId?: string;
   userGuide?: string;
+  author?: string;
 };
 
 export type updatePluginResponse = {};
@@ -78,7 +79,8 @@ async function handler(
           workflow: updateFields.workflow,
           templateType: updateFields.templateType,
           associatedPluginId: updateFields.associatedPluginId,
-          userGuide: updateFields.userGuide
+          userGuide: updateFields.userGuide,
+          author: updateFields.author
         }
       }
     );

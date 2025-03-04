@@ -19,4 +19,5 @@ export type EditCustomPluginType = {
   workflow: string;
   associatedPluginId?: string;
   userGuide?: string;
+  author?: string;
 };

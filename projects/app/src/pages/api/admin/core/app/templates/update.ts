@@ -10,10 +10,7 @@ import { AppTemplateSchemaType } from '@fastgpt/global/core/app/type';
 
 export type updateTemplateQuery = {};
 
-export type updateTemplateBody = Omit<
-  AppTemplateSchemaType,
-  'author' | 'isQuickTemplate' | 'order'
->;
+export type updateTemplateBody = Omit<AppTemplateSchemaType, 'isQuickTemplate' | 'order'>;
 export type updateTemplateResponse = {};
 
 async function handler(
@@ -21,11 +18,12 @@ async function handler(
   res: ApiResponseType<any>
 ): Promise<updateTemplateResponse> {
   await adminCert({ req, authToken: true });
-  const { templateId, name, intro, avatar, tags, type, isActive, userGuide, workflow } = req.body;
+  const { templateId, name, intro, avatar, tags, type, isActive, userGuide, workflow, author } =
+    req.body;
 
   const updateData = isCommunityTemplate(templateId)
     ? { isActive, tags, userGuide }
-    : { name, intro, avatar, tags, type, isActive, userGuide, workflow };
+    : { name, intro, avatar, tags, type, isActive, userGuide, workflow, author };
 
   await MongoAppTemplate.updateOne({ templateId }, { $set: updateData }, { upsert: true });
 

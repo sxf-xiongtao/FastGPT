@@ -38,6 +38,7 @@ export const defaultTemplate: AppTemplateSchemaType = {
   name: '',
   intro: '',
   avatar: '',
+  author: '',
   tags: [AppTemplateTypeEnum.writing],
   type: 'advanced',
   isActive: true,
@@ -210,6 +211,7 @@ const TemplateConfigModal = ({
         name: data.name,
         intro: data.intro,
         avatar: data.avatar,
+        author: data.author,
         tags: data.tags,
         type: data.type,
         isActive: data.isActive,
@@ -347,6 +349,19 @@ const TemplateConfigModal = ({
               </Box>
             </HStack>
             <HStack mt={3}>
+              <Box flex={'0 0 140px'} fontSize={'sm'} fontWeight={'medium'}>
+                作者名称
+              </Box>
+              <Box flex={1}>
+                <Input
+                  flex={1}
+                  disabled={isCommunity}
+                  {...register('author')}
+                  placeholder="默认为系统名"
+                />
+              </Box>
+            </HStack>
+            <HStack mt={3}>
               <Box flex={1} fontSize={'sm'} fontWeight={'medium'}>
                 是否启用
               </Box>
@@ -442,7 +457,7 @@ const TemplateConfigModal = ({
                 {...register('userGuide.content')}
                 placeholder={'使用 markdown 语法'}
                 bg={'myGray.50'}
-                minH={'392px'}
+                minH={'432px'}
               />
             ) : (
               <Input {...register('userGuide.link')} placeholder={'请输入链接'} bg={'myGray.50'} />

@@ -72,6 +72,7 @@ const PluginCard = ({
             workflow: plugin?.customWorkflow,
             associatedPluginId: plugin?.associatedPluginId,
             userGuide: plugin?.userGuide,
+            author: plugin?.author,
             hasTokenFee: plugin?.hasTokenFee,
             currentCost: plugin?.currentCost
           });

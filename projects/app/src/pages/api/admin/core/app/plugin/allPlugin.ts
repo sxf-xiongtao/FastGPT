@@ -5,6 +5,7 @@ import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { AppTypeEnum } from '@fastgpt/global/core/app/constants';
 import { replaceRegChars } from '@fastgpt/global/common/string/tools';
 import { adminCert } from '@/service/support/permission/adminCert';
+import { isValidObjectId } from 'mongoose';
 
 export type ListAppBody = {
   searchKey?: string;
@@ -23,7 +24,8 @@ async function handler(req: ApiRequestProps<ListAppBody>): Promise<SystemPluginL
       ? {
           $or: [
             { name: { $regex: new RegExp(`${replaceRegChars(searchKey)}`, 'i') } },
-            { intro: { $regex: new RegExp(`${replaceRegChars(searchKey)}`, 'i') } }
+            { intro: { $regex: new RegExp(`${replaceRegChars(searchKey)}`, 'i') } },
+            ...(isValidObjectId(searchKey) ? [{ _id: searchKey }] : [])
           ]
         }
       : {};

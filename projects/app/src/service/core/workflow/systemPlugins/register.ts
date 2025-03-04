@@ -52,7 +52,7 @@ export const getSystemPlugins = async () => {
         isActive: false,
         isFolder: false,
         parentId: null,
-        author: '',
+        author: item.customConfig?.author || '',
         version,
         name,
         avatar,
