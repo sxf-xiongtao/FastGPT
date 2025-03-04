@@ -117,7 +117,7 @@ async function createCollectionAndPushData(props: {
         rawLink: item.url,
 
         trainingType: DatasetCollectionDataProcessModeEnum.chunk,
-        imageIndex: true,
+        imageIndex: dataset.vlmModel ? true : false,
 
         chunkSize,
         metadata: {

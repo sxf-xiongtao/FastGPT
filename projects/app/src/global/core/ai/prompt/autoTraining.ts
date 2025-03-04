@@ -28,13 +28,17 @@ export const getAutoTrainingPrompt = ({ text }: { text: string }) => {
 };
 
 export const getImageParsePrompt = (varables: { text: string }) => {
-  const IMAGE_PARSE_PROMPT = `As an assistant, you are responsible for integrating the provided textual and image information. 
-These summaries will be embedded and used to retrieve the raw image.
-Write a clear and concise summary that captures all the important information. 
-Please use the same language as the "image" or "Input" for output.
-Input:"""
+  const IMAGE_PARSE_PROMPT = `## Task
+As an assistant, you are responsible for integrating the provided textual and image information. These summaries will be embedded and used to retrieve the raw image. Write a clear and concise summary that captures all the important information. 
+
+## Rules
+- Please use the same language as the "image" or "Input" for output.
+
+## Input
+"""
 {{text}}
-"""`;
+"""
+`;
 
   return replaceVariable(IMAGE_PARSE_PROMPT, varables) as string;
 };
