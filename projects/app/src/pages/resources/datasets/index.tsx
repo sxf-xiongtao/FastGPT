@@ -21,6 +21,7 @@ import BoxCard from '@/components/common/BoxContainer/Card';
 import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
 import { useRouter } from 'next/router';
 import { type InferGetServerSidePropsType } from 'next';
+import { useScrollPagination } from '@fastgpt/web/hooks/useScrollPagination';
 
 const DatasetTable = ({ FE_URL }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [appDetail, setAppDetail] = useState();
@@ -30,9 +31,8 @@ const DatasetTable = ({ FE_URL }: InferGetServerSidePropsType<typeof getServerSi
     data: datasets,
     isLoading,
     ScrollData
-  } = usePagination(getDatasets, {
-    pageSize: 20,
-    type: 'scroll'
+  } = useScrollPagination(getDatasets, {
+    pageSize: 20
   });
 
   const routeToDataset = (id: string) => {
@@ -146,7 +146,7 @@ function AppDetailModal({ app, onClose }: { app: any; onClose: () => void }) {
 }
 
 export async function getServerSideProps(content: any) {
-  const FE_URL = process.env.FE_DOMAIN;
+  const FE_URL = process.env.FE_DOMAIN || null;
   return {
     props: {
       ...(await serviceSideProps(content)),

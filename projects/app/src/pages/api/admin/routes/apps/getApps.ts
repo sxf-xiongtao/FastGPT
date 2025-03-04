@@ -27,7 +27,7 @@ async function handler(
   const { offset, pageSize } = parsePaginationRequest(req);
 
   const [apps, total] = await Promise.all([
-    MongoApp.find().sort({ createTime: -1 }).skip(offset).limit(pageSize),
+    MongoApp.find().sort({ updateTime: -1 }).skip(offset).limit(pageSize),
     MongoApp.countDocuments()
   ]);
 

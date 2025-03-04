@@ -30,7 +30,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   const [records, total] = await Promise.all([
     MongoDataset.find(match, 'name intro teamId tmbId', { ...readFromSecondary })
-      .sort({ createTime: -1 })
+      .sort({ updateTime: -1 })
       .skip(offset)
       .limit(pageSize),
     MongoDataset.countDocuments(match, { ...readFromSecondary })

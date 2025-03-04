@@ -20,6 +20,7 @@ import MyModal from '@fastgpt/web/components/common/MyModal';
 import BoxCard from '@/components/common/BoxContainer/Card';
 import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
 import { type InferGetServerSidePropsType } from 'next';
+import { useScrollPagination } from '@fastgpt/web/hooks/useScrollPagination';
 
 const AppTable = ({ FE_URL }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [appDetail, setAppDetail] = useState<any>();
@@ -28,9 +29,8 @@ const AppTable = ({ FE_URL }: InferGetServerSidePropsType<typeof getServerSidePr
     data: apps,
     isLoading,
     ScrollData
-  } = usePagination(getApps, {
-    pageSize: 20,
-    type: 'scroll'
+  } = useScrollPagination(getApps, {
+    pageSize: 20
   });
 
   const routeToApp = (id: string) => {
@@ -135,7 +135,7 @@ function AppDetailModal({ app, onClose }: { app: any; onClose: () => void }) {
 }
 
 export async function getServerSideProps(content: any) {
-  const FE_URL = process.env.FE_DOMAIN;
+  const FE_URL = process.env.FE_DOMAIN || null;
   return {
     props: {
       ...(await serviceSideProps(content)),
