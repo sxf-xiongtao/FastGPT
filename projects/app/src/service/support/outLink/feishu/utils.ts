@@ -1,8 +1,8 @@
+import { retryFn } from '@fastgpt/global/common/system/utils';
 import { TmpDataEnum } from '@fastgpt/global/support/tmpData/constant';
 import { getTmpData, setTmpData } from '@fastgpt/service/support/tmpData/controller';
 import axios from 'axios';
 import crypto from 'crypto';
-import { retryRun } from '@fastgpt/global/common/fn/utils';
 
 const feishuBotBaseURL = process.env.FEISHU_BASE_URL || 'https://open.feishu.cn';
 const getTenantURL = `${feishuBotBaseURL}/open-apis/auth/v3/tenant_access_token/internal`;
@@ -119,7 +119,7 @@ export async function replyMessage({
   accessToken: string;
   replyContent: string;
 }) {
-  return retryRun(() =>
+  return retryFn(() =>
     axios.request({
       headers: {
         Authorization: `Bearer ${accessToken}`,

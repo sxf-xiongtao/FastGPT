@@ -28,17 +28,22 @@ export const getProInitData = async () => {
     const config: SystemConfigType = fastgptProConfig?.value
       ? (fastgptProConfig?.value as SystemConfigType)
       : {};
-
     global.systemConfig = config;
 
-    initFastGPTConfig(fastgptConfig?.value as unknown as FastGPTConfigFileType);
+    const fastgptConfigValue = fastgptConfig?.value as unknown as FastGPTConfigFileType;
+    if (fastgptConfigValue) {
+      if (fastgptConfigValue.feConfigs) {
+        fastgptConfigValue.feConfigs.isPlus = true;
+      }
+      initFastGPTConfig(fastgptConfigValue);
+    }
 
     console.log({
       feConfigs: global.feConfigs,
       systemEnv: global.systemEnv,
-      subPlans: global.subPlans
+      subPlans: global.subPlans,
+      systemConfig: global.systemConfig
     });
-    console.log(global.systemConfig);
   } catch (error) {
     console.log('init config error', error);
   }
@@ -54,6 +59,7 @@ export function initGlobalVariables() {
   global.concatBillQueue = [];
 
   global.autoTrainingLen = 0;
+  global.imageParseQueueLen = 0;
 }
 
 export async function initDatasetStatus() {

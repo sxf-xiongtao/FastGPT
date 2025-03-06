@@ -106,4 +106,5 @@ declare global {
   var concatBillQueue: ConcatBillQueueItemType[];
 
   var autoTrainingLen: number;
+  var imageParseQueueLen: number;
 }

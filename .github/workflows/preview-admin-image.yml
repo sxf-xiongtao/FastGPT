@@ -1,9 +1,7 @@
 name: Preview fastgpt-admin in pr
 on:
   pull_request_target:
-    paths:
-      - 'projects/app/**'
-      - 'FastGPT/packages/**'
+    # Remove paths filter to trigger on all changes
   workflow_dispatch:
 
 jobs:

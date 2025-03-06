@@ -36,3 +36,38 @@ export const pushAutoTrainingUsage = async ({
 
   return { totalPoints };
 };
+
+export const pushImageParseUsage = async ({
+  teamId,
+  tmbId,
+  model,
+  inputTokens,
+  outputTokens,
+  billId
+}: {
+  teamId: string;
+  tmbId: string;
+  model: string;
+  inputTokens: number;
+  outputTokens: number;
+  billId: string;
+}) => {
+  // 计算价格
+  const { totalPoints } = formatModelChars2Points({
+    model,
+    modelType: ModelTypeEnum.llm,
+    inputTokens,
+    outputTokens
+  });
+  concatUsage({
+    billId,
+    teamId,
+    tmbId,
+    totalPoints,
+    inputTokens,
+    outputTokens,
+    listIndex: 3
+  });
+
+  return { totalPoints };
+};
