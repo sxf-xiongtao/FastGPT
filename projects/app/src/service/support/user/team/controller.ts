@@ -55,7 +55,6 @@ export async function teamMemberSchema2TeamItemType(
     teamDomain: data.team.teamDomain,
     role: data.role,
     status: data.status,
-    defaultTeam: data.defaultTeam,
     permission: new TeamPermission({
       per: per ?? TeamDefaultPermissionVal,
       isOwner: data.role === TeamMemberRoleEnum.owner
@@ -75,7 +74,6 @@ export async function teamMemberSchema2TeamItemType(
  * @param{string} obj.notificationAccount
  * @param{string} obj.name
  * @param{string} obj.avatar
- * @param{boolean} obj.defaultTeam
  * @param{ClientSession} obj.session
  * @throws{Error} if ownerId or name is not exist
  */
@@ -84,7 +82,6 @@ export async function createTeam({
   notificationAccount,
   name,
   avatar,
-  defaultTeam = false,
   memberName,
   memberAvatar,
   session
@@ -116,7 +113,6 @@ export async function createTeam({
           name: memberName,
           role: TeamMemberRoleEnum.owner,
           status: TeamMemberStatusEnum.active,
-          defaultTeam,
           avatar: memberAvatar
         }
       ],
@@ -151,7 +147,6 @@ export async function createTeam({
       teamDomain: team.teamDomain,
       role: tmb.role,
       status: tmb.status,
-      defaultTeam: tmb.defaultTeam,
       permission: new TeamPermission({
         isOwner: true
       })
@@ -186,7 +181,6 @@ export async function getUserTeams(data: {
     return Promise.reject('userId or tmbId is required');
   }
   const members = await MongoTeamMember.find(data)
-    .sort({ defaultTeam: -1 })
     .populate<{
       team: TeamSchema;
       user: UserModelSchema;
@@ -230,8 +224,7 @@ export async function getAndCreateUserDefaultTeam({
   session: ClientSession;
 }): Promise<TeamTmbItemType> {
   const tmb = await MongoTeamMember.findOne({
-    userId: ownerId,
-    defaultTeam: true
+    userId: ownerId
   })
     .populate<{ team: TeamSchema; user: UserModelSchema }>('team user')
     .lean();
@@ -243,7 +236,6 @@ export async function getAndCreateUserDefaultTeam({
       avatar: teamAvatar,
       memberName: memberName,
       memberAvatar: memberAvatar,
-      defaultTeam: true,
       notificationAccount,
       session
     });
