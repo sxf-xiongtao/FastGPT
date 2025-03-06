@@ -45,7 +45,7 @@ const matchAndParseTextImageUrl = async (text: string) => {
     if (!url) continue;
 
     try {
-      const base64 = await getImageBase64(url);
+      const { completeBase64: base64 } = await getImageBase64(url);
       images.push(base64);
     } catch (error) {}
   }
