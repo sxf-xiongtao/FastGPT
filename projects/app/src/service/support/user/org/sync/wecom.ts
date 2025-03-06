@@ -252,7 +252,6 @@ export async function wecomOrgSync({ teamId, corpid, secret, syncSecret }: Wecom
     const tmbs = await (async () => {
       const users = await MongoUser.find(
         {
-          teamId,
           username: { $in: userIdList.map((user) => `${wecomUserPrefix}-${user.userid}`) }
         },
         undefined,
