@@ -34,6 +34,9 @@ type EventProps = {
       message_type: string;
       update_time: string;
       thread_id?: string; // 话题组特有
+      mentions?: {
+        key: string; // "@_all" 代表@全体成员
+      }[];
     };
     sender: {
       sender_id: {
@@ -119,6 +122,13 @@ async function handler(
     addLog.warn(`feishu message error, not message`, {
       event
     });
+    return 'ok';
+  }
+
+  // filter out @all messages
+  if (event.message.mentions?.some((mention) => mention.key === '@_all')) {
+    return 'ok';
+  } else if (event.message.content.includes('@_all')) {
     return 'ok';
   }
 
