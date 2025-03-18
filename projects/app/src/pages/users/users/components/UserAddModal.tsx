@@ -14,6 +14,7 @@ import { AddIcon } from '@chakra-ui/icons';
 import { hashStr } from '@fastgpt/global/common/string/tools';
 import { useToast } from '@fastgpt/web/hooks/useToast';
 import MyModal from '@fastgpt/web/components/common/MyModal';
+import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
 
 type TFormData = {
   username: string;
@@ -23,7 +24,6 @@ type TFormData = {
 export default function UserAddModal(props: { data: any; updateData: any }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data, updateData } = props;
-  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const {
@@ -35,27 +35,21 @@ export default function UserAddModal(props: { data: any; updateData: any }) {
     defaultValues: data
   });
 
-  const onSubmit = async (formData: TFormData) => {
-    try {
-      await POST(`/admin/routes/users/addUser`, {
+  const { runAsync: onSubmit, loading: isLoading } = useRequest2(
+    (formData: TFormData) => {
+      return POST(`/admin/routes/users/addUser`, {
         ...formData,
         password: hashStr(formData.password)
       });
-      setIsLoading(true);
-      toast({
-        title: '添加成功',
-        status: 'success'
-      });
-      updateData();
-      onClose();
-    } catch (error: any) {
-      toast({
-        title: error.message,
-        status: 'error'
-      });
+    },
+    {
+      onSuccess() {
+        updateData();
+        onClose();
+      },
+      successToast: '添加成功'
     }
-    setIsLoading(false);
-  };
+  );
 
   return (
     <>

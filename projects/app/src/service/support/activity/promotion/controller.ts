@@ -12,8 +12,7 @@ export async function createOnePromotion(data: {
   try {
     // find default team
     const tmb = await MongoTeamMember.findOne({
-      userId,
-      defaultTeam: true
+      userId
     });
     if (!tmb) {
       return;

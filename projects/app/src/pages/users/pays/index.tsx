@@ -31,7 +31,7 @@ import MyModal from '@fastgpt/web/components/common/MyModal';
 import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import { getPays } from '@/web/admin/pays/api';
 import BoxCard from '@/components/common/BoxContainer/Card';
-import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
+import { serviceSideProps } from '@/web/common/i18n/utils';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 
 const billTypeList: { label: string; value: BillTypeEnum | '' }[] = [
@@ -145,7 +145,7 @@ const BillTable = () => {
                     list={billTypeList}
                     value={billType}
                     size={'sm'}
-                    onchange={(e) => {
+                    onChange={(e) => {
                       setBillType(e);
                     }}
                     w={'130px'}
@@ -161,7 +161,7 @@ const BillTable = () => {
                     ]}
                     value={billStatus}
                     size={'sm'}
-                    onchange={(e) => {
+                    onChange={(e) => {
                       setBillStatus(e);
                     }}
                     w={'130px'}

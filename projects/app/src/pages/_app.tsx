@@ -3,7 +3,9 @@ import { ChakraProvider } from '@chakra-ui/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import NProgress from 'nprogress';
 import Router from 'next/router';
+
 import { appWithTranslation } from 'next-i18next';
+
 import { theme } from '@fastgpt/web/styles/theme';
 import Layout from '@/components/Layout';
 

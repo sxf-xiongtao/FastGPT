@@ -61,8 +61,7 @@ async function handler(
   const { user, token } = await usernameLogin({
     username,
     avatar: avatarUrl,
-    inviterId,
-    createDefaultTeam: true
+    inviterId
   });
 
   setCookie(res, token);

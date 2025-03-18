@@ -322,7 +322,7 @@ const CustomPluginConfig = ({
                 <MySelect
                   value={templateType || pluginTypeSelectList?.[0].value}
                   list={pluginTypeSelectList}
-                  onchange={(e) => {
+                  onChange={(e) => {
                     setValue('templateType', e as any);
                   }}
                 />

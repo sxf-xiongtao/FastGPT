@@ -1,1 +1,0 @@
-pnpm run gen:theme-typings

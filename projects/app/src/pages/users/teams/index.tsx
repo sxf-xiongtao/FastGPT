@@ -22,7 +22,7 @@ import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tool
 import EditTeamModal from './components/EditTeamModal';
 import { getTeams } from '@/web/admin/users/api';
 import BoxCard from '@/components/common/BoxContainer/Card';
-import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
+import { serviceSideProps } from '@/web/common/i18n/utils';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 
 const TeamTable = () => {

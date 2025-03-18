@@ -50,19 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
       inviterId,
       fastgpt_sem,
-      sourceDomain,
-      ...(getIsSyncUser()
-        ? {
-            createDefaultTeam: false,
-            defaultTeamIdList: await (async () => {
-              const root = await MongoUser.findOne({ username: 'root' });
-              const rootTeam = await MongoTeam.findOne({ ownerId: root!._id });
-              return [String(rootTeam!._id)];
-            })()
-          }
-        : {
-            createDefaultTeam: true
-          })
+      sourceDomain
     });
 
     // 百度转化

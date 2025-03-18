@@ -61,6 +61,7 @@ export type ConfigFormType = {
     microsoft: NonNullable<SystemConfigType['auth']>['microsoft'];
     wecom: NonNullable<SystemConfigType['auth']>['wecom'];
     fastLogin: string;
+    singleTeamMode: boolean;
   };
   paySettings: {
     wx: NonNullable<SystemConfigType['pay']>['wx'];

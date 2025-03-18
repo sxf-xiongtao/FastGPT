@@ -7,7 +7,7 @@ import { SystemPluginTemplateItemType } from '@fastgpt/global/core/workflow/type
 import dynamic from 'next/dynamic';
 import { defaultCustomPluginForm } from '../../../../components/templates/toolkit/CustomPluginConfig';
 import type { EditCustomPluginType } from '@/global/core/workflow/plugin/type.d';
-import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
+import { serviceSideProps } from '@/web/common/i18n/utils';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { useToast } from '@fastgpt/web/hooks/useToast';
 import { useRouter } from 'next/router';

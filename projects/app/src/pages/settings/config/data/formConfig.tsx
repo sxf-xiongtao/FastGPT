@@ -399,6 +399,12 @@ export const getUserFormConfig = (): FormConfig => {
       title: '通知 & 登录配置',
       type: 'object',
       properties: {
+        singleTeamMode: {
+          key: 'loginSettings.singleTeamMode',
+          type: 'boolean',
+          title: '单团队模式',
+          description: `开启后，不再创建默认团队，而是加入 Root 用户团队。优先级：成员同步模式（目前仅支持企微）> 单团队模式 > 多团队模式 ![](/imgs/single-team-mode-intro.png)`
+        },
         email: {
           key: 'loginSettings.email',
           type: 'object',

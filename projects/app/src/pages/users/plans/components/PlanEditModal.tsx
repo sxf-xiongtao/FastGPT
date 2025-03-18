@@ -133,7 +133,7 @@ export default function PlanEditModal(props: {
                     <MySelect
                       h={10}
                       value={value}
-                      onchange={onChange}
+                      onChange={onChange}
                       list={[
                         { label: '免费版', value: StandardSubLevelEnum.free },
                         { label: '体验版', value: StandardSubLevelEnum.experience },

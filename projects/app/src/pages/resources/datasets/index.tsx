@@ -18,7 +18,7 @@ import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import MyModal from '@fastgpt/web/components/common/MyModal';
 import { getDatasets } from '@/web/admin/datasets/api';
 import BoxCard from '@/components/common/BoxContainer/Card';
-import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
+import { serviceSideProps } from '@/web/common/i18n/utils';
 import { useRouter } from 'next/router';
 import { type InferGetServerSidePropsType } from 'next';
 import { useScrollPagination } from '@fastgpt/web/hooks/useScrollPagination';

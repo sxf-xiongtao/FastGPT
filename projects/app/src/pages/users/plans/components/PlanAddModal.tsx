@@ -129,7 +129,7 @@ export default function PlanAddModal(props: { updateData: any }) {
                 <MySelect
                   h={10}
                   value={value}
-                  onchange={(value) => {
+                  onChange={(value) => {
                     onChange(value);
                   }}
                   list={[
@@ -184,7 +184,7 @@ export default function PlanAddModal(props: { updateData: any }) {
                   <MySelect
                     h={10}
                     value={value}
-                    onchange={onChange}
+                    onChange={onChange}
                     list={[
                       { label: '体验版', value: StandardSubLevelEnum.experience },
                       { label: '团队版', value: StandardSubLevelEnum.team },

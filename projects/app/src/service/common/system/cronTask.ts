@@ -17,7 +17,7 @@ import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { getStandardPlanConfig, initTeamFreePlan } from '@fastgpt/service/support/wallet/sub/utils';
 import { addMonths } from 'date-fns';
 
-/* 
+/*
   1. Extra dataset
   2. Not free standard plans
 */
@@ -43,7 +43,7 @@ export const clearExpiredSubPlan = async () => {
   addLog.info(`删除过期的订阅套餐: ${standardPlans.deletedCount}`);
 };
 
-/* 
+/*
   TODO: 未来改成续费国外订阅模式，目前下面的代码不再使用
 */
 export const updateStandardPlan = async () => {

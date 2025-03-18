@@ -2,7 +2,7 @@ import { Box, Button, Flex, HStack, Input, Textarea } from '@chakra-ui/react';
 import React from 'react';
 import { useConfirm } from '@fastgpt/web/hooks/useConfirm';
 import { useRequest } from '@fastgpt/web/hooks/useRequest';
-import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
+import { serviceSideProps } from '@/web/common/i18n/utils';
 import {
   getSystemMsgModal,
   postSendSystemMsg,
@@ -121,7 +121,7 @@ const InformSetting = () => {
               { label: '紧急（站内信+登录通知+邮件/短信提醒）', value: InformLevelEnum.emergency }
             ]}
             value={informLevel}
-            onchange={(value) => setValue('level', value)}
+            onChange={(value) => setValue('level', value)}
           />
         </Flex>
         <Flex alignItems={'center'} mt={3}>

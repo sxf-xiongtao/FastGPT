@@ -1,4 +1,5 @@
 import { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
+import { TeamModeEnum } from '@/global/settings/constants';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
 import { FastGPTFeConfigsType } from '@fastgpt/global/common/system/types';
 import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
@@ -129,7 +130,8 @@ export function formatConfigStore2FormSchema({
         syncSecret: fastgptPro?.auth?.wecom?.syncSecret || '',
         isSync: fastgptPro?.auth?.wecom?.isSync || false
       },
-      fastLogin: JSON.stringify(fastgptPro.fastLogin || {}, null, 2)
+      fastLogin: JSON.stringify(fastgptPro.fastLogin || {}, null, 2),
+      singleTeamMode: fastgptPro.teamMode === 'single'
     },
     paySettings: {
       wx: fastgptPro?.pay?.wx || {},
@@ -166,8 +168,19 @@ export function formatFormData2ConfigStore({
   externalProviderSettings
 }: ConfigFormType): ConfigStoreType {
   const { feConfigs, systemEnv, concatMd, scripts, limit, sso, navbar } = siteSettings;
-  const { email, phone, github, wechat, dingtalk, google, fastLogin, sms, microsoft, wecom } =
-    loginSettings;
+  const {
+    email,
+    phone,
+    github,
+    wechat,
+    dingtalk,
+    google,
+    fastLogin,
+    sms,
+    microsoft,
+    wecom,
+    singleTeamMode
+  } = loginSettings;
   const { censor } = securitySettings;
   const { wx, subPlans } = paySettings;
   const { externalProviderWorkflowVariables } = externalProviderSettings;
@@ -289,6 +302,15 @@ export function formatFormData2ConfigStore({
         } catch (error) {
           return {};
         }
+      })(),
+      teamMode: (() => {
+        if (loginSettings.wecom?.isSync) {
+          return TeamModeEnum.sync;
+        }
+        if (loginSettings.singleTeamMode) {
+          return TeamModeEnum.single;
+        }
+        return TeamModeEnum.multi;
       })(),
       pay: {
         wx

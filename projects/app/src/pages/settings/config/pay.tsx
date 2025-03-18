@@ -12,7 +12,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { PayFormConfig } from './data/formConfig';
 import BoxCard from '@/components/common/BoxContainer/Card';
 import MyTag from '@fastgpt/web/components/common/Tag/index';
-import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
+import { serviceSideProps } from '@/web/common/i18n/utils';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 
 let defaultStandardValue =

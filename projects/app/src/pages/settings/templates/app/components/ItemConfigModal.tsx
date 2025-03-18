@@ -341,7 +341,7 @@ const TemplateConfigModal = ({
                     label: t(templateType.typeName as any),
                     value: templateType.typeId
                   }))}
-                  onchange={(e) => {
+                  onChange={(e) => {
                     setValue('tags', [e as any]);
                   }}
                   isDisabled={isCommunity}

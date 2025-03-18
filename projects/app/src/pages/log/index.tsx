@@ -27,7 +27,7 @@ import { useSystem } from '@fastgpt/web/hooks/useSystem';
 import { SystemLogType } from '@fastgpt/service/common/system/log/type';
 import { getSystemLogList } from '@/web/admin/common/api';
 import { LogLevelEnum } from '@fastgpt/service/common/system/log/constant';
-import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
+import { serviceSideProps } from '@/web/common/i18n/utils';
 
 const LogTable = () => {
   const { isPc } = useSystem();

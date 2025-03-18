@@ -1,4 +1,4 @@
-const { i18n } = require('./next-i18next.config');
+const { i18n } = require('./next-i18next.config.js');
 const path = require('path');
 const fs = require('fs');
 
@@ -28,18 +28,19 @@ const nextConfig = {
           test: /\.svg$/i,
           issuer: /\.[jt]sx?$/,
           use: ['@svgr/webpack']
-        },
-        {
-          test: /\.node$/,
-          use: [{ loader: 'nextjs-node-loader' }]
         }
       ]),
       exprContextCritical: false,
       unknownContextCritical: false
     };
 
+    if (!config.externals) {
+      config.externals = [];
+    }
+
     if (isServer) {
       config.externals.push('worker_threads');
+      config.externals.push('@node-rs/jieba');
 
       if (nextRuntime === 'nodejs') {
         // config.output.globalObject = 'self';
@@ -75,14 +76,14 @@ const nextConfig = {
 
     return config;
   },
-  transpilePackages: ['@fastgpt/*', 'ahooks', '@chakra-ui/*', 'react'],
+  transpilePackages: ['@fastgpt/global', '@fastgpt/web', 'ahooks'],
   experimental: {
     // 指定导出包优化，按需引入包模块
     serverComponentsExternalPackages: [
       'mongoose',
       'pg',
-      '@node-rs/jieba',
-      '@zilliz/milvus2-sdk-node'
+      '@zilliz/milvus2-sdk-node',
+      "tiktoken",
     ],
     outputFileTracingRoot: path.join(__dirname, '../../'),
     instrumentationHook: true

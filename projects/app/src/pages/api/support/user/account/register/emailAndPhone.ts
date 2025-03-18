@@ -14,6 +14,7 @@ import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { AccountRegisterBody } from '@fastgpt/global/support/user/login/api';
 import { NextAPI } from '@/service/middleware/entry';
 import { UserErrEnum } from '@fastgpt/global/common/error/code/user';
+import { getTeamByUsername } from '@/service/support/user/team/controller';
 
 async function handler(req: ApiRequestProps<AccountRegisterBody>, res: NextApiResponse<any>) {
   const { username, code, password, inviterId, bd_vid, fastgpt_sem, sourceDomain } = req.body;
@@ -48,8 +49,7 @@ async function handler(req: ApiRequestProps<AccountRegisterBody>, res: NextApiRe
     phonePrefix: 86, // 目前只支持国内的
     inviterId,
     fastgpt_sem,
-    sourceDomain,
-    createDefaultTeam: true
+    sourceDomain
   });
 
   const token = createJWT(user);

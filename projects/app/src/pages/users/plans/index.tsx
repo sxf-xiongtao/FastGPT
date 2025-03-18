@@ -23,7 +23,7 @@ import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/walle
 import PlanAddModal from './components/PlanAddModal';
 import PlanEditModal from './components/PlanEditModal';
 import BoxCard from '@/components/common/BoxContainer/Card';
-import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
+import { serviceSideProps } from '@/web/common/i18n/utils';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 
 export type PlanType = {

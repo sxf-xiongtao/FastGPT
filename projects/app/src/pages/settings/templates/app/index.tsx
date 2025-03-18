@@ -12,7 +12,7 @@ import {
 import DndDrag, { Draggable } from '@fastgpt/web/components/common/DndDrag';
 import EmptyTip from '@fastgpt/web/components/common/EmptyTip';
 import { defaultTemplate } from './components/ItemConfigModal';
-import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
+import { serviceSideProps } from '@/web/common/i18n/utils';
 import { AppTemplateSchemaType } from '@fastgpt/global/core/app/type';
 import MyBox from '@fastgpt/web/components/common/MyBox';
 import TemplateConfigModal from './components/ItemConfigModal';
@@ -75,7 +75,7 @@ const AppTemplate = () => {
         </Flex>
         <MySelect
           value={currentAppType}
-          onchange={(value) => {
+          onChange={(value) => {
             setCurrentAppType(value as AppTypeEnum | 'all');
           }}
           minW={'7rem'}

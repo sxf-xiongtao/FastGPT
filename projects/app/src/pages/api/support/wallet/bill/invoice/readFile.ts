@@ -1,6 +1,5 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
-import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoInvoice } from '@/service/support/wallet/bill/invoiceSchema';
 
 export type readFileQuery = {
@@ -36,7 +35,10 @@ async function handler(
   // 返回 PDF 文件
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Cache-Control', 'public, max-age=31536000');
-  res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(record.teamName)}"`);
+  res.setHeader(
+    'Content-Disposition',
+    `inline; filename="${encodeURIComponent(record.teamName)}.pdf"`
+  );
 
   const fileBuffer = record.file;
   res.send(fileBuffer);

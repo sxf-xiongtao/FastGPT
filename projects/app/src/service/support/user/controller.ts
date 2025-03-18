@@ -1,7 +1,7 @@
 import { authMaxUsers } from '@/service/support/user/auth';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { UserType } from '@fastgpt/global/support/user/type';
-import { getAndCreateUserDefaultTeam } from './team/controller';
+import { getAndCreateUserDefaultTeam, getTeamByUsername } from './team/controller';
 import { getNanoid, hashStr } from '@fastgpt/global/common/string/tools';
 import { sendInform2OneUser } from './inform/controller';
 import { createJWT } from '@fastgpt/service/support/permission/controller';
@@ -28,6 +28,8 @@ import { getIsSyncUser } from '@/global/support/user/constants';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { TeamReadPermissionVal } from '@fastgpt/global/support/permission/user/constant';
 import { addLog } from '@fastgpt/service/common/system/log';
+import { TeamModeEnum } from '@/global/settings/constants';
+import { TeamTmbItemType } from '@fastgpt/global/support/user/team/type';
 
 type UserProps = {
   username: string;
@@ -60,15 +62,24 @@ export async function createUserByUsername({
   notificationAccount,
   fastgpt_sem,
   sourceDomain,
-  createDefaultTeam,
-  defaultTeamIdList
+  defaultTeamIdList: _defaultTeamIdList = []
 }: UserProps & {
   teamName?: string;
   memberName?: string;
   password: string;
-  createDefaultTeam?: boolean;
   defaultTeamIdList?: string[]; // invite user to register/Sync user
 }): Promise<UserType> {
+  if (global.systemConfig.teamMode === TeamModeEnum.sync) {
+    return Promise.reject('You can not create user in sync mode');
+  }
+
+  const createDefaultTeam =
+    !global.systemConfig.teamMode || global.systemConfig.teamMode === TeamModeEnum.multi;
+  const defaultTeamIdList =
+    global.systemConfig.teamMode === TeamModeEnum.single
+      ? [String((await getTeamByUsername('root'))._id)]
+      : _defaultTeamIdList;
+
   await authMaxUsers();
   const { user, tmb } = await mongoSessionRun(async (session) => {
     //1. create user
@@ -89,6 +100,8 @@ export async function createUserByUsername({
 
     //2. create or join team
     const tmb = await (async () => {
+      let tmb: TeamTmbItemType | undefined;
+
       if (createDefaultTeam) {
         // username: email;phone;git-xxx;google-xxx
         const formatTeamName = (() => {
@@ -99,33 +112,36 @@ export async function createUserByUsername({
           }
           return splitUsername[0];
         })();
-        const tmb = await getAndCreateUserDefaultTeam({
+        tmb = await getAndCreateUserDefaultTeam({
           ownerId: user._id,
           notificationAccount,
           teamName: `${formatTeamName.slice(0, 10)} Team`,
-          memberName,
+          memberName: memberName || user.username,
           teamAvatar: avatar,
           memberAvatar: avatar,
           session
         });
-        if (!defaultTeamIdList) return tmb;
       }
-      if (defaultTeamIdList) {
+
+      // Join default teams
+      if (defaultTeamIdList && defaultTeamIdList.length > 0) {
         const teams = await MongoTeam.find({ _id: { $in: defaultTeamIdList } }, '_id');
         if (!teams.length) return Promise.reject('default team not exist');
+
         const tmbs = await MongoTeamMember.create(
           teams.map((team) => ({
             teamId: team._id,
             userId: user._id,
-            name: memberName,
+            name: memberName || user.username,
             status: TeamMemberStatusEnum.active,
             createTime: new Date()
           })),
           { session }
         );
-        return {
+
+        tmb = {
           ...tmbs[0].toObject(),
-          memberName: memberName ?? user.username,
+          memberName: memberName || user.username,
           userId: user._id,
           teamId: tmbs[0].teamId,
           teamName: teams[0].name,
@@ -136,6 +152,8 @@ export async function createUserByUsername({
           })
         };
       }
+
+      if (tmb) return tmb;
 
       return Promise.reject(
         'no team create or join team, please check the createDefaultTeam and defaultTeamIdList'
@@ -170,14 +188,10 @@ export async function usernameLogin({
 
   inviterId,
   fastgpt_sem,
-  sourceDomain,
-  createDefaultTeam,
-  defaultTeamIdList
+  sourceDomain
 }: UserProps & {
   teamName?: string;
   memberName?: string;
-  createDefaultTeam: boolean;
-  defaultTeamIdList?: string[];
 }) {
   // try to login
   const user = await MongoUser.findOne({ username });
@@ -197,9 +211,7 @@ export async function usernameLogin({
 
       inviterId,
       fastgpt_sem,
-      sourceDomain,
-      defaultTeamIdList,
-      createDefaultTeam
+      sourceDomain
     });
     // send default password inform
     sendInform2OneUser({
@@ -335,8 +347,7 @@ export async function syncUser({ teamId, latestUserList, source, session }: Sync
             userId: u._id,
             name: user.name,
             status: TeamMemberStatusEnum.active,
-            createTime: new Date(),
-            defaultTeam: true
+            createTime: new Date()
           }
         ],
         { session, ordered: true }
@@ -552,8 +563,13 @@ export async function removeUserFromTeam({
       { session }
     );
 
-    // Update member status to leave
-    removeTmb.status = TeamMemberStatusEnum.leave;
+    // Update member status to leave or forbidden
+    // if isSyncUser, will forbidden -> could be restored
+    // if not isSyncUser, will leave -> could not be restored, only re-invite
+    removeTmb.status = getIsSyncUser()
+      ? TeamMemberStatusEnum.forbidden
+      : TeamMemberStatusEnum.leave;
+
     removeTmb.updateTime = new Date();
     await removeTmb.save({ session });
   };

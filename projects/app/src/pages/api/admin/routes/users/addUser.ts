@@ -1,6 +1,7 @@
 import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { createUserByUsername } from '@/service/support/user/controller';
+import { getTeamByUsername } from '@/service/support/user/team/controller';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
@@ -29,8 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const user = await createUserByUsername({
       username,
-      password,
-      createDefaultTeam: true
+      password
     });
 
     jsonRes(res, {

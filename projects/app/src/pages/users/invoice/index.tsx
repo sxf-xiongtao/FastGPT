@@ -30,7 +30,7 @@ import { useCallback, useState } from 'react';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 import { useSelectFile } from '@fastgpt/web/common/file/hooks/useSelectFile';
 import { InvoiceStatusEnum } from '@fastgpt/global/support/wallet/bill/invoice/constants';
-import { serviceSideProps } from '@fastgpt/web/common/system/nextjs';
+import { serviceSideProps } from '@/web/common/i18n/utils';
 
 const InvoiceManageTable = () => {
   const { isPc } = useSystem();

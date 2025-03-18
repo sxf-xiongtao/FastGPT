@@ -17,8 +17,7 @@ export type TeamMemberExportResponse = {};
 const statusMap = {
   active: '正常',
   leave: '已离职',
-  reject: '已拒绝',
-  waiting: '待接受'
+  forbidden: '已停用'
 };
 
 async function handler(

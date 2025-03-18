@@ -43,8 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
     const { user, token: loginToken } = await usernameLogin({
       username,
-      avatar: data.data.avatar,
-      createDefaultTeam: true
+      avatar: data.data.avatar
     });
 
     setCookie(res, loginToken);

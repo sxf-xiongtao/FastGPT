@@ -33,6 +33,7 @@ import { UserModelSchema } from '@fastgpt/global/support/user/type';
 import { TeamSchema } from '@fastgpt/global/support/user/team/type';
 import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { Types } from 'mongoose';
+import { MongoUser } from '@fastgpt/service/support/user/schema';
 
 /* -------- format --------- */
 export async function teamMemberSchema2TeamItemType(
@@ -203,6 +204,18 @@ export async function getTeamByTmbId(tmbId: string) {
   }
 
   return teamMemberSchema2TeamItemType(tmb);
+}
+
+export async function getTeamByUsername(username: string) {
+  const user = await MongoUser.findOne({ username });
+  if (!user) {
+    return Promise.reject(TeamErrEnum.unAuthTeam);
+  }
+  const team = await MongoTeam.findOne({ ownerId: user._id }).lean();
+  if (!team) {
+    return Promise.reject(TeamErrEnum.unAuthTeam);
+  }
+  return team;
 }
 
 // get default team, if not exit, create one
