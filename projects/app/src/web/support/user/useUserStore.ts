@@ -1,8 +1,7 @@
+import { create, devtools, immer } from '@fastgpt/web/common/zustand';
+
 import { LicenseDataType } from '@/types';
 import { getLicenseData } from '@/web/admin/common/api';
-import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
 
 type State = {
   licenseData?: LicenseDataType;

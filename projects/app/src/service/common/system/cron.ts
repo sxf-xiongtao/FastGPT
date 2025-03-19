@@ -67,13 +67,12 @@ const freeAccountCron = () => {
   });
 };
 
-// 每小时扫描一遍
+// 集合同步
 const syncCollectionCron = () => {
-  setCron('15 */1 * * *', async () => {
-    await syncCollectionTask();
-  });
+  setCron('15 */1 * * *', syncCollectionTask);
 };
 
+// 成员同步
 const syncMemberAndOrgCron = () => {
   const cron = process.env.SYNC_MEMBER_CRON || '0 0 * * *';
   setCron(cron, async () => {

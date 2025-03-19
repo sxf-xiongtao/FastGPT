@@ -1,6 +1,6 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
-import { MongoInvitationLink } from '@fastgpt/service/support/user/team/invitationLink/schema';
+import { MongoInvitationLink } from '@/service/support/user/team/invitationLink/schema';
 import { InvitationInfoType } from '@fastgpt/service/support/user/team/invitationLink/type';
 import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';

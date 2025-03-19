@@ -1,4 +1,7 @@
-import type { FeishuServer } from '@fastgpt/global/core/dataset/apiDataset';
+import type {
+  ApiFileReadContentResponse,
+  FeishuServer
+} from '@fastgpt/global/core/dataset/apiDataset';
 import axios, { Method } from 'axios';
 import { ParentIdType } from '@fastgpt/global/common/parentFolder/type';
 import { addLog } from '@fastgpt/service/common/system/log';
@@ -134,14 +137,28 @@ export const useFeishuDatasetRequest = ({ feishuServer }: { feishuServer: Feishu
       }));
   };
 
-  const getFileContent = async ({ apiFileId }: { apiFileId: string }) => {
-    const { content } = await request<{ content: string }>(
-      `/open-apis/docx/v1/documents/${apiFileId}/raw_content`,
-      {},
-      'GET'
-    );
+  const getFileContent = async ({
+    apiFileId
+  }: {
+    apiFileId: string;
+  }): Promise<ApiFileReadContentResponse> => {
+    const [{ content }, { document }] = await Promise.all([
+      request<{ content: string }>(
+        `/open-apis/docx/v1/documents/${apiFileId}/raw_content`,
+        {},
+        'GET'
+      ),
+      request<{ document: { title: string } }>(
+        `/open-apis/docx/v1/documents/${apiFileId}`,
+        {},
+        'GET'
+      )
+    ]);
 
-    return content;
+    return {
+      title: document?.title,
+      rawText: content
+    };
   };
 
   const getFilePreviewUrl = async ({ apiFileId }: { apiFileId: string }) => {

@@ -3,6 +3,7 @@ import { CheerioCrawler, LogLevel, EnqueueStrategy, Configuration } from 'crawle
 import { htmlToMarkdown } from '@fastgpt/service/common/string/utils';
 import { cheerioToHtml } from '@fastgpt/service/common/string/cheerio';
 import { filterRegxs, excludeList, contentMinLength } from './constants';
+import { addLog } from '@fastgpt/service/common/system/log';
 
 export type CrawlDataItemType = { url: string; title: string; content: string };
 
@@ -74,7 +75,8 @@ export const crawlWebsite = async ({
         });
       },
       errorHandler({ error, request }) {
-        console.log(error);
+        console.log(request);
+        addLog.error('[WebsiteSync]: Error', error);
       }
     },
     config

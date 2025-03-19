@@ -3,7 +3,7 @@ import { NextAPI } from '@/service/middleware/entry';
 import { InvitationLinkCreateType } from '@fastgpt/service/support/user/team/invitationLink/type';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { TeamManagePermissionVal } from '@fastgpt/global/support/permission/user/constant';
-import { MongoInvitationLink } from '@fastgpt/service/support/user/team/invitationLink/schema';
+import { MongoInvitationLink } from '@/service/support/user/team/invitationLink/schema';
 import { addDays, addMinutes, addYears } from 'date-fns';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { MaxInvitationLinksAmount } from '@fastgpt/service/support/user/team/invitationLink/constants';
