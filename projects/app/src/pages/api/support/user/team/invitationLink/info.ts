@@ -21,7 +21,7 @@ async function handler(
     authToken: true
   });
 
-  const invitation = await MongoInvitationLink.findOne({ _id: linkId })
+  const invitation = await MongoInvitationLink.findOne({ linkId })
     .populate<{ team: { name: string; avatar: string } }>('team')
     .lean();
 
@@ -34,4 +34,5 @@ async function handler(
     teamName: invitation.team.name
   };
 }
+
 export default NextAPI(handler);

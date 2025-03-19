@@ -22,11 +22,18 @@ async function handler(
 
   const amount = await MongoInvitationLink.countDocuments({
     teamId,
-    forbidden: false,
+    $or: [
+      {
+        forbidden: false
+      },
+      {
+        forbidden: { $exists: false }
+      }
+    ],
     expires: { $gt: new Date() }
   });
   if (amount >= MaxInvitationLinksAmount) {
-    return Promise.reject(TeamErrEnum.invitationLinkInvalid);
+    return Promise.reject(TeamErrEnum.tooManyInvitations);
   }
 
   const invitationLink = await MongoInvitationLink.create({
@@ -47,6 +54,7 @@ async function handler(
       return addDays(new Date(), 7);
     })()
   });
-  return invitationLink._id;
+  return invitationLink.linkId;
 }
+
 export default NextAPI(handler);

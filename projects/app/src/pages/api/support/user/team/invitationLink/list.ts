@@ -41,4 +41,5 @@ async function handler(
     })
   }));
 }
+
 export default NextAPI(handler);

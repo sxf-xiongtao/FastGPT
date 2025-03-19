@@ -32,8 +32,8 @@ import { DefaultGroupName } from '@fastgpt/global/support/user/team/group/consta
 import { UserModelSchema } from '@fastgpt/global/support/user/type';
 import { TeamSchema } from '@fastgpt/global/support/user/team/type';
 import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
-import { Types } from 'mongoose';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
+import { Types } from '@fastgpt/service/common/mongo';
 
 /* -------- format --------- */
 export async function teamMemberSchema2TeamItemType(
