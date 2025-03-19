@@ -31,25 +31,13 @@ importers:
         version: 13.3.0
       next-i18next:
         specifier: 15.4.2
-        version: 15.4.2(i18next@23.16.8)(next@14.2.24(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 15.4.2(i18next@23.16.8)(next@14.2.24(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       prettier:
         specifier: 3.2.4
         version: 3.2.4
       react-i18next:
         specifier: 14.1.2
         version: 14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-
-  FastGPT/local:
-    dependencies:
-      axios:
-        specifier: ^1.7.2
-        version: 1.8.3
-      form-data:
-        specifier: ^4.0.0
-        version: 4.0.2
-      node-fetch:
-        specifier: ^3.3.2
-        version: 3.3.2
 
   FastGPT/packages/global:
     dependencies:
@@ -85,7 +73,7 @@ importers:
         version: 5.1.3
       next:
         specifier: 14.2.24
-        version: 14.2.24(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
+        version: 14.2.24(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
       openai:
         specifier: 4.61.0
         version: 4.61.0(encoding@0.1.13)(zod@3.24.2)
@@ -231,7 +219,7 @@ importers:
         version: 1.4.5-lts.1
       next:
         specifier: 14.2.24
-        version: 14.2.24(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
+        version: 14.2.24(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
       nextjs-cors:
         specifier: ^2.2.0
         version: 2.2.0(next@14.2.24(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))
@@ -316,7 +304,7 @@ importers:
         version: 2.1.1(@chakra-ui/system@2.6.1(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@chakra-ui/next-js':
         specifier: 2.4.2
-        version: 2.4.2(@chakra-ui/react@2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(next@14.2.24(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react@18.3.1)
+        version: 2.4.2(@chakra-ui/react@2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(next@14.2.24(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react@18.3.1)
       '@chakra-ui/react':
         specifier: 2.10.7
         version: 2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -379,7 +367,7 @@ importers:
         version: 4.17.21
       next-i18next:
         specifier: 15.4.2
-        version: 15.4.2(i18next@23.16.8)(next@14.2.24(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 15.4.2(i18next@23.16.8)(next@14.2.24(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       papaparse:
         specifier: ^5.4.1
         version: 5.4.1
@@ -437,7 +425,7 @@ importers:
         version: 2.1.1(@chakra-ui/system@2.6.1(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@chakra-ui/next-js':
         specifier: 2.4.2
-        version: 2.4.2(@chakra-ui/react@2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(next@14.2.24(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react@18.3.1)
+        version: 2.4.2(@chakra-ui/react@2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(next@14.2.24(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react@18.3.1)
       '@chakra-ui/react':
         specifier: 2.10.7
         version: 2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -533,10 +521,10 @@ importers:
         version: 5.1.3
       next:
         specifier: 14.2.24
-        version: 14.2.24(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
+        version: 14.2.24(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
       next-i18next:
         specifier: 15.4.2
-        version: 15.4.2(i18next@23.16.8)(next@14.2.24(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 15.4.2(i18next@23.16.8)(next@14.2.24(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       nprogress:
         specifier: ^0.2.0
         version: 0.2.0
@@ -648,7 +636,7 @@ importers:
         version: 5.8.2
       vitest:
         specifier: ^3.0.2
-        version: 3.0.8(@types/debug@4.1.12)(@types/node@20.17.24)(jiti@1.21.7)(jsdom@26.0.0)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0)
+        version: 3.0.8(@types/debug@4.1.12)(@types/node@20.17.24)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0)
 
   FastGPT/projects/sandbox:
     dependencies:
@@ -791,7 +779,7 @@ importers:
         version: 2.1.1(@chakra-ui/system@2.6.1(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@chakra-ui/next-js':
         specifier: 2.4.2
-        version: 2.4.2(@chakra-ui/react@2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(next@14.2.24(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react@18.3.1)
+        version: 2.4.2(@chakra-ui/react@2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(next@14.2.24(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react@18.3.1)
       '@chakra-ui/react':
         specifier: 2.10.7
         version: 2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -887,10 +875,10 @@ importers:
         version: 5.1.3
       next:
         specifier: 14.2.24
-        version: 14.2.24(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
+        version: 14.2.24(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
       next-i18next:
         specifier: 15.4.2
-        version: 15.4.2(i18next@23.16.8)(next@14.2.24(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 15.4.2(i18next@23.16.8)(next@14.2.24(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       nodemailer:
         specifier: ^6.9.4
         version: 6.10.0
@@ -5294,10 +5282,6 @@ packages:
   damerau-levenshtein@1.0.8:
     resolution: {integrity: sha512-sdQSFB7+llfUcQHUQO3+B8ERRj0Oa4w9POWMI/puGtuf7gFywGmkaLCElnudfTiKZV+NvHqL0ifzdrI8Ro7ESA==}
 
-  data-uri-to-buffer@4.0.1:
-    resolution: {integrity: sha512-0R9ikRb668HB7QDxT1vkpuUBtqc53YyAwMwGeUFKRojY/NWKvdZ+9UYtRfGmhqNbRkTSVpMbmyhXipFFv2cb/A==}
-    engines: {node: '>= 12'}
-
   data-uri-to-buffer@6.0.2:
     resolution: {integrity: sha512-7hvf7/GW8e86rW0ptuwS3OcBGDjIi6SZva7hCyWC0yYry2cOPmLIjXAUHI6DK2HsnwJd9ifmt57i8eV2n4YNpw==}
     engines: {node: '>= 14'}
@@ -6058,10 +6042,6 @@ packages:
   fecha@4.2.3:
     resolution: {integrity: sha512-OP2IUU6HeYKJi3i0z4A19kHMQoLVs4Hc+DPqqxI2h/DPZHTm/vjsfC6P0b4jCMy14XizLBqvndQ+UilD7707Jw==}
 
-  fetch-blob@3.2.0:
-    resolution: {integrity: sha512-7yAQpD2UMJzLi1Dqv7qFYnPbaPx7ZfFK6PiIxQ4PfkGPyNyl2Ugx+a/umUonmKqjhM4DnfbMvdX6otXq83soQQ==}
-    engines: {node: ^12.20 || >= 14.13}
-
   fflate@0.8.2:
     resolution: {integrity: sha512-cPJU47OaAoCbg0pBvzsgpTPhmhqI5eJjh/JIu8tPj5q+T7iLvW/JAYUqmE7KOB4R1ZyEhzBaIQpQpardBF5z8A==}
 
@@ -6207,10 +6187,6 @@ packages:
   formdata-node@4.4.1:
     resolution: {integrity: sha512-0iirZp3uVDjVGt9p49aTaqjk84TrglENEDuqfdlZQ1roC9CWlPk6Avf8EEnZNcAqPonwkG35x4n3ww/1THYAeQ==}
     engines: {node: '>= 12.20'}
-
-  formdata-polyfill@4.0.10:
-    resolution: {integrity: sha512-buewHzMvYL29jdeQTVILecSaZKnt/RJWjoZCF5OW60Z67/GmSLBkOFM7qh1PI3zFNtJbaZL5eQu1vLfazOwj4g==}
-    engines: {node: '>=12.20.0'}
 
   formidable@2.1.2:
     resolution: {integrity: sha512-CM3GuJ57US06mlpQ47YcunuUZ9jpm8Vx+P2CGt2j7HpgkKZO/DJYQ0Bobim8G6PFQmK5lOqOOdUXboU+h73A4g==}
@@ -8158,10 +8134,6 @@ packages:
     peerDependenciesMeta:
       encoding:
         optional: true
-
-  node-fetch@3.3.2:
-    resolution: {integrity: sha512-dRB78srN/l6gqWulah9SrxeYnxeddIG30+GOqK/9OlLVyLg3HPnr6SqOWTWOXKRwC2eGYCkZ59NNuSgvSrpgOA==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
   node-gyp@10.3.1:
     resolution: {integrity: sha512-Pp3nFHBThHzVtNY7U6JfPjvT/DTE8+o/4xKsLQtBoU+j2HLsGlhcfzflAoUreaJbNmYnX+LlLi0qjV8kpyO6xQ==}
@@ -10475,10 +10447,6 @@ packages:
   web-namespaces@2.0.1:
     resolution: {integrity: sha512-bKr1DkiNa2krS7qxNtdrtHAmzuYGFQLiQ13TsorsdT6ULTkPLKuu5+GsFpDlg6JFjUTwX2DyhMPG2be8uPrqsQ==}
 
-  web-streams-polyfill@3.3.3:
-    resolution: {integrity: sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==}
-    engines: {node: '>= 8'}
-
   web-streams-polyfill@4.0.0-beta.3:
     resolution: {integrity: sha512-QW95TCTaHmsYfHDybGMwO5IJIM93I/6vTRk+daHTWFPhwh+C8Cg7j7XyKrwrj8Ib6vYXe0ocYNrmzY4xAAN6ug==}
     engines: {node: '>= 14'}
@@ -11940,20 +11908,12 @@ snapshots:
       '@chakra-ui/system': 2.6.1(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(react@18.3.1)
       react: 18.3.1
 
-  '@chakra-ui/next-js@2.4.2(@chakra-ui/react@2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(next@14.2.24(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react@18.3.1)':
+  '@chakra-ui/next-js@2.4.2(@chakra-ui/react@2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(next@14.2.24(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react@18.3.1)':
     dependencies:
       '@chakra-ui/react': 2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@emotion/cache': 11.14.0
       '@emotion/react': 11.11.1(@types/react@18.3.1)(react@18.3.1)
-      next: 14.2.24(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
-      react: 18.3.1
-
-  '@chakra-ui/next-js@2.4.2(@chakra-ui/react@2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(next@14.2.24(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react@18.3.1)':
-    dependencies:
-      '@chakra-ui/react': 2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@emotion/cache': 11.14.0
-      '@emotion/react': 11.11.1(@types/react@18.3.1)(react@18.3.1)
-      next: 14.2.24(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
+      next: 14.2.24(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
       react: 18.3.1
 
   '@chakra-ui/object-utils@2.1.0': {}
@@ -15924,8 +15884,6 @@ snapshots:
 
   damerau-levenshtein@1.0.8: {}
 
-  data-uri-to-buffer@4.0.1: {}
-
   data-uri-to-buffer@6.0.2: {}
 
   data-urls@5.0.0:
@@ -16446,7 +16404,7 @@ snapshots:
       eslint: 8.56.0
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.9.0(eslint-plugin-import@2.31.0(eslint@8.56.0))(eslint@8.56.0)
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@8.56.0)(typescript@5.8.2))(eslint-import-resolver-typescript@3.9.0(eslint-plugin-import@2.31.0(eslint@8.56.0))(eslint@8.56.0))(eslint@8.56.0)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@8.56.0)(typescript@5.8.2))(eslint-import-resolver-typescript@3.9.0)(eslint@8.56.0)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@8.56.0)
       eslint-plugin-react: 7.37.4(eslint@8.56.0)
       eslint-plugin-react-hooks: 4.6.2(eslint@8.56.0)
@@ -16465,8 +16423,8 @@ snapshots:
       '@typescript-eslint/parser': 6.21.0(eslint@8.56.0)(typescript@5.8.2)
       eslint: 8.56.0
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.9.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.56.0)(typescript@5.8.2))(eslint@8.56.0))(eslint@8.56.0)
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.56.0)(typescript@5.8.2))(eslint-import-resolver-typescript@3.9.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.56.0)(typescript@5.8.2))(eslint@8.56.0))(eslint@8.56.0))(eslint@8.56.0)
+      eslint-import-resolver-typescript: 3.9.0(eslint-plugin-import@2.31.0)(eslint@8.56.0)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.56.0)(typescript@5.8.2))(eslint-import-resolver-typescript@3.9.0)(eslint@8.56.0)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@8.56.0)
       eslint-plugin-react: 7.37.4(eslint@8.56.0)
       eslint-plugin-react-hooks: 4.6.2(eslint@8.56.0)
@@ -16485,21 +16443,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.9.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.56.0)(typescript@5.8.2))(eslint@8.56.0))(eslint@8.56.0):
-    dependencies:
-      '@nolyfill/is-core-module': 1.0.39
-      debug: 4.4.0
-      eslint: 8.56.0
-      get-tsconfig: 4.10.0
-      is-bun-module: 1.3.0
-      oxc-resolver: 5.0.0
-      stable-hash: 0.0.5
-      tinyglobby: 0.2.12
-    optionalDependencies:
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.56.0)(typescript@5.8.2))(eslint-import-resolver-typescript@3.9.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.56.0)(typescript@5.8.2))(eslint@8.56.0))(eslint@8.56.0))(eslint@8.56.0)
-    transitivePeerDependencies:
-      - supports-color
-
   eslint-import-resolver-typescript@3.9.0(eslint-plugin-import@2.31.0(eslint@8.56.0))(eslint@8.56.0):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
@@ -16511,7 +16454,22 @@ snapshots:
       stable-hash: 0.0.5
       tinyglobby: 0.2.12
     optionalDependencies:
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@8.56.0)(typescript@5.8.2))(eslint-import-resolver-typescript@3.9.0(eslint-plugin-import@2.31.0(eslint@8.56.0))(eslint@8.56.0))(eslint@8.56.0)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.62.0(eslint@8.56.0)(typescript@5.8.2))(eslint-import-resolver-typescript@3.9.0)(eslint@8.56.0)
+    transitivePeerDependencies:
+      - supports-color
+
+  eslint-import-resolver-typescript@3.9.0(eslint-plugin-import@2.31.0)(eslint@8.56.0):
+    dependencies:
+      '@nolyfill/is-core-module': 1.0.39
+      debug: 4.4.0
+      eslint: 8.56.0
+      get-tsconfig: 4.10.0
+      is-bun-module: 1.3.0
+      oxc-resolver: 5.0.0
+      stable-hash: 0.0.5
+      tinyglobby: 0.2.12
+    optionalDependencies:
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.56.0)(typescript@5.8.2))(eslint-import-resolver-typescript@3.9.0)(eslint@8.56.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -16526,18 +16484,18 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.56.0)(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.9.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.56.0)(typescript@5.8.2))(eslint@8.56.0))(eslint@8.56.0))(eslint@8.56.0):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.56.0)(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.9.0)(eslint@8.56.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 6.21.0(eslint@8.56.0)(typescript@5.8.2)
       eslint: 8.56.0
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.9.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.56.0)(typescript@5.8.2))(eslint@8.56.0))(eslint@8.56.0)
+      eslint-import-resolver-typescript: 3.9.0(eslint-plugin-import@2.31.0)(eslint@8.56.0)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@8.56.0)(typescript@5.8.2))(eslint-import-resolver-typescript@3.9.0(eslint-plugin-import@2.31.0(eslint@8.56.0))(eslint@8.56.0))(eslint@8.56.0):
+  eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.62.0(eslint@8.56.0)(typescript@5.8.2))(eslint-import-resolver-typescript@3.9.0)(eslint@8.56.0):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8
@@ -16566,7 +16524,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.56.0)(typescript@5.8.2))(eslint-import-resolver-typescript@3.9.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.56.0)(typescript@5.8.2))(eslint@8.56.0))(eslint@8.56.0))(eslint@8.56.0):
+  eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.56.0)(typescript@5.8.2))(eslint-import-resolver-typescript@3.9.0)(eslint@8.56.0):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8
@@ -16577,7 +16535,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.56.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.56.0)(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.9.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.56.0)(typescript@5.8.2))(eslint@8.56.0))(eslint@8.56.0))(eslint@8.56.0)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.56.0)(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.9.0)(eslint@8.56.0)
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -16951,11 +16909,6 @@ snapshots:
 
   fecha@4.2.3: {}
 
-  fetch-blob@3.2.0:
-    dependencies:
-      node-domexception: 1.0.0
-      web-streams-polyfill: 3.3.3
-
   fflate@0.8.2: {}
 
   figlet@1.8.0: {}
@@ -17112,10 +17065,6 @@ snapshots:
     dependencies:
       node-domexception: 1.0.0
       web-streams-polyfill: 4.0.0-beta.3
-
-  formdata-polyfill@4.0.10:
-    dependencies:
-      fetch-blob: 3.2.0
 
   formidable@2.1.2:
     dependencies:
@@ -19695,7 +19644,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  next-i18next@15.4.2(i18next@23.16.8)(next@14.2.24(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
+  next-i18next@15.4.2(i18next@23.16.8)(next@14.2.24(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
     dependencies:
       '@babel/runtime': 7.26.10
       '@types/hoist-non-react-statics': 3.3.6
@@ -19703,23 +19652,11 @@ snapshots:
       hoist-non-react-statics: 3.3.2
       i18next: 23.16.8
       i18next-fs-backend: 2.6.0
-      next: 14.2.24(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
+      next: 14.2.24(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
       react: 18.3.1
       react-i18next: 14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
-  next-i18next@15.4.2(i18next@23.16.8)(next@14.2.24(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
-    dependencies:
-      '@babel/runtime': 7.26.10
-      '@types/hoist-non-react-statics': 3.3.6
-      core-js: 3.41.0
-      hoist-non-react-statics: 3.3.2
-      i18next: 23.16.8
-      i18next-fs-backend: 2.6.0
-      next: 14.2.24(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
-      react: 18.3.1
-      react-i18next: 14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-
-  next@14.2.24(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1):
+  next@14.2.24(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1):
     dependencies:
       '@next/env': 14.2.24
       '@swc/helpers': 0.5.5
@@ -19729,33 +19666,7 @@ snapshots:
       postcss: 8.4.31
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      styled-jsx: 5.1.1(@babel/core@7.26.10)(react@18.3.1)
-    optionalDependencies:
-      '@next/swc-darwin-arm64': 14.2.24
-      '@next/swc-darwin-x64': 14.2.24
-      '@next/swc-linux-arm64-gnu': 14.2.24
-      '@next/swc-linux-arm64-musl': 14.2.24
-      '@next/swc-linux-x64-gnu': 14.2.24
-      '@next/swc-linux-x64-musl': 14.2.24
-      '@next/swc-win32-arm64-msvc': 14.2.24
-      '@next/swc-win32-ia32-msvc': 14.2.24
-      '@next/swc-win32-x64-msvc': 14.2.24
-      sass: 1.85.1
-    transitivePeerDependencies:
-      - '@babel/core'
-      - babel-plugin-macros
-
-  next@14.2.24(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1):
-    dependencies:
-      '@next/env': 14.2.24
-      '@swc/helpers': 0.5.5
-      busboy: 1.6.0
-      caniuse-lite: 1.0.30001704
-      graceful-fs: 4.2.11
-      postcss: 8.4.31
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      styled-jsx: 5.1.1(babel-plugin-macros@3.1.0)(react@18.3.1)
+      styled-jsx: 5.1.1(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react@18.3.1)
     optionalDependencies:
       '@next/swc-darwin-arm64': 14.2.24
       '@next/swc-darwin-x64': 14.2.24
@@ -19774,7 +19685,7 @@ snapshots:
   nextjs-cors@2.2.0(next@14.2.24(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)):
     dependencies:
       cors: 2.8.5
-      next: 14.2.24(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
+      next: 14.2.24(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
 
   node-abi@3.74.0:
     dependencies:
@@ -19803,12 +19714,6 @@ snapshots:
       whatwg-url: 5.0.0
     optionalDependencies:
       encoding: 0.1.13
-
-  node-fetch@3.3.2:
-    dependencies:
-      data-uri-to-buffer: 4.0.1
-      fetch-blob: 3.2.0
-      formdata-polyfill: 4.0.10
 
   node-gyp@10.3.1:
     dependencies:
@@ -21591,18 +21496,12 @@ snapshots:
     dependencies:
       inline-style-parser: 0.2.4
 
-  styled-jsx@5.1.1(@babel/core@7.26.10)(react@18.3.1):
+  styled-jsx@5.1.1(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react@18.3.1):
     dependencies:
       client-only: 0.0.1
       react: 18.3.1
     optionalDependencies:
       '@babel/core': 7.26.10
-
-  styled-jsx@5.1.1(babel-plugin-macros@3.1.0)(react@18.3.1):
-    dependencies:
-      client-only: 0.0.1
-      react: 18.3.1
-    optionalDependencies:
       babel-plugin-macros: 3.1.0
 
   stylis@4.2.0: {}
@@ -22359,7 +22258,7 @@ snapshots:
       terser: 5.39.0
       yaml: 2.7.0
 
-  vitest@3.0.8(@types/debug@4.1.12)(@types/node@20.17.24)(jiti@1.21.7)(jsdom@26.0.0)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0):
+  vitest@3.0.8(@types/debug@4.1.12)(@types/node@20.17.24)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0):
     dependencies:
       '@vitest/expect': 3.0.8
       '@vitest/mocker': 3.0.8(vite@6.2.2(@types/node@20.17.24)(jiti@1.21.7)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0))
@@ -22419,8 +22318,6 @@ snapshots:
       defaults: 1.0.4
 
   web-namespaces@2.0.1: {}
-
-  web-streams-polyfill@3.3.3: {}
 
   web-streams-polyfill@4.0.0-beta.3: {}
 
