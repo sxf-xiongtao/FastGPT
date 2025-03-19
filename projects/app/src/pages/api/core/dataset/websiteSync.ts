@@ -6,21 +6,25 @@ import {
   DatasetStatusEnum,
   DatasetCollectionDataProcessModeEnum
 } from '@fastgpt/global/core/dataset/constants';
-import { delay } from '@fastgpt/global/common/system/utils';
-import { DatasetSchemaType } from '@fastgpt/global/core/dataset/type';
+import { delay, retryFn } from '@fastgpt/global/common/system/utils';
+import { DatasetCollectionSchemaType, DatasetSchemaType } from '@fastgpt/global/core/dataset/type';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { PostWebsiteSyncParams } from '@fastgpt/global/core/dataset/api.d';
-import { delDatasetRelevantData } from '@fastgpt/service/core/dataset/controller';
 import { updateWebSyncLimit } from '@fastgpt/service/support/user/utils';
-import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { checkTeamWebSyncPermission } from '@/service/support/permission/teamLimit';
 import { MongoBill } from '@/service/support/wallet/bill/schema';
 import { ManagePermissionVal } from '@fastgpt/global/support/permission/constant';
 import { crawlDynamicWebsite } from '@/service/common/crawler/crawlDynamicWebsite';
 import { addDays } from 'date-fns';
-import { createCollectionAndInsertData } from '@fastgpt/service/core/dataset/collection/controller';
+import {
+  createCollectionAndInsertData,
+  delCollection
+} from '@fastgpt/service/core/dataset/collection/controller';
 import { NextAPI } from '@/service/middleware/entry';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
+import { hashStr } from '@fastgpt/global/common/string/tools';
+import { MongoDatasetCollection } from '@fastgpt/service/core/dataset/collection/schema';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 
 // config
 const maxCrawlPage = process.env.MAX_CRAWL_PAGE ? parseInt(process.env.MAX_CRAWL_PAGE) : 200;
@@ -43,12 +47,20 @@ async function handler(req: ApiRequestProps<PostWebsiteSyncParams>, res: NextApi
 
     await checkTeamWebSyncPermission(teamId);
 
-    // 1. clear dataset all data
-    await mongoSessionRun((session) => delDatasetRelevantData({ datasets: [dataset], session }));
+    // 1. find all existing links
+    const linkMap = new Map<string, DatasetCollectionSchemaType>();
+    if (await checkDatasetExist(datasetId)) {
+      const links = await getCollectionLinks(teamId, datasetId);
+      links.forEach((link) => {
+        if (link.rawLink) {
+          linkMap.set(`${link.rawLink}-${link.hashRawText}`, link);
+        }
+      });
+    }
 
     // 2. crawl all website
     const crawl = dynamic ? crawlDynamicWebsite : crawlWebsite;
-    crawl({
+    await crawl({
       uid: datasetId,
       url: dataset.websiteConfig.url.trim(),
       maxPage: maxCrawlPage,
@@ -56,18 +68,43 @@ async function handler(req: ApiRequestProps<PostWebsiteSyncParams>, res: NextApi
       crawlOnePageCallback: async (item, stopCrawler) => {
         try {
           if (await checkDatasetExist(datasetId)) {
-            createCollectionAndPushData({
-              dataset,
-              item,
-              billId,
-              retry: 3
-            });
+            const key = `${item.url}-${hashStr(item.content)}`;
+            const oldLink = linkMap.get(key);
+            if (!oldLink) {
+              // not exist
+              await createCollectionAndPushData({
+                dataset,
+                item,
+                billId,
+                retry: 3
+              });
+            } else {
+              // exist
+              linkMap.delete(key);
+              if (oldLink.name !== item.title) {
+                // update title
+                await retryFn(async () => {
+                  await MongoDatasetCollection.updateOne(
+                    { _id: oldLink._id },
+                    { $set: { name: item.title } }
+                  );
+                }, 3);
+              }
+            }
           } else {
             stopCrawler();
           }
         } catch (error) {}
       }
     });
+
+    // 3. delete outdated links
+    await retryFn(async () =>
+      mongoSessionRun(async (session) => {
+        const collections: DatasetCollectionSchemaType[] = Array.from(linkMap.values());
+        await delCollection({ collections, session, delImg: true, delFile: true });
+      })
+    );
 
     updateWebSyncLimit(teamId);
 
@@ -149,4 +186,14 @@ async function updateStatusToActive(datasetId: string): Promise<void> {
     await delay(2000);
     return updateStatusToActive(datasetId);
   }
+}
+
+export async function getCollectionLinks(teamId: string, datasetId: string) {
+  const collections = await MongoDatasetCollection.find({
+    teamId,
+    datasetId,
+    type: DatasetCollectionTypeEnum.link
+  });
+
+  return collections;
 }
