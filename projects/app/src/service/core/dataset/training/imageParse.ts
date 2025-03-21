@@ -36,12 +36,12 @@ const reduceQueueAndReturn = (delay = 0) => {
 
 const matchAndParseTextImageUrl = async (text: string) => {
   // 匹配 ![](xxx)的图片格式，提取出 url
-  const regex = /!\[\]\((.*?)\)/g;
+  const regex = /!\[(.*?)\]\((.*?)\)/g;
   const matches = text.matchAll(regex);
   const images: string[] = [];
 
   for await (const match of matches) {
-    const url = match[1];
+    const url = match[2];
     if (!url) continue;
 
     try {
