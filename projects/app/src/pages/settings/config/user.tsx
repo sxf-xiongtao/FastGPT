@@ -1,18 +1,19 @@
 import React, { useMemo, useState } from 'react';
-import { Box, Divider, Input, Textarea } from '@chakra-ui/react';
+import { Box, Divider, Flex, Input, Textarea } from '@chakra-ui/react';
 import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';
 import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
 import { getInitFormData, postUpdateConfig } from '@/web/core/config/api';
 import { useForm } from 'react-hook-form';
 import { serviceSideProps } from '@/web/common/i18n/utils';
-import FirstTitle from '@/components/Settings/FirstTitle';
-import SettingPage from '@/components/Settings/SettingPage';
-import SecondTitle from '@/components/Settings/SecondTitle';
-import FormItem from '@/components/Settings/FormItem';
+import FirstTitle from '@/pageComponents/Settings/FirstTitle';
+import SettingPage from '@/pageComponents/Settings/SettingPage';
+import SecondTitle from '@/pageComponents/Settings/SecondTitle';
+import FormItem from '@/pageComponents/Settings/FormItem';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
-import Switch from '@/components/Settings/Switch';
-import MySelect from '@/components/Settings/Select';
-import ImageInput from '@/components/Settings/ImageInput';
+import Switch from '@/pageComponents/Settings/Switch';
+import MySelect from '@fastgpt/web/components/common/MySelect';
+import ImageInput from '@/pageComponents/Settings/ImageInput';
+import { TeamModeEnum } from '@/global/settings/constants';
 
 interface titleType {
   mainTitle: string;
@@ -22,7 +23,7 @@ interface titleType {
 const UserSetting = () => {
   const [rawData, setRawData] = useState<ConfigFormType>();
 
-  const { reset, watch, register, handleSubmit, control } =
+  const { setValue, reset, watch, register, handleSubmit, control } =
     useForm<ConfigFormType['loginSettings']>();
 
   const { loading: loadingConfig } = useRequest2(getInitFormData, {
@@ -55,11 +56,12 @@ const UserSetting = () => {
 
   const isLoading = loadingConfig || loadingSave;
   const hasSSOURL = !!watch('sso.url');
+  const teamMode = watch('teamMode');
   const teamModeOptions = useMemo(
     () => [
-      { label: '多团队模式', value: 'multi' },
-      { label: '单团队模式', value: 'single' },
-      ...(hasSSOURL ? [{ label: '同步模式', value: 'sync' }] : [])
+      { label: '多团队模式', value: TeamModeEnum.multi },
+      { label: '单团队模式', value: TeamModeEnum.single },
+      ...(hasSSOURL ? [{ label: '同步模式', value: TeamModeEnum.sync }] : [])
     ],
     [hasSSOURL]
   );
@@ -90,7 +92,11 @@ const UserSetting = () => {
       <SecondTitle title="团队模式设置" description="![](/imgs/single-team-mode-intro.png)" />
 
       <FormItem>
-        <MySelect {...register('teamMode')} options={teamModeOptions} />
+        <MySelect<`${TeamModeEnum}`>
+          value={teamMode}
+          list={teamModeOptions}
+          onChange={(val) => setValue('teamMode', val)}
+        />
       </FormItem>
 
       <Divider mt="4" />

@@ -1,6 +1,6 @@
 import { throttle } from '@/utils/tools';
 import { useEffect, useState } from 'react';
-import BoxCard from '../common/BoxContainer/Card';
+import BoxCard from '@/components/common/BoxContainer/Card';
 import { Box, Button, Flex } from '@chakra-ui/react';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 import MyLoading from '@fastgpt/web/components/common/MyLoading';

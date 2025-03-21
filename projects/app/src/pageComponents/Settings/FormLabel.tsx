@@ -1,20 +1,20 @@
 import { Box, HStack, StackProps } from '@chakra-ui/react';
 import QuestionTip from '@fastgpt/web/components/common/MyTooltip/QuestionTip';
-import MarkDownModal from '../MarkDownModal/MarkDownModal';
+import MarkdownModal from '@/components/MarkDownModal/MarkDownModal';
 
 export const Description: React.FC<any> = ({ description }: { description?: string }) => {
   if (!description) {
     return null;
   } else {
     return (
-      <MarkDownModal source={description}>
+      <MarkdownModal source={description}>
         <QuestionTip
           display={'flex'}
           alignItems={'center'}
           label={`${description}\n\n点击查看详情`}
           cursor={'pointer'}
         />
-      </MarkDownModal>
+      </MarkdownModal>
     );
   }
 };

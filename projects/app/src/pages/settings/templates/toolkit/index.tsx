@@ -5,7 +5,7 @@ import { getPluginGroups, getSystemPlugins, putUpdatePluginOrder } from '@/web/c
 import Avatar from '@fastgpt/web/components/common/Avatar';
 import { SystemPluginTemplateItemType } from '@fastgpt/global/core/workflow/type';
 import dynamic from 'next/dynamic';
-import { defaultCustomPluginForm } from '../../../../components/templates/toolkit/CustomPluginConfig';
+import { defaultCustomPluginForm } from '../../../../pageComponents/templates/toolkit/CustomPluginConfig';
 import type { EditCustomPluginType } from '@/global/core/workflow/plugin/type.d';
 import { serviceSideProps } from '@/web/common/i18n/utils';
 import MyIcon from '@fastgpt/web/components/common/Icon';
@@ -18,26 +18,29 @@ import { useTranslation } from 'next-i18next';
 import MyBox from '@fastgpt/web/components/common/MyBox';
 
 const CustomPluginConfig = dynamic(
-  () => import('../../../../components/templates/toolkit/CustomPluginConfig'),
+  () => import('../../../../pageComponents/templates/toolkit/CustomPluginConfig'),
   {
     ssr: false
   }
 );
 const SystemPluginConfig = dynamic(
-  () => import('../../../../components/templates/toolkit/SystemPluginConfig'),
+  () => import('../../../../pageComponents/templates/toolkit/SystemPluginConfig'),
   {
     ssr: false
   }
 );
 const GroupModal = dynamic(
-  () => import('../../../../components/templates/toolkit/GroupConfigModal'),
+  () => import('../../../../pageComponents/templates/toolkit/GroupConfigModal'),
   {
     ssr: false
   }
 );
-const PluginCard = dynamic(() => import('../../../../components/templates/toolkit/PluginCard'), {
-  ssr: false
-});
+const PluginCard = dynamic(
+  () => import('../../../../pageComponents/templates/toolkit/PluginCard'),
+  {
+    ssr: false
+  }
+);
 
 const SystemPlugin = () => {
   const { t } = useTranslation();
