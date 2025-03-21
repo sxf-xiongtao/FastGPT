@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { RedirectFn, GetUserInfoFn } from '../type.d';
+import { RedirectFn, GetUserInfoFn } from '../type';
 
 export const hebamr_redirectFn: RedirectFn = async ({ redirect_uri, state }) => {
   const targetUrl = process.env.SSO_TARGET_URL as string;

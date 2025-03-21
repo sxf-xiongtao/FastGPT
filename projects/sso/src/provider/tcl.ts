@@ -1,4 +1,4 @@
-import { RedirectFn, GetUserInfoFn } from '../type.d';
+import { RedirectFn, GetUserInfoFn } from '../type';
 import axios from 'axios';
 
 export const tcl_redirectFn: RedirectFn = async ({ state }) => {

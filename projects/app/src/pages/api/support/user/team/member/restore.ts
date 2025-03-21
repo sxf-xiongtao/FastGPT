@@ -2,9 +2,9 @@ import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/nex
 import { NextAPI } from '@/service/middleware/entry';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { TeamManagePermissionVal } from '@fastgpt/global/support/permission/user/constant';
-import { getIsSyncUser } from '@/global/support/user/constants';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { TeamMemberStatusEnum } from '@fastgpt/global/support/user/team/constant';
+import { TeamModeEnum } from '@/global/settings/constants';
 export type MemberRestoreQuery = {};
 export type MemberRestoreBody = {
   tmbId: string;
@@ -22,7 +22,7 @@ async function handler(
     per: TeamManagePermissionVal
   });
 
-  if (!getIsSyncUser()) {
+  if (global.systemConfig.teamMode !== TeamModeEnum.sync) {
     return Promise.reject('Only when Sync User feature is enabled can be restored');
   }
 

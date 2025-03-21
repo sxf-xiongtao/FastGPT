@@ -24,7 +24,6 @@ import { GroupMemberRole } from '@fastgpt/global/support/permission/memberGroup/
 import { changeOwner } from '@/service/core/changeOwner';
 import { getGroupsByTmbId } from '@fastgpt/service/support/permission/memberGroup/controllers';
 import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
-import { getIsSyncUser } from '@/global/support/user/constants';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { TeamReadPermissionVal } from '@fastgpt/global/support/permission/user/constant';
 import { addLog } from '@fastgpt/service/common/system/log';
@@ -232,13 +231,23 @@ export async function usernameLogin({
 
   try {
     if (notificationAccount) {
-      if (getIsSyncUser()) {
+      if (global.systemConfig.teamMode === TeamModeEnum.sync) {
         user.contact = notificationAccount;
         await user.save();
       } else if (!user.contact) {
         user.contact = notificationAccount;
         await user.save();
       }
+    }
+    if (memberName && global.systemConfig.teamMode === TeamModeEnum.sync) {
+      await MongoTeamMember.updateOne(
+        {
+          userId: user._id
+        },
+        {
+          name: memberName
+        }
+      );
     }
   } catch (error) {
     addLog.warn('usernameLogin user contact update error', {
@@ -260,12 +269,12 @@ export async function usernameLogin({
 export type SyncUserParams = {
   teamId: string;
   latestUserList: {
-    userid: string;
-    name?: string;
+    username: string;
+    memberName?: string;
     contact?: string;
     avatar?: string;
   }[];
-  source: `${SyncOrgSourceEnum}`;
+  // source: `${SyncOrgSourceEnum}`;
   session?: ClientSession;
 };
 
@@ -273,9 +282,14 @@ export type SyncUserParams = {
  * delete un-exist users
  * create new users
  * */
-export async function syncUser({ teamId, latestUserList, source, session }: SyncUserParams) {
+export async function syncUser({ teamId, latestUserList, session }: SyncUserParams) {
+  addLog.debug('syncUser: latestUserList', latestUserList);
+  if (!latestUserList.length) {
+    return;
+  }
   const func = async (session: ClientSession) => {
-    // 1. get users we have now, and filter with the prefix 'wecom-'...
+    const prefix = latestUserList[0].username.split('-')[0];
+    // 1. get users we have now, and filter with the prefix
     const tmbs = await MongoTeamMember.find(
       {
         teamId
@@ -287,18 +301,17 @@ export async function syncUser({ teamId, latestUserList, source, session }: Sync
     const usersInDB = (
       await MongoUser.find(
         {
-          _id: { $in: tmbs.map((tmb) => tmb.userId) }
+          _id: { $in: tmbs.map((tmb) => tmb.userId) },
+          username: { $regex: new RegExp(`^${prefix}`) }
         },
         undefined,
         { session }
       ).lean()
-    ).filter((user) => user.username.startsWith(source) && user.username !== 'root');
+    ).filter((user) => user.username.startsWith(prefix) && user.username !== 'root');
 
     // 2. remove deleted users
-    const newUserIds = latestUserList.map((item) => item.userid);
-    const deletedUsers = usersInDB.filter(
-      (user) => !newUserIds.includes(user.username.split('-')[1])
-    );
+    const newUserIds = latestUserList.map((item) => item.username);
+    const deletedUsers = usersInDB.filter((user) => !newUserIds.includes(user.username));
 
     const deletedTmbUsers = tmbs.filter((tmb) => {
       return deletedUsers.map((user) => String(user._id)).includes(String(tmb.userId));
@@ -322,7 +335,7 @@ export async function syncUser({ teamId, latestUserList, source, session }: Sync
 
     // 3. create new users (without default team)
     const newUsers = latestUserList.filter((user) => {
-      return !usersInDB.map((item) => item.username).includes(`${source}-${user.userid}`);
+      return !usersInDB.map((item) => item.username).includes(user.username);
     });
 
     for await (const user of newUsers) {
@@ -330,10 +343,11 @@ export async function syncUser({ teamId, latestUserList, source, session }: Sync
       const [u] = await MongoUser.create(
         [
           {
-            username: `${source}-${user.userid}`,
+            username: user.username,
             avatar: user.avatar,
             status: UserStatusEnum.active,
-            password: getNanoid()
+            password: getNanoid(),
+            contact: user.contact
           }
         ],
         { session, ordered: true }
@@ -345,7 +359,7 @@ export async function syncUser({ teamId, latestUserList, source, session }: Sync
           {
             teamId,
             userId: u._id,
-            name: user.name,
+            name: user.memberName || user.username,
             status: TeamMemberStatusEnum.active,
             createTime: new Date()
           }
@@ -374,6 +388,7 @@ export type syncOrgParams = {
 };
 
 export async function syncOrg({ teamId, latestOrgList: orgs, session }: syncOrgParams) {
+  addLog.debug('syncOrg: latestOrgList', orgs);
   const permissions = await MongoResourcePermission.find(
     {
       teamId,
@@ -566,9 +581,10 @@ export async function removeUserFromTeam({
     // Update member status to leave or forbidden
     // if isSyncUser, will forbidden -> could be restored
     // if not isSyncUser, will leave -> could not be restored, only re-invite
-    removeTmb.status = getIsSyncUser()
-      ? TeamMemberStatusEnum.forbidden
-      : TeamMemberStatusEnum.leave;
+    removeTmb.status =
+      global.systemConfig.teamMode === TeamModeEnum.sync
+        ? TeamMemberStatusEnum.forbidden
+        : TeamMemberStatusEnum.leave;
 
     removeTmb.updateTime = new Date();
     await removeTmb.save({ session });

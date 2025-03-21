@@ -1,8 +1,8 @@
 import { Box, HStack, StackProps } from '@chakra-ui/react';
-import MarkDownModal from '../../../../../components/MarkDownModal/MarkDownModal';
 import QuestionTip from '@fastgpt/web/components/common/MyTooltip/QuestionTip';
+import MarkDownModal from '../MarkDownModal/MarkDownModal';
 
-const Description: React.FC<any> = ({ description }: { description?: string }) => {
+export const Description: React.FC<any> = ({ description }: { description?: string }) => {
   if (!description) {
     return null;
   } else {
@@ -18,7 +18,6 @@ const Description: React.FC<any> = ({ description }: { description?: string }) =
     );
   }
 };
-
 const FormLabel = ({
   title,
   description,
