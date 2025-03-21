@@ -15,6 +15,11 @@ import { splitText2Chunks } from '@fastgpt/global/common/string/textSplitter';
 import { generateImageAnnotion } from './imageParse';
 import { DatasetDataIndexTypeEnum } from '@fastgpt/global/core/dataset/data/constants';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
+import { LLMModelItemType } from '@fastgpt/global/core/ai/model.d';
+import {
+  chunkAutoChunkSize,
+  getLLMMaxChunkSize
+} from '@fastgpt/global/core/dataset/training/utils';
 
 export const startTrainingProcess = () => {
   generateAutoTraining();
@@ -81,10 +86,15 @@ const parseFormatAnswer = (answer: string) => {
   const summary = answer.match(/## Summary\s*\n([\s\S]*?)$/i)?.[1];
   return { question: question?.trim() || '', summary: summary?.trim() || '' };
 };
-export const formatSplitText2Index = (
-  answer: string,
-  rawText: string
-): Omit<DatasetDataIndexItemType, 'dataId'>[] => {
+export const formatSplitText2Index = ({
+  answer,
+  rawText,
+  llmModel
+}: {
+  answer: string;
+  rawText: string;
+  llmModel: LLMModelItemType;
+}): Omit<DatasetDataIndexItemType, 'dataId'>[] => {
   const { question, summary } = parseFormatAnswer(answer);
 
   const indexes = [
@@ -106,7 +116,11 @@ export const formatSplitText2Index = (
       : [])
   ];
 
-  const { chunks } = splitText2Chunks({ text: rawText, chunkLen: 512 });
+  const { chunks } = splitText2Chunks({
+    text: rawText,
+    chunkSize: chunkAutoChunkSize,
+    maxSize: getLLMMaxChunkSize(llmModel)
+  });
   indexes.push(
     ...chunks.map((item) => ({
       text: item,

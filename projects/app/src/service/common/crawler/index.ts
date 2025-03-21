@@ -12,17 +12,15 @@ export const crawlWebsite = async ({
   url,
   maxPage = 50,
   selector = 'body',
-  crawlOnePageCallback,
-  onSuccess
+  crawlOnePageCallback
 }: {
   uid: string;
   url: string;
   maxPage?: number;
   selector?: string;
   crawlOnePageCallback?: (e: CrawlDataItemType, stopCrawler: () => void) => any;
-  onSuccess?: (e: CrawlDataItemType[]) => any;
 }) => {
-  const datas: CrawlDataItemType[] = [];
+  const existUrl = new Map<string, boolean>();
 
   const config = new Configuration({
     defaultDatasetId: uid,
@@ -57,16 +55,18 @@ export const crawlWebsite = async ({
           content: markdown
         };
 
-        if (datas.find((e) => e.url === item.url)) {
+        if (existUrl.get(item.url)) {
           return;
         }
 
         if (item.content.length > contentMinLength) {
-          datas.push(item);
+          existUrl.set(item.url, true);
           crawlOnePageCallback?.(item, stopCrawler);
+        } else {
+          return;
         }
 
-        await delay(200);
+        await delay(100);
 
         await enqueueLinks({
           strategy: EnqueueStrategy.SameHostname,
@@ -93,10 +93,4 @@ export const crawlWebsite = async ({
   await crawler.run([url]);
 
   stopCrawler();
-
-  const reuslts = datas.filter((item) => item.content.length > contentMinLength);
-
-  onSuccess?.(reuslts);
-
-  return reuslts;
 };
