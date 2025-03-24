@@ -1,5 +1,6 @@
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
+import _ from 'lodash';
 import type {
   CreateTeamProps,
   UpdateTeamProps
@@ -34,6 +35,13 @@ import { TeamSchema } from '@fastgpt/global/support/user/team/type';
 import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { Types } from '@fastgpt/service/common/mongo';
+import { getOrgsByTmbId } from '@fastgpt/service/support/permission/org/controllers';
+import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
+import { GroupMemberSchemaType } from '@fastgpt/global/support/permission/memberGroup/type';
+import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
+import { PermissionValueType } from '@fastgpt/global/support/permission/type';
+import { MongoOrgMemberModel } from '@fastgpt/service/support/permission/org/orgMemberSchema';
+import MyPopover from '@fastgpt/web/components/common/MyPopover';
 
 /* -------- format --------- */
 export async function teamMemberSchema2TeamItemType(
@@ -268,7 +276,8 @@ export async function getUserTeamOrDefaultTeam(tmbId?: string, userId?: string) 
 }
 
 /* --------------- member -------------- */
-/** get the members of a team
+/** @deprecated: do not use this function anymore, it will get ALL members, which is very slow.
+ * get the members of a team
  * @param teamId: the objectId of team
  * @return a object whose type is [TeamMemberItemType]
  * @throws {Error} if teamId is not exist
@@ -324,22 +333,37 @@ export async function getTeamMembersPaged({
   teamId,
   offset,
   pageSize,
-  withLeaved = false
+  withLeaved = false,
+  orgId
 }: {
   teamId: string;
   offset: number;
   pageSize: number;
   withLeaved?: boolean;
+  orgId?: string;
 }): Promise<PaginationResponse<TeamMemberItemType>> {
-  const [groups, permissions, members, total] = await Promise.all([
+  const [filterTmbIds, _orgMembers] = await (async () => {
+    if (orgId) {
+      const orgMembers = await MongoOrgMemberModel.find({ teamId, orgId }).lean();
+      return [orgMembers.map((m) => m.tmbId), orgMembers];
+    }
+    return [undefined, undefined];
+  })();
+
+  const [groups, permissions, members, total, team] = await Promise.all([
     getGroupsByTeamId(teamId),
     MongoResourcePermission.find({
       teamId: teamId,
       resourceType: PerResourceTypeEnum.team
     }),
-    MongoTeamMember.aggregate([
+    MongoTeamMember.aggregate<
+      TeamMemberSchema & {
+        user: UserModelSchema[];
+      }
+    >([
       {
         $match: {
+          ...(orgId ? { _id: { $in: filterTmbIds } } : {}),
           teamId: new Types.ObjectId(teamId),
           ...(withLeaved ? {} : { status: notLeaveStatus })
         }
@@ -360,11 +384,10 @@ export async function getTeamMembersPaged({
             $switch: {
               branches: [
                 { case: { $eq: ['$status', 'active'] }, then: 1 },
-                { case: { $eq: ['$status', 'waiting'] }, then: 2 },
-                { case: { $eq: ['$status', 'reject'] }, then: 3 },
-                { case: { $eq: ['$status', 'leave'] }, then: 4 }
+                { case: { $eq: ['$status', 'leave'] }, then: 2 },
+                { case: { $eq: ['$status', 'forbidden'] }, then: 3 }
               ],
-              default: 5 // 如果有其他状态，可以给一个默认值
+              default: 4 // 如果有其他状态，可以给一个默认值
             }
           }
         }
@@ -378,8 +401,28 @@ export async function getTeamMembersPaged({
         }
       }
     ]),
-    MongoTeamMember.countDocuments({ teamId, status: notLeaveStatus })
+    MongoTeamMember.countDocuments({
+      teamId,
+      ...(withLeaved ? {} : { status: notLeaveStatus }),
+      ...(filterTmbIds ? { _id: { $in: filterTmbIds } } : {})
+    }),
+    MongoTeam.findById(teamId)
   ]);
+
+  const tmbIds = members.map((m) => String(m._id));
+  const orgMembers =
+    _orgMembers ??
+    (await MongoOrgMemberModel.find({
+      teamId,
+      tmbId: { $in: tmbIds }
+    }).lean());
+  const orgs = await MongoOrgModel.find({
+    _id: { $in: orgMembers.map((m) => m.orgId) }
+  }).lean();
+  const allOrgs = await MongoOrgModel.find({
+    teamId,
+    pathId: { $in: orgs.flatMap((org) => org.path.split('/')) }
+  }).lean();
 
   const list = members.map((member) => {
     const isOwner = member.role === TeamMemberRoleEnum.owner;
@@ -390,11 +433,24 @@ export async function getTeamMembersPaged({
       .filter((p) => p !== undefined);
 
     const groupPer = concatPer(groupPermission);
-
     const per =
       permissions.find((p) => String(p.tmbId) === String(member._id))?.permission ??
       groupPer ??
       TeamDefaultPermissionVal;
+
+    const myOrgids = orgMembers
+      .filter((m) => String(m.tmbId) === String(member._id))
+      .map((m) => String(m.orgId));
+    const myOrgs = allOrgs
+      .filter((org) => myOrgids.includes(String(org._id)))
+      .map((org) => {
+        if (org.path === '')
+          return {
+            ...org,
+            name: team?.name
+          };
+        return org;
+      });
 
     return {
       userId: member.userId,
@@ -410,7 +466,16 @@ export async function getTeamMembersPaged({
       }),
       contact: member.user[0].contact,
       createTime: member.createTime,
-      updateTime: member.updateTime
+      updateTime: member.updateTime,
+      orgs: myOrgs.map((org) => {
+        const pathids = org.path.split('/').slice(1);
+        const pathNames = _.chain(allOrgs)
+          .filter((o) => pathids.includes(String(o.pathId)))
+          .map((o) => o.name)
+          .slice(1)
+          .value();
+        return pathNames.length > 0 ? '/' + pathNames.join('/') + '/' + org.name : '/' + org.name;
+      })
     };
   });
 

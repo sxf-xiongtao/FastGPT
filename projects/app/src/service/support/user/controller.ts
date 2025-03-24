@@ -536,20 +536,20 @@ export async function removeUserFromTeam({
       }
     );
     // Delete group member
-    // await MongoGroupMemberModel.deleteMany(
-    //   {
-    //     tmbId: memberTmbId
-    //   },
-    //   { session }
-    // );
+    await MongoGroupMemberModel.deleteMany(
+      {
+        tmbId: memberTmbId
+      },
+      { session }
+    );
     // Delete org member
-    // await MongoOrgMemberModel.deleteMany(
-    //   {
-    //     teamId,
-    //     tmbId: memberTmbId
-    //   },
-    //   { session }
-    // );
+    await MongoOrgMemberModel.deleteMany(
+      {
+        teamId,
+        tmbId: memberTmbId
+      },
+      { session }
+    );
 
     // Transfer permission
     await changeOwner({

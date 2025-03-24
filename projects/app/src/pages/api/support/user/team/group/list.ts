@@ -1,14 +1,12 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
-import { PerResourceTypeEnum } from '@fastgpt/global/support/permission/constant';
 import { TeamReadPermissionVal } from '@fastgpt/global/support/permission/user/constant';
 import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
 import { MemberGroupListType } from '@fastgpt/global/support/permission/memberGroup/type';
 import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
-import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
-import { TeamPermission } from '@fastgpt/global/support/permission/user/controller';
 import { DefaultGroupName } from '@fastgpt/global/support/user/team/group/constant';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 
 export type GroupListQuery = {};
 export type GroupListBody = {};
@@ -18,7 +16,7 @@ async function handler(
   req: ApiRequestProps<GroupListBody, GroupListQuery>,
   _res: ApiResponseType<any>
 ): Promise<GroupListResponse> {
-  const { teamId } = await authUserPer({
+  const { teamId, tmbId } = await authUserPer({
     req,
     per: TeamReadPermissionVal,
     authToken: true
@@ -32,31 +30,59 @@ async function handler(
   }
   const groupIds = allGroups.map((group) => group._id);
 
-  const allMembers = await MongoGroupMemberModel.find(
+  const groupMembers = await MongoGroupMemberModel.find(
     { groupId: { $in: groupIds } },
     'tmbId groupId role'
   ).lean();
 
-  const allPermissions = await MongoResourcePermission.find(
-    { groupId: { $in: groupIds }, resourceType: PerResourceTypeEnum.team },
-    'permission groupId'
-  ).lean();
+  const selectedGroupMembers = groupIds
+    .flatMap((groupId) =>
+      groupMembers.filter((member) => String(member.groupId) === String(groupId)).slice(0, 3)
+    )
+    .concat(groupMembers.filter((gm) => gm.role === 'owner'));
+
+  const tmbs = await MongoTeamMember.find({
+    teamId,
+    _id: { $in: selectedGroupMembers.map((member) => member.tmbId) }
+  }).lean();
 
   return allGroups.map((group) => {
-    const members = allMembers
-      .filter((member) => String(member.groupId) === String(group._id))
-      .map((member) => ({
-        role: member.role,
-        tmbId: member.tmbId
-      }));
-    const per = allPermissions.find(
-      (permission) => String(permission.groupId) === String(group._id)
-    )?.permission;
+    if (group.name === DefaultGroupName) {
+      return {
+        ...group,
+        members: [],
+        count: 0,
+        owner: {} as any,
+        canEdit: false
+      };
+    }
+    const myGroupMembers = groupMembers.filter(
+      (member) => String(member.groupId) === String(group._id)
+    );
+    const myTmbIds = myGroupMembers.map((member) => String(member.tmbId));
+    const myTmbs = tmbs.filter((tmb) => myTmbIds.includes(String(tmb._id)));
+    const owner = myTmbs.find(
+      (tmb) =>
+        String(tmb._id) === String(myGroupMembers.find((member) => member.role === 'owner')?.tmbId)
+    )!;
+    const myAdminIds = myGroupMembers
+      .filter((member) => member.role === 'admin')
+      .map((member) => member.tmbId);
 
     return {
       ...group,
-      members: members,
-      permission: new TeamPermission({ per })
+      members: myTmbs.map((tmb) => ({
+        name: tmb.name,
+        avatar: tmb.avatar,
+        tmbId: tmb._id
+      })),
+      count: myGroupMembers.length,
+      owner: {
+        name: owner.name,
+        avatar: owner.avatar,
+        tmbId: String(owner._id)
+      },
+      canEdit: myAdminIds.includes(String(tmbId)) || tmbId === String(owner?._id)
     };
   });
 }

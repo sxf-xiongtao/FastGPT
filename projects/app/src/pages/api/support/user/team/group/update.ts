@@ -16,7 +16,7 @@ export type GroupUpdateQuery = {};
 export type GroupUpdateBody = putUpdateGroupData;
 export type GroupUpdateResponse = {};
 
-/* 
+/*
    Update the group information
 */
 async function handler(
