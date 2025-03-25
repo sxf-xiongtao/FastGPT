@@ -410,14 +410,22 @@ export async function getTeamMembersPaged({
     (await MongoOrgMemberModel.find({
       teamId,
       tmbId: { $in: tmbIds }
-    }).lean());
+    })
+      .sort({ _id: -1 })
+      .lean());
   const orgs = await MongoOrgModel.find({
     _id: { $in: orgMembers.map((m) => m.orgId) }
   }).lean();
-  const allOrgs = await MongoOrgModel.find({
-    teamId,
-    pathId: { $in: orgs.flatMap((org) => org.path.split('/')) }
-  }).lean();
+  const allOrgs = [
+    ...orgs,
+    ...(await MongoOrgModel.find({
+      teamId,
+      pathId: { $in: orgs.flatMap((org) => org.path.split('/')) }
+    }).lean())
+  ].map((item) => ({
+    ...item,
+    name: item.path === '' ? team?.name : item.name
+  }));
 
   const list = members.map((member) => {
     const isOwner = member.role === TeamMemberRoleEnum.owner;
@@ -436,16 +444,12 @@ export async function getTeamMembersPaged({
     const myOrgids = orgMembers
       .filter((m) => String(m.tmbId) === String(member._id))
       .map((m) => String(m.orgId));
-    const myOrgs = allOrgs
-      .filter((org) => myOrgids.includes(String(org._id)))
-      .map((org) => {
-        if (org.path === '')
-          return {
-            ...org,
-            name: team?.name
-          };
+    const myOrgs = myOrgids
+      .map((orgId) => {
+        const org = allOrgs.find((o) => String(o._id) === orgId);
         return org;
-      });
+      })
+      .filter(Boolean);
 
     return {
       userId: member.userId,
@@ -463,13 +467,13 @@ export async function getTeamMembersPaged({
       createTime: member.createTime,
       updateTime: member.updateTime,
       orgs: myOrgs.map((org) => {
-        const pathids = org.path.split('/').slice(1);
+        const pathids = org!.path.split('/').slice(1);
         const pathNames = _.chain(allOrgs)
           .filter((o) => pathids.includes(String(o.pathId)))
           .map((o) => o.name)
           .slice(1)
           .value();
-        return pathNames.length > 0 ? '/' + pathNames.join('/') + '/' + org.name : '/' + org.name;
+        return pathNames.length > 0 ? '/' + pathNames.join('/') + '/' + org!.name : '/' + org!.name;
       })
     };
   });

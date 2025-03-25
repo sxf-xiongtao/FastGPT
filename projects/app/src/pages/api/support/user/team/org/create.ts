@@ -16,7 +16,7 @@ async function handler(
   req: ApiRequestProps<OrgCreateBody, OrgCreateQuery>,
   _res: ApiResponseType<any>
 ): Promise<OrgCreateResponse> {
-  const { name, avatar, parentId, description } = req.body;
+  const { name, avatar, path = '', description } = req.body;
 
   if (!name || name.length === 0) {
     return Promise.reject(CommonErrEnum.missingParams);
@@ -24,13 +24,12 @@ async function handler(
 
   const { teamId } = await authOrgMember({
     req,
-    authToken: true,
-    orgIds: parentId
+    authToken: true
   });
 
   await mongoSessionRun(async (session) => {
     // Find the parent org
-    const parent = await MongoOrgModel.findOne({ _id: parentId, teamId }, undefined, {
+    const parent = await MongoOrgModel.findOne({ path, teamId }, undefined, {
       session
     }).lean();
     if (!parent) {
