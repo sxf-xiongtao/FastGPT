@@ -360,17 +360,11 @@ export async function getTeamMembersPaged({
         $match: {
           ...(orgId ? { _id: { $in: filterTmbIds } } : {}),
           teamId: new Types.ObjectId(teamId),
-          ...(withLeaved ? {} : { status: notLeaveStatus })
-        }
-      },
-      { $skip: offset },
-      { $limit: pageSize },
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'userId',
-          foreignField: '_id',
-          as: 'user'
+          ...(withLeaved
+            ? {}
+            : {
+                status: notLeaveStatus
+              })
         }
       },
       {
@@ -389,6 +383,16 @@ export async function getTeamMembersPaged({
       },
       {
         $sort: { statusOrder: 1 }
+      },
+      { $skip: offset },
+      { $limit: pageSize },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'user'
+        }
       },
       {
         $project: {

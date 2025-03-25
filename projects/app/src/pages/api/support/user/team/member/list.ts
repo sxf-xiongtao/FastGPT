@@ -7,7 +7,7 @@ import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
 
 export type MemberListQuery = PaginationProps<{
-  withLeaved?: boolean;
+  withLeaved?: 'true' | 'false';
 }>;
 export type MemberListBody = {};
 export type MemberListResponse = PaginationResponse<TeamMemberItemType>;
@@ -24,7 +24,7 @@ async function handler(
     teamId,
     offset,
     pageSize,
-    withLeaved
+    withLeaved: withLeaved === 'true'
   });
 }
 export default NextAPI(handler);
