@@ -35,13 +35,8 @@ import { TeamSchema } from '@fastgpt/global/support/user/team/type';
 import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { Types } from '@fastgpt/service/common/mongo';
-import { getOrgsByTmbId } from '@fastgpt/service/support/permission/org/controllers';
 import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
-import { GroupMemberSchemaType } from '@fastgpt/global/support/permission/memberGroup/type';
-import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
-import { PermissionValueType } from '@fastgpt/global/support/permission/type';
 import { MongoOrgMemberModel } from '@fastgpt/service/support/permission/org/orgMemberSchema';
-import MyPopover from '@fastgpt/web/components/common/MyPopover';
 
 /* -------- format --------- */
 export async function teamMemberSchema2TeamItemType(

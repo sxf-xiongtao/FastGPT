@@ -19,11 +19,14 @@ async function handler(
   const { teamId } = await authCert({ req, authToken: true });
   const { offset, pageSize } = parsePaginationRequest(req);
   const { orgId } = req.query;
-  if (!orgId)
+
+  if (!orgId) {
     return {
       list: [],
       total: 0
     };
+  }
+
   return getTeamMembersPaged({
     offset,
     pageSize,
