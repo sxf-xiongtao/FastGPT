@@ -20,9 +20,6 @@ export type SearchQuery = {
 export type SearchBody = {};
 export type SearchResponse = SearchResult;
 
-/** 用户搜索接口
- * @param searchKey 关键词 可以通过 userId, memberName, contact 搜索
- * */
 async function handler(
   req: ApiRequestProps<SearchBody, SearchQuery>,
   _res: ApiResponseType<any>
