@@ -353,7 +353,7 @@ export async function getTeamMembersPaged({
     }),
     MongoTeamMember.aggregate<
       TeamMemberSchema & {
-        user: UserModelSchema[];
+        user: UserModelSchema;
       }
     >([
       {
@@ -384,8 +384,6 @@ export async function getTeamMembersPaged({
       {
         $sort: { statusOrder: 1 }
       },
-      { $skip: offset },
-      { $limit: pageSize },
       {
         $lookup: {
           from: 'users',
@@ -394,6 +392,11 @@ export async function getTeamMembersPaged({
           as: 'user'
         }
       },
+      {
+        $unwind: '$user'
+      },
+      { $skip: offset },
+      { $limit: pageSize },
       {
         $project: {
           statusOrder: 0
@@ -467,7 +470,7 @@ export async function getTeamMembersPaged({
         per,
         isOwner
       }),
-      contact: member.user[0].contact,
+      contact: member.user.contact,
       createTime: member.createTime,
       updateTime: member.updateTime,
       orgs: myOrgs.map((org) => {
