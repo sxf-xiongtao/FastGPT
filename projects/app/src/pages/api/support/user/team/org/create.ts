@@ -1,4 +1,5 @@
 import { NextAPI } from '@/service/middleware/entry';
+import { getRootOrg } from '@/service/support/user/team/org/utils';
 import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import type { postCreateOrgData } from '@fastgpt/global/support/user/team/org/api';
@@ -16,7 +17,7 @@ async function handler(
   req: ApiRequestProps<OrgCreateBody, OrgCreateQuery>,
   _res: ApiResponseType<any>
 ): Promise<OrgCreateResponse> {
-  const { name, avatar, path = '', description } = req.body;
+  const { name, avatar, orgId, description } = req.body;
 
   if (!name || name.length === 0) {
     return Promise.reject(CommonErrEnum.missingParams);
@@ -29,9 +30,15 @@ async function handler(
 
   await mongoSessionRun(async (session) => {
     // Find the parent org
-    const parent = await MongoOrgModel.findOne({ path, teamId }, undefined, {
-      session
-    }).lean();
+    const parent = await (async () => {
+      if (orgId === '') {
+        return await getRootOrg({ teamId });
+      }
+      return await MongoOrgModel.findOne({ _id: orgId, teamId }, undefined, {
+        session
+      }).lean();
+    })();
+
     if (!parent) {
       return Promise.reject(TeamErrEnum.orgParentNotExist);
     }

@@ -47,7 +47,6 @@ export const countOrgChildren = async ({
       teamId
     })
   ]);
-  console.log('count', orgCount, memberCount, path, orgId);
 
   return orgCount + memberCount;
 };

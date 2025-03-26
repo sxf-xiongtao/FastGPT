@@ -1,16 +1,40 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
 import { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
-import { getTeamMembersPaged } from '@/service/support/user/team/controller';
-import { TeamMemberItemType } from '@fastgpt/global/support/user/team/type';
+import {
+  formatTeamMemberItemType,
+  getMembersOrgs,
+  getMembersPermission
+} from '@/service/support/user/team/controller';
+import { TeamMemberItemType, TeamMemberSchema } from '@fastgpt/global/support/user/team/type';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
+import { getRootOrg } from '@/service/support/user/team/org/utils';
+import { MongoOrgMemberModel } from '@fastgpt/service/support/permission/org/orgMemberSchema';
+import { TeamMemberStatusEnum } from '@fastgpt/global/support/user/team/constant';
+import { UserModelSchema } from '@fastgpt/global/support/user/type';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
+import { Types } from 'mongoose';
+import { replaceRegChars } from '@fastgpt/global/common/string/tools';
+import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
 
-export type MemberListQuery = PaginationProps<{
-  withLeaved?: 'true' | 'false';
+export type MemberListQuery = {};
+export type MemberListBody = PaginationProps<{
+  withPermission?: boolean; // 是否获取权限信息
+  withOrgs?: boolean; // 是否获取组织信息
+  searchKey?: string; // 搜索关键词 支持搜索：用户名、联系方式、memberName
+  groupId?: string; // 通过 GroupId 查询筛选
+  orgId?: string; // 通过 OrgId 查询筛选
+  status?: 'active' | 'inactive';
 }>;
-export type MemberListBody = {};
-export type MemberListResponse = PaginationResponse<TeamMemberItemType>;
+
+export type MemberListResponse = PaginationResponse<
+  TeamMemberItemType<{
+    withPermission: MemberListBody['withPermission'];
+    withOrgs: MemberListBody['withOrgs'];
+    withGroupRole: MemberListBody['groupId'] extends string ? true : false;
+  }>
+>;
 
 async function handler(
   req: ApiRequestProps<MemberListBody, MemberListQuery>,
@@ -18,13 +42,141 @@ async function handler(
 ): Promise<MemberListResponse> {
   const { teamId } = await authCert({ req, authToken: true });
   const { offset, pageSize } = parsePaginationRequest(req);
-  const { withLeaved } = req.query;
+  const { status, withOrgs, withPermission, searchKey, groupId, orgId } = req.body;
+  const regex = searchKey ? RegExp(replaceRegChars(searchKey), 'i') : undefined;
 
-  return getTeamMembersPaged({
-    teamId,
-    offset,
-    pageSize,
-    withLeaved: withLeaved === 'true'
-  });
+  const [filterTmbIds, _orgMembers, _groupMembers] = await (async () => {
+    if (orgId !== undefined) {
+      const _orgid = await (async () => {
+        if (!orgId) return (await getRootOrg({ teamId }))._id;
+        return orgId;
+      })();
+      const orgMembers = await MongoOrgMemberModel.find({ teamId, orgId: _orgid }).lean();
+      return [orgMembers.map((m) => m.tmbId), orgMembers, undefined];
+    }
+    if (groupId !== undefined) {
+      const groupMembers = await MongoGroupMemberModel.find({ groupId }).lean();
+      return [groupMembers.map((m) => m.tmbId), undefined, groupMembers];
+    }
+    return [undefined, undefined, undefined];
+  })();
+
+  const [{ members, total }] = await MongoTeamMember.aggregate<{
+    members: Array<
+      TeamMemberSchema & {
+        user: UserModelSchema;
+      }
+    >;
+    total?: [{ count?: number }];
+  }>([
+    {
+      $match: {
+        ...(filterTmbIds ? { _id: { $in: filterTmbIds } } : {}),
+        teamId: new Types.ObjectId(teamId),
+        ...(status
+          ? status === 'active'
+            ? { status: TeamMemberStatusEnum.active }
+            : { status: { $ne: TeamMemberStatusEnum.active } }
+          : {})
+      }
+    },
+    {
+      $addFields: {
+        statusOrder: {
+          $switch: {
+            branches: [
+              { case: { $eq: ['$status', 'active'] }, then: 1 },
+              { case: { $eq: ['$status', 'leave'] }, then: 2 },
+              { case: { $eq: ['$status', 'forbidden'] }, then: 3 }
+            ],
+            default: 4 // 如果有其他状态，可以给一个默认值
+          }
+        }
+      }
+    },
+    {
+      $sort: { statusOrder: 1 }
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'user'
+      }
+    },
+    {
+      $unwind: '$user'
+    },
+    ...(searchKey
+      ? [
+          {
+            $match: {
+              $or: [{ 'user.username': regex }, { 'user.contact': regex }, { 'user.name': regex }]
+            }
+          }
+        ]
+      : []),
+    {
+      $facet: {
+        members: [
+          {
+            $skip: offset
+          },
+          {
+            $limit: pageSize
+          },
+          {
+            $project: {
+              statusOrder: 0
+            }
+          }
+        ],
+        total: [
+          {
+            $count: 'count'
+          }
+        ]
+      }
+    }
+  ]);
+  // MongoTeamMember.countDocuments({
+  //   teamId,
+  //   ...(filterTmbIds ? { _id: { $in: filterTmbIds } } : {}),
+  //   ...(status
+  //     ? status === 'active'
+  //       ? { status: TeamMemberStatusEnum.active }
+  //       : { status: { $ne: TeamMemberStatusEnum.active } }
+  //     : {})
+  // })
+  // ]);
+
+  const list = await (async () => {
+    let list = members;
+    if (withPermission) {
+      list = await getMembersPermission({
+        members: list,
+        teamId
+      });
+    }
+    if (withOrgs) {
+      list = await getMembersOrgs({
+        members: list,
+        teamId
+      });
+    }
+    if (groupId) {
+      list = list.map((item) => ({
+        ...item,
+        groupRole: _groupMembers?.find((m) => String(m.tmbId) === String(item._id))?.role
+      }));
+    }
+    return list.map(formatTeamMemberItemType);
+  })();
+
+  return {
+    total: total?.[0]?.count ?? 0,
+    list
+  };
 }
 export default NextAPI(handler);

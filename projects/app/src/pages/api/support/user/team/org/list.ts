@@ -2,10 +2,6 @@ import { NextAPI } from '@/service/middleware/entry';
 import { DEFAULT_ORG_AVATAR } from '@fastgpt/global/common/system/constants';
 import { TeamReadPermissionVal } from '@fastgpt/global/support/permission/user/constant';
 import type { OrgListItemType } from '@fastgpt/global/support/user/team/org/type';
-import {
-  createRootOrg,
-  getChildrenByOrg
-} from '@fastgpt/service/support/permission/org/controllers';
 import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
@@ -13,21 +9,23 @@ import { PerResourceTypeEnum } from '@fastgpt/global/support/permission/constant
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
 import { TeamPermission } from '@fastgpt/global/support/permission/user/controller';
 import { countOrgChildren, getRootOrg } from '@/service/support/user/team/org/utils';
-import { MongooseError } from '@fastgpt/service/common/mongo';
 import { getOrgChildrenPath } from '@fastgpt/global/support/user/team/org/constant';
+import { replaceRegChars } from '@fastgpt/global/common/string/tools';
 
-export type OrgListQuery = {
-  orgPath?: string;
-  getPermissions?: boolean;
+export type OrgListQuery = {};
+export type OrgListBody = {
+  orgId: string; // "" ==> root
+  withPermission?: boolean;
+  searchKey?: string;
 };
-export type OrgListBody = {};
 export type OrgListResponse = OrgListItemType[];
 
 async function handler(
   req: ApiRequestProps<OrgListBody, OrgListQuery>,
   res: ApiResponseType<any>
 ): Promise<OrgListResponse> {
-  const { orgPath: path = '', getPermissions } = req.query;
+  const { orgId, withPermission, searchKey } = req.body;
+  const regex = searchKey ? new RegExp(replaceRegChars(searchKey), 'i') : undefined;
 
   const { teamId } = await authUserPer({
     req,
@@ -36,15 +34,23 @@ async function handler(
   });
 
   const orgs = await (async () => {
-    if (path === '') {
-      const rootOrg = await getRootOrg({ teamId });
-      return await MongoOrgModel.find({ teamId, path: getOrgChildrenPath(rootOrg) }).lean();
+    if (searchKey) {
+      return await MongoOrgModel.find({ teamId, name: regex }).lean();
     }
-    return MongoOrgModel.find({ teamId, path }).lean();
+    const org = await (async () => {
+      if (orgId === '') {
+        return getRootOrg({ teamId });
+      }
+      return MongoOrgModel.findById(orgId);
+    })();
+    if (!org) {
+      return Promise.reject('Org not found');
+    }
+    return MongoOrgModel.find({ teamId, path: getOrgChildrenPath(org) }).lean();
   })();
 
   // get permissions
-  const permissions = getPermissions
+  const permissions = withPermission
     ? await MongoResourcePermission.find({
         resourceType: PerResourceTypeEnum.team,
         teamId,

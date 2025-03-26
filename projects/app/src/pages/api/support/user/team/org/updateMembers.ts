@@ -1,6 +1,5 @@
 import { NextAPI } from '@/service/middleware/entry';
 import { getRootOrg } from '@/service/support/user/team/org/utils';
-import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 import type { putUpdateOrgMembersData } from '@fastgpt/global/support/user/team/org/api';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { authOrgMember } from '@fastgpt/service/support/permission/auth/org';
