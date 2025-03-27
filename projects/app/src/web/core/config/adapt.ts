@@ -42,7 +42,7 @@ export function formatConfigStore2FormSchema({
     openapiPrefix = 'openapi',
     vectorMaxProcess = 10,
     qaMaxProcess = 10,
-    pgHNSWEfSearch = 100,
+    hnswEfSearch = 100,
     ...systemEnvProps
   } = systemEnv || {};
 
@@ -74,7 +74,7 @@ export function formatConfigStore2FormSchema({
         openapiPrefix,
         vectorMaxProcess,
         qaMaxProcess,
-        pgHNSWEfSearch,
+        hnswEfSearch,
         ...systemEnvProps
       }
     },

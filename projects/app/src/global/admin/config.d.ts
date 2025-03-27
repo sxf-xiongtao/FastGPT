@@ -40,7 +40,7 @@ export type ConfigFormType = {
       vectorMaxProcess: number;
       qaMaxProcess: number;
       vlmMaxProcess: number;
-      pgHNSWEfSearch: number;
+      hnswEfSearch: number;
       tokenWorkers: number;
     };
     navbar?: NavbarItemType[];

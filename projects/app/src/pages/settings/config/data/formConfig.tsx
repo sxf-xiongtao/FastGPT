@@ -161,8 +161,8 @@ export const getFormConfig = (): FormConfig => {
               type: 'number',
               title: '图片理解模型最大处理进程'
             },
-            pgHNSWEfSearch: {
-              key: 'siteSettings.systemEnv.pgHNSWEfSearch',
+            hnswEfSearch: {
+              key: 'siteSettings.systemEnv.hnswEfSearch',
               type: 'number',
               title: 'HNSW ef_search',
               description: '没有特殊设置过索引的，默认 100 即可'
