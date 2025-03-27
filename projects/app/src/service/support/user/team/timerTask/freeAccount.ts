@@ -1,15 +1,10 @@
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import { TeamSubSchema } from '@fastgpt/global/support/wallet/sub/type';
-import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
 import { addDays, differenceInDays } from 'date-fns';
-import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { systemUseTeamPlanning } from '@/service/support/wallet/sub/utils';
-import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
-import { delDatasetRelevantData } from '@fastgpt/service/core/dataset/controller';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
 import { addLog } from '@fastgpt/service/common/system/log';
-import { formatTime2YMD } from '@fastgpt/global/common/string/time';
 import { sendInform2OneUser } from '../../inform/controller';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 
@@ -69,16 +64,10 @@ const checkUsageTime = async (plan: TeamSubSchema, clearDay: Date, oldDateInform
 
     // 距离 expiredDay 还有 7 3 1 天 发送消息
     const diffDay = differenceInDays(expiredTime, clearDay) + 1;
-    if (diffDay === 7) {
-      return notifyOneFreeClean(teamId, 7);
-    }
-    if (diffDay === 3) {
-      return notifyOneFreeClean(teamId, 3);
-    }
-    if (diffDay === 1) {
-      return notifyOneFreeClean(teamId, 1);
-    }
-    if (diffDay < 0) {
+    const NOTIFY_DAYS = new Set([7, 3, 1]);
+    if (NOTIFY_DAYS.has(diffDay)) {
+      return notifyOneFreeClean(teamId, diffDay);
+    } else if (diffDay < 0) {
       return clearFreeAccount(teamId);
     }
   } catch (error) {
