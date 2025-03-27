@@ -92,6 +92,25 @@ export const NotificationBindTemplate = ({ code }: { code: string }) => {
   };
 };
 
+export const ManageRenameTemplate = ({
+  name,
+  managerName,
+  newName
+}: {
+  name: string;
+  managerName: string;
+  newName: string;
+}) => {
+  return {
+    subject: `${name} - 管理员改名通知`,
+    html: `
+  <div>
+    <p>管理员 ${managerName} 将你在 ${name} 的用户名修改为 ${newName}。</p>
+  </div>
+`
+  };
+};
+
 export const CustomTemplate = ({ title, content }: { title: string; content: string }) => {
   return {
     subject: title,

@@ -216,7 +216,7 @@ export async function usernameLogin({
     // send default password inform
     sendInform2OneUser({
       level: InformLevelEnum.common,
-      teamId: user.team.teamId,
+      userId: user._id,
       templateCode: 'CUSTOM',
       templateParam: {
         title: '新用户注册',

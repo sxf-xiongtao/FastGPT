@@ -8,7 +8,8 @@ import {
   lackOfPointsTemplate,
   NotificationBindTemplate,
   RegisterTemplate,
-  ResetPasswordTemplate
+  ResetPasswordTemplate,
+  ManageRenameTemplate
 } from './templates/emailTemplates';
 
 import {
@@ -17,7 +18,8 @@ import {
   expireSoonTemplate as InformExpireSoonTemplate,
   FreeCleanTemplate as InformFreeCleanTemplate,
   lackOfPointsTemplate as InformLackOfPointsTemplate,
-  CustomTemplate as InformCustomTemplate
+  CustomTemplate as InformCustomTemplate,
+  ManageRenameTemplate as InformManageRenameTemplate
 } from './templates/informTemplates';
 
 const MessageTemplateMap = {
@@ -76,6 +78,13 @@ const MessageTemplateMap = {
     getInformTemplate: InformCustomTemplate,
     lockMinutes: 1,
     isSendQueue: true
+  },
+  [SendInformTemplateCodeEnum.MANAGE_RENAME]: {
+    emailTemplate: ManageRenameTemplate,
+    smsTemplateCode: undefined,
+    getInformTemplate: InformManageRenameTemplate,
+    lockMinutes: 1,
+    isSendQueue: false
   }
 };
 

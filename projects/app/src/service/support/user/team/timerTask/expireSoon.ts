@@ -4,16 +4,21 @@ import { sendInform2OneUser } from '../../inform/controller';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
 import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 
-function notifyOneExpireSoon(teamId: string, day: number) {
+async function notifyOneExpireSoon(teamId: string, day: number) {
+  const team = await MongoTeam.findById(teamId).lean();
+  if (!team) {
+    addLog.error('Can not find team', teamId);
+    return false;
+  }
+
   sendInform2OneUser({
     level: 'emergency',
     templateCode: 'EXPIRE_SOON',
-    templateParam: {
-      sub: '订阅套餐',
-      day
-    },
-    teamId
+    templateParam: { sub: '订阅套餐', day },
+    teamId,
+    userId: team.ownerId
   });
 }
 
@@ -33,17 +38,16 @@ export async function notifyAllExpireSoon() {
       }
     ).lean();
 
+    const map = { 7: 1, 3: 1, 1: 1 };
+
     // Send inform before expire in 7 days, 3 days, 1 day
-    SevenDaysExpireAll.forEach((sub) => {
+    for (const sub of SevenDaysExpireAll) {
       const diffDay = differenceInDays(sub.expiredTime, new Date());
-      if (diffDay === 7) {
-        notifyOneExpireSoon(sub.teamId, 7);
-      } else if (diffDay === 3) {
-        notifyOneExpireSoon(sub.teamId, 3);
-      } else if (diffDay === 1) {
-        notifyOneExpireSoon(sub.teamId, 1);
+      await notifyOneExpireSoon(sub.teamId, diffDay);
+      if (map[diffDay as 7 | 3 | 1]) {
+        await notifyOneExpireSoon(sub.teamId, diffDay);
       }
-    });
+    }
   } catch (error) {
     addLog.error(`notifyAllExpireSoon error`, error);
   }

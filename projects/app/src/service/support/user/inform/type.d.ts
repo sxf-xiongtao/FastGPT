@@ -8,7 +8,8 @@ type _sendInformProps<
   Key extends SendInformTemplateCodeEnum | undefined,
   Level extends InformLevelEnum
 > = {
-  teamId: string;
+  teamId?: string;
+  userId: string;
   level: `${Level}`;
   templateCode: `${Key}`;
   templateParam: Key extends undefined ? undefined : MessageTemplateParamsType<NonNullable<Key>>;

@@ -11,6 +11,7 @@ import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { formatTime2YMD } from '@fastgpt/global/common/string/time';
 import { sendInform2OneUser } from '../../inform/controller';
+import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 
 /* 
   清除不活跃用户的知识库
@@ -105,13 +106,18 @@ const clearFreeAccount = async (teamId: string) => {
   }
 };
 
-const notifyOneFreeClean = (teamId: string, day: number) => {
+const notifyOneFreeClean = async (teamId: string, day: number) => {
+  const team = await MongoTeam.findById(teamId).lean();
+  if (!team) {
+    addLog.error('Can not find team', teamId);
+    return false;
+  }
+
   return sendInform2OneUser({
     teamId,
+    userId: team.ownerId,
     templateCode: 'FREE_CLEAN',
-    templateParam: {
-      day
-    },
+    templateParam: { day },
     level: 'emergency'
   });
 };

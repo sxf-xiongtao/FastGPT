@@ -11,12 +11,12 @@ import { getErrText } from '@fastgpt/global/common/error/utils';
 import { SendInformTemplateCodeEnum } from '@fastgpt/global/support/user/inform/constants';
 
 export async function sendInform2AllUser({ title, content, level }: SendInform2AllProps) {
-  const teams = await MongoTeam.find({}, '_id');
+  const users = await MongoUser.find({}, '_id');
 
-  for await (const team of teams) {
+  for await (const user of users) {
     try {
       await sendInform2OneUser({
-        teamId: team._id,
+        userId: user._id,
         level,
         templateCode: 'CUSTOM',
         templateParam: { title, content }
@@ -30,6 +30,7 @@ export async function sendInform2OneUser<
   Key extends SendInformTemplateCodeEnum
 >({
   teamId,
+  userId,
   level,
   templateCode,
   templateParam,
@@ -38,7 +39,15 @@ export async function sendInform2OneUser<
   success: boolean;
   message?: string;
 }> {
-  const team = await MongoTeam.findById(teamId).lean();
+  async function getTeam(teamId: string | undefined, userId: string) {
+    if (teamId) {
+      return await MongoTeam.findById(teamId).lean();
+    } else {
+      return await MongoTeam.findOne({ ownerId: userId }).lean();
+    }
+  }
+
+  const team = await getTeam(teamId, userId);
 
   if (!team)
     return {
@@ -49,7 +58,8 @@ export async function sendInform2OneUser<
   const { getInformTemplate, lockMinutes, isSendQueue } = getMessageTemplate(templateCode);
 
   // Check lock
-  const timerId = `inform--${templateCode}--${teamId}`;
+  const timerId = `inform--${templateCode}--${userId}`;
+
   const isLock = !(await checkTimerLock({
     timerId,
     lockMinuted: customLockMinutes ?? lockMinutes
@@ -64,8 +74,11 @@ export async function sendInform2OneUser<
   const onSendEmergency = async () => {
     // 紧急通知，发送短信/邮件
     if (level === 'emergency') {
+      if (!teamId) {
+        throw new Error('紧急通知必须提供 teamId');
+      }
       await sendMessage({
-        teamId,
+        teamId: teamId,
         templateCode,
         templateParam
       });
@@ -76,7 +89,8 @@ export async function sendInform2OneUser<
     if (getInformTemplate) {
       await MongoUserInform.create({
         level,
-        userId: team.ownerId,
+        userId: userId,
+        ...(teamId ? { teamId } : {}),
         ...getInformTemplate({ name: team.name, ...templateParam })
       });
     }

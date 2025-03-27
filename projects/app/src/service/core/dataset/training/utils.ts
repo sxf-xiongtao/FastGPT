@@ -14,6 +14,7 @@ import { TrainingModeEnum } from '@fastgpt/global/core/dataset/constants';
 import { splitText2Chunks } from '@fastgpt/global/common/string/textSplitter';
 import { generateImageAnnotion } from './imageParse';
 import { DatasetDataIndexTypeEnum } from '@fastgpt/global/core/dataset/data/constants';
+import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 
 export const startTrainingProcess = () => {
   generateAutoTraining();
@@ -27,11 +28,18 @@ export const checkTeamAiPointsAndLock = async (teamId: string) => {
   } catch (error: any) {
     if (error === TeamErrEnum.aiPointsNotEnough) {
       // send inform and lock data
+      const team = await MongoTeam.findById(teamId).lean();
+      if (!team) {
+        addLog.error('Can not find team', teamId);
+        return false;
+      }
+
       try {
         sendInform2OneUser({
           level: InformLevelEnum.important,
           templateCode: 'LACK_OF_POINTS',
           templateParam: {},
+          userId: team.ownerId,
           teamId
         });
 

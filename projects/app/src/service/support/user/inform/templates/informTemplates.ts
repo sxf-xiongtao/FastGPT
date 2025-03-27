@@ -54,6 +54,22 @@ export const FreeCleanTemplate = ({ name, day }: { name: string; day: string }) 
   };
 };
 
+//管理员改名
+export const ManageRenameTemplate = ({
+  name,
+  managerName,
+  newName
+}: {
+  name: string;
+  managerName: string;
+  newName: string;
+}) => {
+  return {
+    title: `通知标题`,
+    content: `管理员 **${managerName}** 将你在 **${name}** 的用户名修改为 **${newName}**。`
+  };
+};
+
 export const CustomTemplate = ({ title, content }: { title: string; content: string }) => {
   return {
     title,

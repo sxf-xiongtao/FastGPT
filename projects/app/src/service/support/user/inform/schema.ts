@@ -9,6 +9,11 @@ const InformSchema = new Schema({
     ref: 'user',
     required: true
   },
+  teamId: {
+    type: Schema.Types.ObjectId,
+    ref: 'team',
+    required: false
+  },
   time: {
     type: Date,
     default: () => new Date()

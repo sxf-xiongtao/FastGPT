@@ -90,7 +90,7 @@ const InformSetting = () => {
         </HStack>
         <Box py={2}>
           设置该内容，会在用户登录系统后，通过弹窗形式进行强提示。用户关闭后，下次不再提示。只能设置1个该类型通知。支持
-          markdown 个格式。
+          markdown 格式。
         </Box>
         <Textarea rows={10} {...registerSystemMsgModal('content', {})} />
       </BoxCard>

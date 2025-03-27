@@ -8,12 +8,13 @@ import { NextAPI } from '@/service/middleware/entry';
 import { SendInformTemplateCodeEnum } from '@fastgpt/global/support/user/inform/constants';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { teamId, level, templateCode, templateParam, customLockMinutes } =
+  const { userId, teamId, level, templateCode, templateParam, customLockMinutes } =
     req.body as SendInformProps<InformLevelEnum, SendInformTemplateCodeEnum>;
   await authCert({ req, authRoot: true });
 
   // create one unactive inform
   return sendInform2OneUser({
+    userId,
     teamId,
     level,
     templateCode,
