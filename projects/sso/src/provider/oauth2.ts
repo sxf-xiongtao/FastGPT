@@ -35,6 +35,7 @@ export const oauth2_getUserInfo: GetUserInfoFn = async (code: string) => {
   const avatar = data[OAuth2AvatarMap];
   const memberName = data[OAuth2MemberNameMap];
   const contact = data[OAuth2ContactMap];
+
   return {
     username,
     avatar,
