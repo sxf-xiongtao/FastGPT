@@ -2,7 +2,7 @@ import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/nex
 import { NextAPI } from '@/service/middleware/entry';
 import { TeamManagePermissionVal } from '@fastgpt/global/support/permission/user/constant';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
-import { MongoInvitationLink } from '@fastgpt/service/support/user/team/invitationLink/schema';
+import { MongoInvitationLink } from '@/service/support/user/team/invitationLink/schema';
 import { InvitationType } from '@fastgpt/service/support/user/team/invitationLink/type';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 
@@ -41,4 +41,5 @@ async function handler(
     })
   }));
 }
+
 export default NextAPI(handler);

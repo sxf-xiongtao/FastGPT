@@ -8,6 +8,7 @@ import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema
 import { getChildrenByOrg } from '@fastgpt/service/support/permission/org/controllers';
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { getOrgChildrenPath } from '@fastgpt/global/support/user/team/org/constant';
+import { getRootOrg } from '@/service/support/user/team/org/utils';
 
 export type OrgMoveBody = putMoveOrgType;
 export type OrgMoveQuery = {};
@@ -18,7 +19,7 @@ async function handler(
   _res: ApiResponseType<any>
 ): Promise<OrgMoveResponse> {
   const { orgId, targetOrgId } = req.body;
-  if (!orgId || !targetOrgId) {
+  if (!orgId) {
     return Promise.reject(CommonErrEnum.missingParams);
   }
   if (orgId === targetOrgId) {
@@ -27,8 +28,7 @@ async function handler(
 
   const { teamId } = await authOrgMember({
     req,
-    authToken: true,
-    orgIds: [orgId, targetOrgId]
+    authToken: true
   });
 
   const org = await MongoOrgModel.findOne({ _id: orgId, teamId }).lean();
@@ -36,7 +36,10 @@ async function handler(
     return Promise.reject(TeamErrEnum.orgNotExist);
   }
 
-  const parent = await MongoOrgModel.findOne({ _id: targetOrgId, teamId }).lean();
+  const parent = await (async () => {
+    if (!targetOrgId) return await getRootOrg({ teamId });
+    return await MongoOrgModel.findOne({ _id: targetOrgId, teamId }).lean();
+  })();
   if (!parent) {
     return Promise.reject(TeamErrEnum.orgParentNotExist);
   }

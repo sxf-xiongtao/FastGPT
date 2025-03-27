@@ -1,6 +1,6 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
-import { MongoInvitationLink } from '@fastgpt/service/support/user/team/invitationLink/schema';
+import { MongoInvitationLink } from '@/service/support/user/team/invitationLink/schema';
 import { InvitationInfoType } from '@fastgpt/service/support/user/team/invitationLink/type';
 import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
@@ -21,7 +21,7 @@ async function handler(
     authToken: true
   });
 
-  const invitation = await MongoInvitationLink.findOne({ _id: linkId })
+  const invitation = await MongoInvitationLink.findOne({ linkId })
     .populate<{ team: { name: string; avatar: string } }>('team')
     .lean();
 
@@ -34,4 +34,5 @@ async function handler(
     teamName: invitation.team.name
   };
 }
+
 export default NextAPI(handler);

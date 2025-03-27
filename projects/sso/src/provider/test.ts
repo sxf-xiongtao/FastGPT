@@ -1,4 +1,4 @@
-import { RedirectFn, GetUserInfoFn } from '../type.d';
+import { RedirectFn, GetUserInfoFn, GetOrgListFn, GetUserListFn } from '../type';
 
 // 用于存储生成的code和对应的用户信息
 const codeMap = new Map();
@@ -15,6 +15,7 @@ export const test_redirectFn: RedirectFn = async ({ redirect_uri, state }) => {
   });
 
   const redirectUrl = `${redirect_uri}?code=${code}${state ? `&state=${state}` : ''}`;
+  console.log(redirectUrl);
 
   return { redirectUrl };
 };
@@ -31,4 +32,48 @@ export const test_getUserInfo: GetUserInfoFn = async (code: string) => {
   codeMap.delete(code);
 
   return userInfo;
+};
+
+export const test_GetUserList: GetUserListFn = async () => {
+  return Promise.resolve([
+    {
+      username: 'test-1',
+      avatar: 'https://example.com/avatar.jpg',
+      contact: '15677751111',
+      memberName: 'testuser1234',
+      orgs: ['1', '2']
+    },
+    {
+      username: 'test-2',
+      avatar: 'https://example.com/avatar.jpg',
+      contact: '15677751111',
+      memberName: 'testuser5678',
+      orgs: ['3', '4']
+    }
+  ]);
+};
+
+export const test_getOrgList: GetOrgListFn = async () => {
+  return [
+    {
+      id: '1',
+      name: '社区管理',
+      parentId: '0'
+    },
+    {
+      id: '2',
+      name: '1-2',
+      parentId: '1'
+    },
+    {
+      id: '3',
+      name: '1-2-3',
+      parentId: '2'
+    },
+    {
+      id: '4',
+      name: '4',
+      parentId: '0'
+    }
+  ];
 };

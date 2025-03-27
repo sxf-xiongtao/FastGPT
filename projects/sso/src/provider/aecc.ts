@@ -1,6 +1,6 @@
 import axios from 'axios';
 import xml2js from 'xml2js';
-import { RedirectFn, GetUserInfoFn, CallbackFn } from '../type.d';
+import { RedirectFn, GetUserInfoFn, CallbackFn } from '../type';
 import { getTmpValue, setTmpValue } from 'global';
 import { Request } from 'express';
 

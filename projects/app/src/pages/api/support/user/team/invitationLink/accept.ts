@@ -1,6 +1,6 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
-import { MongoInvitationLink } from '@fastgpt/service/support/user/team/invitationLink/schema';
+import { MongoInvitationLink } from '@/service/support/user/team/invitationLink/schema';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { parseHeaderCert } from '@fastgpt/service/support/permission/controller';
@@ -22,7 +22,7 @@ async function handler(
   const { userId } = await parseHeaderCert({ req, authToken: true });
 
   // Check link valid
-  const invitation = await MongoInvitationLink.findOne({ _id: linkId }).lean();
+  const invitation = await MongoInvitationLink.findOne({ linkId }).lean();
   if (!invitation) {
     return Promise.reject(TeamErrEnum.invitationLinkInvalid);
   }
@@ -31,19 +31,7 @@ async function handler(
     return Promise.reject(TeamErrEnum.invitationLinkInvalid);
   }
 
-  if (invitation.usedTimesLimit === 1 && invitation.members.length !== 0) {
-    return Promise.reject(TeamErrEnum.invitationLinkInvalid);
-  }
-
   await checkTeamMaxMembersPermission(invitation.teamId, 1);
-
-  // Check user exist in team
-  // const usersTeamIds = (
-  //   await MongoTeamMember.find({ userId, status: notLeaveStatus }).select('teamId').lean()
-  // ).map((i) => String(i.teamId));
-  // if (usersTeamIds.includes(String(invitation.teamId))) {
-  //   return Promise.reject(TeamErrEnum.youHaveBeenInTheTeam);
-  // }
 
   // accept
   await mongoSessionRun(async (session) => {
@@ -69,12 +57,18 @@ async function handler(
     }
 
     await MongoInvitationLink.updateOne(
-      { _id: linkId },
+      { linkId: linkId },
       {
         $set: {
           members: invitation.members.includes(String(result._id))
             ? invitation.members
-            : invitation.members.concat([String(result._id)])
+            : invitation.members.concat([String(result._id)]),
+          ...(invitation.usedTimesLimit === 1 // make it forbidden
+            ? {
+                forbidden: true,
+                expires: new Date()
+              }
+            : {})
         }
       },
       {

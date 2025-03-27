@@ -37,7 +37,7 @@ async function handler(req: ApiRequestProps<ExternalFileCreateDatasetCollectionP
   );
 
   // 1. read file
-  const rawText = await readDatasetSourceRawText({
+  const { rawText } = await readDatasetSourceRawText({
     teamId,
     tmbId,
     type: DatasetSourceReadTypeEnum.externalFile,

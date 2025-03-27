@@ -6,9 +6,13 @@
     "prepare": "husky install",
     "format": "prettier --config \"./.prettierrc.js\" --write \"./projects/**/src/**/*.{ts,tsx,scss}\"",
     "gen:theme-typings": "chakra-cli tokens FastGPT/packages/web/styles/theme.ts --out node_modules/.pnpm/node_modules/@chakra-ui/styled-system/dist/theming.types.d.ts",
-    "postinstall": "pnpm gen:theme-typings"
+    "postinstall": "pnpm gen:theme-typings",
+    "test": "vitest"
   },
   "devDependencies": {
+    "vitest": "^3.0.9",
+    "vitest-mongodb": "^1.0.1",
+    "@vitest/coverage-v8": "^3.0.9",
     "@chakra-ui/cli": "^2.4.1",
     "@types/node": "^20.14.2",
     "husky": "^8.0.3",

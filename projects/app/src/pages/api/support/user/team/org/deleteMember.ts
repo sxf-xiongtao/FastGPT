@@ -4,9 +4,10 @@ import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { MongoOrgMemberModel } from '@fastgpt/service/support/permission/org/orgMemberSchema';
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { authOrgMember } from '@fastgpt/service/support/permission/auth/org';
+import { getRootOrg } from '@/service/support/user/team/org/utils';
 
 export type OrgDeleteMemberQuery = {
-  orgId: string;
+  orgId: string; // "" ==> root
   tmbId: string;
 };
 export type OrgDeleteMemberBody = {};
@@ -16,16 +17,17 @@ async function handler(
   req: ApiRequestProps<OrgDeleteMemberBody, OrgDeleteMemberQuery>,
   _res: ApiResponseType<any>
 ): Promise<OrgDeleteMemberResponse> {
-  const { orgId, tmbId } = req.query;
+  const { orgId: _orgId, tmbId } = req.query;
   if (!tmbId) {
     return Promise.reject(CommonErrEnum.missingParams);
   }
 
   const { teamId } = await authOrgMember({
     req,
-    authToken: true,
-    orgIds: orgId
+    authToken: true
   });
+
+  const orgId = _orgId || (await getRootOrg({ teamId }))._id;
 
   const member = await MongoOrgMemberModel.findOne({ teamId, orgId, tmbId });
   if (!member) {

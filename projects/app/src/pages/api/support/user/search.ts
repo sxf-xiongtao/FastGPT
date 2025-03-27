@@ -9,6 +9,7 @@ import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
 import { SearchResult } from '@fastgpt/global/support/user/api';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
 import { replaceRegChars } from '@fastgpt/global/common/string/tools';
+import { OrgMemberSchemaType } from '@fastgpt/global/support/user/team/org/type';
 
 export type SearchQuery = {
   searchKey: string;
@@ -19,9 +20,6 @@ export type SearchQuery = {
 export type SearchBody = {};
 export type SearchResponse = SearchResult;
 
-/** 用户搜索接口
- * @param searchKey 关键词 可以通过 userId, memberName, contact 搜索
- * */
 async function handler(
   req: ApiRequestProps<SearchBody, SearchQuery>,
   _res: ApiResponseType<any>
@@ -115,6 +113,9 @@ async function handler(
             ...readFromSecondary
           }
         )
+          .populate<{
+            members: OrgMemberSchemaType[];
+          }>('members')
           .limit(10)
           .lean()
       : [],
@@ -150,7 +151,8 @@ async function handler(
     })),
     orgs: orgs.map((item) => ({
       ...item,
-      avatar: item.avatar || ''
+      avatar: item.avatar || '',
+      total: item.members.length
     })),
     groups
   };

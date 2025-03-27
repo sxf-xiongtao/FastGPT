@@ -1,4 +1,8 @@
-import type { APIFileItem, YuqueServer } from '@fastgpt/global/core/dataset/apiDataset';
+import type {
+  APIFileItem,
+  ApiFileReadContentResponse,
+  YuqueServer
+} from '@fastgpt/global/core/dataset/apiDataset';
 import axios, { Method } from 'axios';
 import { ParentIdType } from '@fastgpt/global/common/parentFolder/type';
 import { addLog } from '@fastgpt/service/common/system/log';
@@ -177,16 +181,23 @@ export const useYuqueDatasetRequest = ({ yuqueServer }: { yuqueServer: YuqueServ
     return files;
   };
 
-  const getFileContent = async ({ apiFileId }: { apiFileId: string }) => {
+  const getFileContent = async ({
+    apiFileId
+  }: {
+    apiFileId: string;
+  }): Promise<ApiFileReadContentResponse> => {
     const [parentId, fileId] = apiFileId.split(/-(.*?)-(.*)/);
 
-    const data = await request<{ body: string }>(
+    const data = await request<{ title: string; body: string }>(
       `/api/v2/repos/${parentId}/docs/${fileId}`,
       {},
       'GET'
     );
 
-    return data.body;
+    return {
+      title: data.title,
+      rawText: data.body
+    };
   };
 
   const getFilePreviewUrl = async ({ apiFileId }: { apiFileId: string }) => {

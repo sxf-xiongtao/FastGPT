@@ -90,29 +90,27 @@ async function handler(
   await (async () => {
     if (isRoot || userPer.isOwner) return;
 
-    // 如果需要更新成管理权限，则需要是owner
-    if (updatePer.hasManagePer && !userPer.isOwner) {
-      return Promise.reject(TeamErrEnum.unAuthTeam);
-    }
-
-    // 如果修改目标，包含管理员，则需要 owner
     const targets = await MongoResourcePermission.find(
       {
         resourceType: PerResourceTypeEnum.team,
         teamId,
         $or: [
-          { tmbId: { $in: updateList.map((v) => v.tmbId) } },
-          { groupId: { $in: updateList.map((v) => v.groupId) } },
-          { orgId: { $in: updateList.map((v) => v.orgId) } }
+          { tmbId: { $in: updateList.flatMap((v) => (v.tmbId ? [v.tmbId] : [])) } },
+          { groupId: { $in: updateList.flatMap((v) => (v.groupId ? [v.groupId] : [])) } },
+          { orgId: { $in: updateList.flatMap((v) => (v.orgId ? [v.orgId] : [])) } }
         ]
       },
       '_id permission'
     ).lean();
+
     const hasManagePer = targets.some((v) => {
       const Per = new TeamPermission({ per: v.permission });
       return Per.hasManagePer;
     });
-    if (hasManagePer && !userPer.isOwner) {
+
+    // 如果修改目标，包含管理员，则需要 owner
+    // 如果需要更新成管理权限，则需要是owner
+    if (hasManagePer !== updatePer.hasManagePer && !userPer.isOwner) {
       return Promise.reject(TeamErrEnum.unAuthTeam);
     }
   })();

@@ -38,13 +38,12 @@ export async function notifyAllExpireSoon() {
       }
     ).lean();
 
-    const map = { 7: 1, 3: 1, 1: 1 };
+    const NOTIFY_DAYS = new Set([7, 3, 1]);
 
     // Send inform before expire in 7 days, 3 days, 1 day
     for (const sub of SevenDaysExpireAll) {
       const diffDay = differenceInDays(sub.expiredTime, new Date());
-      await notifyOneExpireSoon(sub.teamId, diffDay);
-      if (map[diffDay as 7 | 3 | 1]) {
+      if (NOTIFY_DAYS.has(diffDay)) {
         await notifyOneExpireSoon(sub.teamId, diffDay);
       }
     }

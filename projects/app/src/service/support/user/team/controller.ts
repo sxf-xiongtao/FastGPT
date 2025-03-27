@@ -1,5 +1,6 @@
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
+import _ from 'lodash';
 import type {
   CreateTeamProps,
   UpdateTeamProps
@@ -32,8 +33,15 @@ import { DefaultGroupName } from '@fastgpt/global/support/user/team/group/consta
 import { UserModelSchema } from '@fastgpt/global/support/user/type';
 import { TeamSchema } from '@fastgpt/global/support/user/team/type';
 import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
-import { Types } from 'mongoose';
-import { MongoUser } from '@fastgpt/service/support/user/schema';
+import { MongoUser, userCollectionName } from '@fastgpt/service/support/user/schema';
+import { Types } from '@fastgpt/service/common/mongo';
+import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
+import { MongoOrgMemberModel } from '@fastgpt/service/support/permission/org/orgMemberSchema';
+import { replaceRegChars } from '@fastgpt/global/common/string/tools';
+import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
+import { PermissionValueType } from '@fastgpt/global/support/permission/type';
+import { withDefaultProps } from '@chakra-ui/react';
+import { getRootOrg } from './org/utils';
 
 /* -------- format --------- */
 export async function teamMemberSchema2TeamItemType(
@@ -268,7 +276,8 @@ export async function getUserTeamOrDefaultTeam(tmbId?: string, userId?: string) 
 }
 
 /* --------------- member -------------- */
-/** get the members of a team
+/** @deprecated: do not use this function anymore, it will get ALL members, which is very slow.
+ * get the members of a team
  * @param teamId: the objectId of team
  * @return a object whose type is [TeamMemberItemType]
  * @throws {Error} if teamId is not exist
@@ -320,106 +329,6 @@ export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType
   });
 }
 
-export async function getTeamMembersPaged({
-  teamId,
-  offset,
-  pageSize,
-  withLeaved = false
-}: {
-  teamId: string;
-  offset: number;
-  pageSize: number;
-  withLeaved?: boolean;
-}): Promise<PaginationResponse<TeamMemberItemType>> {
-  const [groups, permissions, members, total] = await Promise.all([
-    getGroupsByTeamId(teamId),
-    MongoResourcePermission.find({
-      teamId: teamId,
-      resourceType: PerResourceTypeEnum.team
-    }),
-    MongoTeamMember.aggregate([
-      {
-        $match: {
-          teamId: new Types.ObjectId(teamId),
-          ...(withLeaved ? {} : { status: notLeaveStatus })
-        }
-      },
-      { $skip: offset },
-      { $limit: pageSize },
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'userId',
-          foreignField: '_id',
-          as: 'user'
-        }
-      },
-      {
-        $addFields: {
-          statusOrder: {
-            $switch: {
-              branches: [
-                { case: { $eq: ['$status', 'active'] }, then: 1 },
-                { case: { $eq: ['$status', 'waiting'] }, then: 2 },
-                { case: { $eq: ['$status', 'reject'] }, then: 3 },
-                { case: { $eq: ['$status', 'leave'] }, then: 4 }
-              ],
-              default: 5 // 如果有其他状态，可以给一个默认值
-            }
-          }
-        }
-      },
-      {
-        $sort: { statusOrder: 1 }
-      },
-      {
-        $project: {
-          statusOrder: 0
-        }
-      }
-    ]),
-    MongoTeamMember.countDocuments({ teamId, status: notLeaveStatus })
-  ]);
-
-  const list = members.map((member) => {
-    const isOwner = member.role === TeamMemberRoleEnum.owner;
-
-    const groupPermission = groups
-      .filter((g) => g.members.includes(String(member._id)))
-      .map((g) => g.permission)
-      .filter((p) => p !== undefined);
-
-    const groupPer = concatPer(groupPermission);
-
-    const per =
-      permissions.find((p) => String(p.tmbId) === String(member._id))?.permission ??
-      groupPer ??
-      TeamDefaultPermissionVal;
-
-    return {
-      userId: member.userId,
-      tmbId: member._id,
-      teamId: member.teamId,
-      memberName: member.name,
-      avatar: member.avatar,
-      role: member.role,
-      status: member.status,
-      permission: new TeamPermission({
-        per,
-        isOwner
-      }),
-      contact: member.user[0].contact,
-      createTime: member.createTime,
-      updateTime: member.updateTime
-    };
-  });
-
-  return {
-    total,
-    list
-  };
-}
-
 // get the member of a team
 // @param tmbId: the objectId of team member
 // @return a object whose type is [TeamMemberItemType]
@@ -468,12 +377,189 @@ export async function getTeamMember({
     contact: member.user.contact
   };
 }
-/** remove user from team
- * @param{Object} obj
- * @param{string} obj.teamId
- * @param{string} obj.memberId
- * @throws{Error} if teamId or memberId is not exist
- */
+
+export type SearchUserProps = {
+  teamId: string;
+  searchKey: string;
+  withPermission?: boolean;
+  withOrgs?: boolean;
+  status?: 'active' | 'inactive';
+};
+
+export function formatTeamMemberItemType(
+  member: TeamMemberSchema & {
+    user: UserModelSchema;
+    permission?: TeamPermission;
+    orgs?: string[];
+    groupRole?: string;
+  }
+) {
+  return <
+    TeamMemberItemType<{
+      withOrgs: typeof member.orgs extends string[] ? true : false;
+      withPermission: typeof member.permission extends PermissionValueType ? true : false;
+    }>
+  >{
+    avatar: member.avatar,
+    contact: member.user.contact,
+    createTime: member.createTime,
+    memberName: member.name,
+    orgs: member.orgs,
+    permission: member.permission,
+    role: member.role,
+    status: member.status,
+    teamId: member.teamId,
+    tmbId: member._id,
+    userId: member.userId,
+    updateTime: member.updateTime,
+    groupRole: member.groupRole
+  };
+}
+
+export async function getMembersPermission<T extends TeamMemberSchema[]>({
+  members,
+  teamId
+}: {
+  members: T;
+  teamId: string;
+}): Promise<Array<T[0] & { permission: TeamPermission }>> {
+  const tmbIds = members.map((m) => String(m._id));
+
+  const [orgMembers, groupMembers, memberPermissions] = await Promise.all([
+    MongoOrgMemberModel.find({ teamId, tmbId: { $in: tmbIds } }).lean(),
+    MongoGroupMemberModel.find({
+      tmbId: { $in: tmbIds }
+    }).lean(),
+    MongoResourcePermission.find({
+      resourceType: PerResourceTypeEnum.team,
+      teamId: teamId,
+      resourceId: null,
+      tmbId: { $in: tmbIds }
+    })
+  ]);
+
+  const orgs = await (async () => {
+    const orgs = await MongoOrgModel.find({
+      teamId,
+      _id: { $in: orgMembers.map((m) => m.orgId) }
+    }).lean();
+
+    const pathids = orgs.flatMap((org) => org.path.split('/')).filter(Boolean);
+    return [
+      ...(await MongoOrgModel.find({
+        teamId,
+        pathId: { $in: pathids }
+      }).lean()),
+      ...orgs
+    ];
+  })();
+
+  const [orgPermissions, groupPermissions] = await Promise.all([
+    MongoResourcePermission.find({
+      resourceType: PerResourceTypeEnum.team,
+      teamId: teamId,
+      resourceId: null,
+      orgId: { $in: orgs.map((o) => o._id) }
+    }),
+    MongoResourcePermission.find({
+      resourceType: PerResourceTypeEnum.team,
+      teamId: teamId,
+      resourceId: null,
+      groupId: { $in: groupMembers.map((m) => m.groupId) }
+    })
+  ]);
+
+  return members.map((member) => {
+    const isOwner = member.role === TeamMemberRoleEnum.owner;
+    const groupPermission = _.chain(groupMembers)
+      .filter((item) => String(item.tmbId) === String(member._id))
+      .map((g) => groupPermissions.find((p) => String(p.groupId) === g.groupId)?.permission)
+      .filter(Boolean)
+      .value() as PermissionValueType[];
+    const myPathIds = _.chain(orgMembers)
+      .filter((item) => String(item.tmbId) === String(member._id))
+      .flatMap((orgmember) => {
+        const org = orgs.find((org) => String(org._id) === String(orgmember.orgId));
+        return org?.path.split('/');
+      })
+      .filter(Boolean)
+      .value();
+    const myorgs = orgs.filter((org) => myPathIds.includes(org.pathId));
+    const orgPermission = _.chain(myorgs)
+      .map((org) => orgPermissions.find((p) => String(p.orgId) === org._id)?.permission)
+      .filter(Boolean)
+      .value() as PermissionValueType[];
+
+    const per =
+      memberPermissions.find((p) => String(p.tmbId) === String(member._id))?.permission ??
+      concatPer([...groupPermission, ...orgPermission]) ??
+      TeamDefaultPermissionVal;
+
+    return {
+      ...member,
+      permission: new TeamPermission({
+        per: per,
+        isOwner
+      })
+    };
+  });
+}
+
+export async function getMembersOrgs<T extends TeamMemberSchema[]>({
+  members,
+  teamId
+}: {
+  members: T;
+  teamId: string;
+}): Promise<Array<T[0] & { orgs: string[] }>> {
+  const tmbIds = members.map((m) => String(m._id));
+  const [orgMembers, team] = await Promise.all([
+    MongoOrgMemberModel.find({ teamId, tmbId: { $in: tmbIds } }).lean(),
+    MongoTeam.findById(teamId).lean()
+  ]);
+  const allOrgs = await (async () => {
+    const orgs = await MongoOrgModel.find({
+      teamId,
+      _id: { $in: orgMembers.map((m) => m.orgId) }
+    }).lean();
+
+    const pathids = orgs.flatMap((org) => org.path.split('/')).filter(Boolean);
+    return [
+      ...(await MongoOrgModel.find({
+        teamId,
+        pathId: { $in: pathids }
+      }).lean()),
+      ...orgs
+    ].map((org) => {
+      if (org.path === '') {
+        return {
+          ...org,
+          name: team!.name
+        };
+      }
+      return org;
+    });
+  })();
+
+  return members.map((member) => {
+    const myorgmembers = orgMembers.filter((item) => String(item.tmbId) === String(member._id));
+    const myOrgs = myorgmembers
+      .map((org) => allOrgs.find((o) => String(o._id) === String(org.orgId)))
+      .filter(Boolean);
+    return {
+      ...member,
+      orgs: myOrgs.map((org) => {
+        const pathids = org!.path.split('/').slice(1);
+        const pathNames = _.chain(allOrgs)
+          .filter((o) => pathids.includes(String(o.pathId)))
+          .map((o) => o.name)
+          .slice(1)
+          .value();
+        return pathNames.length > 0 ? '/' + pathNames.join('/') + '/' + org!.name : '/' + org!.name;
+      })
+    };
+  });
+}
 
 /* ----------------- auth ----------------- */
 

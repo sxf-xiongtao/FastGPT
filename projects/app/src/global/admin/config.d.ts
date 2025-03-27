@@ -6,6 +6,7 @@ import {
   ExternalProviderWorkflowVarType
 } from '@fastgpt/global/common/system/types';
 import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import { TeamModeEnum } from '../settings/constants';
 
 export type ConfigStoreType = {
   [SystemConfigsTypeEnum.fastgpt]: FastGPTConfigFileType;
@@ -31,12 +32,6 @@ export type ConfigFormType = {
       uploadFileMaxSize: number;
       lafEnv?: string;
     };
-    sso?: {
-      title?: string;
-      icon?: string;
-      url?: string;
-      autoLogin?: boolean;
-    };
     concatMd: string;
     scripts?: string;
     limit?: FastGPTConfigFileType['feConfigs']['limit'];
@@ -56,12 +51,16 @@ export type ConfigFormType = {
     sms: NonNullable<SystemConfigType['auth']>['sms'];
     github: NonNullable<SystemConfigType['auth']>['github'];
     wechat: NonNullable<SystemConfigType['auth']>['wechat'];
-    dingtalk: NonNullable<SystemConfigType['auth']>['dingtalk'];
     google: NonNullable<SystemConfigType['auth']>['google'];
     microsoft: NonNullable<SystemConfigType['auth']>['microsoft'];
-    wecom: NonNullable<SystemConfigType['auth']>['wecom'];
     fastLogin: string;
-    singleTeamMode: boolean;
+    teamMode?: `${TeamModeEnum}`;
+    sso?: {
+      title?: string;
+      icon?: string;
+      url?: string;
+      autoLogin?: boolean;
+    };
   };
   paySettings: {
     wx: NonNullable<SystemConfigType['pay']>['wx'];

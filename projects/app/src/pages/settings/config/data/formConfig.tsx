@@ -137,13 +137,14 @@ export const getFormConfig = (): FormConfig => {
             oneapiUrl: {
               key: 'siteSettings.systemEnv.oneapiUrl',
               type: 'string',
-              title: 'oneAPI地址(会覆盖环境变量配置的)',
-              description: 'oneAPI地址，可以使用 oneapi 来实现多模型接入'
+              title: '模型调用根地址(会覆盖环境变量配置的)',
+              description: 'https://aiproxy.fastgpt.cn/v1'
             },
             chatApiKey: {
               key: 'siteSettings.systemEnv.chatApiKey',
               type: 'string',
-              title: 'OneAPI 密钥(会覆盖环境变量配置的)'
+              title: '模型调用密钥(会覆盖环境变量配置的)',
+              description: 'sk-xxxxx'
             },
             vectorMaxProcess: {
               key: 'siteSettings.systemEnv.vectorMaxProcess',

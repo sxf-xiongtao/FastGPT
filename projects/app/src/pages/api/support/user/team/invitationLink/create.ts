@@ -3,7 +3,7 @@ import { NextAPI } from '@/service/middleware/entry';
 import { InvitationLinkCreateType } from '@fastgpt/service/support/user/team/invitationLink/type';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { TeamManagePermissionVal } from '@fastgpt/global/support/permission/user/constant';
-import { MongoInvitationLink } from '@fastgpt/service/support/user/team/invitationLink/schema';
+import { MongoInvitationLink } from '@/service/support/user/team/invitationLink/schema';
 import { addDays, addMinutes, addYears } from 'date-fns';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { MaxInvitationLinksAmount } from '@fastgpt/service/support/user/team/invitationLink/constants';
@@ -22,11 +22,18 @@ async function handler(
 
   const amount = await MongoInvitationLink.countDocuments({
     teamId,
-    forbidden: false,
+    $or: [
+      {
+        forbidden: false
+      },
+      {
+        forbidden: { $exists: false }
+      }
+    ],
     expires: { $gt: new Date() }
   });
   if (amount >= MaxInvitationLinksAmount) {
-    return Promise.reject(TeamErrEnum.invitationLinkInvalid);
+    return Promise.reject(TeamErrEnum.tooManyInvitations);
   }
 
   const invitationLink = await MongoInvitationLink.create({
@@ -47,6 +54,7 @@ async function handler(
       return addDays(new Date(), 7);
     })()
   });
-  return invitationLink._id;
+  return invitationLink.linkId;
 }
+
 export default NextAPI(handler);

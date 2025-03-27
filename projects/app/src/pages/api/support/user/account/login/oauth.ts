@@ -11,9 +11,6 @@ import type { OauthLoginProps } from '@fastgpt/global/support/user/api';
 import { UserErrEnum } from '@fastgpt/global/common/error/code/user';
 import { trackBaiduConversion } from '@/service/common/tracking/baidu';
 import { pushTrack } from '@fastgpt/service/common/middle/tracks/utils';
-import { getIsSyncUser, wecomUserPrefix } from '@/global/support/user/constants';
-import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 
 type OauthResponse = {
   username: string;
@@ -27,16 +24,14 @@ type OauthResponse = {
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     await connectToDatabase();
-    const { type, code, callbackUrl, inviterId, bd_vid, fastgpt_sem, sourceDomain } =
+    const { type, callbackUrl, inviterId, bd_vid, fastgpt_sem, sourceDomain, props } =
       req.body as OauthLoginProps;
 
     const { username, avatarUrl, concat, phonePrefix, teamName, memberName } = await (async () => {
-      if (type === OAuthEnum.github) return authGithub(code);
-      if (type === OAuthEnum.google) return authGoogle(code, callbackUrl);
-      if (type === OAuthEnum.microsoft) return authMicrosoft(code, callbackUrl);
-      if (type === OAuthEnum.dingtalk) return authDingtalk(code);
-      if (type === OAuthEnum.wecom) return authWecom(code);
-      if (type === OAuthEnum.sso) return authSso(code);
+      if (type === OAuthEnum.github) return authGithub(props.code);
+      if (type === OAuthEnum.google) return authGoogle(props.code, callbackUrl);
+      if (type === OAuthEnum.microsoft) return authMicrosoft(props.code, callbackUrl);
+      if (type === OAuthEnum.sso) return authSso(props);
       return Promise.reject('type error');
     })();
 
@@ -137,53 +132,6 @@ export async function authGoogle(code: string, callbackUrl: string): Promise<Oau
   };
 }
 
-export async function authDingtalk(code: string): Promise<OauthResponse> {
-  const { data } = await axios.post<{
-    accessToken: string;
-    refreshToken: string;
-    expiresIn: number;
-    corpId: string;
-  }>('https://api.dingtalk.com/v1.0/oauth2/userAccessToken', {
-    clientId: global.systemConfig?.auth?.dingtalk?.clientId,
-    clientSecret: global.systemConfig?.auth?.dingtalk?.secret,
-    code,
-    grantType: 'authorization_code'
-  });
-
-  if (!data.accessToken) {
-    throw new Error('Fail to get dingtalk access token');
-  }
-
-  const { data: userData } = await axios.get<{
-    nick: string;
-    avatarUrl: string;
-    mobile: string;
-    openId: string;
-    unionId: string;
-    email: string;
-    stateCode: string;
-  }>('https://api.dingtalk.com/v1.0/contact/users/me', {
-    headers: {
-      'x-acs-dingtalk-access-token': data.accessToken
-    }
-  });
-
-  if (!userData.openId) {
-    throw new Error('Fail to get dingtalk user info');
-  }
-
-  const username = `dingtalk-${userData.openId}`;
-
-  return {
-    avatarUrl: userData.avatarUrl ?? '',
-    username,
-    concat: userData.mobile,
-    phonePrefix: Number(userData.stateCode),
-    teamName: userData.nick,
-    memberName: userData.nick
-  };
-}
-
 export async function authMicrosoft(code: string, callbackUrl: string): Promise<OauthResponse> {
   const { data: tokenData } = await axios.post<{
     access_token: string;
@@ -224,72 +172,14 @@ export async function authMicrosoft(code: string, callbackUrl: string): Promise<
   };
 }
 
-export async function authWecom(code: string): Promise<OauthResponse> {
-  // const getInfoURL = 'https://qyapi.weixin.qq.com/cgi-bin/auth/getuserinfo';
-  // const getDetailedInfoURL = 'https://qyapi.weixin.qq.com/cgi-bin/user/get';
-
-  // 1. get access_token
-  const getAccessTokenURL = new URL('https://qyapi.weixin.qq.com/cgi-bin/gettoken');
-
-  const corpid = global.systemConfig?.auth?.wecom?.corpid;
-  const secret = global.systemConfig?.auth?.wecom?.secret;
-  if (!corpid || !secret) {
-    throw new Error('corpid or secret is required');
-  }
-  getAccessTokenURL.searchParams.set('corpid', corpid);
-  getAccessTokenURL.searchParams.set('corpsecret', secret);
-
-  const res = await axios.get(getAccessTokenURL.toString());
-  const { access_token } = res.data;
-  if (!access_token) {
-    return Promise.reject('Fail to get wechat access token');
-  }
-  // 2. get userid
-  const getInfoURL = new URL('https://qyapi.weixin.qq.com/cgi-bin/auth/getuserinfo');
-  getInfoURL.searchParams.set('code', code);
-  getInfoURL.searchParams.set('access_token', access_token);
-
-  const { data } = await axios.get<{ userid: string; errmsg?: string; user_ticket: string }>(
-    getInfoURL.toString()
-  );
-  const user_ticket = data.user_ticket;
-
-  const userid = data.userid;
-  if (!userid) {
-    return Promise.reject(data.errmsg || 'Fail to get wechat userid');
-  }
-  // 3. get userInfo
-  const getDetailedInfoURL = new URL('https://qyapi.weixin.qq.com/cgi-bin/auth/getuserdetail');
-  getDetailedInfoURL.searchParams.set('access_token', access_token);
-
-  const { data: userDetail } = await axios.post(getDetailedInfoURL.toString(), {
-    user_ticket
-  });
-
-  // 4. get username
-  const getUsernameURL = new URL('https://qyapi.weixin.qq.com/cgi-bin/user/get');
-  getUsernameURL.searchParams.set('access_token', access_token);
-  getUsernameURL.searchParams.set('userid', userid);
-
-  const {
-    data: { name }
-  } = await axios.get(getUsernameURL.toString());
-
-  return {
-    username: `${wecomUserPrefix}-${userid}`,
-    concat: userDetail.mobile || userDetail.email || '',
-    avatarUrl: userDetail.avatar || '',
-    memberName: name
-  };
-}
 /*
   通用 SSO 登录封装
 */
-export async function authSso(code: string): Promise<OauthResponse> {
+export async function authSso(props: { [key: string]: string }): Promise<OauthResponse> {
   if (!global.feConfigs?.sso || !global.feConfigs?.sso?.url)
     return Promise.reject('Not config sso');
 
-  if (!code) return Promise.reject('Not found code');
+  if (!props.code) return Promise.reject('Not found code');
 
   const { data } = await axios.get<{
     success: boolean;
@@ -297,7 +187,10 @@ export async function authSso(code: string): Promise<OauthResponse> {
     username: string;
     avatar?: string;
     contact?: string;
-  }>(`${global.feConfigs.sso.url}/login/oauth/access_token?code=${code}`);
+    memberName?: string;
+  }>(`${global.feConfigs.sso.url}/login/oauth/getUserInfo`, {
+    params: props
+  });
 
   if (!data.success) {
     return Promise.reject(data.message || UserErrEnum.unAuthSso);
@@ -306,6 +199,7 @@ export async function authSso(code: string): Promise<OauthResponse> {
   return {
     avatarUrl: data.avatar,
     username: data.username,
-    concat: data.contact
+    concat: data.contact,
+    memberName: data.memberName
   };
 }

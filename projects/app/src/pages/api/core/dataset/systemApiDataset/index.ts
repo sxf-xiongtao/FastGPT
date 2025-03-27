@@ -1,6 +1,11 @@
 import { NextAPI } from '@/service/middleware/entry';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { APIFileItem, FeishuServer, YuqueServer } from '@fastgpt/global/core/dataset/apiDataset';
+import {
+  APIFileItem,
+  ApiFileReadContentResponse,
+  FeishuServer,
+  YuqueServer
+} from '@fastgpt/global/core/dataset/apiDataset';
 import { useFeishuDatasetRequest } from '@/service/core/dataset/feishuDataset/api';
 import { useYuqueDatasetRequest } from '@/service/core/dataset/yuqueDataset/api';
 
@@ -20,7 +25,7 @@ export type FileOperationBody = {
   yuqueServer?: YuqueServer;
 };
 
-export type FileOperationResponse = APIFileItem[] | string;
+export type FileOperationResponse = APIFileItem[] | string | ApiFileReadContentResponse;
 
 async function handler(
   req: NextApiRequest,

@@ -66,7 +66,6 @@ export function formatConfigStore2FormSchema({
         lafEnv,
         ...feConfigsProps
       },
-      sso,
       concatMd,
       scripts: JSON.stringify(scripts, null, 2),
       limit,
@@ -87,10 +86,6 @@ export function formatConfigStore2FormSchema({
       google: {
         clientId: fastgptPro?.auth?.google?.clientId || '',
         secret: fastgptPro?.auth?.google?.secret || ''
-      },
-      dingtalk: {
-        clientId: fastgptPro?.auth?.dingtalk?.clientId || '',
-        secret: fastgptPro?.auth?.dingtalk?.secret || ''
       },
       microsoft: {
         clientId: fastgptPro?.auth?.microsoft?.clientId || '',
@@ -123,15 +118,9 @@ export function formatConfigStore2FormSchema({
         appID: fastgptPro?.auth?.wechat?.appID || '',
         appSecret: fastgptPro?.auth?.wechat?.appSecret || ''
       },
-      wecom: {
-        corpid: fastgptPro?.auth?.wecom?.corpid || '',
-        secret: fastgptPro?.auth?.wecom?.secret || '',
-        agentid: fastgptPro?.auth?.wecom?.agentid || '',
-        syncSecret: fastgptPro?.auth?.wecom?.syncSecret || '',
-        isSync: fastgptPro?.auth?.wecom?.isSync || false
-      },
       fastLogin: JSON.stringify(fastgptPro.fastLogin || {}, null, 2),
-      singleTeamMode: fastgptPro.teamMode === 'single'
+      teamMode: fastgptPro.teamMode,
+      sso
     },
     paySettings: {
       wx: fastgptPro?.pay?.wx || {},
@@ -167,20 +156,9 @@ export function formatFormData2ConfigStore({
   securitySettings,
   externalProviderSettings
 }: ConfigFormType): ConfigStoreType {
-  const { feConfigs, systemEnv, concatMd, scripts, limit, sso, navbar } = siteSettings;
-  const {
-    email,
-    phone,
-    github,
-    wechat,
-    dingtalk,
-    google,
-    fastLogin,
-    sms,
-    microsoft,
-    wecom,
-    singleTeamMode
-  } = loginSettings;
+  const { feConfigs, systemEnv, concatMd, scripts, limit, navbar } = siteSettings;
+  const { email, phone, github, wechat, google, fastLogin, sms, microsoft, teamMode, sso } =
+    loginSettings;
   const { censor } = securitySettings;
   const { wx, subPlans } = paySettings;
   const { externalProviderWorkflowVariables } = externalProviderSettings;
@@ -193,15 +171,7 @@ export function formatFormData2ConfigStore({
     oauth: {
       github: github?.clientId,
       google: google?.clientId,
-      dingtalk: dingtalk?.clientId,
       wechat: wechat?.appID,
-      wecom:
-        wecom?.corpid && wecom?.agentid
-          ? {
-              corpid: wecom?.corpid,
-              agentid: wecom?.agentid
-            }
-          : undefined,
       microsoft: microsoft?.clientId
         ? {
             clientId: microsoft?.clientId,
@@ -213,7 +183,7 @@ export function formatFormData2ConfigStore({
     sso,
     register_method: (() => {
       const methods = [];
-      if (loginSettings.wecom?.isSync) {
+      if (loginSettings.teamMode === 'sync') {
         methods.push('sync');
       }
       if (loginSettings?.email?.register) {
@@ -262,11 +232,8 @@ export function formatFormData2ConfigStore({
     email,
     phone,
     github,
-    wechat,
-    dingtalk,
     google,
     microsoft,
-    wecom,
     sms
   };
 
@@ -303,15 +270,7 @@ export function formatFormData2ConfigStore({
           return {};
         }
       })(),
-      teamMode: (() => {
-        if (loginSettings.wecom?.isSync) {
-          return TeamModeEnum.sync;
-        }
-        if (loginSettings.singleTeamMode) {
-          return TeamModeEnum.single;
-        }
-        return TeamModeEnum.multi;
-      })(),
+      teamMode,
       pay: {
         wx
       }

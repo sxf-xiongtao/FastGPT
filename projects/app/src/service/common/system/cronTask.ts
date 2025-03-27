@@ -1,4 +1,5 @@
-import syncOrg from '@/service/support/user/org/sync';
+import { syncUserAndOrg } from '@/service/support/user/sync';
+import { getTeamByUsername } from '@/service/support/user/team/controller';
 import { createStandardSubBill } from '@/service/support/wallet/sub/bill';
 import { TeamMemberRoleEnum } from '@fastgpt/global/support/user/team/constant';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
@@ -143,10 +144,7 @@ export const updateStandardPlan = async () => {
 };
 
 export const syncMemberAndOrg = async () => {
-  const root = await MongoUser.findOne({ username: 'root' }).lean();
-  if (!root) return;
-  const team = await MongoTeam.findOne({ ownerId: root._id }).lean();
-  if (!team) return;
-  await syncOrg({ teamId: team._id });
+  addLog.info('开始同步成员和组织');
+  await syncUserAndOrg();
   addLog.info('同步成员和组织完成');
 };

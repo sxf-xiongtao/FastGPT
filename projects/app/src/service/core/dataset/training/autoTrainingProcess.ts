@@ -143,7 +143,7 @@ export async function generateAutoTraining(): Promise<any> {
     const answer = await llmStreamResponseToAnswerText(chatResponse);
 
     // 3. Format answer to indexes and concat
-    const autoIndexResult = formatSplitText2Index(answer, text); // 格式化后的索引
+    const autoIndexResult = formatSplitText2Index({ answer, rawText: text, llmModel: modelData }); // 格式化后的索引
     const newIndexes = data.indexes.concat(autoIndexResult);
 
     // 4. Update training data to chunk queue
