@@ -112,7 +112,7 @@ async function handler(
       ? [
           {
             $match: {
-              $or: [{ 'user.username': regex }, { 'user.contact': regex }, { 'user.name': regex }]
+              $or: [{ 'user.username': regex }, { 'user.contact': regex }, { name: regex }]
             }
           }
         ]
