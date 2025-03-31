@@ -75,7 +75,7 @@ const syncCollectionCron = () => {
 // 成员同步
 const syncMemberAndOrgCron = () => {
   const cron = process.env.SYNC_MEMBER_CRON;
-  if (cron && global.systemConfig?.teamMode === 'sync') {
+  if (cron) {
     setCron(cron, async () => {
       await syncMemberAndOrg();
     });

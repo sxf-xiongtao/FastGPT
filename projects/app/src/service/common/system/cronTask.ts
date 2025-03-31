@@ -144,7 +144,9 @@ export const updateStandardPlan = async () => {
 };
 
 export const syncMemberAndOrg = async () => {
-  addLog.info('开始同步成员和组织');
-  await syncUserAndOrg();
-  addLog.info('同步成员和组织完成');
+  if (global.systemConfig.teamMode === 'sync') {
+    addLog.info('开始同步成员和组织');
+    await syncUserAndOrg();
+    addLog.info('同步成员和组织完成');
+  }
 };
