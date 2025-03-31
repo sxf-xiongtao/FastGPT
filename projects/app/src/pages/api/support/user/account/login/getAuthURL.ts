@@ -24,7 +24,7 @@ async function handler(
   }>(`${global.feConfigs.sso?.url}/login/oauth/getAuthURL`, {
     params: {
       redirect_uri,
-      isWecomWorkTerminal
+      isWecomWorkTerminal: isWecomWorkTerminal ? '1' : '0'
     }
   });
 

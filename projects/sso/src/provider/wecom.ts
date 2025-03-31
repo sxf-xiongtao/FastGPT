@@ -89,10 +89,10 @@ async function getAccessToken({
 }
 
 export const wecom_redirectFn: RedirectFn = async ({ req, redirect_uri, state }) => {
-  const isWecomWorkTerminal = req.query.isWecomWorkTerminal;
+  const isWecomWorkTerminal = req.query.isWecomWorkTerminal as '1' | '0';
   const corpid = process.env.WECOM_CORPID || '';
   const agentid = process.env.WECOM_AGENTID || '';
-  if (isWecomWorkTerminal) {
+  if (isWecomWorkTerminal === '1') {
     const url = new URL(wecomTargetURLOAuth);
     url.searchParams.set('appid', corpid);
     url.searchParams.set('redirect_uri', redirect_uri);
