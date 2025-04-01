@@ -3,12 +3,10 @@ import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { getTeamMember } from '@/service/support/user/team/controller';
 import { DelMemberProps } from '@fastgpt/global/support/user/team/controller';
 import { authMemberPermission } from '@/service/support/permission/team/auth';
-import {
-  ManagePermissionVal,
-  OwnerPermissionVal
-} from '@fastgpt/global/support/permission/constant';
+import { OwnerPermissionVal } from '@fastgpt/global/support/permission/constant';
 import { NextAPI } from '@/service/middleware/entry';
 import { removeUserFromTeam } from '@/service/support/user/controller';
+import { TeamManagePermissionVal } from '@fastgpt/global/support/permission/user/constant';
 
 async function handler(req: NextApiRequest, _res: NextApiResponse) {
   const { tmbId: memberId } = req.query as DelMemberProps;
@@ -23,7 +21,7 @@ async function handler(req: NextApiRequest, _res: NextApiResponse) {
   if (member.permission.hasManagePer) {
     await authMemberPermission({ teamId, tmbId, permission: OwnerPermissionVal });
   } else {
-    await authMemberPermission({ teamId, tmbId, permission: ManagePermissionVal });
+    await authMemberPermission({ teamId, tmbId, permission: TeamManagePermissionVal });
   }
 
   await removeUserFromTeam({
