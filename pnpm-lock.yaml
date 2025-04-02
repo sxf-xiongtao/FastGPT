@@ -34,11 +34,7 @@ importers:
         version: 13.3.0
       next-i18next:
         specifier: 15.4.2
-<<<<<<< HEAD
         version: 15.4.2(i18next@23.16.8)(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
-=======
-        version: 15.4.2(i18next@23.16.8)(next@14.2.25(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
->>>>>>> 32c4d6a (website sync feature (#473))
       prettier:
         specifier: 3.2.4
         version: 3.2.4
@@ -71,11 +67,7 @@ importers:
         version: 13.3.0
       next-i18next:
         specifier: 15.4.2
-<<<<<<< HEAD
         version: 15.4.2(i18next@23.16.8)(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
-=======
-        version: 15.4.2(i18next@23.16.8)(next@14.2.25(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
->>>>>>> 32c4d6a (website sync feature (#473))
       prettier:
         specifier: 3.2.4
         version: 3.2.4
@@ -125,13 +117,8 @@ importers:
         specifier: ^5.1.3
         version: 5.1.3
       next:
-<<<<<<< HEAD
         specifier: 14.2.26
         version: 14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0)
-=======
-        specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
->>>>>>> 32c4d6a (website sync feature (#473))
       openai:
         specifier: 4.61.0
         version: 4.61.0(encoding@0.1.13)(zod@3.24.2)
@@ -226,11 +213,7 @@ importers:
         version: 1.8.3
       bullmq:
         specifier: ^5.44.0
-<<<<<<< HEAD
         version: 5.46.0
-=======
-        version: 5.44.0
->>>>>>> 32c4d6a (website sync feature (#473))
       chalk:
         specifier: ^5.3.0
         version: 5.4.1
@@ -295,19 +278,11 @@ importers:
         specifier: ^3.11.3
         version: 3.13.0
       next:
-<<<<<<< HEAD
         specifier: 14.2.26
         version: 14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0)
       nextjs-cors:
         specifier: ^2.2.0
         version: 2.2.0(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0))
-=======
-        specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
-      nextjs-cors:
-        specifier: ^2.2.0
-        version: 2.2.0(next@14.2.25(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))
->>>>>>> 32c4d6a (website sync feature (#473))
       node-cron:
         specifier: ^3.0.3
         version: 3.0.3
@@ -389,11 +364,7 @@ importers:
         version: 2.1.1(@chakra-ui/system@2.6.1(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@chakra-ui/next-js':
         specifier: 2.4.2
-<<<<<<< HEAD
         version: 2.4.2(@chakra-ui/react@2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0))(react@18.3.1)
-=======
-        version: 2.4.2(@chakra-ui/react@2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(next@14.2.25(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react@18.3.1)
->>>>>>> 32c4d6a (website sync feature (#473))
       '@chakra-ui/react':
         specifier: 2.10.7
         version: 2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -456,11 +427,7 @@ importers:
         version: 4.17.21
       next-i18next:
         specifier: 15.4.2
-<<<<<<< HEAD
         version: 15.4.2(i18next@23.16.8)(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
-=======
-        version: 15.4.2(i18next@23.16.8)(next@14.2.25(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
->>>>>>> 32c4d6a (website sync feature (#473))
       papaparse:
         specifier: ^5.4.1
         version: 5.4.1
@@ -872,11 +839,7 @@ importers:
         version: 2.1.1(@chakra-ui/system@2.6.1(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@chakra-ui/next-js':
         specifier: 2.4.2
-<<<<<<< HEAD
         version: 2.4.2(@chakra-ui/react@2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0))(react@18.3.1)
-=======
-        version: 2.4.2(@chakra-ui/react@2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(next@14.2.25(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react@18.3.1)
->>>>>>> 32c4d6a (website sync feature (#473))
       '@chakra-ui/react':
         specifier: 2.10.7
         version: 2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -974,19 +937,11 @@ importers:
         specifier: ^5.1.3
         version: 5.1.3
       next:
-<<<<<<< HEAD
         specifier: 14.2.26
         version: 14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0)
       next-i18next:
         specifier: 15.4.2
         version: 15.4.2(i18next@23.16.8)(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
-=======
-        specifier: 14.2.25
-        version: 14.2.25(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
-      next-i18next:
-        specifier: 15.4.2
-        version: 15.4.2(i18next@23.16.8)(next@14.2.25(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
->>>>>>> 32c4d6a (website sync feature (#473))
       nodemailer:
         specifier: ^6.9.4
         version: 6.10.0
@@ -4987,13 +4942,8 @@ packages:
   buffer@6.0.3:
     resolution: {integrity: sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==}
 
-<<<<<<< HEAD
   bullmq@5.46.0:
     resolution: {integrity: sha512-+05wyrLsJ+2FNj6MB8eChEkxHHtI3YcGp7uaAs1DjYzbkQQGSKujszhHGsGFy7RdZL3eqnIKOWb+4xGtKUYlsg==}
-=======
-  bullmq@5.44.0:
-    resolution: {integrity: sha512-OnEtkuXyrUx2Jm5BpH92+ttrobblBdCbkhOe3OoR0hxZuAilI3mPWlwELslhfImRpDv8rK+C/0/VK7I8f3xIig==}
->>>>>>> 32c4d6a (website sync feature (#473))
 
   bundle-n-require@1.1.2:
     resolution: {integrity: sha512-bEk2jakVK1ytnZ9R2AAiZEeK/GxPUM8jvcRxHZXifZDMcjkI4EG/GlsJ2YGSVYT9y/p/gA9/0yDY8rCGsSU6Tg==}
@@ -12601,7 +12551,6 @@ snapshots:
       next: 14.2.26(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
       react: 18.3.1
 
-<<<<<<< HEAD
   '@chakra-ui/next-js@2.4.2(@chakra-ui/react@2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0))(react@18.3.1)':
     dependencies:
       '@chakra-ui/react': 2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -12610,8 +12559,6 @@ snapshots:
       next: 14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0)
       react: 18.3.1
 
-=======
->>>>>>> 32c4d6a (website sync feature (#473))
   '@chakra-ui/object-utils@2.1.0': {}
 
   '@chakra-ui/react-use-safe-layout-effect@2.1.0(react@18.3.1)':
@@ -16112,11 +16059,7 @@ snapshots:
       base64-js: 1.5.1
       ieee754: 1.2.1
 
-<<<<<<< HEAD
   bullmq@5.46.0:
-=======
-  bullmq@5.44.0:
->>>>>>> 32c4d6a (website sync feature (#473))
     dependencies:
       cron-parser: 4.9.0
       ioredis: 5.6.0
@@ -20772,7 +20715,6 @@ snapshots:
       react: 18.3.1
       react-i18next: 14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
-<<<<<<< HEAD
   next-i18next@15.4.2(i18next@23.16.8)(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
     dependencies:
       '@babel/runtime': 7.26.10
@@ -20786,9 +20728,6 @@ snapshots:
       react-i18next: 14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
   next@14.2.26(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1):
-=======
-  next@14.2.25(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1):
->>>>>>> 32c4d6a (website sync feature (#473))
     dependencies:
       '@next/env': 14.2.26
       '@swc/helpers': 0.5.5
@@ -20814,7 +20753,6 @@ snapshots:
       - '@babel/core'
       - babel-plugin-macros
 
-<<<<<<< HEAD
   next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0):
     dependencies:
       '@next/env': 14.2.26
@@ -20845,12 +20783,6 @@ snapshots:
     dependencies:
       cors: 2.8.5
       next: 14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0)
-=======
-  nextjs-cors@2.2.0(next@14.2.25(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)):
-    dependencies:
-      cors: 2.8.5
-      next: 14.2.25(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
->>>>>>> 32c4d6a (website sync feature (#473))
 
   node-abi@3.74.0:
     dependencies:

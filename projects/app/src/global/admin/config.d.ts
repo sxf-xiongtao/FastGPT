@@ -3,9 +3,9 @@ import { SystemConfigType } from '@/types';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
 import {
   FastGPTConfigFileType,
-  ExternalProviderWorkflowVarType
+  ExternalProviderWorkflowVarType,
+  customPdfParseType
 } from '@fastgpt/global/common/system/types';
-import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import { TeamModeEnum } from '../settings/constants';
 
 export type ConfigStoreType = {
@@ -17,9 +17,11 @@ export type ConfigFormType = {
   siteSettings: {
     feConfigs: {
       show_workorder: boolean;
+      appTemplateCourse: string;
       show_emptyChat: boolean;
       show_team_chat: boolean;
       show_openai_account: boolean;
+      show_compliance_copywriting: boolean;
       show_promotion: boolean;
       favicon: string;
       docUrl: string;
@@ -36,12 +38,15 @@ export type ConfigFormType = {
     scripts?: string;
     limit?: FastGPTConfigFileType['feConfigs']['limit'];
     systemEnv: {
+      oneapiUrl?: string;
+      chatApiKey: string;
       openapiPrefix: string;
       vectorMaxProcess: number;
       qaMaxProcess: number;
       vlmMaxProcess: number;
       hnswEfSearch: number;
       tokenWorkers: number;
+      customPdfParse?: customPdfParseType;
     };
     navbar?: NavbarItemType[];
   };
@@ -66,7 +71,7 @@ export type ConfigFormType = {
     wx: NonNullable<SystemConfigType['pay']>['wx'];
     subPlans: {
       planDescriptionUrl: string;
-      [SubTypeEnum.standard]: string;
+      standard: string;
       extraDatasetSizePrice: number;
       extraPointsPrice: number;
     };

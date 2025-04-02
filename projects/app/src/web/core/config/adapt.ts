@@ -35,6 +35,8 @@ export function formatConfigStore2FormSchema({
     lafEnv,
     sso,
     navbarItems = [],
+    appTemplateCourse = '',
+    show_compliance_copywriting = false,
     ...feConfigsProps
   } = feConfigs || {};
 
@@ -43,6 +45,11 @@ export function formatConfigStore2FormSchema({
     vectorMaxProcess = 10,
     qaMaxProcess = 10,
     hnswEfSearch = 100,
+    oneapiUrl = '',
+    chatApiKey = '',
+    vlmMaxProcess = 5,
+    tokenWorkers = 1,
+    customPdfParse,
     ...systemEnvProps
   } = systemEnv || {};
 
@@ -64,6 +71,8 @@ export function formatConfigStore2FormSchema({
         uploadFileMaxAmount,
         uploadFileMaxSize,
         lafEnv,
+        appTemplateCourse,
+        show_compliance_copywriting,
         ...feConfigsProps
       },
       concatMd,
@@ -75,6 +84,11 @@ export function formatConfigStore2FormSchema({
         vectorMaxProcess,
         qaMaxProcess,
         hnswEfSearch,
+        oneapiUrl,
+        chatApiKey,
+        vlmMaxProcess,
+        tokenWorkers,
+        customPdfParse,
         ...systemEnvProps
       }
     },

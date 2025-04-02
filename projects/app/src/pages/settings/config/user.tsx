@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Box, Divider, Flex, Input, Textarea } from '@chakra-ui/react';
+import { Box, Divider, Input, Textarea } from '@chakra-ui/react';
 import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';
 import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
 import { getInitFormData, postUpdateConfig } from '@/web/core/config/api';
