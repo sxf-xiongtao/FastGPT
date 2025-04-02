@@ -30,6 +30,7 @@
     "assert": "^2.0.0",
     "autoprefixer": "^10.4.19",
     "axios": "^1.8.2",
+    "bullmq": "^5.44.0",
     "canvas": "^3.0.0",
     "clsx": "^1.2.1",
     "crawlee": "^3.11.0",

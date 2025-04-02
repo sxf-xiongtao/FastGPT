@@ -41,6 +41,7 @@ const nextConfig = {
     if (isServer) {
       config.externals.push('worker_threads');
       config.externals.push('@node-rs/jieba');
+      config.externals.push('header-generator');
 
       if (nextRuntime === 'nodejs') {
         // config.output.globalObject = 'self';
@@ -79,12 +80,7 @@ const nextConfig = {
   transpilePackages: ['@fastgpt/global', '@fastgpt/web', 'ahooks'],
   experimental: {
     // 指定导出包优化，按需引入包模块
-    serverComponentsExternalPackages: [
-      'mongoose',
-      'pg',
-      '@zilliz/milvus2-sdk-node',
-      "tiktoken",
-    ],
+    serverComponentsExternalPackages: ['mongoose', 'pg', '@zilliz/milvus2-sdk-node', 'tiktoken'],
     outputFileTracingRoot: path.join(__dirname, '../../'),
     instrumentationHook: true
   }

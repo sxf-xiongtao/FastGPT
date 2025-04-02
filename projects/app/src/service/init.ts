@@ -1,11 +1,8 @@
 import { SystemConfigType } from '@/types';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
 import { FastGPTConfigFileType } from '@fastgpt/global/common/system/types';
-import { delay } from '@fastgpt/global/common/system/utils';
-import { DatasetStatusEnum } from '@fastgpt/global/core/dataset/constants';
 import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema';
 import { initFastGPTConfig } from '@fastgpt/service/common/system/tools';
-import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { loadSystemModels } from '@fastgpt/service/core/ai/config/utils';
 
 export const getProInitData = async () => {
@@ -60,16 +57,4 @@ export function initGlobalVariables() {
 
   global.autoTrainingLen = 0;
   global.imageParseQueueLen = 0;
-}
-
-export async function initDatasetStatus() {
-  try {
-    await MongoDataset.updateMany(
-      { status: { $ne: DatasetStatusEnum.active } },
-      { status: DatasetStatusEnum.active }
-    );
-  } catch (error) {
-    await delay(100);
-    initDatasetStatus();
-  }
 }

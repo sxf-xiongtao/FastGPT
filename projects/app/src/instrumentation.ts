@@ -5,13 +5,14 @@ export async function register() {
     if (process.env.NEXT_RUNTIME === 'nodejs') {
       const [
         { connectMongo },
-        { initGlobalVariables, initDatasetStatus, getProInitData },
+        { initGlobalVariables, getProInitData },
         { startCron },
         { concatBillTimer, reduceAiPointsTimer },
         { authLicense },
         { getSystemPluginCb },
         { startTrainingProcess },
-        { startMongoWatch }
+        { startMongoWatch },
+        { initBullMQWorkers }
       ] = await Promise.all([
         import('@fastgpt/service/common/mongo/init'),
         import('@/service/init'),
@@ -20,20 +21,19 @@ export async function register() {
         import('@/service/core/license'),
         import('@/service/core/workflow/systemPlugins/register'),
         import('@/service/core/dataset/training/utils'),
-        import('@/service/middleware/volumnMongoWatch')
+        import('@/service/middleware/volumnMongoWatch'),
+        import('@/service/common/bullmq/index')
       ]);
 
       initGlobalVariables();
 
       await connectMongo();
+      initBullMQWorkers();
 
       // Start cron and timer
       startCron();
       reduceAiPointsTimer();
       concatBillTimer();
-
-      // Reset dataset status
-      initDatasetStatus();
 
       await Promise.all([getProInitData(), authLicense(), getSystemPluginCb(true)]);
 
