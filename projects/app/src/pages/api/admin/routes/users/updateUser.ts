@@ -1,12 +1,11 @@
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { connectToDatabase } from '@/service/mongo';
+
 import { adminCert } from '@/service/support/permission/adminCert';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    await connectToDatabase();
     await adminCert({ req, authToken: true });
 
     let { _id: id, password, status, username } = req.body;

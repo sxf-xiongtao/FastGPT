@@ -5,6 +5,7 @@ export async function register() {
     if (process.env.NEXT_RUNTIME === 'nodejs') {
       const [
         { connectMongo },
+        { connectionMongo, connectionLogMongo, MONGO_URL, MONGO_LOG_URL },
         { initGlobalVariables, getProInitData },
         { startCron },
         { concatBillTimer, reduceAiPointsTimer },
@@ -15,6 +16,7 @@ export async function register() {
         { initBullMQWorkers }
       ] = await Promise.all([
         import('@fastgpt/service/common/mongo/init'),
+        import('@fastgpt/service/common/mongo/index'),
         import('@/service/init'),
         import('@/service/common/system/cron'),
         import('@/service/support/wallet/controller'),
@@ -27,8 +29,9 @@ export async function register() {
 
       initGlobalVariables();
 
-      await connectMongo();
-      initBullMQWorkers();
+      // Connect to MongoDB
+      await Promise.all([connectMongo(connectionMongo, MONGO_URL), initBullMQWorkers()]);
+      connectMongo(connectionLogMongo, MONGO_LOG_URL);
 
       // Start cron and timer
       startCron();

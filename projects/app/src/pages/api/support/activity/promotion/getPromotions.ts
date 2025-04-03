@@ -1,13 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { connectToDatabase } from '@/service/mongo';
+
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoPromotionRecord } from '@fastgpt/service/support/activity/promotion/schema';
 import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    await connectToDatabase();
     let { pageNum = 1, pageSize = 10 } = req.body as {
       pageNum: number;
       pageSize: number;

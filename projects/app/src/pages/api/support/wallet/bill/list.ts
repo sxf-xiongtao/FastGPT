@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { connectToDatabase } from '@/service/mongo';
+
 import { MongoBill } from '@/service/support/wallet/bill/schema';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
@@ -18,7 +18,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse): Promise<Respo
     type?: BillTypeEnum;
   };
   const { offset, pageSize } = parsePaginationRequest(req);
-  await connectToDatabase();
+
   const { teamId } = await authUserPer({ req, authToken: true, per: ReadPermissionVal });
 
   const match = {

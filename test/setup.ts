@@ -1,6 +1,12 @@
 import { readFileSync } from 'fs';
 import mongoose from '@fastgpt/service/common/mongo';
 import { connectMongo } from '@fastgpt/service/common/mongo/init';
+import {
+  connectionMongo,
+  connectionLogMongo,
+  MONGO_URL,
+  MONGO_LOG_URL
+} from '@fastgpt/service/common/mongo';
 import { afterAll, afterEach, beforeAll, vi } from 'vitest';
 import { setup, teardown } from 'vitest-mongodb';
 import '@test/mocks';
@@ -33,7 +39,8 @@ beforeAll(async () => {
   });
   vi.stubEnv('MONGODB_URI', (globalThis as any).__MONGO_URI__);
   // initGlobalVariables();
-  await connectMongo();
+  await connectMongo(connectionMongo, MONGO_URL);
+  await connectMongo(connectionLogMongo, MONGO_LOG_URL);
 
   // const str = readFileSync('projects/app/.env.local', 'utf-8');
   // const lines = str.split('\n');

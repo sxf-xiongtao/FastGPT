@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import axios from 'axios';
-import { connectToDatabase } from '@/service/mongo';
+
 import { setCookie } from '@fastgpt/service/support/permission/controller';
 import { usernameLogin } from '@/service/support/user/controller';
 import type { FastLoginProps } from '@fastgpt/global/support/user/api';
@@ -17,7 +17,6 @@ type FastLoginAuthResponse = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
-    await connectToDatabase();
     const { code, token } = req.body as FastLoginProps;
 
     const fastLoginData = global.systemConfig?.fastLogin?.[code];

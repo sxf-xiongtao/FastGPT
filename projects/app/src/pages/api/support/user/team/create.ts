@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { connectToDatabase } from '@/service/mongo';
+
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { createTeam } from '@/service/support/user/team/controller';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
@@ -9,7 +9,6 @@ import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    await connectToDatabase();
     const { userId } = await authCert({ req, authToken: true });
 
     const count = await MongoTeamMember.countDocuments({

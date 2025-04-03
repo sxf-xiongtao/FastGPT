@@ -22,7 +22,7 @@ importers:
         version: 20.17.24
       '@vitest/coverage-v8':
         specifier: ^3.0.9
-        version: 3.0.9(vitest@3.0.9(@types/debug@4.1.12)(@types/node@20.17.24)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0))
+        version: 3.0.9(vitest@3.0.9(@types/debug@4.1.12)(@types/node@20.17.24)(jiti@1.21.7)(jsdom@26.0.0)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0))
       husky:
         specifier: ^8.0.3
         version: 8.0.3
@@ -34,7 +34,11 @@ importers:
         version: 13.3.0
       next-i18next:
         specifier: 15.4.2
+<<<<<<< HEAD
         version: 15.4.2(i18next@23.16.8)(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+=======
+        version: 15.4.2(i18next@23.16.8)(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
       prettier:
         specifier: 3.2.4
         version: 3.2.4
@@ -55,7 +59,7 @@ importers:
         version: 2.5.8(encoding@0.1.13)(react@18.3.1)(ws@8.18.1)
       '@vitest/coverage-v8':
         specifier: ^3.0.2
-        version: 3.0.9(vitest@3.0.9(@types/debug@4.1.12)(@types/node@22.13.10)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0))
+        version: 3.0.9(vitest@3.0.9(@types/debug@4.1.12)(@types/node@22.13.10)(jiti@1.21.7)(jsdom@26.0.0)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0))
       husky:
         specifier: ^8.0.3
         version: 8.0.3
@@ -67,7 +71,11 @@ importers:
         version: 13.3.0
       next-i18next:
         specifier: 15.4.2
+<<<<<<< HEAD
         version: 15.4.2(i18next@23.16.8)(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+=======
+        version: 15.4.2(i18next@23.16.8)(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
       prettier:
         specifier: 3.2.4
         version: 3.2.4
@@ -76,13 +84,13 @@ importers:
         version: 14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       vitest:
         specifier: ^3.0.2
-        version: 3.0.9(@types/debug@4.1.12)(@types/node@22.13.10)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0)
+        version: 3.0.9(@types/debug@4.1.12)(@types/node@22.13.10)(jiti@1.21.7)(jsdom@26.0.0)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0)
       vitest-mongodb:
         specifier: ^1.0.1
         version: 1.0.1
       zhlint:
         specifier: ^0.7.4
-        version: 0.7.4(@types/node@22.13.10)(jsdom@26.0.0(canvas@3.1.0))(sass@1.85.1)(terser@5.39.0)(typescript@5.8.2)
+        version: 0.7.4(@types/node@22.13.10)(jsdom@26.0.0)(sass@1.85.1)(terser@5.39.0)(typescript@5.8.2)
 
   FastGPT/packages/global:
     dependencies:
@@ -211,9 +219,12 @@ importers:
       axios:
         specifier: ^1.8.2
         version: 1.8.3
+<<<<<<< HEAD
       bullmq:
         specifier: ^5.44.0
         version: 5.46.0
+=======
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
       chalk:
         specifier: ^5.3.0
         version: 5.4.1
@@ -247,9 +258,6 @@ importers:
       iconv-lite:
         specifier: ^0.6.3
         version: 0.6.3
-      ioredis:
-        specifier: ^5.6.0
-        version: 5.6.0
       joplin-turndown-plugin-gfm:
         specifier: ^1.0.12
         version: 1.0.12
@@ -364,7 +372,11 @@ importers:
         version: 2.1.1(@chakra-ui/system@2.6.1(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@chakra-ui/next-js':
         specifier: 2.4.2
+<<<<<<< HEAD
         version: 2.4.2(@chakra-ui/react@2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0))(react@18.3.1)
+=======
+        version: 2.4.2(@chakra-ui/react@2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react@18.3.1)
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
       '@chakra-ui/react':
         specifier: 2.10.7
         version: 2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -427,7 +439,11 @@ importers:
         version: 4.17.21
       next-i18next:
         specifier: 15.4.2
+<<<<<<< HEAD
         version: 15.4.2(i18next@23.16.8)(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+=======
+        version: 15.4.2(i18next@23.16.8)(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
       papaparse:
         specifier: ^5.4.1
         version: 5.4.1
@@ -696,7 +712,7 @@ importers:
         version: 5.8.2
       vitest:
         specifier: ^3.0.2
-        version: 3.0.8(@types/debug@4.1.12)(@types/node@20.17.24)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0)
+        version: 3.0.8(@types/debug@4.1.12)(@types/node@20.17.24)(jiti@1.21.7)(jsdom@26.0.0)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0)
 
   FastGPT/projects/sandbox:
     dependencies:
@@ -839,7 +855,11 @@ importers:
         version: 2.1.1(@chakra-ui/system@2.6.1(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@chakra-ui/next-js':
         specifier: 2.4.2
+<<<<<<< HEAD
         version: 2.4.2(@chakra-ui/react@2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0))(react@18.3.1)
+=======
+        version: 2.4.2(@chakra-ui/react@2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react@18.3.1)
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
       '@chakra-ui/react':
         specifier: 2.10.7
         version: 2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -938,10 +958,17 @@ importers:
         version: 5.1.3
       next:
         specifier: 14.2.26
+<<<<<<< HEAD
         version: 14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0)
       next-i18next:
         specifier: 15.4.2
         version: 15.4.2(i18next@23.16.8)(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+=======
+        version: 14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
+      next-i18next:
+        specifier: 15.4.2
+        version: 15.4.2(i18next@23.16.8)(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
       nodemailer:
         specifier: ^6.9.4
         version: 6.10.0
@@ -3038,6 +3065,9 @@ packages:
   '@next/env@14.2.26':
     resolution: {integrity: sha512-vO//GJ/YBco+H7xdQhzJxF7ub3SUwft76jwaeOyVVQFHCi5DCnkP16WHB+JBylo4vOKPoZBlR94Z8xBxNBdNJA==}
 
+  '@next/env@14.2.26':
+    resolution: {integrity: sha512-vO//GJ/YBco+H7xdQhzJxF7ub3SUwft76jwaeOyVVQFHCi5DCnkP16WHB+JBylo4vOKPoZBlR94Z8xBxNBdNJA==}
+
   '@next/eslint-plugin-next@13.1.6':
     resolution: {integrity: sha512-o7cauUYsXjzSJkay8wKjpKJf2uLzlggCsGUkPu3lP09Pv97jYlekTC20KJrjQKmSv5DXV0R/uks2ZXhqjNkqAw==}
 
@@ -3050,46 +3080,140 @@ packages:
     cpu: [arm64]
     os: [darwin]
 
+<<<<<<< HEAD
+  '@next/swc-darwin-x64@14.2.26':
+    resolution: {integrity: sha512-U0adH5ryLfmTDkahLwG9sUQG2L0a9rYux8crQeC92rPhi3jGQEY47nByQHrVrt3prZigadwj/2HZ1LUUimuSbg==}
+=======
+  '@next/swc-darwin-arm64@14.2.26':
+    resolution: {integrity: sha512-zDJY8gsKEseGAxG+C2hTMT0w9Nk9N1Sk1qV7vXYz9MEiyRoF5ogQX2+vplyUMIfygnjn9/A04I6yrUTRTuRiyQ==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@next/swc-darwin-x64@14.2.25':
+    resolution: {integrity: sha512-V+iYM/QR+aYeJl3/FWWU/7Ix4b07ovsQ5IbkwgUK29pTHmq+5UxeDr7/dphvtXEq5pLB/PucfcBNh9KZ8vWbug==}
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [darwin]
+
+<<<<<<< HEAD
+  '@next/swc-linux-arm64-gnu@14.2.26':
+    resolution: {integrity: sha512-SINMl1I7UhfHGM7SoRiw0AbwnLEMUnJ/3XXVmhyptzriHbWvPPbbm0OEVG24uUKhuS1t0nvN/DBvm5kz6ZIqpg==}
+=======
   '@next/swc-darwin-x64@14.2.26':
     resolution: {integrity: sha512-U0adH5ryLfmTDkahLwG9sUQG2L0a9rYux8crQeC92rPhi3jGQEY47nByQHrVrt3prZigadwj/2HZ1LUUimuSbg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
 
+  '@next/swc-linux-arm64-gnu@14.2.25':
+    resolution: {integrity: sha512-LFnV2899PJZAIEHQ4IMmZIgL0FBieh5keMnriMY1cK7ompR+JUd24xeTtKkcaw8QmxmEdhoE5Mu9dPSuDBgtTg==}
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [linux]
+
+<<<<<<< HEAD
+  '@next/swc-linux-arm64-musl@14.2.26':
+    resolution: {integrity: sha512-s6JaezoyJK2DxrwHWxLWtJKlqKqTdi/zaYigDXUJ/gmx/72CrzdVZfMvUc6VqnZ7YEvRijvYo+0o4Z9DencduA==}
+=======
   '@next/swc-linux-arm64-gnu@14.2.26':
     resolution: {integrity: sha512-SINMl1I7UhfHGM7SoRiw0AbwnLEMUnJ/3XXVmhyptzriHbWvPPbbm0OEVG24uUKhuS1t0nvN/DBvm5kz6ZIqpg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
+  '@next/swc-linux-arm64-musl@14.2.25':
+    resolution: {integrity: sha512-QC5y5PPTmtqFExcKWKYgUNkHeHE/z3lUsu83di488nyP0ZzQ3Yse2G6TCxz6nNsQwgAx1BehAJTZez+UQxzLfw==}
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [linux]
+
+<<<<<<< HEAD
+  '@next/swc-linux-x64-gnu@14.2.26':
+    resolution: {integrity: sha512-FEXeUQi8/pLr/XI0hKbe0tgbLmHFRhgXOUiPScz2hk0hSmbGiU8aUqVslj/6C6KA38RzXnWoJXo4FMo6aBxjzg==}
+=======
   '@next/swc-linux-arm64-musl@14.2.26':
     resolution: {integrity: sha512-s6JaezoyJK2DxrwHWxLWtJKlqKqTdi/zaYigDXUJ/gmx/72CrzdVZfMvUc6VqnZ7YEvRijvYo+0o4Z9DencduA==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
+  '@next/swc-linux-x64-gnu@14.2.25':
+    resolution: {integrity: sha512-y6/ML4b9eQ2D/56wqatTJN5/JR8/xdObU2Fb1RBidnrr450HLCKr6IJZbPqbv7NXmje61UyxjF5kvSajvjye5w==}
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [linux]
+
+<<<<<<< HEAD
+  '@next/swc-linux-x64-musl@14.2.26':
+    resolution: {integrity: sha512-BUsomaO4d2DuXhXhgQCVt2jjX4B4/Thts8nDoIruEJkhE5ifeQFtvW5c9JkdOtYvE5p2G0hcwQ0UbRaQmQwaVg==}
+=======
   '@next/swc-linux-x64-gnu@14.2.26':
     resolution: {integrity: sha512-FEXeUQi8/pLr/XI0hKbe0tgbLmHFRhgXOUiPScz2hk0hSmbGiU8aUqVslj/6C6KA38RzXnWoJXo4FMo6aBxjzg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
+  '@next/swc-linux-x64-musl@14.2.25':
+    resolution: {integrity: sha512-sPX0TSXHGUOZFvv96GoBXpB3w4emMqKeMgemrSxI7A6l55VBJp/RKYLwZIB9JxSqYPApqiREaIIap+wWq0RU8w==}
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [linux]
+
+<<<<<<< HEAD
+  '@next/swc-win32-arm64-msvc@14.2.26':
+    resolution: {integrity: sha512-5auwsMVzT7wbB2CZXQxDctpWbdEnEW/e66DyXO1DcgHxIyhP06awu+rHKshZE+lPLIGiwtjo7bsyeuubewwxMw==}
+=======
   '@next/swc-linux-x64-musl@14.2.26':
     resolution: {integrity: sha512-BUsomaO4d2DuXhXhgQCVt2jjX4B4/Thts8nDoIruEJkhE5ifeQFtvW5c9JkdOtYvE5p2G0hcwQ0UbRaQmQwaVg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
+  '@next/swc-win32-arm64-msvc@14.2.25':
+    resolution: {integrity: sha512-ReO9S5hkA1DU2cFCsGoOEp7WJkhFzNbU/3VUF6XxNGUCQChyug6hZdYL/istQgfT/GWE6PNIg9cm784OI4ddxQ==}
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [win32]
+
+<<<<<<< HEAD
+  '@next/swc-win32-ia32-msvc@14.2.26':
+    resolution: {integrity: sha512-GQWg/Vbz9zUGi9X80lOeGsz1rMH/MtFO/XqigDznhhhTfDlDoynCM6982mPCbSlxJ/aveZcKtTlwfAjwhyxDpg==}
+=======
   '@next/swc-win32-arm64-msvc@14.2.26':
     resolution: {integrity: sha512-5auwsMVzT7wbB2CZXQxDctpWbdEnEW/e66DyXO1DcgHxIyhP06awu+rHKshZE+lPLIGiwtjo7bsyeuubewwxMw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
 
+  '@next/swc-win32-ia32-msvc@14.2.25':
+    resolution: {integrity: sha512-DZ/gc0o9neuCDyD5IumyTGHVun2dCox5TfPQI/BJTYwpSNYM3CZDI4i6TOdjeq1JMo+Ug4kPSMuZdwsycwFbAw==}
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
+    engines: {node: '>= 10'}
+    cpu: [ia32]
+    os: [win32]
+
+<<<<<<< HEAD
+  '@next/swc-win32-x64-msvc@14.2.26':
+    resolution: {integrity: sha512-2rdB3T1/Gp7bv1eQTTm9d1Y1sv9UuJ2LAwOE0Pe2prHKe32UNscj7YS13fRB37d0GAiGNR+Y7ZcW8YjDI8Ns0w==}
+=======
   '@next/swc-win32-ia32-msvc@14.2.26':
     resolution: {integrity: sha512-GQWg/Vbz9zUGi9X80lOeGsz1rMH/MtFO/XqigDznhhhTfDlDoynCM6982mPCbSlxJ/aveZcKtTlwfAjwhyxDpg==}
     engines: {node: '>= 10'}
     cpu: [ia32]
+    os: [win32]
+
+  '@next/swc-win32-x64-msvc@14.2.25':
+    resolution: {integrity: sha512-KSznmS6eFjQ9RJ1nEc66kJvtGIL1iZMYmGEXsZPh2YtnLtqrgdVvKXJY2ScjjoFnG6nGLyPFR0UiEvDwVah4Tw==}
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
+    engines: {node: '>= 10'}
+    cpu: [x64]
     os: [win32]
 
   '@next/swc-win32-x64-msvc@14.2.26':
@@ -8514,6 +8638,24 @@ packages:
       sass:
         optional: true
 
+  next@14.2.26:
+    resolution: {integrity: sha512-b81XSLihMwCfwiUVRRja3LphLo4uBBMZEzBBWMaISbKTwOmq3wPknIETy/8000tr7Gq4WmbuFYPS7jOYIf+ZJw==}
+    engines: {node: '>=18.17.0'}
+    hasBin: true
+    peerDependencies:
+      '@opentelemetry/api': ^1.1.0
+      '@playwright/test': ^1.41.2
+      react: 18.3.1
+      react-dom: 18.3.1
+      sass: ^1.3.0
+    peerDependenciesMeta:
+      '@opentelemetry/api':
+        optional: true
+      '@playwright/test':
+        optional: true
+      sass:
+        optional: true
+
   nextjs-cors@2.2.0:
     resolution: {integrity: sha512-FZu/A+L59J4POJNqwXYyCPDvsLDeu5HjSBvytzS6lsrJeDz5cmnH45zV+VoNic0hjaeER9xGaiIjZIWzEHnxQg==}
     peerDependencies:
@@ -12559,6 +12701,14 @@ snapshots:
       next: 14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0)
       react: 18.3.1
 
+  '@chakra-ui/next-js@2.4.2(@chakra-ui/react@2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react@18.3.1)':
+    dependencies:
+      '@chakra-ui/react': 2.10.7(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@emotion/styled@11.11.0(@emotion/react@11.11.1(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(react@18.3.1))(@types/react@18.3.1)(framer-motion@9.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@emotion/cache': 11.14.0
+      '@emotion/react': 11.11.1(@types/react@18.3.1)(react@18.3.1)
+      next: 14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
+      react: 18.3.1
+
   '@chakra-ui/object-utils@2.1.0': {}
 
   '@chakra-ui/react-use-safe-layout-effect@2.1.0(react@18.3.1)':
@@ -13859,6 +14009,8 @@ snapshots:
 
   '@next/env@14.2.26': {}
 
+  '@next/env@14.2.26': {}
+
   '@next/eslint-plugin-next@13.1.6':
     dependencies:
       glob: 7.1.7
@@ -13870,6 +14022,7 @@ snapshots:
   '@next/swc-darwin-arm64@14.2.26':
     optional: true
 
+<<<<<<< HEAD
   '@next/swc-darwin-x64@14.2.26':
     optional: true
 
@@ -13889,6 +14042,57 @@ snapshots:
     optional: true
 
   '@next/swc-win32-ia32-msvc@14.2.26':
+    optional: true
+
+  '@next/swc-win32-x64-msvc@14.2.26':
+=======
+  '@next/swc-darwin-arm64@14.2.26':
+    optional: true
+
+  '@next/swc-darwin-x64@14.2.25':
+    optional: true
+
+  '@next/swc-darwin-x64@14.2.26':
+    optional: true
+
+  '@next/swc-linux-arm64-gnu@14.2.25':
+    optional: true
+
+  '@next/swc-linux-arm64-gnu@14.2.26':
+    optional: true
+
+  '@next/swc-linux-arm64-musl@14.2.25':
+    optional: true
+
+  '@next/swc-linux-arm64-musl@14.2.26':
+    optional: true
+
+  '@next/swc-linux-x64-gnu@14.2.25':
+    optional: true
+
+  '@next/swc-linux-x64-gnu@14.2.26':
+    optional: true
+
+  '@next/swc-linux-x64-musl@14.2.25':
+    optional: true
+
+  '@next/swc-linux-x64-musl@14.2.26':
+    optional: true
+
+  '@next/swc-win32-arm64-msvc@14.2.25':
+    optional: true
+
+  '@next/swc-win32-arm64-msvc@14.2.26':
+    optional: true
+
+  '@next/swc-win32-ia32-msvc@14.2.25':
+    optional: true
+
+  '@next/swc-win32-ia32-msvc@14.2.26':
+    optional: true
+
+  '@next/swc-win32-x64-msvc@14.2.25':
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
     optional: true
 
   '@next/swc-win32-x64-msvc@14.2.26':
@@ -15191,7 +15395,7 @@ snapshots:
 
   '@ungap/structured-clone@1.3.0': {}
 
-  '@vitest/coverage-v8@3.0.9(vitest@3.0.9(@types/debug@4.1.12)(@types/node@20.17.24)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0))':
+  '@vitest/coverage-v8@3.0.9(vitest@3.0.9(@types/debug@4.1.12)(@types/node@20.17.24)(jiti@1.21.7)(jsdom@26.0.0)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 1.0.2
@@ -15209,7 +15413,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/coverage-v8@3.0.9(vitest@3.0.9(@types/debug@4.1.12)(@types/node@22.13.10)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0))':
+  '@vitest/coverage-v8@3.0.9(vitest@3.0.9(@types/debug@4.1.12)(@types/node@22.13.10)(jiti@1.21.7)(jsdom@26.0.0)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 1.0.2
@@ -15223,7 +15427,7 @@ snapshots:
       std-env: 3.8.1
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.0.9(@types/debug@4.1.12)(@types/node@22.13.10)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0)
+      vitest: 3.0.9(@types/debug@4.1.12)(@types/node@22.13.10)(jiti@1.21.7)(jsdom@26.0.0)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -20715,7 +20919,23 @@ snapshots:
       react: 18.3.1
       react-i18next: 14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
+<<<<<<< HEAD
   next-i18next@15.4.2(i18next@23.16.8)(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
+=======
+  next-i18next@15.4.2(i18next@23.16.8)(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1))(react-i18next@14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
+    dependencies:
+      '@babel/runtime': 7.26.10
+      '@types/hoist-non-react-statics': 3.3.6
+      core-js: 3.41.0
+      hoist-non-react-statics: 3.3.2
+      i18next: 23.16.8
+      i18next-fs-backend: 2.6.0
+      next: 14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)
+      react: 18.3.1
+      react-i18next: 14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+
+  next@14.2.25(@babel/core@7.26.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1):
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
     dependencies:
       '@babel/runtime': 7.26.10
       '@types/hoist-non-react-statics': 3.3.6
@@ -20753,12 +20973,20 @@ snapshots:
       - '@babel/core'
       - babel-plugin-macros
 
+<<<<<<< HEAD
   next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0):
+=======
+  next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1):
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
     dependencies:
       '@next/env': 14.2.26
       '@swc/helpers': 0.5.5
       busboy: 1.6.0
+<<<<<<< HEAD
       caniuse-lite: 1.0.30001707
+=======
+      caniuse-lite: 1.0.30001704
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
       graceful-fs: 4.2.11
       postcss: 8.4.31
       react: 18.3.1
@@ -20774,12 +21002,20 @@ snapshots:
       '@next/swc-win32-arm64-msvc': 14.2.26
       '@next/swc-win32-ia32-msvc': 14.2.26
       '@next/swc-win32-x64-msvc': 14.2.26
+<<<<<<< HEAD
       sass: 1.86.0
+=======
+      sass: 1.85.1
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
     transitivePeerDependencies:
       - '@babel/core'
       - babel-plugin-macros
 
+<<<<<<< HEAD
   nextjs-cors@2.2.0(next@14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0)):
+=======
+  nextjs-cors@2.2.0(next@14.2.25(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.85.1)):
+>>>>>>> ae420a8 (feat: mongo standard log (#478))
     dependencies:
       cors: 2.8.5
       next: 14.2.26(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.86.0)
@@ -23583,7 +23819,7 @@ snapshots:
       - socks
       - supports-color
 
-  vitest@1.6.1(@types/node@22.13.10)(jsdom@26.0.0(canvas@3.1.0))(sass@1.85.1)(terser@5.39.0):
+  vitest@1.6.1(@types/node@22.13.10)(jsdom@26.0.0)(sass@1.85.1)(terser@5.39.0):
     dependencies:
       '@vitest/expect': 1.6.1
       '@vitest/runner': 1.6.1
@@ -23618,7 +23854,7 @@ snapshots:
       - supports-color
       - terser
 
-  vitest@3.0.8(@types/debug@4.1.12)(@types/node@20.17.24)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0):
+  vitest@3.0.8(@types/debug@4.1.12)(@types/node@20.17.24)(jiti@1.21.7)(jsdom@26.0.0)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0):
     dependencies:
       '@vitest/expect': 3.0.8
       '@vitest/mocker': 3.0.8(vite@6.2.2(@types/node@20.17.24)(jiti@1.21.7)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0))
@@ -23698,7 +23934,7 @@ snapshots:
       - tsx
       - yaml
 
-  vitest@3.0.9(@types/debug@4.1.12)(@types/node@22.13.10)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0):
+  vitest@3.0.9(@types/debug@4.1.12)(@types/node@22.13.10)(jiti@1.21.7)(jsdom@26.0.0)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0):
     dependencies:
       '@vitest/expect': 3.0.9
       '@vitest/mocker': 3.0.9(vite@6.2.2(@types/node@22.13.10)(jiti@1.21.7)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0))
@@ -24100,7 +24336,7 @@ snapshots:
 
   yoctocolors-cjs@2.1.2: {}
 
-  zhlint@0.7.4(@types/node@22.13.10)(jsdom@26.0.0(canvas@3.1.0))(sass@1.85.1)(terser@5.39.0)(typescript@5.8.2):
+  zhlint@0.7.4(@types/node@22.13.10)(jsdom@26.0.0)(sass@1.85.1)(terser@5.39.0)(typescript@5.8.2):
     dependencies:
       chalk: 4.1.2
       glob: 10.4.5
@@ -24109,7 +24345,7 @@ snapshots:
       remark-frontmatter: 1.3.3
       remark-parse: 7.0.2
       unified: 8.4.2
-      vitest: 1.6.1(@types/node@22.13.10)(jsdom@26.0.0(canvas@3.1.0))(sass@1.85.1)(terser@5.39.0)
+      vitest: 1.6.1(@types/node@22.13.10)(jsdom@26.0.0)(sass@1.85.1)(terser@5.39.0)
       vue: 3.5.13(typescript@5.8.2)
     transitivePeerDependencies:
       - '@edge-runtime/vm'

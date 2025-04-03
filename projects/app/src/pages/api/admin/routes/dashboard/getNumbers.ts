@@ -1,4 +1,3 @@
-import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoApp } from '@fastgpt/service/core/app/schema';
@@ -8,7 +7,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    await connectToDatabase();
     await adminCert({ req, authToken: true });
     const usersCount = await MongoUser.countDocuments();
     const datasetsCount = await MongoDataset.countDocuments();

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { connectToDatabase } from '@/service/mongo';
+
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
@@ -21,7 +21,6 @@ import { getStandardPlanConfig } from '@fastgpt/service/support/wallet/sub/utils
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     await authCert({ req, authRoot: true });
-    await connectToDatabase();
 
     // 检查是否开启了订阅模式
     if (!systemUseTeamPlanning()) {

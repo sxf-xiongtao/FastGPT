@@ -3,14 +3,13 @@
  * @param{string} teamId
  */
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { connectToDatabase } from '@/service/mongo';
+
 import { jsonRes } from '@fastgpt/service/common/response';
 import { getTeamTags } from '@/service/support/user/team/tagController';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    await connectToDatabase();
     const { teamId } = await authCert({ req, authToken: true });
 
     jsonRes(res, {

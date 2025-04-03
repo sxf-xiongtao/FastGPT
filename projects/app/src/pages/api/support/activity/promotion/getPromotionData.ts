@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { connectToDatabase } from '@/service/mongo';
+
 import { MongoPromotionRecord } from '@fastgpt/service/support/activity/promotion/schema';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import mongoose from '@fastgpt/service/common/mongo';
@@ -10,7 +10,6 @@ import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tool
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    await connectToDatabase();
     const { userId } = await authCert({ req, authToken: true });
 
     const invitedAmount = await MongoUser.countDocuments({
