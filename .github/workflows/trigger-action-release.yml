@@ -7,6 +7,11 @@ on:
 
 jobs:
   trigger-release:
+    permissions:
+      contents: write
+      packages: write
+      actions: write
+      issues: write
     runs-on: ubuntu-latest
     steps:
       - name: Get tag
@@ -16,7 +21,7 @@ jobs:
       - name: Create Tag and Release in Target Repo
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const tag = '${{ steps.get_tag.outputs.TAG }}';
             const [owner, repo] = 'labring-actions/fastgpt-pro-action'.split('/');
@@ -28,7 +33,7 @@ jobs:
                 repo,
                 branch: 'main'
               });
-              
+
               // Create the tag
               await github.rest.git.createRef({
                 owner,
@@ -36,7 +41,7 @@ jobs:
                 ref: `refs/tags/${tag}`,
                 sha: ref.commit.sha
               });
-              
+
               // Create a release
               await github.rest.repos.createRelease({
                 owner,
@@ -47,7 +52,7 @@ jobs:
                 draft: false,
                 prerelease: false
               });
-              
+
               console.log(`Successfully created tag and release ${tag} in ${owner}/${repo}`);
             } catch (error) {
               console.log(`Error creating tag or release: ${error.message}`);
