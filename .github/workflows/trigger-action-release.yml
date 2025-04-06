@@ -8,10 +8,9 @@ on:
 jobs:
   trigger-release:
     permissions:
-      contents: write
-      packages: write
-      actions: write
-      issues: write
+      # 关键：跨仓库访问权限
+      repository-projects: write # 访问仓库项目
+      id-token: write # 用于令牌交换
     runs-on: ubuntu-latest
     steps:
       - name: Get tag
@@ -24,7 +23,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const tag = '${{ steps.get_tag.outputs.TAG }}';
-            const [owner, repo] = 'labring-actions/fastgpt-pro-action'.split('/');
+            const [owner, repo] = 'labring/fastgpt-pro-action'.split('/');
 
             try {
               // Get the latest commit SHA from the target repository
