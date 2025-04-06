@@ -4,17 +4,21 @@ on:
   push:
     tags:
       - 'v*'
+
+permissions:
+  contents: read
+  packages: write
+  attestations: write
+  id-token: write
+
 jobs:
   build-fastgpt-pro-plugin-images:
     runs-on: ubuntu-20.04
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 0
-          repository: labring/fastgpt-pro
-          ref: ${{ github.ref_name }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 1
       - name: Update submodules
         run: git submodule update --init --recursive # update git submodule
       - name: Install Dependencies
