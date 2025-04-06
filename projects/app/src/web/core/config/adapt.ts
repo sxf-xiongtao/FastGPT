@@ -231,6 +231,7 @@ export function formatFormData2ConfigStore({
   const formatLoginSettings = {
     email,
     phone,
+    wechat,
     github,
     google,
     microsoft,
