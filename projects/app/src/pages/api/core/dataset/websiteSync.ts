@@ -6,7 +6,12 @@ import { checkTeamWebSyncPermission } from '@/service/support/permission/teamLim
 import { ManagePermissionVal } from '@fastgpt/global/support/permission/constant';
 import { NextAPI } from '@/service/middleware/entry';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
-import { addWebsiteSyncJob } from '@fastgpt/service/core/dataset/websiteSync';
+import {
+  addWebsiteSyncJob,
+  getWebsiteSyncDatasetStatus
+} from '@fastgpt/service/core/dataset/websiteSync';
+import { DatasetStatusEnum } from '@fastgpt/global/core/dataset/constants';
+import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
 
 async function handler(req: ApiRequestProps<PostWebsiteSyncParams>, res: NextApiResponse) {
   const { datasetId } = req.body;
@@ -20,6 +25,21 @@ async function handler(req: ApiRequestProps<PostWebsiteSyncParams>, res: NextApi
 
   if (!dataset?.websiteConfig?.url) {
     throw new Error('Dataset is not website dataset');
+  }
+
+  // Check it is already syncing
+  const { status } = await getWebsiteSyncDatasetStatus(datasetId);
+  if (status === DatasetStatusEnum.syncing) {
+    return Promise.reject('Dataset is syncing');
+  }
+
+  // Check is training
+  const trainingCounts = await MongoDatasetTraining.countDocuments({
+    teamId,
+    datasetId
+  });
+  if (trainingCounts > 0) {
+    return Promise.reject('Dataset is training');
   }
 
   await checkTeamWebSyncPermission(teamId);
