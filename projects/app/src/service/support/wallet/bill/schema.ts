@@ -1,5 +1,4 @@
-import { connectionMongo, type Model } from '@fastgpt/service/common/mongo';
-const { Schema, model, models } = connectionMongo;
+import { getMongoModel, Schema } from '@fastgpt/service/common/mongo';
 import { BillSchemaType } from '@fastgpt/global/support/wallet/bill/type.d';
 import {
   TeamCollectionName,
@@ -56,4 +55,4 @@ try {
   console.log(error);
 }
 
-export const MongoBill: Model<BillSchemaType> = models['pays'] || model('pays', BillSchema);
+export const MongoBill = getMongoModel<BillSchemaType>('pays', BillSchema);

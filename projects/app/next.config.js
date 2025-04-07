@@ -41,7 +41,6 @@ const nextConfig = {
     if (isServer) {
       config.externals.push('worker_threads');
       config.externals.push('@node-rs/jieba');
-      config.externals.push('header-generator');
 
       if (nextRuntime === 'nodejs') {
         // config.output.globalObject = 'self';
