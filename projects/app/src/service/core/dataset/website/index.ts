@@ -1,4 +1,4 @@
-import { Job, UnrecoverableError } from 'bullmq';
+import { Job, UnrecoverableError } from '@fastgpt/service/common/bullmq';
 import { crawlWebsite, type CrawlDataItemType } from '@/service/common/crawler';
 import {
   DatasetCollectionTypeEnum,

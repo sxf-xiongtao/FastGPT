@@ -79,7 +79,14 @@ const nextConfig = {
   transpilePackages: ['@fastgpt/global', '@fastgpt/web', 'ahooks'],
   experimental: {
     // 指定导出包优化，按需引入包模块
-    serverComponentsExternalPackages: ['mongoose', 'pg', '@zilliz/milvus2-sdk-node', 'tiktoken'],
+    serverComponentsExternalPackages: [
+      'mongoose',
+      'pg',
+      'bullmq',
+      '@zilliz/milvus2-sdk-node',
+      'tiktoken',
+      'crawlee'
+    ],
     outputFileTracingRoot: path.join(__dirname, '../../'),
     instrumentationHook: true
   }

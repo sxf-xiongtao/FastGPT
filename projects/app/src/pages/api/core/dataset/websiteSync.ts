@@ -10,28 +10,23 @@ import { addWebsiteSyncJob } from '@fastgpt/service/core/dataset/websiteSync';
 
 async function handler(req: ApiRequestProps<PostWebsiteSyncParams>, res: NextApiResponse) {
   const { datasetId } = req.body;
-  try {
-    const { dataset, teamId } = await authDataset({
-      datasetId,
-      req,
-      authToken: true,
-      per: ManagePermissionVal
-    });
 
-    if (!dataset?.websiteConfig?.url) {
-      throw new Error('Dataset is not website dataset');
-    }
+  const { dataset, teamId } = await authDataset({
+    datasetId,
+    req,
+    authToken: true,
+    per: ManagePermissionVal
+  });
 
-    await checkTeamWebSyncPermission(teamId);
-
-    await addWebsiteSyncJob({ datasetId: dataset._id.toString() });
-
-    updateWebSyncLimit(teamId);
-
-    return;
-  } catch (err) {
-    return Promise.reject(err);
+  if (!dataset?.websiteConfig?.url) {
+    throw new Error('Dataset is not website dataset');
   }
+
+  await checkTeamWebSyncPermission(teamId);
+
+  await addWebsiteSyncJob({ datasetId: dataset._id.toString() });
+
+  updateWebSyncLimit(teamId);
 }
 
 export default NextAPI(handler);

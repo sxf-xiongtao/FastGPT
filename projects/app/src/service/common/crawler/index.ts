@@ -1,4 +1,3 @@
-import { delay } from '@fastgpt/global/common/system/utils';
 import { CheerioCrawler, LogLevel, EnqueueStrategy, Configuration } from 'crawlee';
 import { htmlToMarkdown } from '@fastgpt/service/common/string/utils';
 import { cheerioToHtml } from '@fastgpt/service/common/string/cheerio';
@@ -25,7 +24,9 @@ export const crawlWebsite = async ({
   const config = new Configuration({
     defaultDatasetId: uid,
     persistStorage: false,
-    logLevel: LogLevel.INFO
+    logLevel: LogLevel.INFO,
+    maxUsedCpuRatio: 0.4,
+    availableMemoryRatio: 0.25
   });
   let crawler = new CheerioCrawler(
     {
@@ -65,8 +66,6 @@ export const crawlWebsite = async ({
         } else {
           return;
         }
-
-        await delay(100);
 
         await enqueueLinks({
           strategy: EnqueueStrategy.SameHostname,
