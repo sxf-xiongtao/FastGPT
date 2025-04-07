@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { username, password } = req.body as PostLoginProps;
 
     if (!username || !password) {
-      throw new Error('缺少参数');
+      throw new Error('username or password is required');
     }
 
     if (username !== 'root') {

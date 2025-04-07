@@ -203,7 +203,7 @@ export const Settings = () => {
         <Input type="number" {...register('systemEnv.vlmMaxProcess')} placeholder="" />
       </FormItem>
       <FormItem title="HNSW ef_search" description="没有特殊设置过索引的，默认 100 即可">
-        <Input type="number" {...register('systemEnv.pgHNSWEfSearch')} placeholder="" />
+        <Input type="number" {...register('systemEnv.hnswEfSearch')} placeholder="" />
       </FormItem>
       <FormItem title="token计算最大进程（通常多少并发设置多少）" description="">
         <Input type="number" {...register('systemEnv.tokenWorkers')} placeholder="" />
