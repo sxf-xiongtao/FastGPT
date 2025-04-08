@@ -1,13 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { connectToDatabase } from '@/service/mongo';
+
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { authTokenFromTeamDomain } from '@/service/support/user/team/tagController';
 import { AuthTeamTagTokenProps } from '@fastgpt/global/support/user/team/tag';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    await connectToDatabase();
     const { teamId, teamToken } = req.query as AuthTeamTagTokenProps;
 
     const teamInfo = await MongoTeam.findById(teamId);

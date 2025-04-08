@@ -1,28 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Button, Flex } from '@chakra-ui/react';
+import React, { useState, useRef } from 'react';
+import { Box, Flex, Input, Textarea } from '@chakra-ui/react';
 import { useToast } from '@fastgpt/web/hooks/useToast';
 import { throttle } from '@/utils/tools';
 import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';
 import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
-import { useQuery } from '@tanstack/react-query';
 import { getInitFormData, postUpdateConfig } from '@/web/core/config/api';
-import ImportModal from './components/ImportModal';
-import FormField from './components/FormField';
-import { Controller, useForm } from 'react-hook-form';
-import { getFormConfig } from './data/formConfig';
-import BoxCard from '@/components/common/BoxContainer/Card';
-import MyTag from '@fastgpt/web/components/common/Tag/index';
+import FormLabel from './components/FormLabel';
+import Switch from '@/pageComponents/Settings/Switch';
+import { useForm } from 'react-hook-form';
 import { serviceSideProps } from '@/web/common/i18n/utils';
-import { useSystem } from '@fastgpt/web/hooks/useSystem';
-
-interface formLevel {
-  key: string;
-  title: string;
-  type: string;
-  properties?: any;
-  description?: string;
-}
-
+import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
+import FirstTitle from '@/pageComponents/Settings/FirstTitle';
+import SettingPage from '@/pageComponents/Settings/SettingPage';
+import SecondTitle from '@/pageComponents/Settings/SecondTitle';
+import FormItem from '@/pageComponents/Settings/FormItem';
+import { compressImgFileAndUpload } from '@/web/common/file/utils';
+import MyImage from '@fastgpt/web/components/common/Image/MyImage';
+import { AddIcon } from '@chakra-ui/icons';
+import JsonEditor from '@fastgpt/web/components/common/Textarea/JsonEditor';
+import NavbarItems from './components/FormField/NavbarItems';
+import ImageInput from '@/pageComponents/Settings/ImageInput';
 interface titleType {
   mainTitle: string;
   subTitles: string[];
@@ -30,300 +27,231 @@ interface titleType {
 
 export const Settings = () => {
   const [rawData, setRawData] = useState<any>({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [titles, setTitles] = useState<Array<titleType>>([]);
-  const [activeTitle, setActiveTitle] = useState('');
-  const { isPc } = useSystem();
-
+  const { setValue, reset, watch, register, handleSubmit, control } =
+    useForm<ConfigFormType['siteSettings']>();
+  const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  const { reset, control, handleSubmit, setValue } = useForm();
-
-  useQuery(['getInitFormData'], () => getInitFormData(), {
+  const { loading: loadingConfig } = useRequest2(getInitFormData, {
     onSuccess: (data: ConfigStoreType) => {
-      setRawData(data);
       const aggregatedConfigs: ConfigFormType = formatConfigStore2FormSchema(data);
-      reset(aggregatedConfigs);
+      setRawData(aggregatedConfigs);
+      reset(aggregatedConfigs.siteSettings);
     },
-    onError: () => {
-      toast({
-        title: '获取配置出错',
-        status: 'error'
-      });
-    }
+    errorToast: '获取配置出错',
+    manual: false
   });
 
-  const onSubmit = async (data: any) => {
-    setIsLoading(true);
-    try {
-      const formData = formatFormData2ConfigStore(data);
+  const { loading: loadingSave, runAsync: saveConfig } = useRequest2(postUpdateConfig, {
+    manual: true,
+    successToast: '保存成功',
+    errorToast: '保存失败'
+  });
 
-      await postUpdateConfig(formData);
-
-      toast({
-        title: '配置保存成功',
-        status: 'success',
-        duration: 2000,
-        isClosable: true,
-        position: 'top'
-      });
-    } catch (error) {
-      console.log(error);
-
-      toast({
-        title: '保存配置出错',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-        position: 'top'
-      });
-    } finally {
-      setIsLoading(false);
+  const onSubmit = handleSubmit((data) => {
+    if (!rawData) {
+      return;
     }
-  };
+    saveConfig(
+      formatFormData2ConfigStore({
+        ...rawData,
+        siteSettings: data
+      })
+    );
+  });
 
-  const handleScroll = throttle(() => {
-    let firstVisibleTitle: any = null;
+  const isLoading = loadingConfig || loadingSave;
 
-    titles.forEach((title: titleType) => {
-      title.subTitles.forEach((subTitle: string) => {
-        const subTitleElement = document.getElementById(subTitle);
-        if (!subTitleElement) return;
-
-        const subTitleRect = subTitleElement.getBoundingClientRect();
-        if (subTitleRect.top <= window.innerHeight && subTitleRect.bottom >= 0) {
-          if (
-            !firstVisibleTitle ||
-            subTitleRect.top < firstVisibleTitle.getBoundingClientRect().top
-          ) {
-            firstVisibleTitle = subTitleElement;
-          }
-        }
-      });
-    });
-
-    if (firstVisibleTitle) {
-      setActiveTitle(firstVisibleTitle.id);
+  const titles: Array<titleType> = [
+    {
+      mainTitle: '基础配置',
+      subTitles: [
+        '前端展示配置',
+        '个性化配置',
+        '全局Script脚本',
+        '系统参数',
+        'PDF 解析配置',
+        '使用限制',
+        '侧边栏配置'
+      ]
     }
-  }, 100);
-
-  const formConfig = getFormConfig();
-  const firstLevels = Object.values(formConfig);
-
-  useEffect(() => {
-    const topLevelKeys = Object.keys(formConfig);
-
-    const secondLevelTitles: { [key: string]: string[] } = {};
-    for (const key in formConfig) {
-      const properties = formConfig[key].properties;
-      const secondLevelTitlesArr = Object.keys(properties).map(
-        (propKey) => properties[propKey].title
-      );
-      secondLevelTitles[key] = secondLevelTitlesArr;
-    }
-
-    const formattedOutput = topLevelKeys.map((title) => {
-      return { mainTitle: formConfig[title].title, subTitles: secondLevelTitles[title] };
-    });
-
-    setTitles(formattedOutput);
-    setActiveTitle(formattedOutput[0].mainTitle);
-  }, []);
+  ];
 
   return (
-    <Flex h={'100%'} gap={4}>
-      <Box overflowY={'auto'} flex={'1 0 0'} onScroll={handleScroll}>
-        {firstLevels.map((firstLevel) => {
-          const secondLevels: formLevel[] = Object.values(firstLevel.properties);
-          return (
-            <Box
-              key={firstLevel.title}
-              id={firstLevel.title}
-              mb={10}
-              border={'base'}
-              borderRadius={'lg'}
-              boxShadow={'3'}
-              bg={'white'}
-              overflow={'hidden'}
-            >
-              <Box
-                fontSize={'lg'}
-                color={'myGray.900'}
-                fontWeight={'bold'}
-                bg={'myGray.100'}
-                px={4}
-                py={2}
-              >
-                {firstLevel.title}
-              </Box>
-              {secondLevels.map((secondLevel) => {
-                return (
-                  <Box
-                    key={secondLevel.title}
-                    px={6}
-                    py={6}
-                    _notLast={{
-                      borderBottomWidth: '1.5px',
-                      borderBottomColor: 'myGray.200'
-                    }}
-                  >
-                    {!!secondLevel.properties ? (
-                      <Box>
-                        <Flex id={secondLevel.title} color={'primary.600'} mb={5}>
-                          <MyTag fontSize={'md'} type="borderFill">
-                            {secondLevel.title}
-                          </MyTag>
-                        </Flex>
-                        <Flex pl={2} flexWrap={'wrap'}>
-                          {Object.values(secondLevel.properties).map((thirdLevel) => {
-                            const thirdLevelTyped = thirdLevel as formLevel;
-                            return (
-                              <Box
-                                key={thirdLevelTyped.title}
-                                {...(thirdLevelTyped.type === 'boolean'
-                                  ? {
-                                      w: '50%'
-                                    }
-                                  : {
-                                      w: '100%',
-                                      _notFirst: { mt: 5 }
-                                    })}
-                              >
-                                <Controller
-                                  control={control}
-                                  name={thirdLevelTyped.key}
-                                  render={({ field: { onChange, value } }) => (
-                                    <FormField
-                                      type={thirdLevelTyped.type}
-                                      title={thirdLevelTyped.title}
-                                      description={thirdLevelTyped.description || ''}
-                                      value={value}
-                                      onChange={(value) => {
-                                        console.log(thirdLevelTyped.key, value);
-                                        onChange(value);
-                                        setValue(thirdLevelTyped.key, value);
-                                      }}
-                                      level={3}
-                                    />
-                                  )}
-                                />
-                              </Box>
-                            );
-                          })}
-                        </Flex>
-                      </Box>
-                    ) : (
-                      <Controller
-                        control={control}
-                        name={secondLevel.key}
-                        render={({ field: { onChange, value } }) => (
-                          <FormField
-                            type={secondLevel.type}
-                            title={secondLevel.title}
-                            description={secondLevel.description || ''}
-                            value={value}
-                            onChange={onChange}
-                            level={2}
-                          />
-                        )}
-                      />
-                    )}
-                  </Box>
-                );
-              })}
-            </Box>
-          );
-        })}
-      </Box>
-      {/* 目录 */}
-      <Flex
-        flex={'0 0 200px'}
-        flexDirection={'column'}
-        position={isPc ? 'relative' : 'absolute'}
-        gap={4}
+    <SettingPage titles={titles} loading={isLoading} onSubmit={onSubmit}>
+      <FirstTitle title="基础配置" />
+      <SecondTitle title="前端展示配置" />
+      <Box
+        px={6}
+        mb={4}
+        _notLast={{
+          borderBottomWidth: '1.5px',
+          borderBottomColor: 'myGray.200'
+        }}
       >
-        <BoxCard
-          flex={'1 0 0'}
-          overflow={'overlay'}
-          display={['none', 'block']}
-          userSelect={'none'}
-          px={4}
-          py={4}
-        >
-          <Box>
-            {titles.map((title: titleType) => (
-              <Box key={title.mainTitle}>
-                <Box
-                  {...(activeTitle === title.mainTitle
-                    ? {
-                        bg: 'primary.600',
-                        color: 'white'
-                      }
-                    : {
-                        _hover: {
-                          color: 'primary.600'
-                        },
-                        onClick: () => {
-                          const anchor = document.getElementById(title.mainTitle);
-                          if (anchor) {
-                            anchor.scrollIntoView({ behavior: 'auto', block: 'start' });
-                          }
-                        }
-                      })}
-                  py={1}
-                  px={2}
-                  borderRadius={'md'}
-                  cursor={'pointer'}
-                >
-                  {title.mainTitle}
-                </Box>
-                <Box ml={3} fontSize={'sm'}>
-                  {title?.subTitles.map((subTitle: string) => (
-                    <Box
-                      key={subTitle}
-                      {...(activeTitle === subTitle
-                        ? {
-                            bg: 'primary.600',
-                            color: 'white'
-                          }
-                        : {
-                            _hover: {
-                              color: 'primary.600'
-                            },
-                            onClick: () => {
-                              const anchor = document.getElementById(subTitle);
-                              if (anchor) {
-                                anchor.scrollIntoView({ behavior: 'auto', block: 'start' });
-                              }
-                            }
-                          })}
-                      py={1}
-                      px={2}
-                      borderRadius={'md'}
-                      cursor={'pointer'}
-                    >
-                      {subTitle}
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
-            ))}
-          </Box>
-        </BoxCard>
-        <Box w={'100%'}>
-          <Box>
-            <ImportModal value={rawData} setFormData={reset} setRawData={setRawData}>
-              <Button variant={'whiteBase'} mb={3} w={'100%'} isLoading={isLoading}>
-                配置文件
-              </Button>
-            </ImportModal>
-          </Box>
-          <Button onClick={handleSubmit(onSubmit)} w={'100%'} isLoading={isLoading}>
-            保存
-          </Button>
+        <Flex px={6} wrap="wrap" justifyContent="space-between" my={3}>
+          <Flex alignItems={'center'} my={3} w={['100%', '48%']}>
+            <FormLabel title="展示团队分享" description="" mb={2} minW={'240px'} />
+            <Switch control={control} name="feConfigs.show_team_chat" />
+          </Flex>
+          <Flex alignItems={'center'} my={3} w={['100%', '48%']}>
+            <FormLabel title="展示聊天空白页（都关闭即可）" description="" mb={2} minW={'240px'} />
+            <Switch control={control} name="feConfigs.show_emptyChat" />
+          </Flex>
+          <Flex alignItems={'center'} my={3} w={['100%', '48%']}>
+            <FormLabel title="展示邀请好友活动" description="" mb={2} minW={'240px'} />
+            <Switch control={control} name="feConfigs.show_promotion" />
+          </Flex>
+          <Flex alignItems={'center'} my={3} w={['100%', '48%']}>
+            <FormLabel title="前端是否展示合规提示文案" description="" mb={2} minW={'240px'} />
+            <Switch control={control} name="feConfigs.show_compliance_copywriting" />
+          </Flex>
+        </Flex>
+      </Box>
+      <FormItem title="系统名" description="">
+        <Input {...register('feConfigs.systemTitle')} placeholder="" />
+      </FormItem>
+      <FormItem
+        title="自定义api域名"
+        description="可以设置一个额外的api地址，不使用主站的地址，需配置域名的cname和ssl证书。"
+      >
+        <Input
+          {...register('feConfigs.customApiDomain')}
+          placeholder="可以设置一个额外的api地址，不使用主站的地址，需配置域名的cname和ssl证书。"
+        />
+      </FormItem>
+      <FormItem
+        title="自定义分享链接域名"
+        description="可以设置一个额外的分享链接地址，不使用主站的地址，需配置域名的cname和ssl证书。"
+      >
+        <Input
+          {...register('feConfigs.customSharePageDomain')}
+          placeholder="可以设置一个额外的分享链接地址，不使用主站的地址，需配置域名的cname和ssl证书。"
+        />
+      </FormItem>
+      <FormItem title="favicon" description="">
+        <ImageInput control={control} name="feConfigs.favicon" />
+      </FormItem>
+      <FormItem title="OpenAPI 前缀" description="">
+        <Input {...register('systemEnv.openapiPrefix')} placeholder="" />
+      </FormItem>
+
+      <SecondTitle title="个性化配置" />
+
+      <FormItem
+        title="联系弹窗"
+        description="使用 Markdown 进行配置，配置之后，在网页中“联系我们”相关的内容，会提示填写的内容。"
+      >
+        <Textarea
+          rows={8}
+          variant="outline"
+          whiteSpace="pre-wrap"
+          wordBreak={'break-word'}
+          {...register('concatMd')}
+          placeholder="使用 Markdown 进行配置，配置之后，在网页中“联系我们”相关的内容，会提示填写的内容。"
+        />
+      </FormItem>
+
+      <FormItem title="自定义 api 文档地址" description="自定义 openapi 文档地址">
+        <Input {...register('feConfigs.openAPIDocUrl')} placeholder="" />
+      </FormItem>
+      <FormItem title="文档地址（加一个 / 结尾，否则会携带子路径跳转）" description="">
+        <Input {...register('feConfigs.docUrl')} placeholder="" />
+      </FormItem>
+      <FormItem title="贡献插件文档地址" description="">
+        <Input {...register('feConfigs.systemPluginCourseUrl')} placeholder="" />
+      </FormItem>
+      <FormItem title="贡献模板市场文档地址" description="">
+        <Input {...register('feConfigs.appTemplateCourse')} placeholder="" />
+      </FormItem>
+
+      <SecondTitle title="全局Script脚本" />
+
+      <FormItem
+        title="全局 Script 脚本"
+        description="自定义 Script 脚本，可以全局插入（可以做站点流量监控之类的）"
+      >
+        <Box className="mb-8" w={'100%'}>
+          <JsonEditor
+            value={watch('scripts')}
+            onChange={throttle((e) => {
+              setValue('scripts', e || '');
+            }, 1000)}
+            defaultHeight={250}
+            resize
+          />
         </Box>
-      </Flex>
-    </Flex>
+      </FormItem>
+
+      <SecondTitle title="系统参数" />
+      <FormItem
+        title="oneAPI地址(会覆盖环境变量配置的)"
+        description="oneAPI地址，可以使用 oneapi 来实现多模型接入"
+      >
+        <Input {...register('systemEnv.oneapiUrl')} placeholder="请输入 oneAPI 地址" />
+      </FormItem>
+      <FormItem title="OneAPI 密钥(会覆盖环境变量配置的)" description="">
+        <Input {...register('systemEnv.chatApiKey')} placeholder="请输入 OneAPI 密钥" />
+      </FormItem>
+      <FormItem title="知识库索引最大处理进程" description="">
+        <Input type="number" {...register('systemEnv.vectorMaxProcess')} placeholder="" />
+      </FormItem>
+      <FormItem title="文件理解模型最大处理进程" description="">
+        <Input type="number" {...register('systemEnv.qaMaxProcess')} placeholder="" />
+      </FormItem>
+      <FormItem title="图片理解模型最大处理进程" description="">
+        <Input type="number" {...register('systemEnv.vlmMaxProcess')} placeholder="" />
+      </FormItem>
+      <FormItem title="HNSW ef_search" description="没有特殊设置过索引的，默认 100 即可">
+        <Input type="number" {...register('systemEnv.hnswEfSearch')} placeholder="" />
+      </FormItem>
+      <FormItem title="token计算最大进程（通常多少并发设置多少）" description="">
+        <Input type="number" {...register('systemEnv.tokenWorkers')} placeholder="" />
+      </FormItem>
+      <SecondTitle title="PDF 解析配置" />
+      <FormItem title="自定义 PDF 解析地址" description="">
+        <Input {...register('systemEnv.customPdfParse.url')} placeholder="" />
+      </FormItem>
+      <FormItem title="自定义 PDF 解析密钥" description="">
+        <Input {...register('systemEnv.customPdfParse.key')} placeholder="" />
+      </FormItem>
+      <FormItem title="Doc2x pdf 解析密钥（比自定义 PDF 解析优先级低）" description="">
+        <Input {...register('systemEnv.customPdfParse.doc2xKey')} placeholder="" />
+      </FormItem>
+      <FormItem title="自定义 PDF 解析价格(n 积分/页)" description="">
+        <Input type="number" {...register('systemEnv.customPdfParse.price')} placeholder="" />
+      </FormItem>
+      <SecondTitle title="使用限制" />
+      <FormItem
+        title="单次最多上传多少个文件"
+        description="用户上传知识库时，每次上传最多选择多少个文件"
+      >
+        <Input type="number" {...register('feConfigs.uploadFileMaxAmount')} placeholder="" />
+      </FormItem>
+      <FormItem
+        title="上传文件最大大小（M)"
+        description="用户上传知识库时，每个文件最大是多少。放大的话，需要注意网关也要设置得够大。"
+      >
+        <Input type="number" {...register('feConfigs.uploadFileMaxSize')} placeholder="" />
+      </FormItem>
+      <FormItem title="导出间隔时长(分钟)" description="">
+        <Input type="number" {...register('limit.exportDatasetLimitMinutes')} placeholder="" />
+      </FormItem>
+      <FormItem title="站点同步使用间隔时长(分钟)" description="">
+        <Input type="number" {...register('limit.websiteSyncLimitMinuted')} placeholder="" />
+      </FormItem>
+      <SecondTitle title="侧边栏配置" />
+      <Box p={6}>
+        <NavbarItems
+          value={watch('navbar')}
+          onChange={(e: any) => {
+            setValue('navbar', e);
+          }}
+          title="侧边栏配置"
+          description="移动端的侧边栏显示在账号 - 个人信息里"
+        />
+      </Box>
+    </SettingPage>
   );
 };
 

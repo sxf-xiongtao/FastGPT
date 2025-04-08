@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { connectToDatabase } from '@/service/mongo';
+
 import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { jsonRes } from '@fastgpt/service/common/response';
@@ -12,7 +12,7 @@ import { beforeUpdateConfig } from '@/service/admin/settings/hooks';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { fastgpt, fastgptPro } = req.body as ConfigStoreType;
-    await connectToDatabase();
+
     await adminCert({ req, authToken: true });
 
     if (!fastgpt && !fastgptPro) {

@@ -1,4 +1,3 @@
-import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { createUserByUsername } from '@/service/support/user/controller';
 import { getTeamByUsername } from '@/service/support/user/team/controller';
@@ -9,7 +8,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    await connectToDatabase();
     await adminCert({ req, authToken: true });
 
     const { username, password } = req.body;

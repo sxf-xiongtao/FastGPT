@@ -1,339 +1,130 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Button, Flex } from '@chakra-ui/react';
-import { useToast } from '@fastgpt/web/hooks/useToast';
-import { throttle } from '@/utils/tools';
+import React, { useState } from 'react';
+import { Box, Divider, Flex } from '@chakra-ui/react';
 import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';
 import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
-import { useQuery } from '@tanstack/react-query';
 import { getInitFormData, postUpdateConfig } from '@/web/core/config/api';
-import ImportModal from './components/ImportModal';
-import FormField from './components/FormField';
-import { Controller, useForm } from 'react-hook-form';
-import { ThirdPartyFormConfig } from './data/formConfig';
-import BoxCard from '@/components/common/BoxContainer/Card';
-import MyTag from '@fastgpt/web/components/common/Tag/index';
-import { useSystem } from '@fastgpt/web/hooks/useSystem';
+import { useForm } from 'react-hook-form';
 import MyIcon from '@fastgpt/web/components/common/Icon';
-
-interface formLevel {
-  key: string;
-  title: string;
-  type: string;
-  properties?: any;
-  description?: string;
-}
-
+import FirstTitle from '@/pageComponents/Settings/FirstTitle';
+import SettingPage from '@/pageComponents/Settings/SettingPage';
+import SecondTitle from '@/pageComponents/Settings/SecondTitle';
+import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
+import Switch from '@/pageComponents/Settings/Switch';
+import ThirdPartyVariables from './components/FormField/ThirdPartyVariables';
+import FormLabel from './components/FormLabel';
+import ThirdPartyAccountItem from './components/FormField/ThirdPartyAccountItem';
 interface titleType {
   mainTitle: string;
   subTitles: string[];
 }
 
 export const Settings = () => {
-  const [rawData, setRawData] = useState<any>({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [titles, setTitles] = useState<Array<titleType>>([]);
-  const [activeTitle, setActiveTitle] = useState('');
+  const [rawData, setRawData] = useState<ConfigFormType>();
 
-  const { toast } = useToast();
-  const { isPc } = useSystem();
+  const { setValue, reset, watch, handleSubmit, control } = useForm<ConfigFormType>();
 
-  const { reset, control, handleSubmit, setValue } = useForm();
-
-  useQuery(['getInitFormData'], () => getInitFormData(), {
+  const { loading: loadingConfig } = useRequest2(getInitFormData, {
     onSuccess: (data: ConfigStoreType) => {
-      setRawData(data);
-      const aggregatedConfigs: ConfigFormType = formatConfigStore2FormSchema(data);
-      reset(aggregatedConfigs);
-    },
-    onError: () => {
-      toast({
-        title: '获取配置出错',
-        status: 'error'
-      });
-    }
-  });
+      const aggregatedConfigs = formatConfigStore2FormSchema(data);
+      setRawData(aggregatedConfigs);
 
-  const onSubmit = async (data: any) => {
-    setIsLoading(true);
-    try {
-      const formData = formatFormData2ConfigStore(data);
-
-      await postUpdateConfig(formData);
-
-      toast({
-        title: '配置保存成功',
-        status: 'success',
-        duration: 2000,
-        isClosable: true,
-        position: 'top'
-      });
-    } catch (error) {
-      console.log(error);
-
-      toast({
-        title: '保存配置出错',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-        position: 'top'
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleScroll = throttle(() => {
-    let firstVisibleTitle: any = null;
-
-    titles.forEach((title: titleType) => {
-      title.subTitles.forEach((subTitle: string) => {
-        const subTitleElement = document.getElementById(subTitle);
-        if (!subTitleElement) return;
-
-        const subTitleRect = subTitleElement.getBoundingClientRect();
-        if (subTitleRect.top <= window.innerHeight && subTitleRect.bottom >= 0) {
-          if (
-            !firstVisibleTitle ||
-            subTitleRect.top < firstVisibleTitle.getBoundingClientRect().top
-          ) {
-            firstVisibleTitle = subTitleElement;
-          }
+      reset({
+        ...aggregatedConfigs,
+        externalProviderSettings: {
+          externalProviderWorkflowVariables:
+            aggregatedConfigs.externalProviderSettings?.externalProviderWorkflowVariables || []
         }
       });
-    });
+    },
+    errorToast: '获取配置出错',
+    manual: false
+  });
 
-    if (firstVisibleTitle) {
-      setActiveTitle(firstVisibleTitle.id);
+  const { loading: loadingSave, runAsync: saveConfig } = useRequest2(postUpdateConfig, {
+    manual: true,
+    successToast: '保存成功',
+    errorToast: '保存失败'
+  });
+
+  const onSubmit = handleSubmit((data) => {
+    if (!rawData) {
+      return;
     }
-  }, 100);
+    saveConfig(
+      formatFormData2ConfigStore({
+        ...rawData,
+        externalProviderSettings: {
+          ...rawData.externalProviderSettings,
+          externalProviderWorkflowVariables:
+            data.externalProviderSettings.externalProviderWorkflowVariables
+        },
+        siteSettings: {
+          ...rawData.siteSettings,
+          feConfigs: {
+            ...rawData.siteSettings.feConfigs,
+            show_openai_account: data.siteSettings.feConfigs.show_openai_account,
+            lafEnv: data.siteSettings.feConfigs.lafEnv
+          }
+        }
+      })
+    );
+  });
 
-  const formConfig = ThirdPartyFormConfig;
-  const firstLevels = Object.values(formConfig);
-
-  useEffect(() => {
-    const topLevelKeys = Object.keys(formConfig);
-
-    const secondLevelTitles: { [key: string]: string[] } = {};
-    for (const key in formConfig) {
-      const properties = formConfig[key].properties;
-      const secondLevelTitlesArr = Object.keys(properties).map(
-        (propKey) => properties[propKey].title
-      );
-      secondLevelTitles[key] = secondLevelTitlesArr;
+  const isLoading = loadingConfig || loadingSave;
+  const titles: Array<titleType> = [
+    {
+      mainTitle: '第三方账号配置',
+      subTitles: ['允许用户配置账号', '自定义工作流变量']
     }
-
-    const formattedOutput = topLevelKeys.map((title) => {
-      return { mainTitle: formConfig[title].title, subTitles: secondLevelTitles[title] };
-    });
-
-    setTitles(formattedOutput);
-    setActiveTitle(formattedOutput[0].mainTitle);
-  }, []);
+  ];
 
   return (
-    <Flex h={'100%'} gap={4}>
-      <Box overflowY={'auto'} flex={'1 0 0'} onScroll={handleScroll}>
-        {firstLevels.map((firstLevel) => {
-          const secondLevels: formLevel[] = Object.values(firstLevel.properties);
-          return (
-            <Box
-              key={firstLevel.title}
-              id={firstLevel.title}
-              mb={10}
-              border={'base'}
-              borderRadius={'lg'}
-              boxShadow={'3'}
-              bg={'white'}
-              overflow={'hidden'}
-            >
-              <Flex bg={'myGray.100'} alignItems={'center'}>
-                <Box fontSize={'lg'} color={'myGray.900'} fontWeight={'bold'} px={4} py={2}>
-                  {firstLevel.title}
-                </Box>
-                <Flex
-                  color={'primary.600'}
-                  alignItems={'center'}
-                  cursor={'pointer'}
-                  onClick={() => {
-                    window.open(
-                      'https://fael3z0zfze.feishu.cn/wiki/KOWaw6jkui5E3ekdOhvce4O9n4g?from=from_copylink'
-                    );
-                  }}
-                >
-                  <MyIcon name="book" w={'14px'} mr={1} />
-                  <Box fontSize={'mini'} fontWeight={'medium'}>
-                    查看文档
-                  </Box>
-                </Flex>
-              </Flex>
-              {secondLevels.map((secondLevel) => {
-                return (
-                  <Box
-                    key={secondLevel.title}
-                    px={6}
-                    py={6}
-                    _notLast={{
-                      borderBottomWidth: '1.5px',
-                      borderBottomColor: 'myGray.200'
-                    }}
-                  >
-                    {!!secondLevel.properties ? (
-                      <Box>
-                        <Flex id={secondLevel.title} color={'primary.600'} mb={5}>
-                          <MyTag fontSize={'md'} type="borderFill">
-                            {secondLevel.title}
-                          </MyTag>
-                        </Flex>
-                        <Flex pl={2} flexWrap={'wrap'}>
-                          {Object.values(secondLevel.properties).map((thirdLevel) => {
-                            const thirdLevelTyped = thirdLevel as formLevel;
-                            return (
-                              <Box
-                                key={thirdLevelTyped.title}
-                                {...(thirdLevelTyped.type === 'boolean'
-                                  ? {
-                                      w: '50%'
-                                    }
-                                  : {
-                                      w: '100%',
-                                      _notFirst: { mt: 5 }
-                                    })}
-                              >
-                                <Controller
-                                  control={control}
-                                  name={thirdLevelTyped.key}
-                                  render={({ field: { onChange, value } }) => (
-                                    <FormField
-                                      type={thirdLevelTyped.type}
-                                      title={thirdLevelTyped.title}
-                                      description={thirdLevelTyped.description || ''}
-                                      value={value}
-                                      onChange={(value) => {
-                                        console.log(thirdLevelTyped.key, value);
-                                        onChange(value);
-                                        setValue(thirdLevelTyped.key, value);
-                                      }}
-                                      level={3}
-                                    />
-                                  )}
-                                />
-                              </Box>
-                            );
-                          })}
-                        </Flex>
-                      </Box>
-                    ) : (
-                      <Controller
-                        control={control}
-                        name={secondLevel.key}
-                        render={({ field: { onChange, value } }) => (
-                          <FormField
-                            type={secondLevel.type}
-                            title={secondLevel.title}
-                            description={secondLevel.description || ''}
-                            value={value}
-                            onChange={onChange}
-                            level={2}
-                          />
-                        )}
-                      />
-                    )}
-                  </Box>
-                );
-              })}
-            </Box>
-          );
-        })}
-      </Box>
-      {/* 目录 */}
-      <Flex
-        flex={'0 0 200px'}
-        flexDirection={'column'}
-        position={!isPc ? 'absolute' : 'relative'}
-        gap={4}
-      >
-        <BoxCard
-          flex={'1 0 0'}
-          overflow={'overlay'}
-          display={['none', 'block']}
-          userSelect={'none'}
-          px={4}
-          py={4}
+    <SettingPage titles={titles} loading={isLoading} onSubmit={onSubmit}>
+      <Flex bg={'myGray.100'} alignItems={'center'}>
+        <FirstTitle title="第三方账号配置" />
+        <Flex
+          color={'primary.600'}
+          alignItems={'center'}
+          cursor={'pointer'}
+          onClick={() => {
+            window.open(
+              'https://fael3z0zfze.feishu.cn/wiki/KOWaw6jkui5E3ekdOhvce4O9n4g?from=from_copylink'
+            );
+          }}
         >
-          <Box>
-            {titles.map((title: titleType) => (
-              <Box key={title.mainTitle}>
-                <Box
-                  {...(activeTitle === title.mainTitle
-                    ? {
-                        bg: 'primary.600',
-                        color: 'white'
-                      }
-                    : {
-                        _hover: {
-                          color: 'primary.600'
-                        },
-                        onClick: () => {
-                          const anchor = document.getElementById(title.mainTitle);
-                          if (anchor) {
-                            anchor.scrollIntoView({ behavior: 'auto', block: 'start' });
-                          }
-                        }
-                      })}
-                  py={1}
-                  px={2}
-                  borderRadius={'md'}
-                  cursor={'pointer'}
-                >
-                  {title.mainTitle}
-                </Box>
-                <Box ml={3} fontSize={'sm'}>
-                  {title?.subTitles.map((subTitle: string) => (
-                    <Box
-                      key={subTitle}
-                      {...(activeTitle === subTitle
-                        ? {
-                            bg: 'primary.600',
-                            color: 'white'
-                          }
-                        : {
-                            _hover: {
-                              color: 'primary.600'
-                            },
-                            onClick: () => {
-                              const anchor = document.getElementById(subTitle);
-                              if (anchor) {
-                                anchor.scrollIntoView({ behavior: 'auto', block: 'start' });
-                              }
-                            }
-                          })}
-                      py={1}
-                      px={2}
-                      borderRadius={'md'}
-                      cursor={'pointer'}
-                    >
-                      {subTitle}
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
-            ))}
+          <MyIcon name="book" w={'14px'} mr={1} />
+          <Box fontSize={'mini'} fontWeight={'medium'}>
+            查看文档
           </Box>
-        </BoxCard>
-        <Box w={'100%'}>
-          <Box>
-            <ImportModal value={rawData} setFormData={reset} setRawData={setRawData}>
-              <Button variant={'whiteBase'} mb={3} w={'100%'} isLoading={isLoading}>
-                配置文件
-              </Button>
-            </ImportModal>
-          </Box>
-          <Button onClick={handleSubmit(onSubmit)} w={'100%'} isLoading={isLoading}>
-            保存
-          </Button>
-        </Box>
+        </Flex>
       </Flex>
-    </Flex>
+      <SecondTitle title="允许用户配置账号" />
+
+      <Flex px={6} alignItems={'center'} my={3}>
+        <FormLabel title="OpenAI/OneAPI 账号" description="" mb={2} minW={'240px'} />
+        <Switch control={control} name="siteSettings.feConfigs.show_openai_account" />
+      </Flex>
+      <Flex px={6}>
+        <FormLabel title="laf 账号" mb={2} minW={'240px'} />
+        <ThirdPartyAccountItem
+          value={watch('siteSettings.feConfigs.lafEnv') || ''}
+          onChange={(val) => {
+            setValue('siteSettings.feConfigs.lafEnv', val);
+          }}
+          description="请输入 laf 地址"
+        />
+      </Flex>
+      <Divider mt="4" />
+      <Box p={6}>
+        <ThirdPartyVariables
+          value={watch(`externalProviderSettings.externalProviderWorkflowVariables`)}
+          onChange={(val) => {
+            setValue(`externalProviderSettings.externalProviderWorkflowVariables`, val);
+          }}
+          title="自定义工作流变量"
+        />
+      </Box>
+    </SettingPage>
   );
 };
 

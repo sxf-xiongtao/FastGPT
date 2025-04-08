@@ -1,6 +1,6 @@
 import { reComputeStandPlans } from '@/pages/api/support/wallet/bill/checkPayResult';
 import { NextAPI } from '@/service/middleware/entry';
-import { connectToDatabase } from '@/service/mongo';
+
 import { adminCert } from '@/service/support/permission/adminCert';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';

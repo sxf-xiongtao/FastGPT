@@ -1,4 +1,3 @@
-import { connectToDatabase } from '@/service/mongo';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { TeamMemberItemType } from '@fastgpt/global/support/user/team/type';
 import { jsonRes } from '@fastgpt/service/common/response';
@@ -9,7 +8,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    await connectToDatabase();
     await adminCert({ req, authToken: true });
 
     const teamId = (req.query.teamId as string) || '';

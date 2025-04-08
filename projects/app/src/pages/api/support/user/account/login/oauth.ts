@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import axios from 'axios';
 import { parseQueryString } from '@/utils/tools';
-import { connectToDatabase } from '@/service/mongo';
+
 import jwt from 'jsonwebtoken';
 import { setCookie } from '@fastgpt/service/support/permission/controller';
 import { usernameLogin } from '@/service/support/user/controller';
@@ -23,7 +23,6 @@ type OauthResponse = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
-    await connectToDatabase();
     const { type, callbackUrl, inviterId, bd_vid, fastgpt_sem, sourceDomain, props } =
       req.body as OauthLoginProps;
 

@@ -79,14 +79,14 @@ export default function DashBoard() {
   const { data: chartData = [], loading: isLoadingChart } = useRequest2(
     async () => {
       const [userResponse, payResponse, chatResponse, pointResponse] = await Promise.all([
-        GET<FetchChatData[]>(`admin/routes/dashboard/getUserFormData`, {
+        GET<FetchChatData[]>(`/admin/routes/dashboard/getUserFormData`, {
           day: dateRange
         }),
-        GET<FetchChatData[]>(`admin/routes/dashboard/getPaysFormData`, { day: dateRange }),
-        GET<FetchChatData[]>(`admin/routes/dashboard/getChatFormData`, {
+        GET<FetchChatData[]>(`/admin/routes/dashboard/getPaysFormData`, { day: dateRange }),
+        GET<FetchChatData[]>(`/admin/routes/dashboard/getChatFormData`, {
           day: dateRange
         }),
-        GET<FetchChatData[]>(`admin/routes/dashboard/getPointUsages`, { day: dateRange })
+        GET<FetchChatData[]>(`/admin/routes/dashboard/getPointUsages`, { day: dateRange })
       ]);
 
       const data = userResponse.map((item, i) => {

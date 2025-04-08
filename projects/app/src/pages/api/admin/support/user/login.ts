@@ -2,17 +2,16 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
-import { connectToDatabase } from '@/service/mongo';
+
 import type { PostLoginProps } from '@fastgpt/global/support/user/api.d';
 import { getUserDetail } from '@fastgpt/service/support/user/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    await connectToDatabase();
     const { username, password } = req.body as PostLoginProps;
 
     if (!username || !password) {
-      throw new Error('缺少参数');
+      throw new Error('username or password is required');
     }
 
     if (username !== 'root') {

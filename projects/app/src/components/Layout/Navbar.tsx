@@ -95,7 +95,7 @@ const LIST = [
       },
       {
         activeLink: '/settings/config/model',
-        name: '模型配置',
+        name: '安全审查',
         icon: 'common/model'
       },
       {

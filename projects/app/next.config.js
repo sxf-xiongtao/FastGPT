@@ -82,8 +82,10 @@ const nextConfig = {
     serverComponentsExternalPackages: [
       'mongoose',
       'pg',
+      'bullmq',
       '@zilliz/milvus2-sdk-node',
-      "tiktoken",
+      'tiktoken',
+      'crawlee'
     ],
     outputFileTracingRoot: path.join(__dirname, '../../'),
     instrumentationHook: true
