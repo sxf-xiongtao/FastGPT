@@ -1,9 +1,18 @@
+import { censorCheckRequest } from '@/pages/api/common/censor/check';
+import {
+  getProApiDatasetFileContentRequest,
+  getProApiDatasetFileListRequest,
+  getProApiDatasetFilePreviewUrlRequest
+} from '@/pages/api/core/dataset/systemApiDataset';
 import { SystemConfigType } from '@/types';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
 import { FastGPTConfigFileType } from '@fastgpt/global/common/system/types';
 import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema';
 import { initFastGPTConfig } from '@fastgpt/service/common/system/tools';
 import { loadSystemModels } from '@fastgpt/service/core/ai/config/utils';
+import { deepRagSearch } from './core/dataset/search';
+import { openapiAuthLimitRequest } from '@/pages/api/support/openapi/authLimit';
+import { concatUsageRequest, createUsageRequest } from './support/wallet/usage/utils';
 
 export const getProInitData = async () => {
   try {
@@ -47,6 +56,18 @@ export const getProInitData = async () => {
 };
 
 export function initGlobalVariables() {
+  function initPlusRequest() {
+    global.textCensorHandler = censorCheckRequest;
+    global.deepRagHandler = deepRagSearch;
+    global.authOpenApiHandler = openapiAuthLimitRequest;
+    global.createUsageHandler = createUsageRequest;
+    global.concatUsageHandler = concatUsageRequest;
+
+    global.getProApiDatasetFileList = getProApiDatasetFileListRequest;
+    global.getProApiDatasetFileContent = getProApiDatasetFileContentRequest;
+    global.getProApiDatasetFilePreviewUrl = getProApiDatasetFilePreviewUrlRequest;
+  }
+
   global.sendInformQueue = [];
   global.sendInformQueueLen = 0;
 
@@ -57,4 +78,6 @@ export function initGlobalVariables() {
 
   global.autoTrainingLen = 0;
   global.imageParseQueueLen = 0;
+
+  initPlusRequest();
 }

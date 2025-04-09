@@ -1,23 +1,15 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { jsonRes } from '@fastgpt/service/common/response';
+import type { NextApiResponse } from 'next';
 
 import { ConcatUsageProps } from '@fastgpt/global/support/wallet/usage/api.d';
-import { addLog } from '@fastgpt/service/common/system/log';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { concatUsage } from '@fastgpt/service/support/wallet/usage/controller';
+import { NextAPI } from '@/service/middleware/entry';
+import { ApiRequestProps } from '@fastgpt/service/type/next';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    await authCert({ req, authRoot: true });
-    const body = req.body as ConcatUsageProps;
+async function handler(req: ApiRequestProps<ConcatUsageProps>, res: NextApiResponse) {
+  await authCert({ req, authRoot: true });
 
-    await concatUsage(body);
-
-    jsonRes(res);
-  } catch (err) {
-    addLog.error('Push Concat Usage Error', err);
-    console.log(err);
-
-    jsonRes(res);
-  }
+  await concatUsage(req.body);
 }
+
+export default NextAPI(handler);

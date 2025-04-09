@@ -1,77 +1,92 @@
 import { NextAPI } from '@/service/middleware/entry';
-import { NextApiRequest, NextApiResponse } from 'next';
-import {
-  APIFileItem,
-  ApiFileReadContentResponse,
-  FeishuServer,
-  YuqueServer
-} from '@fastgpt/global/core/dataset/apiDataset';
+import { NextApiResponse } from 'next';
+import { APIFileItem, ApiFileReadContentResponse } from '@fastgpt/global/core/dataset/apiDataset';
 import { useFeishuDatasetRequest } from '@/service/core/dataset/feishuDataset/api';
 import { useYuqueDatasetRequest } from '@/service/core/dataset/yuqueDataset/api';
-
-export enum FileOperationType {
-  LIST = 'list',
-  READ = 'read',
-  CONTENT = 'content'
-}
-
-export type FileOperationQuery = {};
-
-export type FileOperationBody = {
-  type: FileOperationType;
-  apiFileId?: string;
-  parentId?: string | null;
-  feishuServer?: FeishuServer;
-  yuqueServer?: YuqueServer;
-};
+import { ApiRequestProps } from '@fastgpt/service/type/next';
+import {
+  GetProApiDatasetFileContentParams,
+  GetProApiDatasetFileListParams,
+  GetProApiDatasetFilePreviewUrlParams,
+  ProApiDatasetCommonParams,
+  ProApiDatasetOperationTypeEnum
+} from '@fastgpt/service/core/dataset/apiDataset/proApi';
+import { ParentIdType } from '@fastgpt/global/common/parentFolder/type';
 
 export type FileOperationResponse = APIFileItem[] | string | ApiFileReadContentResponse;
 
+export type ProApiDatasetOperationParams = ProApiDatasetCommonParams &
+  (
+    | { type: ProApiDatasetOperationTypeEnum.LIST; parentId?: ParentIdType }
+    | {
+        type: ProApiDatasetOperationTypeEnum.READ;
+        apiFileId: string;
+      }
+    | {
+        type: ProApiDatasetOperationTypeEnum.CONTENT;
+        apiFileId: string;
+      }
+  );
+
+export type ProApiDatasetOperationResponse = APIFileItem[] | string | ApiFileReadContentResponse;
+
 async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<FileOperationResponse>
-): Promise<FileOperationResponse> {
-  const {
-    type,
-    apiFileId,
-    parentId = null,
-    feishuServer,
-    yuqueServer
-  } = req.body as FileOperationBody;
+  req: ApiRequestProps<ProApiDatasetOperationParams>,
+  res: NextApiResponse
+): Promise<ProApiDatasetOperationResponse> {
+  const type = req.body.type;
 
-  if (!feishuServer && !yuqueServer) {
-    return Promise.reject('feishuServer or yuqueServer is required');
+  if (type === ProApiDatasetOperationTypeEnum.LIST) {
+    return getProApiDatasetFileListRequest(req.body);
   }
-
-  if (feishuServer) {
-    const feishuRequest = useFeishuDatasetRequest({ feishuServer });
-    switch (type) {
-      case FileOperationType.LIST:
-        return feishuRequest.listFiles({ parentId });
-      case FileOperationType.READ:
-        return feishuRequest.getFilePreviewUrl({ apiFileId: apiFileId! });
-      case FileOperationType.CONTENT:
-        return feishuRequest.getFileContent({ apiFileId: apiFileId! });
-      default:
-        return Promise.reject('Invalid operation type');
-    }
+  if (type === ProApiDatasetOperationTypeEnum.READ) {
+    return getProApiDatasetFilePreviewUrlRequest(req.body);
   }
-
-  if (yuqueServer) {
-    const yuqueRequest = useYuqueDatasetRequest({ yuqueServer });
-    switch (type) {
-      case FileOperationType.LIST:
-        return yuqueRequest.listFiles({ parentId });
-      case FileOperationType.READ:
-        return yuqueRequest.getFilePreviewUrl({ apiFileId: apiFileId! });
-      case FileOperationType.CONTENT:
-        return yuqueRequest.getFileContent({ apiFileId: apiFileId! });
-      default:
-        return Promise.reject('Invalid operation type');
-    }
+  if (type === ProApiDatasetOperationTypeEnum.CONTENT) {
+    return getProApiDatasetFileContentRequest(req.body);
   }
 
   return Promise.reject('No valid server configuration provided');
 }
 
 export default NextAPI(handler);
+
+export const getProApiDatasetFileListRequest = async ({
+  feishuServer,
+  yuqueServer,
+  parentId
+}: GetProApiDatasetFileListParams) => {
+  if (feishuServer) {
+    return useFeishuDatasetRequest({ feishuServer }).listFiles({ parentId });
+  }
+  if (yuqueServer) {
+    return useYuqueDatasetRequest({ yuqueServer }).listFiles({ parentId });
+  }
+  return Promise.reject('No valid server configuration provided');
+};
+export const getProApiDatasetFileContentRequest = async ({
+  apiFileId,
+  feishuServer,
+  yuqueServer
+}: GetProApiDatasetFileContentParams) => {
+  if (feishuServer) {
+    return useFeishuDatasetRequest({ feishuServer }).getFileContent({ apiFileId });
+  }
+  if (yuqueServer) {
+    return useYuqueDatasetRequest({ yuqueServer }).getFileContent({ apiFileId });
+  }
+  return Promise.reject('No valid server configuration provided');
+};
+export const getProApiDatasetFilePreviewUrlRequest = async ({
+  apiFileId,
+  feishuServer,
+  yuqueServer
+}: GetProApiDatasetFilePreviewUrlParams) => {
+  if (feishuServer) {
+    return useFeishuDatasetRequest({ feishuServer }).getFilePreviewUrl({ apiFileId });
+  }
+  if (yuqueServer) {
+    return useYuqueDatasetRequest({ yuqueServer }).getFilePreviewUrl({ apiFileId });
+  }
+  return Promise.reject('No valid server configuration provided');
+};

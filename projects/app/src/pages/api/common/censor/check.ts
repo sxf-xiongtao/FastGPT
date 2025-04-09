@@ -17,9 +17,16 @@ async function handler(
   req: ApiRequestProps<CustomCensorCheckBody, CustomCensorCheckQuery>,
   _res: ApiResponseType<any>
 ): Promise<CustomCensorCheckResponse> {
-  const { text } = req.body;
   await authCert({ req, authRoot: true });
 
+  return censorCheckRequest(req.body);
+}
+
+export default NextAPI(handler);
+
+export const censorCheckRequest = ({
+  text
+}: CustomCensorCheckBody): Promise<CustomCensorCheckResponse> => {
   try {
     if (global.systemConfig.censor?.customCensorURL) {
       return censorCheckCustom(text);
@@ -27,10 +34,8 @@ async function handler(
 
     return censorCheckBaidu(text);
   } catch (error) {
-    return {
+    return Promise.resolve({
       code: 200
-    };
+    });
   }
-}
-
-export default NextAPI(handler);
+};
