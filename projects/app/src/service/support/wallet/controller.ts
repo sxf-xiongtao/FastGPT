@@ -1,6 +1,6 @@
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { addLog } from '@fastgpt/service/common/system/log';
-import { delay } from '@fastgpt/global/common/system/utils';
+import { delay, retryFn } from '@fastgpt/global/common/system/utils';
 import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
 import type { ConcatBillQueueItemType } from '@fastgpt/service/support/wallet/usage/type';
 import { ClientSession } from '@fastgpt/service/common/mongo';
@@ -15,12 +15,10 @@ const batchUpdateTime = Number(process.env.BATCH_UPDATE_TIME || 3000);
 export async function updateTeamBalance({
   teamId,
   amount,
-  retry = 3,
   session
 }: {
   teamId: string;
   amount: number;
-  retry?: number;
   session?: ClientSession;
 }): Promise<any> {
   if (amount === 0) return;
@@ -30,37 +28,24 @@ export async function updateTeamBalance({
     amount
   });
 
-  try {
-    await MongoTeam.findByIdAndUpdate(
-      teamId,
+  return retryFn(() =>
+    MongoTeam.updateOne(
+      { _id: teamId },
       {
         $inc: { balance: amount }
       },
       { session }
-    );
-  } catch (error) {
-    if (session) {
-      return Promise.reject(error);
-    }
-
-    console.log(error, retry);
-
-    if (retry > 0) {
-      await delay(100);
-      return updateTeamBalance({ teamId, amount, retry: retry - 1, session });
-    }
-  }
+    )
+  );
 }
 
-export const incTeamAiPoints = async ({
+const incTeamAiPoints = async ({
   teamId,
   totalPoints,
-  retry = 3,
   session
 }: {
   teamId: string;
   totalPoints: number;
-  retry?: number;
   session?: ClientSession;
 }): Promise<any> => {
   if (totalPoints === 0) return;
@@ -69,7 +54,7 @@ export const incTeamAiPoints = async ({
     teamId,
     totalPoints
   });
-  try {
+  return retryFn(async () => {
     // 先按日期过期的先扣
     const updateResult = await MongoTeamSub.findOneAndUpdate(
       {
@@ -81,13 +66,15 @@ export const incTeamAiPoints = async ({
         $inc: { surplusPoints: totalPoints }
       },
       { session }
-    ).sort({
-      expiredTime: 1
-    });
+    )
+      .sort({
+        expiredTime: 1
+      })
+      .lean();
 
     // 如果没有一个扣除成功，就直接扣余额多的
     if (!updateResult) {
-      await MongoTeamSub.findOneAndUpdate(
+      await MongoTeamSub.updateOne(
         {
           teamId,
           type: [SubTypeEnum.standard, SubTypeEnum.extraPoints]
@@ -100,18 +87,7 @@ export const incTeamAiPoints = async ({
         surplusPoints: -1
       });
     }
-  } catch (error) {
-    if (session) {
-      return Promise.reject(error);
-    }
-
-    console.log(error, retry);
-
-    if (retry > 0) {
-      await delay(100);
-      return incTeamAiPoints({ teamId, totalPoints, retry: retry - 1, session });
-    }
-  }
+  });
 };
 
 export const reduceAiPointsTimer = async () => {
@@ -181,16 +157,19 @@ export const concatBillTimer = async () => {
     for await (const item of concatList) {
       const { billId, listIndex, totalPoints, inputTokens, outputTokens } = item;
       try {
-        await MongoUsage.findByIdAndUpdate(billId, {
-          $inc: {
-            totalPoints,
-            ...(listIndex !== undefined && {
-              [`list.${listIndex}.amount`]: totalPoints,
-              [`list.${listIndex}.inputTokens`]: inputTokens,
-              [`list.${listIndex}.outputTokens`]: outputTokens
-            })
+        await MongoUsage.updateOne(
+          { _id: billId },
+          {
+            $inc: {
+              totalPoints,
+              ...(listIndex !== undefined && {
+                [`list.${listIndex}.amount`]: totalPoints,
+                [`list.${listIndex}.inputTokens`]: inputTokens,
+                [`list.${listIndex}.outputTokens`]: outputTokens
+              })
+            }
           }
-        });
+        );
       } catch (error) {
         addLog.error('Concat bill error', error);
       }

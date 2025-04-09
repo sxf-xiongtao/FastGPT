@@ -1,6 +1,5 @@
 import type { Agent } from 'http';
 import type { Pool } from 'pg';
-import type { ConcatBillQueueItemType } from '@fastgpt/service/support/wallet/usage/type';
 import {
   FastGPTConfigFileType,
   FastGPTFeConfigsType,
@@ -103,9 +102,6 @@ declare global {
 
   var sendInformQueue: (() => Promise<void>)[];
   var sendInformQueueLen: number;
-
-  var reduceAiPointsQueue: { teamId: string; totalPoints: number }[];
-  var concatBillQueue: ConcatBillQueueItemType[];
 
   var autoTrainingLen: number;
   var imageParseQueueLen: number;

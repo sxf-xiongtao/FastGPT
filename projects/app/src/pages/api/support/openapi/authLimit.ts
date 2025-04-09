@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiResponse } from 'next';
 import type { AuthOpenApiLimitProps } from '@fastgpt/service/support/openapi/auth';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { NextAPI } from '@/service/middleware/entry';
@@ -6,8 +6,12 @@ import { ApiRequestProps } from '@fastgpt/service/type/next';
 
 async function handler(req: ApiRequestProps<AuthOpenApiLimitProps>, res: NextApiResponse) {
   await authCert({ req, authRoot: true });
-  const { openApi } = req.body;
+  return openapiAuthLimitRequest(req.body);
+}
 
+export default NextAPI(handler);
+
+export const openapiAuthLimitRequest = ({ openApi }: AuthOpenApiLimitProps) => {
   // expiredTime already 2 string
   if (openApi?.limit?.expiredTime && new Date(openApi.limit.expiredTime).getTime() < Date.now()) {
     return Promise.reject(`Key ${openApi.apiKey} is expired`);
@@ -20,7 +24,5 @@ async function handler(req: ApiRequestProps<AuthOpenApiLimitProps>, res: NextApi
     return Promise.reject(`Key ${openApi.apiKey} is over usage`);
   }
 
-  return;
-}
-
-export default NextAPI(handler);
+  return Promise.resolve();
+};

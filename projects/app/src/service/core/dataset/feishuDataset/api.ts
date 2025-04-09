@@ -1,4 +1,5 @@
 import type {
+  APIFileItem,
   ApiFileReadContentResponse,
   FeishuServer
 } from '@fastgpt/global/core/dataset/apiDataset';
@@ -102,7 +103,7 @@ export const useFeishuDatasetRequest = ({ feishuServer }: { feishuServer: Feishu
       .catch((err) => responseError(err));
   };
 
-  const listFiles = async ({ parentId }: { parentId?: ParentIdType }) => {
+  const listFiles = async ({ parentId }: { parentId?: ParentIdType }): Promise<APIFileItem[]> => {
     const fetchFiles = async (pageToken?: string): Promise<feishuFileListResponse['files']> => {
       const data = await request<feishuFileListResponse>(
         `/open-apis/drive/v1/files`,
@@ -161,7 +162,7 @@ export const useFeishuDatasetRequest = ({ feishuServer }: { feishuServer: Feishu
     };
   };
 
-  const getFilePreviewUrl = async ({ apiFileId }: { apiFileId: string }) => {
+  const getFilePreviewUrl = async ({ apiFileId }: { apiFileId: string }): Promise<string> => {
     const { metas } = await request<{ metas: { url: string }[] }>(
       `/open-apis/drive/v1/metas/batch_query`,
       {
