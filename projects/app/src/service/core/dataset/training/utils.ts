@@ -116,17 +116,5 @@ export const formatSplitText2Index = ({
       : [])
   ];
 
-  const { chunks } = splitText2Chunks({
-    text: rawText,
-    chunkSize: chunkAutoChunkSize,
-    maxSize: getLLMMaxChunkSize(llmModel)
-  });
-  indexes.push(
-    ...chunks.map((item) => ({
-      text: item,
-      type: DatasetDataIndexTypeEnum.custom
-    }))
-  );
-
   return indexes;
 };
