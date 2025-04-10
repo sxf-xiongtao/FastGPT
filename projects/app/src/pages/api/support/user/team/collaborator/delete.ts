@@ -11,6 +11,7 @@ import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { TeamManagePermissionVal } from '@fastgpt/global/support/permission/user/constant';
 import { TeamPermission } from '@fastgpt/global/support/permission/user/controller';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
+import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 
 export type removeQuery = RequireOnlyOne<{
   tmbId?: string;
@@ -27,7 +28,7 @@ async function handler(
   const { tmbId, groupId, orgId } = req.query;
 
   if (!tmbId && !groupId && !orgId) {
-    return Promise.reject('tmbId or groupId is required');
+    return Promise.reject(CommonErrEnum.missingParams);
   }
 
   // 至少要管理员才能改权限
@@ -48,6 +49,7 @@ async function handler(
       {
         resourceType: PerResourceTypeEnum.team,
         teamId,
+        resourceId: null,
         ...(tmbId ? { tmbId } : {}),
         ...(groupId ? { groupId } : {}),
         ...(orgId ? { orgId } : {})

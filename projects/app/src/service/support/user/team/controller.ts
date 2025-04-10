@@ -33,15 +33,12 @@ import { DefaultGroupName } from '@fastgpt/global/support/user/team/group/consta
 import { UserModelSchema } from '@fastgpt/global/support/user/type';
 import { TeamSchema } from '@fastgpt/global/support/user/team/type';
 import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
-import { MongoUser, userCollectionName } from '@fastgpt/service/support/user/schema';
+import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { Types } from '@fastgpt/service/common/mongo';
 import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
 import { MongoOrgMemberModel } from '@fastgpt/service/support/permission/org/orgMemberSchema';
-import { replaceRegChars } from '@fastgpt/global/common/string/tools';
 import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
 import { PermissionValueType } from '@fastgpt/global/support/permission/type';
-import { withDefaultProps } from '@chakra-ui/react';
-import { getRootOrg } from './org/utils';
 
 /* -------- format --------- */
 export async function teamMemberSchema2TeamItemType(
@@ -370,7 +367,7 @@ export async function getTeamMember({
     status: member.status,
     permission: new TeamPermission({
       per: per ?? TeamDefaultPermissionVal,
-      isOwner: member.role === TeamMemberRoleEnum.owner
+      isOwner: String(team.ownerId) === String(member.userId)
     }),
     createTime: member.createTime,
     updateTime: member.updateTime,

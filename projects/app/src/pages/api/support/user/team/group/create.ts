@@ -7,6 +7,7 @@ import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/membe
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { postCreateGroupData } from '@fastgpt/global/support/user/team/group/api';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
+import { parseHeaderCert } from '@fastgpt/service/support/permission/controller';
 
 export type GroupCreateQuery = {};
 export type GroupCreateBody = postCreateGroupData;

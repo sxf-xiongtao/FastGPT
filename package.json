@@ -7,20 +7,20 @@
     "format": "prettier --config \"./.prettierrc.js\" --write \"./projects/**/src/**/*.{ts,tsx,scss}\"",
     "gen:theme-typings": "chakra-cli tokens FastGPT/packages/web/styles/theme.ts --out node_modules/.pnpm/node_modules/@chakra-ui/styled-system/dist/theming.types.d.ts",
     "postinstall": "pnpm gen:theme-typings",
-    "test": "vitest"
+    "test": "vitest run"
   },
   "devDependencies": {
-    "vitest": "^3.0.9",
-    "vitest-mongodb": "^1.0.1",
-    "@vitest/coverage-v8": "^3.0.9",
     "@chakra-ui/cli": "^2.4.1",
     "@types/node": "^20.14.2",
+    "@vitest/coverage-v8": "^3.0.9",
     "husky": "^8.0.3",
     "i18next": "23.16.8",
     "lint-staged": "^13.3.0",
+    "mongodb-memory-server": "^10.1.4",
     "next-i18next": "15.4.2",
+    "prettier": "3.2.4",
     "react-i18next": "14.1.2",
-    "prettier": "3.2.4"
+    "vitest": "^3.0.9"
   },
   "resolutions": {
     "react": "18.3.1",

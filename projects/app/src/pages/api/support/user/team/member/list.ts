@@ -14,7 +14,7 @@ import { MongoOrgMemberModel } from '@fastgpt/service/support/permission/org/org
 import { TeamMemberStatusEnum } from '@fastgpt/global/support/user/team/constant';
 import { UserModelSchema } from '@fastgpt/global/support/user/type';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
-import { Types } from 'mongoose';
+import { Types } from '@fastgpt/service/common/mongo';
 import { replaceRegChars } from '@fastgpt/global/common/string/tools';
 import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
 

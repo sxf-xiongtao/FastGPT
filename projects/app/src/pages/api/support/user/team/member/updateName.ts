@@ -2,13 +2,14 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { NextAPI } from '@/service/middleware/entry';
+import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { name } = req.body as { name: string };
   const { tmbId } = await authCert({ req, authToken: true });
 
   if (!name) {
-    throw new Error('name is required');
+    return Promise.reject(CommonErrEnum.missingParams);
   }
 
   await MongoTeamMember.findByIdAndUpdate(tmbId, {

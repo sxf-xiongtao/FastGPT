@@ -28,6 +28,18 @@ async function handler(
     return Promise.reject(CommonErrEnum.missingParams);
   }
 
+  // Update permission
+  // 至少要管理员才能改权限
+  const {
+    permission: userPer,
+    teamId,
+    isRoot
+  } = await authUserPer({
+    req,
+    authToken: true,
+    per: TeamManagePermissionVal
+  });
+
   // 构建更新列表
   const updateList: { tmbId?: string; groupId?: string; orgId?: string }[] = [];
   members.forEach((v) => {
@@ -46,7 +58,6 @@ async function handler(
     });
   });
 
-  // Add member, zero permission
   if (permission === undefined) {
     const { teamId } = await authUserPer({
       req,
@@ -54,36 +65,71 @@ async function handler(
       per: TeamManagePermissionVal
     });
 
-    const bulkOps = updateList.map((v) => ({
-      updateOne: {
-        filter: {
+    return mongoSessionRun(async (session) => {
+      const documentsToInsert = (() => {
+        const docs: {
+          teamId: string;
+          resourceType: PerResourceTypeEnum;
+          tmbId?: string;
+          groupId?: string;
+          orgId?: string;
+        }[] = [];
+        members.forEach((tmbId) => {
+          docs.push({
+            teamId,
+            resourceType: PerResourceTypeEnum.team,
+            tmbId
+          });
+        });
+        groups.forEach((groupId) => {
+          docs.push({
+            teamId,
+            resourceType: PerResourceTypeEnum.team,
+            groupId
+          });
+        });
+        orgs.forEach((orgId) => {
+          docs.push({
+            teamId,
+            resourceType: PerResourceTypeEnum.team,
+            orgId
+          });
+        });
+        return docs;
+      })();
+
+      const existingDocuments = await MongoResourcePermission.find(
+        {
           teamId,
           resourceType: PerResourceTypeEnum.team,
-          ...v
+          resourceId: null
         },
-        update: {
-          $set: { permission: TeamDefaultPermissionVal }
-        },
-        upsert: true
-      }
-    }));
+        null,
+        { session }
+      );
+      // 过滤出需要插入的文档
+      const newDocuments = documentsToInsert
+        .filter((v) => {
+          return !existingDocuments.some(
+            (d) =>
+              (v.tmbId && String(v.tmbId) === String(d.tmbId)) ||
+              (v.groupId && String(v.groupId) === String(d.groupId)) ||
+              (v.orgId && String(v.orgId) === String(d.orgId))
+          );
+        })
+        .map((doc) => ({
+          ...doc,
+          permission: TeamDefaultPermissionVal
+        }));
 
-    return mongoSessionRun(async (session) => {
-      await MongoResourcePermission.bulkWrite(bulkOps, { session });
+      // 插入新文档
+      if (newDocuments.length > 0) {
+        await MongoResourcePermission.insertMany(newDocuments, {
+          session
+        });
+      }
     });
   }
-
-  // Update permission
-  // 至少要管理员才能改权限
-  const {
-    permission: userPer,
-    teamId,
-    isRoot
-  } = await authUserPer({
-    req,
-    authToken: true,
-    per: TeamManagePermissionVal
-  });
 
   // Auth
   const updatePer = new TeamPermission({ per: permission });

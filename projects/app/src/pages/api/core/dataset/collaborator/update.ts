@@ -33,7 +33,10 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
     permission
   } = req.body;
 
-  if (tmbIds === undefined && groupIds === undefined && orgIds === undefined) {
+  if (
+    (tmbIds === undefined && groupIds === undefined && orgIds === undefined) ||
+    permission === undefined
+  ) {
     return Promise.reject(CommonErrEnum.missingParams);
   }
 

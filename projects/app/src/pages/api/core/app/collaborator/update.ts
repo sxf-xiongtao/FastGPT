@@ -42,7 +42,10 @@ async function handler(req: NextApiRequest) {
   } = req.body as UpdateAppCollaboratorBody;
 
   // check params
-  if (tmbIds === undefined && groupIds === undefined && orgIds === undefined) {
+  if (
+    (tmbIds === undefined && groupIds === undefined && orgIds === undefined) ||
+    permission === undefined
+  ) {
     return Promise.reject(CommonErrEnum.missingParams);
   }
 

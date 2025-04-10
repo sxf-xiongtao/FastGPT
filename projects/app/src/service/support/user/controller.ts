@@ -482,39 +482,38 @@ export async function removeUserFromTeam({
   memberId: string;
   session?: ClientSession;
 }) {
-  const removeTmb = await MongoTeamMember.findOne(
-    {
-      teamId,
-      _id: memberId
-    },
-    undefined,
-    { session }
-  );
-  if (!removeTmb) {
-    return Promise.reject('member not exist');
-  }
-
-  const ownerTmb = await MongoTeamMember.findOne(
-    {
-      teamId,
-      role: TeamMemberRoleEnum.owner
-    },
-    undefined,
-    { session }
-  );
-  if (!ownerTmb) {
-    return Promise.reject('owner not exist');
-  }
-
-  const memberTmbId = String(memberId);
-  const teamOwnerTmbId = String(ownerTmb._id);
-
-  if (teamOwnerTmbId === memberTmbId) {
-    return Promise.reject('owner can not be deleted');
-  }
-
   // Transfer source
   const func = async (session: ClientSession) => {
+    const removeTmb = await MongoTeamMember.findOne(
+      {
+        teamId,
+        _id: memberId
+      },
+      undefined,
+      { session }
+    );
+    if (!removeTmb) {
+      return Promise.reject('member not exist');
+    }
+
+    const ownerTmb = await MongoTeamMember.findOne(
+      {
+        teamId,
+        role: TeamMemberRoleEnum.owner
+      },
+      undefined,
+      { session }
+    );
+    if (!ownerTmb) {
+      return Promise.reject('owner not exist');
+    }
+
+    const memberTmbId = String(memberId);
+    const teamOwnerTmbId = String(ownerTmb._id);
+
+    if (teamOwnerTmbId === memberTmbId) {
+      return Promise.reject('owner can not be deleted');
+    }
     // Transfer group to team owner
     const groups = await getGroupsByTmbId({
       tmbId: memberTmbId,

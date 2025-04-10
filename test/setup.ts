@@ -1,67 +1,45 @@
-import { readFileSync } from 'fs';
-import mongoose from '@fastgpt/service/common/mongo';
+import { connectionLogMongo, connectionMongo, Mongoose } from '@fastgpt/service/common/mongo';
 import { connectMongo } from '@fastgpt/service/common/mongo/init';
-import {
-  connectionMongo,
-  connectionLogMongo,
-  MONGO_URL,
-  MONGO_LOG_URL
-} from '@fastgpt/service/common/mongo';
-import { afterAll, afterEach, beforeAll, vi } from 'vitest';
-import { setup, teardown } from 'vitest-mongodb';
+import { afterAll, beforeAll, beforeEach, vi, inject } from 'vitest';
 import '@test/mocks';
+import { clean } from '../FastGPT/test/datas/users';
+import { randomUUID } from 'crypto';
 
 vi.stubEnv('NODE_ENV', 'test');
 
-vi.mock(import('@fastgpt/service/common/mongo'), async (importOriginal) => {
+vi.mock(import('@fastgpt/service/common/mongo/init'), async (importOriginal: any) => {
   const mod = await importOriginal();
   return {
     ...mod,
-    connectionMongo: await (async () => {
-      if (!global.mongodb) {
-        global.mongodb = mongoose;
-        await global.mongodb.connect((globalThis as any).__MONGO_URI__ as string);
-      }
-
-      return global.mongodb;
-    })()
+    connectMongo: async (db: Mongoose, url: string) => {
+      (await db.connect(url)).connection.useDb(randomUUID());
+    }
   };
 });
 
 beforeAll(async () => {
-  await setup({
-    type: 'replSet',
-    serverOptions: {
-      replSet: {
-        count: 2
-      }
-    }
-  });
-  vi.stubEnv('MONGODB_URI', (globalThis as any).__MONGO_URI__);
-  // initGlobalVariables();
-  await connectMongo(connectionMongo, MONGO_URL);
-  await connectMongo(connectionLogMongo, MONGO_LOG_URL);
-
-  // const str = readFileSync('projects/app/.env.local', 'utf-8');
-  // const lines = str.split('\n');
-  // const systemEnv: Record<string, string> = {};
-  // for (const line of lines) {
-  //   const [key, value] = line.split('=');
-  //   if (key && value && !key.startsWith('#')) {
-  //     systemEnv[key] = value;
-  //     vi.stubEnv(key, value);
-  //   }
-  // }
-  // systemEnv.oneapiUrl = systemEnv['ONEAPI_URL'];
-  // global.systemEnv = systemEnv as any;
-  // await setupModels()l
+  vi.stubEnv('MONGODB_URI', inject('MONGODB_URI'));
+  await connectMongo(connectionMongo, inject('MONGODB_URI'));
+  await connectMongo(connectionLogMongo, inject('MONGODB_URI'));
 });
 
 afterAll(async () => {
-  await teardown();
+  if (connectionMongo?.connection) connectionMongo?.connection.close();
+  if (connectionLogMongo?.connection) connectionLogMongo?.connection.close();
 });
 
-afterEach(async () => {
-  // clean the database
-  await mongoose.connection.dropDatabase();
+beforeEach(async () => {
+  await connectMongo(connectionMongo, inject('MONGODB_URI'));
+  await connectMongo(connectionLogMongo, inject('MONGODB_URI'));
+  return async () => {
+    clean();
+    await connectionMongo?.connection.db?.dropDatabase();
+    await connectionLogMongo?.connection.db?.dropDatabase();
+  };
 });
+
+declare module 'vitest' {
+  export interface ProvidedContext {
+    MONGODB_URI: string;
+  }
+}

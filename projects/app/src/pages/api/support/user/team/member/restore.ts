@@ -5,6 +5,7 @@ import { TeamManagePermissionVal } from '@fastgpt/global/support/permission/user
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { TeamMemberStatusEnum } from '@fastgpt/global/support/user/team/constant';
 import { TeamModeEnum } from '@/global/settings/constants';
+import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 export type MemberRestoreQuery = {};
 export type MemberRestoreBody = {
   tmbId: string;
@@ -15,6 +16,9 @@ async function handler(
   res: ApiResponseType<any>
 ): Promise<MemberRestoreResponse> {
   const { tmbId } = req.body;
+  if (!tmbId) {
+    return Promise.reject(CommonErrEnum.missingParams);
+  }
 
   const { teamId } = await authUserPer({
     req,

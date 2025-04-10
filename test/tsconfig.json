@@ -14,8 +14,13 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["../projects/app/src/*"],
+      "@fastgpt/*": ["../FastGPT/packages/*"],
+      "@test/*": ["../FastGPT/test/*"]
+    }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.d.ts", "FastGPT/packages/**/*.d.ts"],
+  "include": ["setup.ts", "type.d.ts"],
   "exclude": ["node_modules"]
 }

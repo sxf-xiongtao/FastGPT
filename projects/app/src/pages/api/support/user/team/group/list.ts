@@ -19,7 +19,8 @@ import { ManagePermissionVal, NullPermission } from '@fastgpt/global/support/per
 
 export type GroupListQuery = {};
 export type GroupListBody = GetGroupListBody;
-export type GroupListResponse<T extends boolean | undefined> = MemberGroupListItemType<T>[];
+export type GroupListResponse<WithMembers extends boolean | undefined> =
+  MemberGroupListItemType<WithMembers>[];
 
 async function handler(
   req: ApiRequestProps<GroupListBody, GroupListQuery>,

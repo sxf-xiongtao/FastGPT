@@ -7,7 +7,9 @@ import { notLeaveStatus } from '@fastgpt/global/support/user/team/constant';
 
 export type MemberCountQuery = {};
 export type MemberCountBody = {};
-export type MemberCountResponse = {};
+export type MemberCountResponse = {
+  count: number;
+};
 
 async function handler(
   req: ApiRequestProps<MemberCountBody, MemberCountQuery>,

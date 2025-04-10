@@ -5,19 +5,30 @@ export default defineConfig({
     reporters: ['dot', 'github-actions'],
     coverage: {
       enabled: true,
-      reporter: ['text', 'json', 'html'],
-      all: false
+      reporter: ['json-summary', 'json', 'html'],
+      reportOnFailure: true,
+      include: ['projects/**/*.ts', 'packages/**/*.ts'],
+      all: true,
+      cleanOnRerun: false
     },
     outputFile: 'test-results.json',
-    setupFiles: ['./test/setup.ts'],
-    include: ['./FastGPT/test/test.ts', './test/cases/**/*.test.ts'],
-    testTimeout: 5000
-  },
-  resolve: {
+    setupFiles: 'test/setup.ts',
+    globalSetup: 'test/globalSetup.ts',
+    include: ['./FastGPT/test/test.ts', './projects/app/test/**/*.test.ts'],
+    testTimeout: 5000,
+    fileParallelism: false,
+    pool: 'threads',
     alias: {
       '@': resolve('projects/app/src'),
       '@fastgpt': resolve('FastGPT/packages'),
       '@test': resolve('FastGPT/test')
     }
   }
+  // resolve: {
+  //   alias: {
+  //     '@': resolve('projects/app/src'),
+  //     '@fastgpt': resolve('FastGPT/packages'),
+  //     '@test': resolve('FastGPT/test')
+  //   }
+  // }
 });

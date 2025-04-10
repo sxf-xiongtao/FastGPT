@@ -7,9 +7,17 @@ import { OwnerPermissionVal } from '@fastgpt/global/support/permission/constant'
 import { NextAPI } from '@/service/middleware/entry';
 import { removeUserFromTeam } from '@/service/support/user/controller';
 import { TeamManagePermissionVal } from '@fastgpt/global/support/permission/user/constant';
+import { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 
-async function handler(req: NextApiRequest, _res: NextApiResponse) {
-  const { tmbId: memberId } = req.query as DelMemberProps;
+export type MemberDeleteQuery = DelMemberProps;
+export type MemberDeleteBody = {};
+export type MemberDeleteResponse = {};
+
+async function handler(
+  req: ApiRequestProps<MemberDeleteBody, MemberDeleteQuery>,
+  res: ApiResponseType<any>
+): Promise<MemberDeleteResponse> {
+  const { tmbId: memberId } = req.query;
   const { teamId, tmbId } = await authCert({ req, authToken: true });
 
   // get member permission

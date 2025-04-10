@@ -1,6 +1,5 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
-import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { authGroupMemberRole } from '@fastgpt/service/support/permission/memberGroup/controllers';
 import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
 import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
