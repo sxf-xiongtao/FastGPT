@@ -8,6 +8,8 @@ import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { authOrgMember } from '@fastgpt/service/support/permission/auth/org';
 import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
+import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
+import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
 
 export type OrgCreateQuery = {};
 export type OrgCreateBody = postCreateOrgData;
@@ -23,7 +25,7 @@ async function handler(
     return Promise.reject(CommonErrEnum.missingParams);
   }
 
-  const { teamId } = await authOrgMember({
+  const { teamId, tmbId } = await authOrgMember({
     req,
     authToken: true
   });
@@ -54,6 +56,15 @@ async function handler(
       ],
       { session, ordered: true }
     );
+  });
+
+  addOperationLog({
+    tmbId,
+    teamId,
+    event: OperationLogEventEnum.CREATE_DEPARTMENT,
+    params: {
+      departmentName: name
+    }
   });
 }
 

@@ -9,6 +9,8 @@ import { getChildrenByOrg } from '@fastgpt/service/support/permission/org/contro
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { getOrgChildrenPath } from '@fastgpt/global/support/user/team/org/constant';
 import { getRootOrg } from '@/service/support/user/team/org/utils';
+import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
+import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
 
 export type OrgMoveBody = putMoveOrgType;
 export type OrgMoveQuery = {};
@@ -26,7 +28,7 @@ async function handler(
     return Promise.reject(TeamErrEnum.cannotMoveToSubPath);
   }
 
-  const { teamId } = await authOrgMember({
+  const { teamId, tmbId } = await authOrgMember({
     req,
     authToken: true
   });
@@ -72,6 +74,15 @@ async function handler(
       },
       { session }
     );
+  });
+
+  addOperationLog({
+    tmbId,
+    teamId,
+    event: OperationLogEventEnum.RELOCATE_DEPARTMENT,
+    params: {
+      departmentName: org.name
+    }
   });
 }
 

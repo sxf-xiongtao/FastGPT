@@ -7,6 +7,8 @@ import { parseHeaderCert } from '@fastgpt/service/support/permission/controller'
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { TeamMemberStatusEnum } from '@fastgpt/global/support/user/team/constant';
 import { checkTeamMaxMembersPermission } from '@/service/support/permission/teamLimit';
+import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
+import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
 
 export type InvitationLinkAcceptQuery = {};
 export type InvitationLinkAcceptBody = {
@@ -19,7 +21,7 @@ async function handler(
   _res: ApiResponseType<any>
 ): Promise<InvitationLinkAcceptResponse> {
   const { linkId } = req.body;
-  const { userId } = await parseHeaderCert({ req, authToken: true });
+  const { userId, tmbId } = await parseHeaderCert({ req, authToken: true });
 
   // Check link valid
   const invitation = await MongoInvitationLink.findOne({ linkId }).lean();
@@ -75,6 +77,15 @@ async function handler(
         session
       }
     );
+  });
+
+  addOperationLog({
+    tmbId,
+    teamId: invitation.teamId,
+    event: OperationLogEventEnum.JOIN_TEAM,
+    params: {
+      link: invitation.description
+    }
   });
 
   return {};

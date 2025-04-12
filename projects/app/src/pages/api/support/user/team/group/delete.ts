@@ -9,6 +9,8 @@ import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { DefaultGroupName } from '@fastgpt/global/support/user/team/group/constant';
 import { authGroupMemberRole } from '@fastgpt/service/support/permission/memberGroup/controllers';
 import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
+import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
+import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
 
 export type GroupDeleteQuery = {
   groupId: string;
@@ -24,13 +26,27 @@ async function handler(
   if (!groupId) {
     return Promise.reject(CommonErrEnum.missingParams);
   }
-  const { teamId } = await authGroupMemberRole({
+  const { teamId, tmbId } = await authGroupMemberRole({
     req,
     per: TeamManagePermissionVal,
     authToken: true,
     groupId,
     role: ['owner']
   });
+
+  const group = await MongoMemberGroupModel.findOne(
+    {
+      _id: groupId,
+      teamId
+    },
+    { name: 1 }
+  ).lean();
+
+  const groupName = group?.name;
+
+  if (!groupName) {
+    return Promise.reject(TeamErrEnum.groupNotExist);
+  }
 
   await mongoSessionRun(async (session) => {
     const group = await MongoMemberGroupModel.findOne(
@@ -77,6 +93,15 @@ async function handler(
         session
       }
     );
+  });
+
+  addOperationLog({
+    tmbId,
+    teamId,
+    event: OperationLogEventEnum.DELETE_GROUP,
+    params: {
+      groupName: groupName
+    }
   });
 
   return {};

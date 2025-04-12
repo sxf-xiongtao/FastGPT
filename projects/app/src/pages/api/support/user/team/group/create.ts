@@ -7,8 +7,9 @@ import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/membe
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { postCreateGroupData } from '@fastgpt/global/support/user/team/group/api';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
+import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
+import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
 import { parseHeaderCert } from '@fastgpt/service/support/permission/controller';
-
 export type GroupCreateQuery = {};
 export type GroupCreateBody = postCreateGroupData;
 export type GroupCreateResponse = {};
@@ -69,6 +70,15 @@ async function handler(
       ],
       { session, ordered: true }
     );
+  });
+
+  addOperationLog({
+    tmbId,
+    teamId,
+    event: OperationLogEventEnum.CREATE_GROUP,
+    params: {
+      groupName: name
+    }
   });
 
   return {};

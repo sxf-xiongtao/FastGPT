@@ -7,6 +7,9 @@ import { OwnerPermissionVal } from '@fastgpt/global/support/permission/constant'
 import { NextAPI } from '@/service/middleware/entry';
 import { removeUserFromTeam } from '@/service/support/user/controller';
 import { TeamManagePermissionVal } from '@fastgpt/global/support/permission/user/constant';
+import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
+import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 
 export type MemberDeleteQuery = DelMemberProps;
@@ -36,6 +39,26 @@ async function handler(
     teamId,
     memberId
   });
+
+  (async () => {
+    const memberName = await MongoTeamMember.findOne({ _id: memberId }, { name: 1 })
+      .lean()
+      .then((doc) => {
+        if (!doc) {
+          throw new Error('Member not found');
+        }
+        return doc.name;
+      });
+
+    addOperationLog({
+      tmbId,
+      teamId,
+      event: OperationLogEventEnum.KICK_OUT_TEAM,
+      params: {
+        memberName: memberName
+      }
+    });
+  })();
 
   return {};
 }

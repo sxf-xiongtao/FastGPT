@@ -8,6 +8,8 @@ import { MongoOrgMemberModel } from '@fastgpt/service/support/permission/org/org
 import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
+import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
+import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
 
 export type OrgDeleteQuery = {
   orgId: string;
@@ -23,11 +25,17 @@ async function handler(
   if (!orgId) {
     return Promise.reject(CommonErrEnum.missingParams);
   }
-  const { teamId } = await authOrgMember({
+  const { teamId, tmbId } = await authOrgMember({
     req,
     authToken: true,
     orgIds: orgId
   });
+
+  const orgName = await MongoOrgModel.findOne({ _id: orgId }, 'name').then((org) => org?.name);
+
+  if (!orgName) {
+    return Promise.reject(CommonErrEnum.fileNotFound);
+  }
 
   await mongoSessionRun(async (session) => {
     const org = await MongoOrgModel.findOne({ _id: orgId, teamId }, undefined, { session });
@@ -62,6 +70,15 @@ async function handler(
         session
       }
     );
+  });
+
+  addOperationLog({
+    tmbId,
+    teamId,
+    event: OperationLogEventEnum.DELETE_DEPARTMENT,
+    params: {
+      departmentName: orgName
+    }
   });
 }
 

@@ -11,6 +11,11 @@ import { TeamPermission } from '@fastgpt/global/support/permission/user/controll
 import { UpdateClbPermissionProps } from '@fastgpt/global/support/permission/collaborator';
 import { PermissionValueType } from '@fastgpt/global/support/permission/type';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
+import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
+import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
+import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
 
 export type UpdatePermissionQuery = {};
 export type UpdatePermissionBody = Omit<UpdateClbPermissionProps, 'permission'> & {
@@ -33,7 +38,8 @@ async function handler(
   const {
     permission: userPer,
     teamId,
-    isRoot
+    isRoot,
+    tmbId
   } = await authUserPer({
     req,
     authToken: true,
@@ -175,6 +181,36 @@ async function handler(
       upsert: true
     }
   }));
+
+  (async () => {
+    const targetNames = await Promise.all(
+      updateList.map(async (v) => {
+        if (v.tmbId) {
+          const member = await MongoTeamMember.findOne({ _id: v.tmbId }, 'name').exec();
+          return member?.name || v.tmbId;
+        }
+        if (v.groupId) {
+          const group = await MongoMemberGroupModel.findOne({ _id: v.groupId }, 'name').exec();
+          return group?.name || v.groupId;
+        }
+        if (v.orgId) {
+          const org = await MongoOrgModel.findOne({ _id: v.orgId }, 'name').exec();
+          return org?.name || v.orgId;
+        }
+        return '';
+      })
+    );
+
+    addOperationLog({
+      tmbId,
+      teamId,
+      event: OperationLogEventEnum.ASSIGN_PERMISSION,
+      params: {
+        objectName: targetNames.join(', '),
+        permission: updatePer.value.toString()
+      }
+    });
+  })();
 
   return mongoSessionRun(async (session) => {
     await MongoResourcePermission.bulkWrite(bulkOps, { session });

@@ -7,6 +7,8 @@ import { MongoInvitationLink } from '@/service/support/user/team/invitationLink/
 import { addDays, addMinutes, addYears } from 'date-fns';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { MaxInvitationLinksAmount } from '@fastgpt/service/support/user/team/invitationLink/constants';
+import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
+import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
 
 export type CreateInvitationLinkQuery = {};
 export type CreateInvitationLinkBody = InvitationLinkCreateType;
@@ -18,7 +20,11 @@ async function handler(
 ): Promise<CreateInvitationLinkResponse> {
   const { expires, description, usedTimesLimit } = req.body;
 
-  const { teamId } = await authUserPer({ req, authToken: true, per: TeamManagePermissionVal });
+  const { teamId, tmbId } = await authUserPer({
+    req,
+    authToken: true,
+    per: TeamManagePermissionVal
+  });
 
   const amount = await MongoInvitationLink.countDocuments({
     teamId,
@@ -54,6 +60,16 @@ async function handler(
       return addDays(new Date(), 7);
     })()
   });
+
+  addOperationLog({
+    tmbId,
+    teamId,
+    event: OperationLogEventEnum.CREATE_INVITATION_LINK,
+    params: {
+      link: invitationLink.description
+    }
+  });
+
   return invitationLink.linkId;
 }
 
