@@ -6,10 +6,13 @@ import { NextAPI } from '@/service/middleware/entry';
 import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { addSourceMember } from '@fastgpt/service/support/user/utils';
 import { OperationListItemType } from '@fastgpt/global/support/operationLog/type';
+import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
 
 type OperationLogQuery = {
   pageNum?: number;
   pageSize?: number;
+  tmbIds?: string[];
+  events?: OperationLogEventEnum[];
 };
 type OperationLogBody = {};
 
@@ -19,20 +22,33 @@ async function handler(
 ): Promise<PaginationResponse<OperationListItemType>> {
   const { teamId } = await authCert({ req, authToken: true });
 
-  const { pageNum = 1, pageSize = 20 } = req.query as {
+  const {
+    pageNum = 1,
+    pageSize = 20,
+    tmbIds,
+    events
+  } = req.body as {
     pageNum: number;
     pageSize: number;
+    tmbIds?: string[];
+    events?: OperationLogEventEnum[];
+  };
+
+  const filter: Record<string, any> = {
+    teamId,
+    ...(tmbIds ? { tmbId: { $in: tmbIds } } : {}),
+    ...(events ? { event: { $in: events } } : {})
   };
 
   const [logs, total] = await Promise.all([
-    MongoOperationLog.find({ teamId: teamId }, '_id tmbId timestamp event metadata', {
+    MongoOperationLog.find(filter, '_id tmbId timestamp event metadata', {
       ...readFromSecondary
     })
       .sort({ timestamp: -1 })
       .skip((pageNum - 1) * pageSize)
       .limit(pageSize)
       .lean(),
-    MongoOperationLog.countDocuments({ teamId: teamId }, { ...readFromSecondary })
+    MongoOperationLog.countDocuments(filter, { ...readFromSecondary })
   ]);
 
   const logsWithMembers = await addSourceMember({
