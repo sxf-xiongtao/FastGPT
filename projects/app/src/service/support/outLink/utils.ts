@@ -4,7 +4,7 @@ import { DispatchNodeResponseKeyEnum } from '@fastgpt/global/core/workflow/runti
 import {
   getWorkflowEntryNodeIds,
   getMaxHistoryLimitFromNodes,
-  initWorkflowEdgeStatus,
+  storeEdges2RuntimeEdges,
   storeNodes2RuntimeNodes
 } from '@fastgpt/global/core/workflow/runtime/utils';
 import { OutlinkAppType, OutLinkSchema } from '@fastgpt/global/support/outLink/type';
@@ -105,7 +105,7 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
       query: dispatchQuery,
       chatConfig,
       stream: false,
-      runtimeEdges: initWorkflowEdgeStatus(edges),
+      runtimeEdges: storeEdges2RuntimeEdges(edges),
       runtimeNodes: storeNodes2RuntimeNodes(nodes, getWorkflowEntryNodeIds(nodes)),
       maxRunTimes: WORKFLOW_MAX_RUN_TIMES
     });
