@@ -12,9 +12,8 @@ permissions:
   id-token: write
 
 jobs:
-  build-fastgpt-pro-images-x64:
+  build-fastgpt-pro-images:
     runs-on: [self-hosted]
-    # runs-on: [self-hosted, linux, x64]
     steps:
       - name: Checkout
         uses: actions/checkout@v3

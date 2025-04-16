@@ -58,7 +58,9 @@ const map = {
   [AppTypeEnum.workflow]: '工作流',
   [AppTypeEnum.plugin]: '插件',
   [AppTypeEnum.folder]: '文件夹',
-  [AppTypeEnum.httpPlugin]: 'HTTP 插件'
+  [AppTypeEnum.httpPlugin]: 'HTTP 插件',
+  [AppTypeEnum.toolSet]: '工具集',
+  [AppTypeEnum.tool]: '工具'
 };
 
 const TemplateConfigModal = ({

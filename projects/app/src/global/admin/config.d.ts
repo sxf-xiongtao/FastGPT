@@ -33,6 +33,7 @@ export type ConfigFormType = {
       uploadFileMaxAmount: number;
       uploadFileMaxSize: number;
       lafEnv?: string;
+      mcpServerProxyEndpoint: string;
     };
     concatMd: string;
     scripts?: string;

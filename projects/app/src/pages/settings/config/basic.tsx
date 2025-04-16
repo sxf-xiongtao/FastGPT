@@ -29,8 +29,6 @@ export const Settings = () => {
   const [rawData, setRawData] = useState<any>({});
   const { setValue, reset, watch, register, handleSubmit, control } =
     useForm<ConfigFormType['siteSettings']>();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
 
   const { loading: loadingConfig } = useRequest2(getInitFormData, {
     onSuccess: (data: ConfigStoreType) => {
@@ -184,6 +182,12 @@ export const Settings = () => {
       </FormItem>
 
       <SecondTitle title="系统参数" />
+      <FormItem
+        title="MCP 转发服务地址"
+        description="需要部署一个 MCP 转发服务，用于将 FastGPT 应用以MCP协议暴露，例如：http://localhost:3005"
+      >
+        <Input {...register('feConfigs.mcpServerProxyEndpoint')} placeholder="" />
+      </FormItem>
       <FormItem
         title="oneAPI地址(会覆盖环境变量配置的)"
         description="oneAPI地址，可以使用 oneapi 来实现多模型接入"

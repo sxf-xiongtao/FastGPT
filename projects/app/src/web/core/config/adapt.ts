@@ -37,6 +37,7 @@ export function formatConfigStore2FormSchema({
     navbarItems = [],
     appTemplateCourse = '',
     show_compliance_copywriting = false,
+    mcpServerProxyEndpoint = '',
     ...feConfigsProps
   } = feConfigs || {};
 
@@ -73,6 +74,7 @@ export function formatConfigStore2FormSchema({
         lafEnv,
         appTemplateCourse,
         show_compliance_copywriting,
+        mcpServerProxyEndpoint,
         ...feConfigsProps
       },
       concatMd,
