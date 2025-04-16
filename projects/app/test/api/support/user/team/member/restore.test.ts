@@ -6,6 +6,7 @@ import { Call } from '@test/utils/request';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
+import { removeUserFromTeam } from '@/service/support/user/controller';
 beforeAll(() => {
   vi.stubGlobal('systemConfig', {
     teamMode: 'sync'
@@ -13,19 +14,11 @@ beforeAll(() => {
 });
 describe('restore api', () => {
   it('restore', async () => {
-    const users = await getFakeUsers();
-    const res = await Call<
-      deleteapi.MemberDeleteBody,
-      deleteapi.MemberDeleteQuery,
-      deleteapi.MemberDeleteResponse
-    >(deleteapi.default, {
-      auth: users.owner,
-      query: {
-        tmbId: users.members[0].tmbId
-      }
+    const users = await getFakeUsers(1);
+    await removeUserFromTeam({
+      teamId: users.members[0].teamId,
+      memberId: users.members[0].tmbId
     });
-    expect(res.error).toBeUndefined();
-    expect(res.code).toBe(200);
 
     const tmb = await MongoTeamMember.findById(users.members[0].tmbId).lean();
     expect(tmb.status).toBe('forbidden');

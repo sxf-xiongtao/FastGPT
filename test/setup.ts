@@ -1,9 +1,10 @@
 import { connectionLogMongo, connectionMongo, Mongoose } from '@fastgpt/service/common/mongo';
 import { connectMongo } from '@fastgpt/service/common/mongo/init';
-import { afterAll, beforeAll, beforeEach, vi, inject } from 'vitest';
+import { afterAll, beforeAll, beforeEach, vi, inject, onTestFinished } from 'vitest';
 import '@test/mocks';
 import { clean } from '../FastGPT/test/datas/users';
 import { randomUUID } from 'crypto';
+import { delay } from '@fastgpt/global/common/system/utils';
 
 vi.stubEnv('NODE_ENV', 'test');
 
@@ -12,7 +13,8 @@ vi.mock(import('@fastgpt/service/common/mongo/init'), async (importOriginal: any
   return {
     ...mod,
     connectMongo: async (db: Mongoose, url: string) => {
-      (await db.connect(url)).connection.useDb(randomUUID());
+      await db.connect(url, { dbName: randomUUID() });
+      await db.connection.db?.dropDatabase();
     }
   };
 });
@@ -31,11 +33,14 @@ afterAll(async () => {
 beforeEach(async () => {
   await connectMongo(connectionMongo, inject('MONGODB_URI'));
   await connectMongo(connectionLogMongo, inject('MONGODB_URI'));
-  return async () => {
+  onTestFinished(async () => {
     clean();
-    await connectionMongo?.connection.db?.dropDatabase();
-    await connectionLogMongo?.connection.db?.dropDatabase();
-  };
+    await delay(200); // wait for asynchronous operations to complete
+    await Promise.all([
+      connectionMongo?.connection.db?.dropDatabase(),
+      connectionLogMongo?.connection.db?.dropDatabase()
+    ]);
+  });
 });
 
 declare module 'vitest' {
