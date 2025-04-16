@@ -12,8 +12,9 @@ permissions:
   id-token: write
 
 jobs:
-  build-fastgpt-pro-images:
-    runs-on: ubuntu-20.04
+  build-fastgpt-pro-images-x64:
+    runs-on: [self-hosted]
+    # runs-on: [self-hosted, linux, x64]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -84,7 +85,7 @@ jobs:
           -t ${Ali_Latest} \
           .
   build-fastgpt-pro-images-sub-route:
-    runs-on: ubuntu-20.04
+    runs-on: [self-hosted]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
