@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const result = await MongoUser.findByIdAndUpdate(id, {
       ...(username && { username }),
       ...(password && { password }),
-      ...(status && { status })
+      ...(status !== undefined && { status })
     });
 
     jsonRes(res, {

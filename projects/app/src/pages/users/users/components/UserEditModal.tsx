@@ -16,8 +16,10 @@ import { POST } from '@/service/common/request';
 import { hashStr } from '@fastgpt/global/common/string/tools';
 import { useToast } from '@fastgpt/web/hooks/useToast';
 import MyModal from '@fastgpt/web/components/common/MyModal';
+import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
 
 type TFormData = {
+  username: string;
   password: string;
   status: string;
 };
@@ -31,12 +33,15 @@ export default function UserEditModal(props: { data: any; getData: any }) {
     defaultValues: data
   });
 
-  const onSubmit = async (formData: TFormData) => {
+  const { runAsync: onSubmit, loading } = useRequest2(async (formData: TFormData) => {
     try {
-      const res = await POST(`/admin/routes/users/updateUser`, {
-        ...formData,
-        password: hashStr(formData.password)
+      await POST(`/admin/routes/users/updateUser`, {
+        _id: data._id,
+        username: formData.username,
+        status: formData.status,
+        password: formData.password ? hashStr(formData.password) : undefined
       });
+
       toast({
         title: '更新成功',
         status: 'success'
@@ -49,7 +54,7 @@ export default function UserEditModal(props: { data: any; getData: any }) {
         status: 'error'
       });
     }
-  };
+  });
 
   return (
     <>
@@ -110,7 +115,7 @@ export default function UserEditModal(props: { data: any; getData: any }) {
           <Button variant={'outline'} mr={4} onClick={onClose}>
             关闭
           </Button>
-          <Button variant={'primary'} onClick={handleSubmit(onSubmit)}>
+          <Button isLoading={loading} variant={'primary'} onClick={handleSubmit(onSubmit)}>
             确定
           </Button>
         </ModalFooter>
