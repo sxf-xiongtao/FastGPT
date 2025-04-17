@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   build-fastgpt-pro-images:
-    runs-on: [self-hosted]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -84,7 +84,7 @@ jobs:
           -t ${Ali_Latest} \
           .
   build-fastgpt-pro-images-sub-route:
-    runs-on: [self-hosted]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
