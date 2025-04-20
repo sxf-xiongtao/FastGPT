@@ -75,19 +75,34 @@ export default function DashBoard() {
     }
   );
 
-  const [dateRange, setDateRange] = useState<string>('7');
+  const [dateRange, setDateRange] = useState<number>(7);
   const { data: chartData = [], loading: isLoadingChart } = useRequest2(
     async () => {
+      const startTime = dayjs().subtract(dateRange, 'day').add(1, 'day').startOf('day').format();
+
       const [userResponse, payResponse, chatResponse, pointResponse] = await Promise.all([
         GET<FetchChatData[]>(`/admin/routes/dashboard/getUserFormData`, {
-          day: dateRange
-        }),
-        GET<FetchChatData[]>(`/admin/routes/dashboard/getPaysFormData`, { day: dateRange }),
+          startTime: startTime
+        }).then((res) => res.map((item) => ({ ...item, date: dayjs(item.date).format('MM/DD') }))),
+        GET<FetchChatData[]>(`/admin/routes/dashboard/getPaysFormData`, {
+          startTime: startTime
+        }).then((res) => res.map((item) => ({ ...item, date: dayjs(item.date).format('MM/DD') }))),
         GET<FetchChatData[]>(`/admin/routes/dashboard/getChatFormData`, {
-          day: dateRange
-        }),
-        GET<FetchChatData[]>(`/admin/routes/dashboard/getPointUsages`, { day: dateRange })
+          startTime: startTime
+        }).then((res) => res.map((item) => ({ ...item, date: dayjs(item.date).format('MM/DD') }))),
+        GET<FetchChatData[]>(`/admin/routes/dashboard/getPointUsages`, {
+          startTime: startTime
+        }).then((res) => res.map((item) => ({ ...item, date: dayjs(item.date).format('MM/DD') })))
       ]);
+
+      // 如果没有对应日期的数据，自动补 0
+      const diff = dayjs().diff(dayjs(startTime).startOf('day'), 'day') + 1;
+      for (let i = 0; i < diff; i++) {
+        const date = dayjs(startTime).add(i, 'day').format('MM/DD');
+        if (!userResponse.find((item) => item.date === date)) {
+          userResponse.push({ date, count: 0, increase: 0 });
+        }
+      }
 
       const data = userResponse.map((item, i) => {
         const pay = payResponse.find((payItem) => payItem.date === item.date);
@@ -156,11 +171,11 @@ export default function DashBoard() {
             趋势图
           </Box>
           <Box>
-            <FillRowTabs
+            <FillRowTabs<number>
               list={[
-                { label: '近7天', value: '7' },
-                { label: '近30天', value: '30' },
-                { label: '近90天', value: '90' }
+                { label: '近7天', value: 7 },
+                { label: '近30天', value: 30 },
+                { label: '近90天', value: 90 }
               ]}
               value={dateRange}
               onChange={setDateRange}

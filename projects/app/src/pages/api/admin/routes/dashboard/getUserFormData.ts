@@ -5,12 +5,13 @@ import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { NextApiResponse } from 'next';
 import { GetDataChartsQuery } from './type';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
+import { getMongoTimezoneCode } from '@fastgpt/global/common/time/timezone';
+import dayjs from 'dayjs';
 
 export type GetUserFormDataResponse = {
   date: Date;
   count: number;
   increase: number;
-  increaseRate: string;
 }[];
 
 async function handler(
@@ -19,88 +20,52 @@ async function handler(
 ): Promise<GetUserFormDataResponse> {
   await adminCert({ req, authToken: true });
 
-  const day = Number(req.query.day);
+  const startTime = req.query.startTime;
 
-  let startCount = await MongoUser.countDocuments({
-    createTime: { $lt: getDashboardDataStartTime(day) }
-  });
   const usersRaw = await MongoUser.aggregate([
-    { $match: { createTime: { $gte: getDashboardDataStartTime(day) } } },
+    { $match: { createTime: { $gte: new Date(startTime) } } },
+    {
+      $addFields: {
+        localTime: {
+          $dateToString: {
+            format: '%Y-%m-%d',
+            date: '$createTime',
+            timezone: getMongoTimezoneCode(startTime)
+          }
+        }
+      }
+    },
     {
       $group: {
-        _id: {
-          year: { $year: '$createTime' },
-          month: { $month: '$createTime' },
-          day: { $dayOfMonth: '$createTime' }
-        },
+        _id: '$localTime',
         count: { $sum: 1 }
       }
     },
     {
       $project: {
         _id: 0,
-        date: { $dateFromParts: { year: '$_id.year', month: '$_id.month', day: '$_id.day' } },
+        date: { $dateFromString: { dateString: '$_id' } },
         count: 1
       }
     },
     { $sort: { date: 1 } }
   ]);
 
-  const userCount = usersRaw.map((item) => {
-    const increaseRate = `${((item.count / startCount) * 100).toFixed(2)}%`;
+  // 计算用户总数
+  let startCount = await MongoUser.countDocuments({
+    createTime: { $lt: new Date(startTime) }
+  });
+
+  const formatResults = usersRaw.map((item) => {
     startCount += item.count;
     return {
       date: item.date,
       count: startCount,
-      increase: item.count,
-      increaseRate
+      increase: item.count
     };
   });
 
-  const currentDate = new Date();
-  const expectedDates = [];
-  if (startCount > 0) {
-    for (let i = day; i >= 0; i--) {
-      const date = new Date(currentDate);
-      date.setDate(currentDate.getDate() - i);
-      date.setUTCHours(0, 0, 0, 0);
-      expectedDates.push(date);
-    }
-  } else {
-    for (let i = day; i >= 0; i--) {
-      const date = new Date(currentDate);
-      date.setDate(currentDate.getDate() - i);
-      date.setUTCHours(0, 0, 0, 0);
-      if (usersRaw[0].date.getTime() > date.getTime()) break;
-      expectedDates.push(date);
-    }
-  }
-
-  const countResult = expectedDates.map((date) => {
-    const existingValue = userCount.find(
-      (item) => new Date(item.date).getTime() === date.getTime()
-    );
-    if (existingValue) {
-      return existingValue;
-    } else {
-      const emptyValue = {
-        date: date.toISOString(),
-        count: userCount.length > 0 ? userCount[0].count - userCount[0].increase : 0,
-        increase: 0,
-        increaseRate: '0.00%'
-      };
-
-      userCount
-        .filter((item) => new Date(item.date).getTime() < date.getTime())
-        .forEach((item) => {
-          emptyValue.count = item.count;
-        });
-
-      return emptyValue;
-    }
-  });
-
-  return countResult.slice(1);
+  return formatResults;
 }
 
 export default NextAPI(handler);

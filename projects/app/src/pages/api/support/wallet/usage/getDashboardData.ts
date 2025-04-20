@@ -1,4 +1,5 @@
 import { NextAPI } from '@/service/middleware/entry';
+import { getMongoTimezoneCode } from '@fastgpt/global/common/time/timezone';
 import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
 import {
   GetUsageDashboardProps,
@@ -37,7 +38,7 @@ async function handler(
     ...(permission.hasManagePer
       ? teamMemberIds
         ? {
-            tmbId: { $in: teamMemberIds }
+            tmbId: { $in: teamMemberIds.map((id) => new Types.ObjectId(id)) }
           }
         : {}
       : { tmbId }),
@@ -48,19 +49,26 @@ async function handler(
     [
       { $match: where },
       {
+        $addFields: {
+          localTime: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$time',
+              timezone: getMongoTimezoneCode(rawDateStart)
+            }
+          }
+        }
+      },
+      {
         $group: {
-          _id: {
-            year: { $year: '$time' },
-            month: { $month: '$time' },
-            day: { $dayOfMonth: '$time' }
-          },
+          _id: '$localTime',
           totalPoints: { $sum: '$totalPoints' }
         }
       },
       {
         $project: {
           _id: 0,
-          date: { $dateFromParts: { year: '$_id.year', month: '$_id.month', day: '$_id.day' } },
+          date: { $dateFromString: { dateString: '$_id' } },
           totalPoints: 1
         }
       },
@@ -71,23 +79,7 @@ async function handler(
     }
   )) as GetUsageDashboardResponseItem[];
 
-  // Generate complete date range
-  const concatData: GetUsageDashboardResponseItem[] = [];
-  let currentDate = dayjs(dateStart);
-  const endDate = dayjs(dateEnd);
-
-  while (currentDate.isBefore(endDate)) {
-    concatData.push({
-      date: currentDate.toDate(),
-      totalPoints:
-        data.find(
-          (item) => dayjs(item.date).format('YYYY-MM-DD') === currentDate.format('YYYY-MM-DD')
-        )?.totalPoints || 0
-    });
-    currentDate = currentDate.add(1, 'day');
-  }
-
-  return concatData;
+  return data;
 }
 
 export default NextAPI(handler);

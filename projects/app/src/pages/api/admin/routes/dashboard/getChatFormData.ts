@@ -1,10 +1,10 @@
 import { adminCert } from '@/service/support/permission/adminCert';
 import { NextApiResponse } from 'next';
 import { MongoChatItem } from '@fastgpt/service/core/chat/chatItemSchema';
-import { getDashboardDataStartTime } from '@/service/admin/common/dashboard/utils';
 import { NextAPI } from '@/service/middleware/entry';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { GetDataChartsQuery } from './type';
+import { getMongoTimezoneCode } from '@fastgpt/global/common/time/timezone';
 
 export type GetChatFormDataResponse = {
   date: Date;
@@ -16,30 +16,37 @@ async function handler(
   res: NextApiResponse
 ): Promise<GetChatFormDataResponse> {
   await adminCert({ req, authToken: true });
-  const day = Number(req.query.day);
+  const startTime = req.query.startTime;
 
   // 获取对话总数
   const chatsRaw = await MongoChatItem.aggregate([
     {
       $match: {
         obj: 'Human',
-        time: { $gte: getDashboardDataStartTime(day) }
+        time: { $gte: new Date(startTime) }
+      }
+    },
+    {
+      $addFields: {
+        localTime: {
+          $dateToString: {
+            format: '%Y-%m-%d',
+            date: '$time',
+            timezone: getMongoTimezoneCode(startTime)
+          }
+        }
       }
     },
     {
       $group: {
-        _id: {
-          year: { $year: '$time' },
-          month: { $month: '$time' },
-          day: { $dayOfMonth: '$time' }
-        },
+        _id: '$localTime',
         count: { $sum: 1 }
       }
     },
     {
       $project: {
         _id: 0,
-        date: { $dateFromParts: { year: '$_id.year', month: '$_id.month', day: '$_id.day' } },
+        date: { $dateFromString: { dateString: '$_id' } },
         count: 1
       }
     },
