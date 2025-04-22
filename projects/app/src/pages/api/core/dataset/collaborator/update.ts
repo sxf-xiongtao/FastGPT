@@ -1,27 +1,27 @@
 import { NextAPI } from '@/service/middleware/entry';
-import { authDataset } from '@fastgpt/service/support/permission/dataset/auth';
-import {
-  PerResourceTypeEnum,
-  ManagePermissionVal
-} from '@fastgpt/global/support/permission/constant';
-import { UpdateDatasetCollaboratorBody } from '@fastgpt/global/core/dataset/collaborator';
-import { DatasetPermission } from '@fastgpt/global/support/permission/dataset/controller';
 import { updateResourcePermission } from '@/service/support/permission/controller';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
+import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
+import { DatasetErrEnum } from '@fastgpt/global/common/error/code/dataset';
+import { UpdateDatasetCollaboratorBody } from '@fastgpt/global/core/dataset/collaborator';
 import { DatasetTypeEnum } from '@fastgpt/global/core/dataset/constants';
+import {
+  ManagePermissionVal,
+  PerResourceTypeEnum
+} from '@fastgpt/global/support/permission/constant';
+import { DatasetPermission } from '@fastgpt/global/support/permission/dataset/controller';
+import { ResourcePermissionType } from '@fastgpt/global/support/permission/type';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { getResourceClbsAndGroups } from '@fastgpt/service/support/permission/controller';
+import { authDataset } from '@fastgpt/service/support/permission/dataset/auth';
 import {
   syncChildrenPermission,
   UpdateCollaboratorItem
 } from '@fastgpt/service/support/permission/inheritPermission';
-import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
-import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
-import { DatasetErrEnum } from '@fastgpt/global/common/error/code/dataset';
 import { getGroupsByTmbId } from '@fastgpt/service/support/permission/memberGroup/controllers';
-import { ResourcePermissionType } from '@fastgpt/global/support/permission/type';
 import { getOrgsByTmbId } from '@fastgpt/service/support/permission/org/controllers';
+import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
+import { ApiRequestProps } from '@fastgpt/service/type/next';
 
 async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
   // Authorization
@@ -220,7 +220,7 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
             ...(item.orgId && { orgId: item.orgId }),
             permission: item.permission
           })),
-          { session }
+          { session, ordered: true }
         );
       }
     }

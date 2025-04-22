@@ -21,8 +21,8 @@ import {
   syncChildrenPermission
 } from '@fastgpt/service/support/permission/inheritPermission';
 import { getGroupsByTmbId } from '@fastgpt/service/support/permission/memberGroup/controllers';
-import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
 import { getOrgsByTmbId } from '@fastgpt/service/support/permission/org/controllers';
+import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
 
 /*
   增加或修改协作者
@@ -239,7 +239,7 @@ async function handler(req: NextApiRequest) {
             }),
             permission: item.permission
           })),
-          { session }
+          { session, ordered: true }
         );
       }
     }
