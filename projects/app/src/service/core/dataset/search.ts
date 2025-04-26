@@ -3,7 +3,7 @@ import { getLLMModel } from '@fastgpt/service/core/ai/model';
 import { filterGPTMessageByMaxContext } from '@fastgpt/service/core/chat/utils';
 import { replaceVariable } from '@fastgpt/global/common/string/tools';
 import { createChatCompletion } from '@fastgpt/service/core/ai/config';
-import { llmCompletionsBodyFormat } from '@fastgpt/service/core/ai/utils';
+import { llmCompletionsBodyFormat, llmResponseToAnswerText } from '@fastgpt/service/core/ai/utils';
 import { ChatCompletionMessageParam } from '@fastgpt/global/core/ai/type';
 import { SearchDataResponseItemType } from '@fastgpt/global/core/dataset/type';
 import {
@@ -175,7 +175,7 @@ class DeepSearchGraph {
       }
     ];
     //   console.log(messages, '--');
-    const { response: result } = await createChatCompletion({
+    const { response } = await createChatCompletion({
       body: llmCompletionsBodyFormat(
         {
           stream: false,
@@ -186,7 +186,7 @@ class DeepSearchGraph {
         this.modelData
       )
     });
-    const answer = result.choices[0].message.content || '';
+    const { text: answer, usage } = await llmResponseToAnswerText(response);
 
     // Count usage
     const AIMessages: ChatCompletionMessageParam[] = [
@@ -195,8 +195,8 @@ class DeepSearchGraph {
         content: answer
       }
     ];
-    const inputTokens = await countGptMessagesTokens(messages);
-    const outputTokens = await countGptMessagesTokens(AIMessages);
+    const inputTokens = usage?.prompt_tokens || (await countGptMessagesTokens(messages));
+    const outputTokens = usage?.completion_tokens || (await countGptMessagesTokens(AIMessages));
 
     if (answer.includes('Done')) {
       return {

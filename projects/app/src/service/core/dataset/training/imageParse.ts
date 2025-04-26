@@ -4,17 +4,17 @@ import { TrainingModeEnum } from '@fastgpt/global/core/dataset/constants';
 import { createChatCompletion } from '@fastgpt/service/core/ai/config';
 import type { ChatCompletionMessageParam } from '@fastgpt/global/core/ai/type.d';
 import { addLog } from '@fastgpt/service/common/system/log';
-import { getImageParsePrompt } from '@/global/core/ai/prompt/autoTraining';
+import { getImageParsePrompt } from '@/global/core/ai/prompt/training';
 import { getVlmModel } from '@fastgpt/service/core/ai/model';
 import { checkTeamAiPointsAndLock } from './utils';
 import { addMinutes } from 'date-fns';
-import { countGptMessagesTokens } from '@fastgpt/service/common/string/tiktoken/index';
+import {
+  countGptMessagesTokens,
+  countPromptTokens
+} from '@fastgpt/service/common/string/tiktoken/index';
 import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
 import { loadRequestMessages } from '@fastgpt/service/core/chat/utils';
-import {
-  llmCompletionsBodyFormat,
-  llmStreamResponseToAnswerText
-} from '@fastgpt/service/core/ai/utils';
+import { llmCompletionsBodyFormat, llmResponseToAnswerText } from '@fastgpt/service/core/ai/utils';
 import { getImageBase64 } from '@fastgpt/service/common/file/image/utils';
 import { DatasetDataIndexTypeEnum } from '@fastgpt/global/core/dataset/data/constants';
 
@@ -69,7 +69,7 @@ export async function generateImageAnnotion(): Promise<any> {
       const data = await MongoDatasetTraining.findOneAndUpdate(
         {
           mode: TrainingModeEnum.image,
-          retryCount: { $gte: 0 },
+          retryCount: { $gte: -10 },
           lockTime: { $lte: addMinutes(new Date(), -10) }
         },
         {
@@ -143,6 +143,12 @@ export async function generateImageAnnotion(): Promise<any> {
     return reduceQueueAndReturn();
   }
 
+  // If retryCount is 0, then update to chunk queue
+  if (data.retryCount <= 0) {
+    await updateImageQueueToChunkQueue();
+    return reduceQueueAndReturn();
+  }
+
   // Get model and check
   const modelData = getVlmModel(data.model);
   if (!modelData) {
@@ -152,22 +158,23 @@ export async function generateImageAnnotion(): Promise<any> {
   }
 
   try {
-    let inputTokens = 0;
-    let outputTokens = 0;
-
     const startTime = Date.now();
-    const prompt = getImageParsePrompt({ text });
 
     // 1. Match text image url
     let images = await matchAndParseTextImageUrl(text);
+
     if (images.length === 0) {
-      addLog.info(`[Image parse queue] No image url found: ${data._id}`);
+      addLog.debug(`[Image parse queue] No image url found: ${data._id}`);
       await updateImageQueueToChunkQueue();
       return reduceQueueAndReturn();
     }
 
     // 2. request VLM to get image annotation
     const messages: ChatCompletionMessageParam[] = [
+      {
+        role: ChatCompletionRequestMessageRoleEnum.System,
+        content: getImageParsePrompt()
+      },
       {
         role: ChatCompletionRequestMessageRoleEnum.User,
         content: [
@@ -179,7 +186,7 @@ export async function generateImageAnnotion(): Promise<any> {
           })),
           {
             type: 'text',
-            text: prompt
+            text: text
           }
         ]
       }
@@ -195,9 +202,9 @@ export async function generateImageAnnotion(): Promise<any> {
         modelData
       )
     });
-    const answer = await llmStreamResponseToAnswerText(chatResponse);
-    inputTokens += await countGptMessagesTokens(messages);
-    outputTokens += await countGptMessagesTokens([{ role: 'assistant', content: answer }]);
+    const { text: answer, usage } = await llmResponseToAnswerText(chatResponse);
+    const inputTokens = usage?.prompt_tokens || (await countGptMessagesTokens(messages));
+    const outputTokens = usage?.completion_tokens || (await countPromptTokens(answer));
 
     // 3. Concat indexes
     const indexes = data.indexes.concat({

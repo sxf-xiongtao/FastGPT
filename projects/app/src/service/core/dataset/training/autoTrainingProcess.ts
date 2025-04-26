@@ -4,17 +4,17 @@ import { TrainingModeEnum } from '@fastgpt/global/core/dataset/constants';
 import { createChatCompletion } from '@fastgpt/service/core/ai/config';
 import type { ChatCompletionMessageParam } from '@fastgpt/global/core/ai/type.d';
 import { addLog } from '@fastgpt/service/common/system/log';
-import { getAutoTrainingPrompt } from '@/global/core/ai/prompt/autoTraining';
+import { getAutoTrainingPrompt } from '@/global/core/ai/prompt/training';
 import { getLLMModel } from '@fastgpt/service/core/ai/model';
 import { checkTeamAiPointsAndLock } from './utils';
 import { addMinutes } from 'date-fns';
-import { countGptMessagesTokens } from '@fastgpt/service/common/string/tiktoken/index';
+import {
+  countGptMessagesTokens,
+  countPromptTokens
+} from '@fastgpt/service/common/string/tiktoken/index';
 import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
 import { loadRequestMessages } from '@fastgpt/service/core/chat/utils';
-import {
-  llmCompletionsBodyFormat,
-  llmStreamResponseToAnswerText
-} from '@fastgpt/service/core/ai/utils';
+import { llmCompletionsBodyFormat, llmResponseToAnswerText } from '@fastgpt/service/core/ai/utils';
 import { formatSplitText2Index } from './utils';
 
 const reduceQueue = () => {
@@ -140,7 +140,9 @@ export async function generateAutoTraining(): Promise<any> {
         modelData
       )
     });
-    const answer = await llmStreamResponseToAnswerText(chatResponse);
+    const { text: answer, usage } = await llmResponseToAnswerText(chatResponse);
+    const inputTokens = usage?.prompt_tokens || (await countGptMessagesTokens(messages));
+    const outputTokens = usage?.completion_tokens || (await countPromptTokens(answer));
 
     // 3. Format answer to indexes and concat
     const autoIndexResult = formatSplitText2Index({ answer, rawText: text, llmModel: modelData }); // 格式化后的索引
@@ -164,8 +166,8 @@ export async function generateAutoTraining(): Promise<any> {
     pushAutoTrainingUsage({
       teamId: data.teamId,
       tmbId: data.tmbId,
-      inputTokens: await countGptMessagesTokens(messages),
-      outputTokens: await countGptMessagesTokens([{ role: 'assistant', content: answer }]),
+      inputTokens,
+      outputTokens,
       billId: data.billId,
       model: modelData.model
     });
@@ -173,7 +175,7 @@ export async function generateAutoTraining(): Promise<any> {
     addLog.info(`[Auto index queue] Finish`, {
       time: `${(Date.now() - startTime) / 1000}s`,
       indexLen: newIndexes.length,
-      usage: chatResponse.usage
+      usage
     });
 
     return returnQueue();
