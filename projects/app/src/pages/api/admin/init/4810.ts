@@ -13,7 +13,7 @@ import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/walle
 import { initTeamFreePlan } from '@fastgpt/service/support/wallet/sub/utils';
 import { delay } from '@fastgpt/global/common/system/utils';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
-import { reComputeStandPlans } from '../../support/wallet/bill/checkPayResult';
+import { reComputeStandPlans } from '@/service/support/wallet/sub/controller';
 
 /* 
     初始化开票状态

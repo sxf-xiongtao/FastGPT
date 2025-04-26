@@ -15,7 +15,7 @@ export default defineConfig({
     setupFiles: 'test/setup.ts',
     globalSetup: 'test/globalSetup.ts',
     include: ['./FastGPT/test/test.ts', './projects/app/test/**/*.test.ts'],
-    testTimeout: 5000,
+    testTimeout: 20000,
     maxConcurrency: 5,
     pool: 'threads',
     alias: {

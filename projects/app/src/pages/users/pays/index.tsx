@@ -90,6 +90,15 @@ const billPayWayMap = {
   },
   [BillPayWayEnum.balance]: {
     label: '余额'
+  },
+  [BillPayWayEnum.alipay]: {
+    label: '支付宝'
+  },
+  [BillPayWayEnum.bank]: {
+    label: '对公'
+  },
+  [BillPayWayEnum.coupon]: {
+    label: '兑换码'
   }
 };
 

@@ -273,7 +273,7 @@ export const deepRagSearch = async ({
     }
 
     for await (const query of planQueries) {
-      const { searchRes: searchRes, tokens: embeddingTokens } = await searchDatasetData({
+      const { searchRes: searchRes, embeddingTokens } = await searchDatasetData({
         ...props,
         queries: [query]
       });
@@ -288,27 +288,37 @@ export const deepRagSearch = async ({
     runTimes++;
   }
 
-  const formatResults = await (async () => {
+  const { formatResults, reRankInputTokens } = await (async () => {
     try {
       const rerankResults = await datasetDataReRank({
         query,
         data: searchResultList
       });
-      const filterDataByTokens = await filterDatasetDataByMaxTokens(rerankResults, props.limit);
-      return filterDataByTokens;
+      const filterDataByTokens = await filterDatasetDataByMaxTokens(
+        rerankResults.results,
+        props.limit
+      );
+      return {
+        formatResults: filterDataByTokens,
+        reRankInputTokens: rerankResults.inputTokens
+      };
     } catch (error) {
-      return searchResultList;
+      return {
+        formatResults: searchResultList,
+        reRankInputTokens: 0
+      };
     }
   })();
 
   return {
     searchRes: formatResults,
-    tokens: embeddingTokensUsage,
+    embeddingTokens: embeddingTokensUsage,
     usingSimilarityFilter,
     usingReRank,
     searchMode: props.searchMode || 'embedding',
     limit: props.limit,
     similarity: props.similarity || 0.8,
+    reRankInputTokens,
     deepSearchResult: {
       model: datasetDeepSearchModel,
       inputTokens: llmInputTokensUsage,

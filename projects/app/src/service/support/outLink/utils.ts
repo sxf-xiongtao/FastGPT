@@ -84,31 +84,32 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
       }
     ];
 
-    const { assistantResponses, newVariables, flowResponses, flowUsages } = await dispatchWorkFlow({
-      res,
-      mode: 'chat',
-      runningAppInfo: {
-        id: String(app._id),
-        teamId: app.teamId,
-        tmbId: app.tmbId
-      },
-      runningUserInfo: {
-        teamId: outLinkConfig.teamId,
-        tmbId: outLinkConfig.tmbId
-      },
-      uid: chatUserId || outLinkConfig.tmbId,
-      timezone,
-      externalProvider,
-      chatId,
-      variables: {},
-      histories,
-      query: dispatchQuery,
-      chatConfig,
-      stream: false,
-      runtimeEdges: storeEdges2RuntimeEdges(edges),
-      runtimeNodes: storeNodes2RuntimeNodes(nodes, getWorkflowEntryNodeIds(nodes)),
-      maxRunTimes: WORKFLOW_MAX_RUN_TIMES
-    });
+    const { assistantResponses, newVariables, flowResponses, flowUsages, durationSeconds } =
+      await dispatchWorkFlow({
+        res,
+        mode: 'chat',
+        runningAppInfo: {
+          id: String(app._id),
+          teamId: app.teamId,
+          tmbId: app.tmbId
+        },
+        runningUserInfo: {
+          teamId: outLinkConfig.teamId,
+          tmbId: outLinkConfig.tmbId
+        },
+        uid: chatUserId || outLinkConfig.tmbId,
+        timezone,
+        externalProvider,
+        chatId,
+        variables: {},
+        histories,
+        query: dispatchQuery,
+        chatConfig,
+        stream: false,
+        runtimeEdges: storeEdges2RuntimeEdges(edges),
+        runtimeNodes: storeNodes2RuntimeNodes(nodes, getWorkflowEntryNodeIds(nodes)),
+        maxRunTimes: WORKFLOW_MAX_RUN_TIMES
+      });
 
     let responseContent = assistantResponses
       .map((response) => {
@@ -144,7 +145,8 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
       ],
       metadata: {
         chatId
-      }
+      },
+      durationSeconds
     });
 
     if (responseContent.length === 0) {

@@ -6,6 +6,8 @@ import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSc
 import { TeamMemberStatusEnum } from '@fastgpt/global/support/user/team/constant';
 import { TeamModeEnum } from '@/global/settings/constants';
 import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
+import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
+import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
 export type MemberRestoreQuery = {};
 export type MemberRestoreBody = {
   tmbId: string;
@@ -36,6 +38,26 @@ async function handler(
       status: TeamMemberStatusEnum.active
     }
   );
+
+  (async () => {
+    const memberName = await MongoTeamMember.findOne({ _id: tmbId }, { name: 1 })
+      .lean()
+      .then((doc) => {
+        if (!doc) {
+          throw new Error('Member not found');
+        }
+        return doc.name;
+      });
+
+    addOperationLog({
+      tmbId,
+      teamId,
+      event: OperationLogEventEnum.RECOVER_TEAM_MEMBER,
+      params: {
+        memberName: memberName
+      }
+    });
+  })();
 
   return {};
 }

@@ -77,6 +77,19 @@ export type SystemConfigType = {
       WX_NOTIFY_URL?: string;
       WX_PRIVATE_KEY?: string;
     };
+    alipay?: {
+      APP_ID?: string;
+      APP_PRIVATE_KEY?: string;
+      APP_CERT_CONTENT?: string;
+      ALIPAY_GATEWAY?: string;
+      ALIPAY_ROOT_CERT_CONTENT?: string;
+      ALIPAY_PUBLIC_CERT_CONTENT?: string;
+      ALIPAY_ENDPOINT?: string;
+      ALIPAY_NOTIFY_URL?: string;
+    };
+    bank?: {
+      description?: string;
+    };
   };
   fastLogin?: Record<
     string,

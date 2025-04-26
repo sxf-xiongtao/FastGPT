@@ -51,9 +51,9 @@ const StandardPlanContentList = ({
       permissionCustomApiKey: plan.permissionCustomApiKey,
       permissionCustomCopyright: plan.permissionCustomCopyright,
       trainingWeight: plan.trainingWeight,
-      permissionReRank: plan.permissionReRank,
       totalPoints: plan.totalPoints,
-      permissionWebsiteSync: plan.permissionWebsiteSync
+      permissionWebsiteSync: plan.permissionWebsiteSync,
+      permissionTeamOperationLog: plan.permissionTeamOperationLog
     };
   }, [level, planMap]);
 
@@ -121,16 +121,18 @@ const StandardPlanContentList = ({
           })}
         </Box>
       </Flex>
-      {!!planContent.permissionReRank && (
-        <Flex alignItems={'center'}>
-          <MyIcon name={'price/right'} w={'16px'} mr={3} />
-          <Box color={'myGray.600'}>{t('common:support.wallet.subscription.rerank')}</Box>
-        </Flex>
-      )}
       {!!planContent.permissionWebsiteSync && (
         <Flex alignItems={'center'}>
           <MyIcon name={'price/right'} w={'16px'} mr={3} />
           <Box color={'myGray.600'}>{t('common:support.wallet.subscription.web_site_sync')}</Box>
+        </Flex>
+      )}
+      {!!planContent.permissionTeamOperationLog && (
+        <Flex alignItems={'center'}>
+          <MyIcon name={'price/right'} w={'16px'} mr={3} />
+          <Box color={'myGray.600'}>
+            {t('common:support.wallet.subscription.team_operation_log')}
+          </Box>
         </Flex>
       )}
     </Grid>
@@ -151,6 +153,8 @@ const EditPlanModal = ({
   const { t } = useTranslation();
   const { register, handleSubmit, watch, setValue } = useForm({ defaultValues: planMap[level] });
   const label = planMap?.[level].name || t(standardSubLevelMap[level].label);
+  const permissionWebsiteSync = watch('permissionWebsiteSync');
+  const permissionTeamOperationLog = watch('permissionTeamOperationLog');
 
   const onSubmit = (data: TeamStandardSubPlanItemType) => {
     onChange(
@@ -264,6 +268,19 @@ const EditPlanModal = ({
           />
         </HStack>
         <HStack mt={3}>
+          <FormLabel flex={'0 0 150px'}>每月 AI 积分</FormLabel>
+          <MyNumberInput
+            flex={'1 0 0'}
+            bg={'myGray.50'}
+            value={watch('totalPoints')}
+            min={0}
+            onChange={(e) => {
+              // @ts-ignore
+              setValue('totalPoints', e ?? '');
+            }}
+          />
+        </HStack>
+        <HStack mt={3}>
           <FormLabel flex={'0 0 150px'}>训练优先级(高的优先)</FormLabel>
           <MyNumberInput
             flex={'1 0 0'}
@@ -278,23 +295,20 @@ const EditPlanModal = ({
           />
         </HStack>
         <HStack mt={3}>
-          <FormLabel flex={'0 0 150px'}>允许使用rerank</FormLabel>
-          <Switch {...register('permissionReRank')} />
-        </HStack>
-        <HStack mt={3}>
           <FormLabel flex={'0 0 150px'}>允许使用站点同步</FormLabel>
-          <Switch {...register('permissionWebsiteSync')} />
+          <Switch
+            isChecked={permissionWebsiteSync}
+            onChange={(e) => {
+              setValue('permissionWebsiteSync', e.target.checked);
+            }}
+          />
         </HStack>
         <HStack mt={3}>
-          <FormLabel flex={'0 0 150px'}>每月 AI 积分</FormLabel>
-          <MyNumberInput
-            flex={'1 0 0'}
-            bg={'myGray.50'}
-            value={watch('totalPoints')}
-            min={0}
+          <FormLabel flex={'0 0 150px'}>允许团队操作日志</FormLabel>
+          <Switch
+            isChecked={permissionTeamOperationLog}
             onChange={(e) => {
-              // @ts-ignore
-              setValue('totalPoints', e ?? '');
+              setValue('permissionTeamOperationLog', e.target.checked);
             }}
           />
         </HStack>
@@ -342,9 +356,9 @@ const StandardPlans = ({
         permissionCustomApiKey: planMap['free']?.permissionCustomApiKey,
         permissionCustomCopyright: planMap['free']?.permissionCustomCopyright,
         trainingWeight: planMap['free']?.trainingWeight,
-        permissionReRank: planMap['free']?.permissionReRank,
         totalPoints: planMap['free']?.totalPoints,
-        permissionWebsiteSync: planMap['free']?.permissionWebsiteSync
+        permissionWebsiteSync: planMap['free']?.permissionWebsiteSync,
+        permissionTeamOperationLog: planMap['free']?.permissionTeamOperationLog
       },
       {
         level: StandardSubLevelEnum.experience,
@@ -361,9 +375,9 @@ const StandardPlans = ({
         permissionCustomApiKey: planMap['experience']?.permissionCustomApiKey,
         permissionCustomCopyright: planMap['experience']?.permissionCustomCopyright,
         trainingWeight: planMap['experience']?.trainingWeight,
-        permissionReRank: planMap['experience']?.permissionReRank,
         totalPoints: planMap['experience']?.totalPoints,
-        permissionWebsiteSync: planMap['experience']?.permissionWebsiteSync
+        permissionWebsiteSync: planMap['experience']?.permissionWebsiteSync,
+        permissionTeamOperationLog: planMap['experience']?.permissionTeamOperationLog
       },
       {
         level: StandardSubLevelEnum.team,
@@ -378,9 +392,9 @@ const StandardPlans = ({
         permissionCustomApiKey: planMap['team']?.permissionCustomApiKey,
         permissionCustomCopyright: planMap['team']?.permissionCustomCopyright,
         trainingWeight: planMap['team']?.trainingWeight,
-        permissionReRank: planMap['team']?.permissionReRank,
         totalPoints: planMap['team']?.totalPoints,
-        permissionWebsiteSync: planMap['team']?.permissionWebsiteSync
+        permissionWebsiteSync: planMap['team']?.permissionWebsiteSync,
+        permissionTeamOperationLog: planMap['team']?.permissionTeamOperationLog
       },
       {
         level: StandardSubLevelEnum.enterprise,
@@ -397,13 +411,13 @@ const StandardPlans = ({
         permissionCustomApiKey: planMap['enterprise']?.permissionCustomApiKey,
         permissionCustomCopyright: planMap['enterprise']?.permissionCustomCopyright,
         trainingWeight: planMap['enterprise']?.trainingWeight,
-        permissionReRank: planMap['enterprise']?.permissionReRank,
         totalPoints: planMap['enterprise']?.totalPoints,
-        permissionWebsiteSync: planMap['enterprise']?.permissionWebsiteSync
+        permissionWebsiteSync: planMap['enterprise']?.permissionWebsiteSync,
+        permissionTeamOperationLog: planMap['enterprise']?.permissionTeamOperationLog
       }
     ];
-  }, [planMap]);
-
+  }, [planMap, t]);
+  console.log(planMap);
   // const openPlan = !!value && value !== '{}';
 
   return (

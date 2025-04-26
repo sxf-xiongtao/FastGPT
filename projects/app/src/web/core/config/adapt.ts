@@ -140,6 +140,8 @@ export function formatConfigStore2FormSchema({
     },
     paySettings: {
       wx: fastgptPro?.pay?.wx || {},
+      alipay: fastgptPro?.pay?.alipay || {},
+      bank: fastgptPro?.pay?.bank || {},
       subPlans: {
         planDescriptionUrl:
           // @ts-ignore
@@ -176,7 +178,7 @@ export function formatFormData2ConfigStore({
   const { email, phone, github, wechat, google, fastLogin, sms, microsoft, teamMode, sso } =
     loginSettings;
   const { censor } = securitySettings;
-  const { wx, subPlans } = paySettings;
+  const { wx, alipay, bank, subPlans } = paySettings;
   const { externalProviderWorkflowVariables } = externalProviderSettings;
 
   const formatFeConfig: FastGPTFeConfigsType = {
@@ -197,6 +199,11 @@ export function formatFormData2ConfigStore({
         : undefined
     },
     sso,
+    payConfig: {
+      wx: !!wx?.WX_PRIVATE_KEY,
+      alipay: !!alipay?.ALIPAY_ROOT_CERT_CONTENT,
+      bank: !!bank?.description
+    },
     register_method: (() => {
       const methods = [];
       if (loginSettings.teamMode === 'sync') {
@@ -244,6 +251,12 @@ export function formatFormData2ConfigStore({
     externalProviderWorkflowVariables
   };
 
+  formatFeConfig.show_pay = !!(
+    formatFeConfig.payConfig?.wx ||
+    formatFeConfig.payConfig?.alipay ||
+    formatFeConfig.payConfig?.bank
+  );
+
   const formatLoginSettings = {
     email,
     phone,
@@ -289,7 +302,9 @@ export function formatFormData2ConfigStore({
       })(),
       teamMode,
       pay: {
-        wx
+        wx,
+        alipay,
+        bank
       }
     }
   };

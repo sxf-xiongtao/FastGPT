@@ -1,14 +1,13 @@
 import type { NextApiResponse } from 'next';
-import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoBill } from '@/service/support/wallet/bill/schema';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
-import { WXPay } from '@/service/support/wallet/bill/pay';
 import {
   BillStatusEnum,
   BillTypeEnum,
   SUB_DATASET_SIZE_RATE,
   SUB_EXTRA_POINT_RATE,
-  billTypeMap
+  billTypeMap,
+  MAX_WX_PAY_AMOUNT
 } from '@fastgpt/global/support/wallet/bill/constants';
 import { getExtraDatasetSizePrice, getExtraPointsPrice } from '@/service/support/wallet/sub/utils';
 import { CreateBillProps, CreateBillResponse } from '@fastgpt/global/support/wallet/bill/api';
@@ -19,13 +18,18 @@ import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { ManagePermissionVal } from '@fastgpt/global/support/permission/constant';
 import { getStandardPlanConfig } from '@fastgpt/service/support/wallet/sub/utils';
 import { subModeMap } from '@fastgpt/global/support/wallet/sub/constants';
+import { BillPayWayEnum } from '@fastgpt/global/support/wallet/bill/constants';
+import { createPaymentController } from '@/service/support/wallet/bill/pay/base';
 
-/* 获取支付二维码 */
-async function handler(req: ApiRequestProps<CreateBillProps>, res: NextApiResponse) {
-  const { type } = req.body;
+/* 创建支付订单 */
+async function handler(
+  req: ApiRequestProps<CreateBillProps>,
+  res: NextApiResponse
+): Promise<CreateBillResponse> {
+  const { type: billType } = req.body;
 
-  if (!billTypeMap[type]) {
-    throw new Error('Invalid type');
+  if (!billTypeMap[billType]) {
+    return Promise.reject('Invalid billType');
   }
 
   const { teamId, tmbId } = await authUserPer({
@@ -36,9 +40,8 @@ async function handler(req: ApiRequestProps<CreateBillProps>, res: NextApiRespon
 
   // amount: read price
   const { readPrice, metadata = {} } = (() => {
-    if (type === BillTypeEnum.standSubPlan) {
+    if (billType === BillTypeEnum.standSubPlan) {
       const { level, subMode } = req.body;
-
       const plan = getStandardPlanConfig(level);
       if (!plan) {
         throw new Error('Invalid plan');
@@ -58,7 +61,7 @@ async function handler(req: ApiRequestProps<CreateBillProps>, res: NextApiRespon
         }
       };
     }
-    if (type === BillTypeEnum.extraDatasetSub) {
+    if (billType === BillTypeEnum.extraDatasetSub) {
       const { month, extraDatasetSize } = req.body;
 
       if (!month || month < 1 || month > 12 || month % 1 !== 0) {
@@ -75,7 +78,7 @@ async function handler(req: ApiRequestProps<CreateBillProps>, res: NextApiRespon
         }
       };
     }
-    if (type === BillTypeEnum.extraPoints) {
+    if (billType === BillTypeEnum.extraPoints) {
       const { extraPoints } = req.body;
 
       const pointsPrice = getExtraPointsPrice('read');
@@ -90,44 +93,63 @@ async function handler(req: ApiRequestProps<CreateBillProps>, res: NextApiRespon
       };
     }
 
-    throw new Error('Invalid bill type');
+    throw new Error('Invalid bill billType');
   })();
 
   if (readPrice <= 0) {
-    throw new Error('Invalid amount');
+    return Promise.reject('Invalid amount');
   }
 
   const storePrice = readPrice * PRICE_SCALE;
+
+  // Get default pay way: wx - alipay
+  const payWay = await (async () => {
+    const hasWxPay = !!global.feConfigs?.payConfig?.wx;
+    if (hasWxPay && readPrice < MAX_WX_PAY_AMOUNT) {
+      return BillPayWayEnum.wx;
+    }
+
+    const hasAlipay = !!global.feConfigs?.payConfig?.alipay;
+    if (hasAlipay) {
+      return BillPayWayEnum.alipay;
+    }
+
+    const hasBank = !!global.feConfigs?.payConfig?.bank;
+    if (hasBank) {
+      return BillPayWayEnum.bank;
+    }
+
+    return Promise.reject('No pay way');
+  })();
+
   const orderId = getNanoid(24);
 
-  const wxPay = new WXPay();
-  const { code_url } = await wxPay.getPayQRUrl({
+  const paymentProcessor = await createPaymentController(payWay);
+  const paymentResult = await paymentProcessor.createPayOrder({
     amount: readPrice,
-    type,
+    type: billType,
     orderId
   });
 
-  // add one pay record
   const bill = await MongoBill.create({
     teamId,
     tmbId,
     orderId,
     price: storePrice,
     status: BillStatusEnum.NOTPAY,
-    type,
+    type: billType,
     metadata: {
-      payWay: 'wx',
+      payWay,
       ...metadata
     }
   });
 
-  jsonRes<CreateBillResponse>(res, {
-    data: {
-      billId: bill._id,
-      readPrice,
-      codeUrl: code_url
-    }
-  });
+  return {
+    ...paymentResult,
+    billId: bill._id,
+    readPrice,
+    payment: payWay
+  };
 }
 
 export default NextAPI(handler);

@@ -11,6 +11,7 @@ import { getMessageTemplate } from '@/service/support/user/inform/constants';
 import { checkTimerLock } from '@fastgpt/service/common/system/timerLock/utils';
 import { authCode } from '@/service/support/user/auth/controller';
 import { i18nT } from '@fastgpt/web/i18n/utils';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 
 const nanoid = customAlphabet('123456789', 6);
 
@@ -65,30 +66,39 @@ async function handler(
   // Check send auth lock
   const { lockMinutes } = getMessageTemplate(templateCode);
   const timerId = `auth--${username}--${type}`;
-  if (
-    !(await checkTimerLock({
-      timerId,
-      lockMinuted: lockMinutes
-    }))
-  ) {
-    return Promise.reject(i18nT('common:error.send_auth_code_too_frequently'));
-  }
-
-  // 创建 auth 记录
-  const code = nanoid();
-  await MongoUserAuth.create({
-    key: username,
-    type,
-    code
-  });
-
-  await sendMessage({
-    target: username,
-    templateCode,
-    templateParam: {
-      code
+  await mongoSessionRun(async (session) => {
+    if (
+      !(await checkTimerLock({
+        timerId,
+        lockMinuted: lockMinutes,
+        session
+      }))
+    ) {
+      return Promise.reject(i18nT('common:error.send_auth_code_too_frequently'));
     }
+
+    // 创建 auth 记录
+    const code = nanoid();
+    await MongoUserAuth.create(
+      [
+        {
+          key: username,
+          type,
+          code
+        }
+      ],
+      { session, ordered: true }
+    );
+
+    await sendMessage({
+      target: username,
+      templateCode,
+      templateParam: {
+        code
+      }
+    });
   });
+
   return {
     message: '发送验证码成功'
   };

@@ -4,45 +4,62 @@ import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import type { BillSchemaType } from '@fastgpt/global/support/wallet/bill/type.d';
 import dayjs from 'dayjs';
-import { WXPay } from '@/service/support/wallet/bill/pay';
 import { createOnePromotion } from '@/service/support/activity/promotion/controller';
 import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
 import { delay } from '@fastgpt/global/common/system/utils';
 import { addLog } from '@fastgpt/service/common/system/log';
-import { BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
+import { BillStatusEnum, BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
-import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
-import { SubTypeEnum, subModeMap } from '@fastgpt/global/support/wallet/sub/constants';
-import { addMonths } from 'date-fns';
+import { subModeMap } from '@fastgpt/global/support/wallet/sub/constants';
 import { ClientSession } from '@fastgpt/service/common/mongo';
 import { NextAPI } from '@/service/middleware/entry';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
-import { getStandardPlanConfig, sortStandPlans } from '@fastgpt/service/support/wallet/sub/utils';
+import { getStandardPlanConfig } from '@fastgpt/service/support/wallet/sub/utils';
 import { UserModelSchema } from '@fastgpt/global/support/user/type';
 import { useIPFrequencyLimit } from '@fastgpt/service/common/middle/reqFrequencyLimit';
+import {
+  addExtraDatasetSizeSub,
+  addExtraPointsSub,
+  addStandardSub
+} from '@/service/support/wallet/sub/controller';
+import { BillPayWayEnum } from '@fastgpt/global/support/wallet/bill/constants';
+import { createPaymentController } from '@/service/support/wallet/bill/pay/base';
+import { CheckPayResultResponse } from '@fastgpt/global/support/wallet/bill/api';
+import { i18nT } from '@fastgpt/web/i18n/utils';
 
 /* 校验支付结果 */
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse): Promise<CheckPayResultResponse> {
   const { payId } = req.query as { payId: string };
 
   await authCert({ req, authToken: true });
 
   // 查找订单记录校验
-  const payOrder = await MongoBill.findById<BillSchemaType>(payId);
-
+  const payOrder = await MongoBill.findById<BillSchemaType>(payId).lean();
   if (!payOrder) {
     return Promise.reject('订单不存在');
   }
-  if (payOrder.status === 'SUCCESS') {
-    return Promise.reject('订单已结算');
+  if (payOrder.status === BillStatusEnum.SUCCESS) {
+    return {
+      status: BillStatusEnum.SUCCESS,
+      description: i18nT('common:bill_already_processed')
+    };
+  }
+  if (
+    payOrder.metadata.payWay === BillPayWayEnum.bank ||
+    payOrder.metadata.payWay === BillPayWayEnum.coupon ||
+    payOrder.metadata.payWay === BillPayWayEnum.balance
+  ) {
+    return {
+      status: BillStatusEnum.NOTPAY,
+      description: i18nT('common:bill_not_pay_processed')
+    };
   }
 
-  // check pay result
-  const wxPay = new WXPay();
-  const payRes = await wxPay.getPayResult(payOrder.orderId);
+  const paymentProcessor = await createPaymentController(payOrder.metadata.payWay);
+  const payRes = await paymentProcessor.getPayResult(payOrder.orderId);
 
   //  重点检查：支付成功
-  if (payRes.trade_state === 'SUCCESS') {
+  if (payRes.status === BillStatusEnum.SUCCESS) {
     const payResult = await mongoSessionRun(async (session) => {
       // 更新订单状态. 如果没有合适的订单，说明订单重复了
       const updateRes = await MongoBill.findOneAndUpdate(
@@ -90,22 +107,30 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         });
       }
     } catch (error) {}
-    return '支付成功';
+
+    return {
+      status: BillStatusEnum.SUCCESS,
+      description: i18nT('common:pay_success')
+    };
   }
 
-  // 校验下是否超过一天
+  // 校验下是否超过一天, 超过一天并且已经关闭的订单，则设置成关闭状态
   const orderTime = dayjs(payOrder.createTime);
   const diffInHours = dayjs().diff(orderTime, 'hours');
-
-  if (payRes.trade_state === 'CLOSED' || diffInHours > 24) {
-    // 订单已关闭
+  if (payRes.status === BillStatusEnum.CLOSED || diffInHours > 24) {
     await MongoBill.findByIdAndUpdate(payId, {
       status: 'CLOSED'
     });
-    return Promise.reject('订单已过期');
+    return {
+      status: BillStatusEnum.CLOSED,
+      description: i18nT('common:bill_expired')
+    };
   }
 
-  return Promise.reject(payRes?.trade_state_desc || '订单无效');
+  return {
+    status: BillStatusEnum.NOTPAY,
+    description: payRes.description || i18nT('common:support.wallet.bill.status.notpay')
+  };
 }
 
 export default NextAPI(
@@ -146,35 +171,6 @@ const unLockTrainingData = async (teamId: string, retry = 3): Promise<any> => {
   }
 };
 
-/* 
-  标准套餐从新计算开始和结束时间
-  最大的套餐，开始和结束时间不变。（最大的套餐，开始时间肯定早于当前时间）
-  逐一从高套餐往低套餐遍历：
-  i 的时长 = i 的结束时间 - i 的开始时间
-  i 的开始时间 = i-1 的结束时间
-  i 的结束时间 = i 新的开始时间 + i 的时长
-*/
-export const reComputeStandPlans = async (teamId: string, session: ClientSession) => {
-  const plans = await MongoTeamSub.find({
-    teamId,
-    type: SubTypeEnum.standard
-  }).session(session);
-
-  sortStandPlans(plans);
-
-  for (let i = 1; i < plans.length; i++) {
-    const plan = plans[i];
-    const lastPlan = plans[i - 1];
-    const duration = plan.expiredTime.getTime() - plan.startTime.getTime();
-    plan.startTime = lastPlan.expiredTime;
-    plan.expiredTime = new Date(plan.startTime.getTime() + duration);
-  }
-
-  for await (const plan of plans) {
-    await plan.save({ session });
-  }
-};
-
 const dealStandardPlanPay = async (payOrder: BillSchemaType, session: ClientSession) => {
   const subLevel = payOrder.metadata.standSubLevel!;
   const subMode = payOrder.metadata.subMode;
@@ -184,45 +180,21 @@ const dealStandardPlanPay = async (payOrder: BillSchemaType, session: ClientSess
     throw new Error('缺少关键参数，更新账单失败，请联系管理员');
   }
 
+  // 计算新增的时长
   const durationMonth = subModeMap[subMode].durationMonth;
 
-  // 1. 查找是否有相同类型的订阅，有的话，直接更新过期时间和增加积分；没有的话，创建新的订阅
-  const teamSub = await MongoTeamSub.findOne({
-    teamId: payOrder.teamId,
-    type: SubTypeEnum.standard,
-    currentSubLevel: subLevel
-  }).session(session);
-
-  // 计算总积分
+  // 计算新增的总积分
   const totalPoints = plan.totalPoints * durationMonth;
 
-  if (teamSub) {
-    teamSub.totalPoints += totalPoints;
-    teamSub.surplusPoints += totalPoints;
-    teamSub.expiredTime = addMonths(teamSub.expiredTime, durationMonth);
-    await teamSub.save({ session });
-  } else {
-    await MongoTeamSub.create(
-      [
-        {
-          teamId: payOrder.teamId,
-          type: SubTypeEnum.standard,
-          startTime: new Date(),
-          expiredTime: addMonths(new Date(), durationMonth),
-          currentMode: subMode,
-          nextMode: subMode,
-          currentSubLevel: subLevel,
-          nextSubLevel: subLevel,
-          totalPoints,
-          surplusPoints: totalPoints
-        }
-      ],
-      { session }
-    );
-  }
-
-  // 2. 重新排序标准订阅
-  await reComputeStandPlans(payOrder.teamId, session);
+  // 新增标准订阅
+  await addStandardSub({
+    teamId: payOrder.teamId,
+    level: subLevel,
+    totalPoints,
+    durationDay: durationMonth * 30,
+    subMode,
+    session
+  });
 };
 const dealExtraDatasetSubPay = async (payOrder: BillSchemaType, session: ClientSession) => {
   const { month, datasetSize } = payOrder.metadata;
@@ -230,21 +202,13 @@ const dealExtraDatasetSubPay = async (payOrder: BillSchemaType, session: ClientS
     throw new Error('缺少关键参数，更新账单失败，请联系管理员');
   }
 
-  // push extra dataset size sub
-  await MongoTeamSub.create(
-    [
-      {
-        teamId: payOrder.teamId,
-        type: SubTypeEnum.extraDatasetSize,
-        startTime: new Date(),
-        expiredTime: addMonths(new Date(), month),
-        price: payOrder.price,
-
-        currentExtraDatasetSize: datasetSize
-      }
-    ],
-    { session }
-  );
+  await addExtraDatasetSizeSub({
+    teamId: payOrder.teamId,
+    datasetSize,
+    durationDay: month * 30,
+    price: payOrder.price,
+    session
+  });
 };
 const dealExtraPointsSubPay = async (payOrder: BillSchemaType, session: ClientSession) => {
   const { month, extraPoints } = payOrder.metadata;
@@ -252,20 +216,11 @@ const dealExtraPointsSubPay = async (payOrder: BillSchemaType, session: ClientSe
     throw new Error('缺少关键参数，更新账单失败，请联系管理员');
   }
 
-  // push extra dataset size sub
-  await MongoTeamSub.create(
-    [
-      {
-        teamId: payOrder.teamId,
-        type: SubTypeEnum.extraPoints,
-        startTime: new Date(),
-        expiredTime: addMonths(new Date(), month),
-        price: payOrder.price,
-
-        totalPoints: extraPoints,
-        surplusPoints: extraPoints
-      }
-    ],
-    { session }
-  );
+  await addExtraPointsSub({
+    teamId: payOrder.teamId,
+    points: extraPoints,
+    durationDay: month * 30,
+    price: payOrder.price,
+    session
+  });
 };

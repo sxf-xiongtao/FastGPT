@@ -1,4 +1,4 @@
-import { reComputeStandPlans } from '@/pages/api/support/wallet/bill/checkPayResult';
+import { reComputeStandPlans } from '@/service/support/wallet/sub/controller';
 import { NextAPI } from '@/service/middleware/entry';
 
 import { adminCert } from '@/service/support/permission/adminCert';

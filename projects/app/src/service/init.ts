@@ -13,6 +13,8 @@ import { initFastGPTConfig } from '@fastgpt/service/common/system/tools';
 import { loadSystemModels } from '@fastgpt/service/core/ai/config/utils';
 import { deepRagSearch } from './core/dataset/search';
 import { concatUsageRequest, createUsageRequest } from './support/wallet/usage/utils';
+import { cloneDeep, isEqual } from 'lodash';
+import { beforeUpdateConfig } from './admin/settings/hooks';
 
 export const getProInitData = async () => {
   try {
@@ -34,38 +36,35 @@ export const getProInitData = async () => {
     const systemConfig: SystemConfigType = fastgptProConfig?.value
       ? (fastgptProConfig?.value as SystemConfigType)
       : {};
+    const fastgptConfigValue = fastgptConfig?.value as FastGPTConfigFileType | undefined;
 
-    const externalUserSystemBaseUrl = process.env.EXTERNAL_USER_SYSTEM_BASE_URL;
-    const fastgptConfigValue = fastgptConfig?.value as unknown as FastGPTConfigFileType;
-    let isConfigEdit = false;
+    // 如果环境变量有变化，这里会重新计算一份最新配置
+    if (fastgptConfigValue && fastgptProConfig?.value) {
+      const cloneFastGPTConfigValue = cloneDeep(fastgptConfigValue);
+      const cloneSystemConfig = cloneDeep(systemConfig);
 
-    if (externalUserSystemBaseUrl !== fastgptConfigValue?.feConfigs?.sso?.url) {
-      isConfigEdit = true;
-    }
-    if (!externalUserSystemBaseUrl) {
-      if (systemConfig.teamMode === 'sync') systemConfig.teamMode = 'multi'; // reset the teamMode
-      fastgptConfigValue.feConfigs.sso = undefined;
-    } else {
-      fastgptConfigValue.feConfigs.sso = {
-        ...fastgptConfigValue.feConfigs.sso,
-        url: process.env.EXTERNAL_USER_SYSTEM_BASE_URL
-      };
-    }
-
-    if (isConfigEdit) {
-      // save to db
-      await Promise.all([
-        MongoSystemConfigs.create({
-          type: SystemConfigsTypeEnum.fastgpt,
-          value: fastgptConfigValue
-        }),
-        MongoSystemConfigs.create({
-          type: SystemConfigsTypeEnum.fastgptPro,
-          value: systemConfig
-        })
-      ]);
+      beforeUpdateConfig(cloneFastGPTConfigValue, cloneSystemConfig);
+      if (
+        JSON.stringify(fastgptConfigValue) !== JSON.stringify(cloneFastGPTConfigValue) ||
+        JSON.stringify(systemConfig) !== JSON.stringify(cloneSystemConfig)
+      ) {
+        console.log('环境变量发生变化了，重新计算配置文件');
+        await Promise.all([
+          MongoSystemConfigs.create({
+            type: SystemConfigsTypeEnum.fastgpt,
+            value: cloneFastGPTConfigValue
+          }),
+          MongoSystemConfigs.create({
+            type: SystemConfigsTypeEnum.fastgptPro,
+            value: cloneSystemConfig
+          })
+        ]);
+      } else {
+        console.log('环境变量没有发生变化，不重新计算配置文件');
+      }
     }
 
+    // Add value to global
     global.systemConfig = systemConfig;
 
     if (fastgptConfigValue) {

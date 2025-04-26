@@ -83,16 +83,20 @@ export async function sendSms({
   const endpoint = 'dysmsapi.aliyuncs.com';
 
   if (process.env.SMS_PROXY) {
-    return axios.post(process.env.SMS_PROXY, {
-      accessKeyId,
-      accessKeySecret,
-      signName,
-      endpoint,
+    return axios
+      .post(process.env.SMS_PROXY, {
+        accessKeyId,
+        accessKeySecret,
+        signName,
+        endpoint,
 
-      templateCode,
-      phone,
-      templateParam
-    });
+        templateCode,
+        phone,
+        templateParam
+      })
+      .catch((err) => {
+        return Promise.reject(err.response?.data ?? err?.response ?? err);
+      });
   }
 
   const sendSmsRequest = new dysmsapi.SendSmsRequest({

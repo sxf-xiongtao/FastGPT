@@ -70,6 +70,8 @@ export type ConfigFormType = {
   };
   paySettings: {
     wx: NonNullable<SystemConfigType['pay']>['wx'];
+    alipay: NonNullable<SystemConfigType['pay']>['alipay'];
+    bank: NonNullable<SystemConfigType['pay']>['bank'];
     subPlans: {
       planDescriptionUrl: string;
       standard: string;
