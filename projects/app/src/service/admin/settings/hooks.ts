@@ -1,18 +1,4 @@
 import { ConfigStoreType } from '@/global/admin/config';
-import axios from 'axios';
-
-async function checkSSOURL() {
-  try {
-    const url = new URL('test', process.env.EXTERNAL_USER_SYSTEM_BASE_URL);
-    const res = await axios.get(url.toString());
-    if (res.status === 200 && res.data === 'FastGPT-SSO-Service') {
-      return true;
-    }
-    return false;
-  } catch (error) {
-    return false;
-  }
-}
 
 export async function beforeUpdateConfig(
   fastgpt: ConfigStoreType['fastgpt'],

@@ -4,6 +4,7 @@ import {
   getProApiDatasetFileListRequest,
   getProApiDatasetFilePreviewUrlRequest
 } from '@/pages/api/core/dataset/systemApiDataset';
+import { openapiAuthLimitRequest } from '@/pages/api/support/openapi/authLimit';
 import { SystemConfigType } from '@/types';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
 import { FastGPTConfigFileType } from '@fastgpt/global/common/system/types';
@@ -11,7 +12,6 @@ import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema
 import { initFastGPTConfig } from '@fastgpt/service/common/system/tools';
 import { loadSystemModels } from '@fastgpt/service/core/ai/config/utils';
 import { deepRagSearch } from './core/dataset/search';
-import { openapiAuthLimitRequest } from '@/pages/api/support/openapi/authLimit';
 import { concatUsageRequest, createUsageRequest } from './support/wallet/usage/utils';
 
 export const getProInitData = async () => {
@@ -31,12 +31,43 @@ export const getProInitData = async () => {
     ]);
 
     // concat config
-    const config: SystemConfigType = fastgptProConfig?.value
+    const systemConfig: SystemConfigType = fastgptProConfig?.value
       ? (fastgptProConfig?.value as SystemConfigType)
       : {};
-    global.systemConfig = config;
 
+    const externalUserSystemBaseUrl = process.env.EXTERNAL_USER_SYSTEM_BASE_URL;
     const fastgptConfigValue = fastgptConfig?.value as unknown as FastGPTConfigFileType;
+    let isConfigEdit = false;
+
+    if (externalUserSystemBaseUrl !== fastgptConfigValue?.feConfigs?.sso?.url) {
+      isConfigEdit = true;
+    }
+    if (!externalUserSystemBaseUrl) {
+      if (systemConfig.teamMode === 'sync') systemConfig.teamMode = 'multi'; // reset the teamMode
+      fastgptConfigValue.feConfigs.sso = undefined;
+    } else {
+      fastgptConfigValue.feConfigs.sso = {
+        ...fastgptConfigValue.feConfigs.sso,
+        url: process.env.EXTERNAL_USER_SYSTEM_BASE_URL
+      };
+    }
+
+    if (isConfigEdit) {
+      // save to db
+      await Promise.all([
+        MongoSystemConfigs.create({
+          type: SystemConfigsTypeEnum.fastgpt,
+          value: fastgptConfigValue
+        }),
+        MongoSystemConfigs.create({
+          type: SystemConfigsTypeEnum.fastgptPro,
+          value: systemConfig
+        })
+      ]);
+    }
+
+    global.systemConfig = systemConfig;
+
     if (fastgptConfigValue) {
       if (fastgptConfigValue.feConfigs) {
         fastgptConfigValue.feConfigs.isPlus = true;

@@ -1,19 +1,19 @@
-import React, { useMemo, useState } from 'react';
-import { Box, Divider, Input, Textarea } from '@chakra-ui/react';
-import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';
 import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
-import { getInitFormData, postUpdateConfig } from '@/web/core/config/api';
-import { useForm } from 'react-hook-form';
-import { serviceSideProps } from '@/web/common/i18n/utils';
-import FirstTitle from '@/pageComponents/Settings/FirstTitle';
-import SettingPage from '@/pageComponents/Settings/SettingPage';
-import SecondTitle from '@/pageComponents/Settings/SecondTitle';
-import FormItem from '@/pageComponents/Settings/FormItem';
-import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
-import Switch from '@/pageComponents/Settings/Switch';
-import MySelect from '@fastgpt/web/components/common/MySelect';
-import ImageInput from '@/pageComponents/Settings/ImageInput';
 import { TeamModeEnum } from '@/global/settings/constants';
+import FirstTitle from '@/pageComponents/Settings/FirstTitle';
+import FormItem from '@/pageComponents/Settings/FormItem';
+import ImageInput from '@/pageComponents/Settings/ImageInput';
+import SecondTitle from '@/pageComponents/Settings/SecondTitle';
+import SettingPage from '@/pageComponents/Settings/SettingPage';
+import Switch from '@/pageComponents/Settings/Switch';
+import { serviceSideProps } from '@/web/common/i18n/utils';
+import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';
+import { getInitFormData, postUpdateConfig } from '@/web/core/config/api';
+import { Box, Divider, Input, Textarea } from '@chakra-ui/react';
+import MySelect from '@fastgpt/web/components/common/MySelect';
+import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
+import { useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 interface titleType {
   mainTitle: string;
@@ -105,7 +105,7 @@ const UserSetting = () => {
           <SecondTitle title="自定义用户系统配置" />
           <FormItem
             title="用户服务根地址(末尾不加/)"
-            description="具体用法请看： [FastGPT SSO 配置](https://fael3z0zfze.feishu.cn/docx/FugkdIgOJoCnrcxUcTycWZwInde)"
+            description="具体用法请看： [SSO & 外部成员同步](https://doc.tryfastgpt.ai/docs/guide/admin/sso/)"
           >
             <Box>{watch('sso.url')}</Box>
           </FormItem>
