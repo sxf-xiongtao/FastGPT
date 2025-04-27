@@ -20,6 +20,7 @@ import { getStandardPlanConfig } from '@fastgpt/service/support/wallet/sub/utils
 import { subModeMap } from '@fastgpt/global/support/wallet/sub/constants';
 import { BillPayWayEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { createPaymentController } from '@/service/support/wallet/bill/pay/base';
+import { i18nT } from '@fastgpt/web/i18n/utils';
 
 /* 创建支付订单 */
 async function handler(
@@ -119,7 +120,10 @@ async function handler(
       return BillPayWayEnum.bank;
     }
 
-    return Promise.reject('No pay way');
+    if (hasWxPay) {
+      return Promise.reject(i18nT('common:price_over_wx_limit'));
+    }
+    return Promise.reject(i18nT('common:no_pay_way'));
   })();
 
   const orderId = getNanoid(24);

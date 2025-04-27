@@ -10,6 +10,7 @@ import { CreateOrderResponse, UpdatePaymentProps } from '@fastgpt/global/support
 import { NextAPI } from '@/service/middleware/entry';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import { createPaymentController } from '@/service/support/wallet/bill/pay/base';
+import { i18nT } from '@fastgpt/web/i18n/utils';
 
 async function handler(
   req: ApiRequestProps<UpdatePaymentProps>,
@@ -43,7 +44,10 @@ async function handler(
       return BillPayWayEnum.bank;
     }
 
-    return Promise.reject('No pay way');
+    if (hasWxPay) {
+      return Promise.reject(i18nT('common:price_over_wx_limit'));
+    }
+    return Promise.reject(i18nT('common:no_pay_way'));
   })();
 
   const paymentProcessor = await createPaymentController(payWay);
