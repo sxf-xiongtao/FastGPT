@@ -1,15 +1,11 @@
-import { test_getUserInfo, test_redirectFn } from './test';
-import { leapmotor_getUserInfo, leapmotor_redirectFn } from './leapmotor';
-import { aecc_callbackFn, aecc_getUserInfo, aecc_redirectFn } from './aecc';
-import { hebamr_redirectFn, hebamr_getUserInfo } from './hebamr';
+import { bjsf_assertFn, bjsf_getMetadata, bjsf_getUserInfo, bjsf_redirectFn } from 'provider/bjsf';
+import { TCL_getUserInfo, tcl_redirectFn } from 'provider/tcl';
 import {
-  feishu_redirectFn,
-  feishu_getUserInfo,
-  feishu_getOrgList,
-  feishu_getUserList
-} from './feishu';
-import { wecom_redirectFn, wecom_getUserInfo, wecom_getUserList, wecom_getOrgList } from './wecom';
-import { dingtalk_redirectFn, dingtalk_getUserInfo } from './dingtalk';
+  testSaml_assertFn,
+  testSaml_getMetadata,
+  testSaml_getUserInfo,
+  testSaml_redirectFn
+} from 'provider/testSaml';
 import type {
   AssertFn,
   CallbackFn,
@@ -19,15 +15,25 @@ import type {
   GetUserListFn,
   RedirectFn
 } from 'type';
+import { aecc_callbackFn, aecc_getUserInfo, aecc_redirectFn } from './aecc';
+import { dingtalk_getUserInfo, dingtalk_redirectFn } from './dingtalk';
 import {
-  testSaml_assertFn,
-  testSaml_getMetadata,
-  testSaml_getUserInfo,
-  testSaml_redirectFn
-} from 'provider/testSaml';
-import { bjsf_assertFn, bjsf_getMetadata, bjsf_getUserInfo, bjsf_redirectFn } from 'provider/bjsf';
-import { TCL_getUserInfo, tcl_redirectFn } from 'provider/tcl';
+  feishu_getOrgList,
+  feishu_getUserInfo,
+  feishu_getUserList,
+  feishu_redirectFn
+} from './feishu';
+import { hebamr_getUserInfo, hebamr_redirectFn } from './hebamr';
+import { leapmotor_getUserInfo, leapmotor_redirectFn } from './leapmotor';
 import { oauth2_getUserInfo, oauth2_redirectFn } from './oauth2';
+import {
+  stressTest_getOrgList,
+  stressTest_getUserInfo,
+  stressTest_GetUserList,
+  stressTest_redirectFn
+} from './stressTest';
+import { test_getUserInfo, test_redirectFn } from './test';
+import { wecom_getOrgList, wecom_getUserInfo, wecom_getUserList, wecom_redirectFn } from './wecom';
 
 const providerMap: {
   [key: string]: {
@@ -92,6 +98,12 @@ const providerMap: {
   oauth2: {
     redirectFn: oauth2_redirectFn,
     getUserInfo: oauth2_getUserInfo
+  },
+  stressTest: {
+    redirectFn: stressTest_redirectFn,
+    getUserInfo: stressTest_getUserInfo,
+    getUserList: stressTest_GetUserList,
+    getOrgList: stressTest_getOrgList
   }
 };
 

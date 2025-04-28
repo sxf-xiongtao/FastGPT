@@ -1,8 +1,10 @@
+import { TeamMemberSchema } from '@fastgpt/global/support/user/team/type';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { addLog } from '@fastgpt/service/common/system/log';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import axios from 'axios';
-import { syncUser, syncOrg } from './controller';
+import { syncOrg, syncUser } from './controller';
 import { getTeamByUsername } from './team/controller';
 
 export async function syncUserAndOrg() {
@@ -52,14 +54,17 @@ export async function syncUserAndOrg() {
 
   const latestUserList = userListRes.userList;
 
-  await mongoSessionRun(async (session) => {
-    if (latestUserList.length === 0) return; // do nothing
-    await syncUser({
+  if (latestUserList.length === 0) return; // do nothing
+  addLog.info(`syncUserAndOrg: sync user`);
+  await mongoSessionRun(async (session) =>
+    syncUser({
       teamId,
       latestUserList,
       session
-    });
-
+    })
+  );
+  addLog.info(`syncUserAndOrg: sync org`);
+  await mongoSessionRun(async (session) => {
     if (orgListRes.orgList.length === 0) return; // do not sync org
     const OrgMap = (() => {
       const map = new Map<
@@ -118,9 +123,13 @@ export async function syncUserAndOrg() {
         undefined,
         { session }
       ).lean();
+      const userIdTmbMap = new Map<string, TeamMemberSchema>();
+      tmbs.forEach((tmb) => {
+        userIdTmbMap.set(String(tmb.userId), tmb);
+      });
 
       return users.map((user) => {
-        const tmb = tmbs.find((tmb) => String(tmb.userId) === String(user._id))!;
+        const tmb = userIdTmbMap.get(String(user._id))!;
         return {
           userid: String(user._id),
           tmbId: String(tmb._id),
@@ -128,7 +137,6 @@ export async function syncUserAndOrg() {
         };
       });
     })();
-
     const latestOrgList = orgListRes.orgList.map((org) => ({
       pathId: org.id,
       path: getPath(org.id),
@@ -148,4 +156,6 @@ export async function syncUserAndOrg() {
       session
     });
   });
+
+  addLog.info(`syncUserAndOrg: end`);
 }

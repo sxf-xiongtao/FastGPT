@@ -1,22 +1,22 @@
-import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
-import { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import {
   formatTeamMemberItemType,
   getMembersOrgs,
   getMembersPermission
 } from '@/service/support/user/team/controller';
-import { TeamMemberItemType, TeamMemberSchema } from '@fastgpt/global/support/user/team/type';
-import { authCert } from '@fastgpt/service/support/permission/auth/common';
-import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
 import { getRootOrg } from '@/service/support/user/team/org/utils';
-import { MongoOrgMemberModel } from '@fastgpt/service/support/permission/org/orgMemberSchema';
-import { TeamMemberStatusEnum } from '@fastgpt/global/support/user/team/constant';
-import { UserModelSchema } from '@fastgpt/global/support/user/type';
-import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
-import { Types } from '@fastgpt/service/common/mongo';
 import { replaceRegChars } from '@fastgpt/global/common/string/tools';
+import { TeamMemberStatusEnum } from '@fastgpt/global/support/user/team/constant';
+import { TeamMemberItemType, TeamMemberSchema } from '@fastgpt/global/support/user/team/type';
+import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
+import { PipelineStage, Types } from '@fastgpt/service/common/mongo';
+import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
+import { MongoOrgMemberModel } from '@fastgpt/service/support/permission/org/orgMemberSchema';
+import { MongoUser } from '@fastgpt/service/support/user/schema';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
+import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
+import { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
 
 export type MemberListQuery = {};
 export type MemberListBody = PaginationProps<{
@@ -61,18 +61,27 @@ async function handler(
     return [undefined, undefined, undefined];
   })();
 
-  const [{ members, total }] = await MongoTeamMember.aggregate<{
-    members: Array<
-      TeamMemberSchema & {
-        user: UserModelSchema;
-      }
-    >;
-    total?: [{ count?: number }];
-  }>([
+  const usersFilterByUsernameAndContact = searchKey
+    ? await MongoUser.find({
+        $or: [{ username: regex }, { contact: regex }]
+      }).lean()
+    : null;
+
+  const pipeline: PipelineStage[] = [
     {
       $match: {
-        ...(filterTmbIds ? { _id: { $in: filterTmbIds } } : {}),
         teamId: new Types.ObjectId(teamId),
+        ...(filterTmbIds ? { _id: { $in: filterTmbIds } } : {}),
+        ...(searchKey
+          ? {
+              $or: [
+                ...(usersFilterByUsernameAndContact
+                  ? [{ userId: { $in: usersFilterByUsernameAndContact.map((u) => u._id) } }]
+                  : []),
+                { name: regex }
+              ]
+            }
+          : {}),
         ...(status
           ? status === 'active'
             ? { status: TeamMemberStatusEnum.active }
@@ -96,63 +105,34 @@ async function handler(
     },
     {
       $sort: { statusOrder: 1 }
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'userId',
-        foreignField: '_id',
-        as: 'user'
-      }
-    },
-    {
-      $unwind: '$user'
-    },
-    ...(searchKey
-      ? [
-          {
-            $match: {
-              $or: [{ 'user.username': regex }, { 'user.contact': regex }, { name: regex }]
-            }
-          }
-        ]
-      : []),
-    {
-      $facet: {
-        members: [
-          {
-            $skip: offset
-          },
-          {
-            $limit: pageSize
-          },
-          {
-            $project: {
-              statusOrder: 0
-            }
-          }
-        ],
-        total: [
-          {
-            $count: 'count'
-          }
-        ]
-      }
     }
+  ];
+
+  const [members, total] = await Promise.all([
+    MongoTeamMember.aggregate<TeamMemberSchema>([
+      ...pipeline,
+      {
+        $skip: offset
+      },
+      {
+        $limit: pageSize
+      }
+    ]),
+    MongoTeamMember.aggregate<{
+      count?: number;
+    }>([...pipeline]).count('count')
   ]);
-  // MongoTeamMember.countDocuments({
-  //   teamId,
-  //   ...(filterTmbIds ? { _id: { $in: filterTmbIds } } : {}),
-  //   ...(status
-  //     ? status === 'active'
-  //       ? { status: TeamMemberStatusEnum.active }
-  //       : { status: { $ne: TeamMemberStatusEnum.active } }
-  //     : {})
-  // })
-  // ]);
+
+  const users = await MongoUser.find({ _id: { $in: members.map((m) => m.userId) } }).lean();
+  const memberWithContact = members.map((member) => ({
+    ...member,
+    user: {
+      contact: users.find((u) => String(u._id) === String(member.userId))?.contact
+    }
+  }));
 
   const list = await (async () => {
-    let list = members;
+    let list = memberWithContact;
     if (withPermission) {
       list = await getMembersPermission({
         members: list,
@@ -175,7 +155,7 @@ async function handler(
   })();
 
   return {
-    total: total?.[0]?.count ?? 0,
+    total: total[0]?.count ?? 0,
     list
   };
 }

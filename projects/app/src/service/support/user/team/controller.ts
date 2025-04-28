@@ -1,44 +1,42 @@
-import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
-import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
-import _ from 'lodash';
-import type {
-  CreateTeamProps,
-  UpdateTeamProps
-} from '@fastgpt/global/support/user/team/controller.d';
+import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
+import { LOGO_ICON } from '@fastgpt/global/common/system/constants';
+import { PerResourceTypeEnum } from '@fastgpt/global/support/permission/constant';
+import { TeamDefaultPermissionVal } from '@fastgpt/global/support/permission/user/constant';
+import { TeamPermission } from '@fastgpt/global/support/permission/user/controller';
 import {
   TeamMemberRoleEnum,
   TeamMemberStatusEnum,
   notLeaveStatus
 } from '@fastgpt/global/support/user/team/constant';
+import type {
+  CreateTeamProps,
+  UpdateTeamProps
+} from '@fastgpt/global/support/user/team/controller.d';
 import {
-  TeamTmbItemType,
   TeamMemberItemType,
-  TeamMemberSchema
+  TeamMemberSchema,
+  TeamTmbItemType
 } from '@fastgpt/global/support/user/team/type';
 import type { TeamMemberWithTeamAndUserSchema } from '@fastgpt/global/support/user/team/type.d';
-import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { ClientSession } from '@fastgpt/service/common/mongo';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
-import { initTeamFreePlan } from '@fastgpt/service/support/wallet/sub/utils';
-import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
-import { PerResourceTypeEnum } from '@fastgpt/global/support/permission/constant';
-import { TeamPermission } from '@fastgpt/global/support/permission/user/controller';
-import { TeamDefaultPermissionVal } from '@fastgpt/global/support/permission/user/constant';
 import { concatPer, getResourcePermission } from '@fastgpt/service/support/permission/controller';
-import { LOGO_ICON } from '@fastgpt/global/common/system/constants';
+import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
+import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
+import { initTeamFreePlan } from '@fastgpt/service/support/wallet/sub/utils';
+import _ from 'lodash';
 
-import { getGroupsByTeamId } from './group/controller';
-import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
-import { DefaultGroupName } from '@fastgpt/global/support/user/team/group/constant';
-import { UserModelSchema } from '@fastgpt/global/support/user/type';
-import { TeamSchema } from '@fastgpt/global/support/user/team/type';
-import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
-import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { Types } from '@fastgpt/service/common/mongo';
-import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
-import { MongoOrgMemberModel } from '@fastgpt/service/support/permission/org/orgMemberSchema';
-import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
 import { PermissionValueType } from '@fastgpt/global/support/permission/type';
+import { DefaultGroupName } from '@fastgpt/global/support/user/team/group/constant';
+import { TeamSchema } from '@fastgpt/global/support/user/team/type';
+import { UserModelSchema } from '@fastgpt/global/support/user/type';
+import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
+import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
+import { MongoOrgMemberModel } from '@fastgpt/service/support/permission/org/orgMemberSchema';
+import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
+import { MongoUser } from '@fastgpt/service/support/user/schema';
+import { getGroupsByTeamId } from './group/controller';
 
 /* -------- format --------- */
 export async function teamMemberSchema2TeamItemType(
@@ -385,7 +383,9 @@ export type SearchUserProps = {
 
 export function formatTeamMemberItemType(
   member: TeamMemberSchema & {
-    user: UserModelSchema;
+    user: {
+      contact?: string;
+    };
     permission?: TeamPermission;
     orgs?: string[];
     groupRole?: string;
