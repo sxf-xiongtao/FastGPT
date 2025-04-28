@@ -23,6 +23,43 @@ import { getErrText } from '@fastgpt/global/common/error/utils';
 import { getUsageSourceByPublishChannel } from '@fastgpt/global/support/wallet/usage/tools';
 import { getChatSourceByPublishChannel } from '@fastgpt/global/core/chat/utils';
 import { WORKFLOW_MAX_RUN_TIMES } from '@fastgpt/service/core/workflow/constants';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { MongoChat } from '@fastgpt/service/core/chat/chatSchema';
+import { getNanoid } from '@fastgpt/global/common/string/tools';
+import { MongoChatItem } from '@fastgpt/service/core/chat/chatItemSchema';
+
+// 新开历史记录, 把原来 chatId 替换
+const RESET_CHAT_INPUT = 'Reset';
+const RESET_CHAT_REPLY = 'The chat records have been reset';
+export const resetChat = ({ appId, chatId }: { appId: string; chatId: string }) => {
+  const newChatId = getNanoid(26);
+  return mongoSessionRun(async (session) => {
+    await MongoChat.updateOne(
+      {
+        appId,
+        chatId
+      },
+      {
+        $set: {
+          chatId: newChatId
+        }
+      },
+      { session }
+    );
+    await MongoChatItem.updateMany(
+      {
+        appId,
+        chatId
+      },
+      {
+        $set: {
+          chatId: newChatId
+        }
+      },
+      { session }
+    );
+  });
+};
 
 export type outLinkInvokeChatProps<T extends OutlinkAppType> = {
   outLinkConfig: OutLinkSchema<T>;
@@ -33,7 +70,7 @@ export type outLinkInvokeChatProps<T extends OutlinkAppType> = {
   chatUserId: string;
   replyCallback: (replyContent: string) => Promise<any>;
 };
-
+const DEFAULT_REPLY = 'This is default reply';
 export async function outlinkInvokeChat<T extends OutlinkAppType>({
   outLinkConfig,
   chatId,
@@ -53,6 +90,13 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
 
     if (!nodes || !chatConfig || !app) {
       return Promise.reject('Invalid chat');
+    }
+
+    // Check whether the chatId is valid
+    if (userQuestion === RESET_CHAT_INPUT) {
+      await resetChat({ appId: outLinkConfig.appId, chatId });
+      replyCallback(RESET_CHAT_REPLY);
+      return;
     }
 
     const { histories } = await getChatItems({
@@ -111,50 +155,57 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
         maxRunTimes: WORKFLOW_MAX_RUN_TIMES
       });
 
+    // Format results
     let responseContent = assistantResponses
       .map((response) => {
         return response.text?.content;
       })
       .filter(Boolean)
-      .join('\n');
-
-    await saveChat({
-      chatId,
-      appId: app._id,
-      teamId: outLinkConfig.teamId,
-      tmbId: outLinkConfig.tmbId,
-      nodes,
-      appChatConfig: chatConfig,
-      variables: newVariables,
-      isUpdateUseTime: true, // owner update use time
-      newTitle: userQuestion.slice(0, 8),
-      shareId: outLinkConfig.shareId,
-      source: getChatSourceByPublishChannel(outLinkConfig.type),
-      sourceName: outLinkConfig.name,
-      content: [
-        {
-          dataId: messageId,
-          obj: ChatRoleEnum.Human,
-          value: dispatchQuery
-        },
-        {
-          obj: ChatRoleEnum.AI,
-          value: assistantResponses,
-          [DispatchNodeResponseKeyEnum.nodeResponse]: flowResponses
-        }
-      ],
-      metadata: {
-        chatId
-      },
-      durationSeconds
-    });
-
+      .join('\n')
+      .trim();
     if (responseContent.length === 0) {
-      responseContent = 'This is default reply';
+      responseContent = DEFAULT_REPLY;
     }
-    const replyResult = await replyCallback(responseContent.trim());
+    // Remove quote references like [id](QUOTE)
+    responseContent = responseContent.replace(/\[\w+\]\(QUOTE\)/g, '');
+
+    // Save and reply
+    const [_, replyResult] = await Promise.all([
+      saveChat({
+        chatId,
+        appId: app._id,
+        teamId: outLinkConfig.teamId,
+        tmbId: outLinkConfig.tmbId,
+        nodes,
+        appChatConfig: chatConfig,
+        variables: newVariables,
+        isUpdateUseTime: true, // owner update use time
+        newTitle: userQuestion.slice(0, 8),
+        shareId: outLinkConfig.shareId,
+        source: getChatSourceByPublishChannel(outLinkConfig.type),
+        sourceName: outLinkConfig.name,
+        content: [
+          {
+            dataId: messageId,
+            obj: ChatRoleEnum.Human,
+            value: dispatchQuery
+          },
+          {
+            obj: ChatRoleEnum.AI,
+            value: assistantResponses,
+            [DispatchNodeResponseKeyEnum.nodeResponse]: flowResponses
+          }
+        ],
+        metadata: {
+          chatId
+        },
+        durationSeconds
+      }),
+      replyCallback(responseContent)
+    ]);
     addLog.info('Reply result', { responseContent, replyResult: replyResult?.data });
 
+    // Create usage
     const { totalPoints } = createChatUsage({
       appName: app.name,
       appId: app._id,
@@ -163,8 +214,7 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
       source: getUsageSourceByPublishChannel(outLinkConfig.type),
       flowUsages
     });
-
-    await addOutLinkUsage({
+    addOutLinkUsage({
       shareId: outLinkConfig.shareId,
       totalPoints: totalPoints
     });
