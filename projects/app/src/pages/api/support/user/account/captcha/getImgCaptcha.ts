@@ -28,15 +28,13 @@ async function handler(
   context.fillRect(0, 0, canvas.width, canvas.height);
   const canvasWidth = canvas.width;
   const canvasHeight = canvas.height;
-  let answer = '',
-    tempLetter = '';
+  let answer = generateCaptchaText(6);
 
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < answer.length; i++) {
     const randomFontSize = `${85 + 40 * Math.random()}px`;
     context.font = randomFontSize + ' FreeFont';
     context.fillStyle = getRandomColor();
-    tempLetter = generateCaptchaText();
-    answer += tempLetter;
+    const tempLetter = answer[i];
     context.rotate(-0.7 + Math.random() * 1);
     context.setTransform(
       new DOMMatrix([
@@ -106,9 +104,26 @@ function getRandomColor() {
   return color;
 }
 
-function generateCaptchaText() {
-  const chars = '123456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
-  return chars[Math.floor(Math.random() * chars.length)];
+function generateCaptchaText(length = 6) {
+  const numbers = '1234567890';
+  const letters = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
+  const allChars = numbers + letters;
+
+  let result = [
+    numbers[Math.floor(Math.random() * numbers.length)],
+    letters[Math.floor(Math.random() * letters.length)]
+  ];
+
+  for (let i = 2; i < length; i++) {
+    result.push(allChars[Math.floor(Math.random() * allChars.length)]);
+  }
+
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+
+  return result.join('');
 }
 
 function adjustGlobalContrast(canvas: Canvas, contrast: number) {
