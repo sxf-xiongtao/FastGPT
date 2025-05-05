@@ -1,11 +1,16 @@
 import { NextAPI } from '@/service/middleware/entry';
 import { NextApiResponse } from 'next';
-import { APIFileItem, ApiFileReadContentResponse } from '@fastgpt/global/core/dataset/apiDataset';
+import {
+  APIFileItem,
+  ApiFileReadContentResponse,
+  ApiDatasetDetailResponse
+} from '@fastgpt/global/core/dataset/apiDataset';
 import { useFeishuDatasetRequest } from '@/service/core/dataset/feishuDataset/api';
 import { useYuqueDatasetRequest } from '@/service/core/dataset/yuqueDataset/api';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
 import {
   GetProApiDatasetFileContentParams,
+  GetProApiDatasetFileDetailParams,
   GetProApiDatasetFileListParams,
   GetProApiDatasetFilePreviewUrlParams,
   ProApiDatasetCommonParams,
@@ -13,7 +18,11 @@ import {
 } from '@fastgpt/service/core/dataset/apiDataset/proApi';
 import { ParentIdType } from '@fastgpt/global/common/parentFolder/type';
 
-export type FileOperationResponse = APIFileItem[] | string | ApiFileReadContentResponse;
+export type FileOperationResponse =
+  | APIFileItem[]
+  | string
+  | ApiFileReadContentResponse
+  | ApiDatasetDetailResponse;
 
 export type ProApiDatasetOperationParams = ProApiDatasetCommonParams &
   (
@@ -26,9 +35,17 @@ export type ProApiDatasetOperationParams = ProApiDatasetCommonParams &
         type: ProApiDatasetOperationTypeEnum.CONTENT;
         apiFileId: string;
       }
+    | {
+        type: ProApiDatasetOperationTypeEnum.DETAIL;
+        apiFileId: string;
+      }
   );
 
-export type ProApiDatasetOperationResponse = APIFileItem[] | string | ApiFileReadContentResponse;
+export type ProApiDatasetOperationResponse =
+  | APIFileItem[]
+  | string
+  | ApiFileReadContentResponse
+  | ApiDatasetDetailResponse;
 
 async function handler(
   req: ApiRequestProps<ProApiDatasetOperationParams>,
@@ -45,10 +62,12 @@ async function handler(
   if (type === ProApiDatasetOperationTypeEnum.CONTENT) {
     return getProApiDatasetFileContentRequest(req.body);
   }
+  if (type === ProApiDatasetOperationTypeEnum.DETAIL) {
+    return getProApiDatasetFileDetailRequest(req.body);
+  }
 
   return Promise.reject('No valid server configuration provided');
 }
-
 export default NextAPI(handler);
 
 export const getProApiDatasetFileListRequest = async ({
@@ -87,6 +106,16 @@ export const getProApiDatasetFilePreviewUrlRequest = async ({
   }
   if (yuqueServer) {
     return useYuqueDatasetRequest({ yuqueServer }).getFilePreviewUrl({ apiFileId });
+  }
+  return Promise.reject('No valid server configuration provided');
+};
+export const getProApiDatasetFileDetailRequest = async ({
+  apiFileId,
+  feishuServer,
+  yuqueServer
+}: GetProApiDatasetFileDetailParams) => {
+  if (yuqueServer) {
+    return useYuqueDatasetRequest({ yuqueServer }).getFileDetail({ apiFileId });
   }
   return Promise.reject('No valid server configuration provided');
 };

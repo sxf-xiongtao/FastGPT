@@ -27,5 +27,8 @@
     },
     "markdown.copyFiles.destination": {
         "**/*.md": "${documentWorkspaceFolder}/FastGPT/docSite/assets/imgs/"
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     }
 }

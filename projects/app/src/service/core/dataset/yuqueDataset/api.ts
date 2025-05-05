@@ -1,7 +1,8 @@
 import type {
   APIFileItem,
   ApiFileReadContentResponse,
-  YuqueServer
+  YuqueServer,
+  ApiDatasetDetailResponse
 } from '@fastgpt/global/core/dataset/apiDataset';
 import axios, { Method } from 'axios';
 import { ParentIdType } from '@fastgpt/global/common/parentFolder/type';
@@ -21,6 +22,7 @@ type yuqueRepoListResponse = {
   type: string;
   updated_at: Date;
   created_at: Date;
+  slug?: string;
 }[];
 
 type yuqueTocListResponse = {
@@ -99,6 +101,11 @@ export const useYuqueDatasetRequest = ({ yuqueServer }: { yuqueServer: YuqueServ
   };
 
   const listFiles = async ({ parentId }: { parentId?: ParentIdType }) => {
+    // Auto set baseurl to parentId
+    if (!parentId) {
+      if (yuqueServer.basePath) parentId = yuqueServer.basePath;
+    }
+
     let files: APIFileItem[] = [];
 
     if (!parentId) {
@@ -132,7 +139,8 @@ export const useYuqueDatasetRequest = ({ yuqueServer }: { yuqueServer: YuqueServ
           type: 'folder',
           updateTime: item.updated_at,
           createTime: item.created_at,
-          hasChild: true
+          hasChild: true,
+          slug: item.slug
         };
       });
     } else {
@@ -152,6 +160,8 @@ export const useYuqueDatasetRequest = ({ yuqueServer }: { yuqueServer: YuqueServ
             type: item.type === 'TITLE' ? ('folder' as const) : ('file' as const),
             updateTime: new Date(),
             createTime: new Date(),
+            uuid: item.uuid,
+            slug: item.slug,
             hasChild: !!item.child_uuid
           }));
       } else {
@@ -167,6 +177,8 @@ export const useYuqueDatasetRequest = ({ yuqueServer }: { yuqueServer: YuqueServ
             type: item.type === 'TITLE' ? ('folder' as const) : ('file' as const),
             updateTime: new Date(),
             createTime: new Date(),
+            uuid: item.uuid,
+            slug: item.slug,
             hasChild: !!item.child_uuid
           }));
       }
@@ -218,9 +230,75 @@ export const useYuqueDatasetRequest = ({ yuqueServer }: { yuqueServer: YuqueServ
     return `${yuqueBaseUrl}/${yuqueServer.userId}/${parentSlug}/${fileSlug}`;
   };
 
+  const getFileDetail = async ({
+    apiFileId
+  }: {
+    apiFileId: string;
+  }): Promise<ApiDatasetDetailResponse> => {
+    //如果id是数字，认为是知识库，获取知识库列表
+    if (typeof apiFileId === 'number' || !isNaN(Number(apiFileId))) {
+      const limit = 100;
+      let offset = 0;
+      let allData: yuqueRepoListResponse = [];
+
+      while (true) {
+        const data = await request<yuqueRepoListResponse>(
+          `/api/v2/groups/${yuqueServer.userId}/repos`,
+          {
+            offset,
+            limit
+          },
+          'GET'
+        );
+
+        if (!data || data.length === 0) break;
+
+        allData = [...allData, ...data];
+        if (data.length < limit) break;
+
+        offset += limit;
+      }
+
+      const file = allData.find((item) => Number(item.id) === Number(apiFileId));
+      if (!file) {
+        return Promise.reject('文件不存在');
+      }
+      return {
+        id: file.id,
+        name: file.name,
+        parentId: null
+      };
+    } else {
+      const [repoId, parentUuid, fileId] = apiFileId.split(/-(.*?)-(.*)/);
+      const data = await request<yuqueTocListResponse>(`/api/v2/repos/${repoId}/toc`, {}, 'GET');
+      const file = data.find((item) => item.uuid === fileId);
+      if (!file) {
+        return Promise.reject('文件不存在');
+      }
+      const parentfile = data.find((item) => item.uuid === file.parent_uuid);
+      const parentId = `${repoId}-${parentfile?.id}-${parentfile?.uuid}`;
+
+      //判断如果parent_uuid为空，则认为是知识库的根目录，返回知识库
+      if (file.parent_uuid) {
+        return {
+          id: file.id,
+          name: file.title,
+          parentId: parentId
+        };
+      } else {
+        return {
+          id: file.id,
+          name: file.title,
+          parentId: repoId
+        };
+      }
+    }
+  };
+
   return {
     getFileContent,
     listFiles,
-    getFilePreviewUrl
+    getFilePreviewUrl,
+    getFileDetail
   };
 };

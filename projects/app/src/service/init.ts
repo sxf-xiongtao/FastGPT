@@ -1,6 +1,7 @@
 import { censorCheckRequest } from '@/pages/api/common/censor/check';
 import {
   getProApiDatasetFileContentRequest,
+  getProApiDatasetFileDetailRequest,
   getProApiDatasetFileListRequest,
   getProApiDatasetFilePreviewUrlRequest
 } from '@/pages/api/core/dataset/systemApiDataset';
@@ -103,6 +104,7 @@ export function initGlobalVariables() {
     global.getProApiDatasetFileList = getProApiDatasetFileListRequest;
     global.getProApiDatasetFileContent = getProApiDatasetFileContentRequest;
     global.getProApiDatasetFilePreviewUrl = getProApiDatasetFilePreviewUrlRequest;
+    global.getProApiDatasetFileDetail = getProApiDatasetFileDetailRequest;
   }
 
   global.sendInformQueue = [];
