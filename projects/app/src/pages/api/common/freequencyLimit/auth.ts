@@ -12,7 +12,7 @@ async function handler(
   try {
     await authFrequencyLimit(req.body);
   } catch (error) {
-    return Promise.reject('common.error.too_many_request');
+    return Promise.reject('common:error.too_many_request');
   }
 }
 

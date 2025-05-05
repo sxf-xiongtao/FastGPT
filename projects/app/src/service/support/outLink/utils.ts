@@ -27,6 +27,7 @@ import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { MongoChat } from '@fastgpt/service/core/chat/chatSchema';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
 import { MongoChatItem } from '@fastgpt/service/core/chat/chatItemSchema';
+import { removeDatasetCiteText } from '@fastgpt/service/core/ai/utils';
 
 // 新开历史记录, 把原来 chatId 替换
 const RESET_CHAT_INPUT = 'Reset';
@@ -166,8 +167,8 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
     if (responseContent.length === 0) {
       responseContent = DEFAULT_REPLY;
     }
-    // Remove quote references like [id](QUOTE)
-    responseContent = responseContent.replace(/\[\w+\]\(QUOTE\)/g, '');
+    // Remove quote references like [id](CITE)
+    responseContent = removeDatasetCiteText(responseContent, false);
 
     // Save and reply
     const [_, replyResult] = await Promise.all([

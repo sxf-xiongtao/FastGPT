@@ -5,8 +5,10 @@ import { createJWT, setCookie } from '@fastgpt/service/support/permission/contro
 
 import type { PostLoginProps } from '@fastgpt/global/support/user/api.d';
 import { getUserDetail } from '@fastgpt/service/support/user/controller';
+import { NextAPI } from '@/service/middleware/entry';
+import { useIPFrequencyLimit } from '@fastgpt/service/common/middle/reqFrequencyLimit';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { username, password } = req.body as PostLoginProps;
 
@@ -55,3 +57,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
   }
 }
+
+const lockTime = Number(process.env.PASSWORD_LOGIN_LOCK_SECONDS || 120);
+export default NextAPI(
+  useIPFrequencyLimit({ id: 'login-by-password', seconds: lockTime, limit: 10, force: true }),
+  handler
+);

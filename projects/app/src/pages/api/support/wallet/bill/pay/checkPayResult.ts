@@ -129,7 +129,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse): Promise<Check
 
   return {
     status: BillStatusEnum.NOTPAY,
-    description: payRes.description || i18nT('common:support.wallet.bill.status.notpay')
+    description: i18nT('common:support.wallet.bill.status.notpay')
   };
 }
 

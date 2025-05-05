@@ -5,6 +5,7 @@ import { NextAPI } from '@/service/middleware/entry';
 import { GetDataChartsQuery } from './type';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { getMongoTimezoneCode } from '@fastgpt/global/common/time/timezone';
+import { BillPayWayEnum } from '@fastgpt/global/support/wallet/bill/constants';
 
 export type GetPaysFormDataResponse = {
   date: Date;
@@ -22,7 +23,7 @@ async function handler(
     {
       $match: {
         status: 'SUCCESS',
-        'metadata.payWay': 'wx',
+        'metadata.payWay': { $in: [BillPayWayEnum.wx, BillPayWayEnum.alipay] },
         createTime: {
           $gte: new Date(startTime)
         }

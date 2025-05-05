@@ -13,8 +13,9 @@ import { initFastGPTConfig } from '@fastgpt/service/common/system/tools';
 import { loadSystemModels } from '@fastgpt/service/core/ai/config/utils';
 import { deepRagSearch } from './core/dataset/search';
 import { concatUsageRequest, createUsageRequest } from './support/wallet/usage/utils';
-import { cloneDeep, isEqual } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { beforeUpdateConfig } from './admin/settings/hooks';
+import { preLoadWorker } from '@fastgpt/service/worker/preload';
 
 export const getProInitData = async () => {
   try {
@@ -82,6 +83,12 @@ export const getProInitData = async () => {
     });
   } catch (error) {
     console.log('init config error', error);
+  }
+
+  try {
+    await preLoadWorker();
+  } catch (error) {
+    console.error('Preload worker error', error);
   }
 };
 

@@ -3,7 +3,7 @@ import { getLLMModel } from '@fastgpt/service/core/ai/model';
 import { filterGPTMessageByMaxContext } from '@fastgpt/service/core/chat/utils';
 import { replaceVariable } from '@fastgpt/global/common/string/tools';
 import { createChatCompletion } from '@fastgpt/service/core/ai/config';
-import { llmCompletionsBodyFormat, llmResponseToAnswerText } from '@fastgpt/service/core/ai/utils';
+import { llmCompletionsBodyFormat, formatLLMResponse } from '@fastgpt/service/core/ai/utils';
 import { ChatCompletionMessageParam } from '@fastgpt/global/core/ai/type';
 import { SearchDataResponseItemType } from '@fastgpt/global/core/dataset/type';
 import {
@@ -186,7 +186,7 @@ class DeepSearchGraph {
         this.modelData
       )
     });
-    const { text: answer, usage } = await llmResponseToAnswerText(response);
+    const { text: answer, usage } = await formatLLMResponse(response);
 
     // Count usage
     const AIMessages: ChatCompletionMessageParam[] = [

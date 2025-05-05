@@ -30,6 +30,7 @@ export const createWxPayProcessor = async (
       });
 
       const data = JSON.parse(res.data);
+
       if (!data.code_url) {
         return Promise.reject(data.message || 'Failed to retrieve payment QR code');
       }

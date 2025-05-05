@@ -14,7 +14,7 @@ import {
 } from '@fastgpt/service/common/string/tiktoken/index';
 import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
 import { loadRequestMessages } from '@fastgpt/service/core/chat/utils';
-import { llmCompletionsBodyFormat, llmResponseToAnswerText } from '@fastgpt/service/core/ai/utils';
+import { llmCompletionsBodyFormat, formatLLMResponse } from '@fastgpt/service/core/ai/utils';
 import { formatSplitText2Index } from './utils';
 
 const reduceQueue = () => {
@@ -140,7 +140,7 @@ export async function generateAutoTraining(): Promise<any> {
         modelData
       )
     });
-    const { text: answer, usage } = await llmResponseToAnswerText(chatResponse);
+    const { text: answer, usage } = await formatLLMResponse(chatResponse);
     const inputTokens = usage?.prompt_tokens || (await countGptMessagesTokens(messages));
     const outputTokens = usage?.completion_tokens || (await countPromptTokens(answer));
 

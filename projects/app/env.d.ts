@@ -62,6 +62,8 @@ declare global {
       // 外部用户系统相关
       EXTERNAL_USER_SYSTEM_BASE_URL?: string;
       EXTERNAL_USER_SYSTEM_AUTH_TOKEN?: string;
+      // # 密码登录锁定时间
+      PASSWORD_LOGIN_LOCK_SECONDS?: string;
     }
   }
 }
