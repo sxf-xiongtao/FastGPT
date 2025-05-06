@@ -69,6 +69,10 @@ export const createWxPayProcessor = async (
           description: 'Request failed'
         };
       }
+    },
+
+    refund: async (params: { orderId: string; amount: number; refundId: string }): Promise<any> => {
+      return Promise.reject('wxPay refund not supported');
     }
   };
 };

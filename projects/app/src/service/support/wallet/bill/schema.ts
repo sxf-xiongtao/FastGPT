@@ -45,7 +45,8 @@ const BillSchema = new Schema({
   metadata: {
     type: Object,
     required: true
-  }
+  },
+  refundData: Object
 });
 
 try {

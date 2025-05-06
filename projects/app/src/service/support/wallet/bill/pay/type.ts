@@ -15,6 +15,7 @@ export type CreatePayOrderParams = {
 export type PayController = {
   createPayOrder: (params: CreatePayOrderParams) => Promise<CreateOrderResponse>;
   getPayResult: (payId: string) => Promise<PayResult>;
+  refund: (params: { orderId: string; amount: number; refundId: string }) => Promise<any>;
 };
 
 export type AlipayConfig = {

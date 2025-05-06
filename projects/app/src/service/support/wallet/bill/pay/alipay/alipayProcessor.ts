@@ -68,6 +68,30 @@ export const createAlipayProcessor = (config: AlipayConfig, systemTitle: string)
           description: 'Request failed'
         };
       }
+    },
+    refund: async (params) => {
+      try {
+        const res = await instance.exec('alipay.trade.refund', {
+          bizContent: {
+            out_trade_no: params.orderId,
+            refund_amount: params.amount,
+            out_request_no: params.refundId // 退款请求号，标识一次退款请求
+          }
+        });
+
+        if (res.code !== '10000') {
+          addLog.warn('Alipay refund error');
+          console.log(res);
+          return Promise.reject(res.subMsg || res.msg || '退款失败');
+        }
+
+        // 退款成功
+        return;
+      } catch (error) {
+        addLog.warn('Alipay refund error');
+        console.log(error);
+        return Promise.reject('退款请求失败');
+      }
     }
   };
 };

@@ -17,8 +17,9 @@ async function handler(
 ): Promise<GetChatFormDataResponse> {
   await adminCert({ req, authToken: true });
   const startTime = req.query.startTime;
+  const timezone = getMongoTimezoneCode(startTime);
 
-  // 获取对话总数
+  // 获取对话总数 - 优化后的查询
   const chatsRaw = await MongoChatItem.aggregate([
     {
       $match: {
@@ -27,12 +28,12 @@ async function handler(
       }
     },
     {
-      $addFields: {
+      $project: {
         localTime: {
           $dateToString: {
             format: '%Y-%m-%d',
             date: '$time',
-            timezone: getMongoTimezoneCode(startTime)
+            timezone
           }
         }
       }
@@ -51,16 +52,9 @@ async function handler(
       }
     },
     { $sort: { date: 1 } }
-  ]);
+  ]).hint({ obj: 1, time: -1 });
 
-  const chatCount = chatsRaw.map((item) => {
-    return {
-      date: item.date,
-      count: item.count
-    };
-  });
-
-  return chatCount;
+  return chatsRaw;
 }
 
 export default NextAPI(handler);

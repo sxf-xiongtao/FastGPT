@@ -18,6 +18,9 @@ export const createBankPayController = (
       return {
         status: BillStatusEnum.SUCCESS
       };
+    },
+    refund: async (params: { orderId: string; amount: number; refundId: string }): Promise<any> => {
+      return Promise.reject('bankPay refund not supported');
     }
   };
 };
