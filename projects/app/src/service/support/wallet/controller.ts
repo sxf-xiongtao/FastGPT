@@ -60,7 +60,7 @@ const incTeamAiPoints = async ({
       {
         teamId,
         type: [SubTypeEnum.standard, SubTypeEnum.extraPoints],
-        surplusPoints: { $gte: Math.abs(totalPoints) }
+        surplusPoints: { $gte: 0 }
       },
       {
         $inc: { surplusPoints: totalPoints }
