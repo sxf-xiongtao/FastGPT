@@ -17,6 +17,7 @@ import { hashStr } from '@fastgpt/global/common/string/tools';
 import { useToast } from '@fastgpt/web/hooks/useToast';
 import MyModal from '@fastgpt/web/components/common/MyModal';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
+import { checkPasswordRule } from '@fastgpt/global/common/string/password';
 
 type TFormData = {
   username: string;
@@ -56,6 +57,19 @@ export default function UserEditModal(props: { data: any; getData: any }) {
     }
   });
 
+  const onSubmitErr = (err: Record<string, any>) => {
+    const val = Object.values(err)[0];
+    if (!val) return;
+    if (val.message) {
+      toast({
+        status: 'warning',
+        title: val.message,
+        duration: 3000,
+        isClosable: true
+      });
+    }
+  };
+
   return (
     <>
       <Button
@@ -92,7 +106,16 @@ export default function UserEditModal(props: { data: any; getData: any }) {
               className="!text-xl"
               id="password"
               variant="outline"
-              placeholder="******"
+              placeholder="密码至少 6 位，且至少包含两种组合：数字、字母或特殊字符"
+              {...register('newPsw', {
+                required: true,
+                validate: (val) => {
+                  if (!checkPasswordRule(val)) {
+                    return '密码至少 6 位，且至少包含两种组合：数字、字母或特殊字符';
+                  }
+                  return true;
+                }
+              })}
             />
           </FormControl>
           <FormControl className="mt-4">
@@ -115,7 +138,11 @@ export default function UserEditModal(props: { data: any; getData: any }) {
           <Button variant={'outline'} mr={4} onClick={onClose}>
             关闭
           </Button>
-          <Button isLoading={loading} variant={'primary'} onClick={handleSubmit(onSubmit)}>
+          <Button
+            isLoading={loading}
+            variant={'primary'}
+            onClick={handleSubmit(onSubmit, onSubmitErr)}
+          >
             确定
           </Button>
         </ModalFooter>
