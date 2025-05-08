@@ -40,7 +40,8 @@ export default function UserEditModal(props: { data: any; getData: any }) {
         _id: data._id,
         username: formData.username,
         status: formData.status,
-        password: formData.password ? hashStr(formData.password) : undefined
+        password: formData.password ? hashStr(formData.password) : undefined,
+        passwordUpdateTime: new Date()
       });
 
       toast({

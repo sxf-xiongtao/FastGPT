@@ -8,12 +8,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     await adminCert({ req, authToken: true });
 
-    let { _id: id, password, status, username } = req.body;
+    let { _id: id, password, status, username, passwordUpdateTime } = req.body;
 
     const result = await MongoUser.findByIdAndUpdate(id, {
       ...(username && { username }),
       ...(password && { password }),
-      ...(status !== undefined && { status })
+      ...(status !== undefined && { status }),
+      ...(passwordUpdateTime && { passwordUpdateTime })
     });
 
     jsonRes(res, {

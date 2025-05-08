@@ -29,7 +29,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       username
     },
     {
-      password
+      password,
+      passwordUpdateTime: new Date()
     }
   );
 

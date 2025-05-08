@@ -39,6 +39,7 @@ type UserProps = {
     keyword?: string;
   };
   sourceDomain?: string;
+  passwordUpdateTime?: Date;
 };
 
 /**
@@ -60,11 +61,13 @@ export async function createUserByUsername({
   notificationAccount,
   fastgpt_sem,
   sourceDomain,
+  passwordUpdateTime,
   defaultTeamIdList: _defaultTeamIdList = []
 }: UserProps & {
   teamName?: string;
   memberName?: string;
   password: string;
+  passwordUpdateTime?: Date;
   defaultTeamIdList?: string[]; // invite user to register/Sync user
 }): Promise<UserType> {
   if (global.systemConfig.teamMode === TeamModeEnum.sync) {
@@ -90,7 +93,8 @@ export async function createUserByUsername({
           inviterId: inviterId && Types.ObjectId.isValid(inviterId) ? inviterId : undefined,
           fastgpt_sem,
           sourceDomain,
-          contact: notificationAccount
+          contact: notificationAccount,
+          passwordUpdateTime: passwordUpdateTime || null
         }
       ],
       { session }
