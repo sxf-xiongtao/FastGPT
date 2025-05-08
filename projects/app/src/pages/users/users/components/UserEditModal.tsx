@@ -40,8 +40,7 @@ export default function UserEditModal(props: { data: any; getData: any }) {
         _id: data._id,
         username: formData.username,
         status: formData.status,
-        password: formData.password ? hashStr(formData.password) : undefined,
-        passwordUpdateTime: new Date()
+        password: formData.password ? hashStr(formData.password) : undefined
       });
 
       toast({
@@ -103,20 +102,17 @@ export default function UserEditModal(props: { data: any; getData: any }) {
               密码
             </FormLabel>
             <Input
-              {...register('password')}
-              className="!text-xl"
-              id="password"
-              variant="outline"
-              placeholder="密码至少 6 位，且至少包含两种组合：数字、字母或特殊字符"
-              {...register('newPsw', {
-                required: true,
+              {...register('password', {
                 validate: (val) => {
+                  if (!val) return true;
                   if (!checkPasswordRule(val)) {
                     return '密码至少 6 位，且至少包含两种组合：数字、字母或特殊字符';
                   }
                   return true;
                 }
               })}
+              variant="outline"
+              placeholder="密码至少 6 位，且至少包含两种组合：数字、字母或特殊字符"
             />
           </FormControl>
           <FormControl className="mt-4">

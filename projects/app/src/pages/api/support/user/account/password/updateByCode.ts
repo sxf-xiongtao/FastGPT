@@ -1,5 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { jsonRes } from '@fastgpt/service/common/response';
+import type { NextApiResponse } from 'next';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
 import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
@@ -8,8 +7,24 @@ import { getUserDetail } from '@fastgpt/service/support/user/controller';
 import { UserErrEnum } from '@fastgpt/global/common/error/code/user';
 import { NextAPI } from '@/service/middleware/entry';
 import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
+import { UserType } from '@fastgpt/global/support/user/type';
+import { ApiRequestProps } from '@fastgpt/service/type/next';
 
-async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
+export type UpdatePswByCodeBody = {
+  username: string;
+  code: string;
+  password: string;
+  tmbId: string;
+};
+export type LoginSuccessResponse = {
+  user: UserType;
+  token: string;
+};
+
+async function handler(
+  req: ApiRequestProps<UpdatePswByCodeBody>,
+  res: NextApiResponse<any>
+): Promise<LoginSuccessResponse> {
   const { username, code, password, tmbId } = req.body;
 
   if (!username || !code || !password) {
@@ -44,12 +59,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const token = createJWT(userInfo);
   setCookie(res, token);
 
-  jsonRes(res, {
-    data: {
-      user: userInfo,
-      token
-    }
-  });
+  return {
+    user: userInfo,
+    token
+  };
 }
 
 export default NextAPI(handler);

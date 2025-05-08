@@ -160,6 +160,7 @@ export const concatBillTimer = async () => {
         await MongoUsage.updateOne(
           { _id: billId },
           {
+            time: new Date(),
             $inc: {
               totalPoints,
               ...(listIndex !== undefined && {

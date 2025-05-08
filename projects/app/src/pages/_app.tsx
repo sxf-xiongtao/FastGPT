@@ -13,8 +13,7 @@ import '../styles/globals.scss';
 import 'tailwindcss/tailwind.css';
 
 import 'nprogress/nprogress.css';
-import '@/styles/reset.scss';
-import '@/styles/default.scss';
+import '../styles/reset.scss';
 import SystemStoreContextProvider from '@fastgpt/web/context/useSystem';
 import { AppProps } from 'next/app';
 import { NextPage } from 'next';

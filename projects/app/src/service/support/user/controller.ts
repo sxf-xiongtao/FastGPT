@@ -94,7 +94,7 @@ export async function createUserByUsername({
           fastgpt_sem,
           sourceDomain,
           contact: notificationAccount,
-          passwordUpdateTime: passwordUpdateTime || null
+          passwordUpdateTime
         }
       ],
       { session }

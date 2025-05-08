@@ -1,0 +1,82 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 项目介绍
+
+FastGPT 是一个 AI Agent 构建平台，支持数据处理、模型调用、可视化工作流编排，适用于复杂 AI 应用场景。项目采用多包（monorepo）架构，支持插件、模板、沙盒等多种扩展能力。
+框架介绍。
+
+## 核心功能
+
+1. FastGPT 提供可视化的方式，帮助用户快速构建一个“应用”，并将该应用通过公网链接或 API 方式对外提供服务。
+2. 可以可视化的管理知识库，支持本地文件、网络链接、s3 等方式导入文件作为知识库。
+
+
+# 框架介绍
+
+前端：Next.js14(page router) + TypeScript + ChakraUI
+后端：Node.js，主要使用 MongoDB(mongoose 库)。
+向量数据库为多选一：PostgreSQL（PG Vector）、Milvus、Oceanbase
+
+# 架构介绍
+
+项目采用 monorepo 的结构进行组织，并使用 DDD 来进行模块划分。
+
+## 项目组织结构
+
+1. projects/app - 管理端项目
+2. projects/sso - 聚合 SSO 服务
+3. FastGPT/projects/app - FastGPT 主服务
+4. FastGPT/projects/sandbox - 代码沙盒
+5. FastGPT/projects/mcp_server  - mcp 转发服务
+6. FastGPT/packages 为所有项目的公用包
+7. FastGPT/packages/global 为前后端公用包
+8. FastGPT/packages/service 为后端公用包
+9. FastGPT/packages/web 为前端公用包
+10. FastGPT/packages/plugins 为系统插件
+11. FastGPT/packages/templates 为应用模板
+
+## DDD 模块划分
+
+系统使用 DDD 的模式进行代码划分，而不是传统的代码功能划分。
+按照 core, support, common 对业务划分成核心、支撑、通用三部分。
+
+1. core - 核心业务
+  1.1: core/ai - AI 相关调用功能
+  1.2: core/app - 应用构建
+  1.3: core/chat - 应用对话
+  1.4: core/dataset - 知识库
+  1.5: core/plugin - 插件
+2. suppoprt - 支撑业务
+  2.1: suppoprt/mcp - mcp 相关业务
+  2.2: suppoprt/openapi - 应用对外提供 api 服务业务
+  2.3: suppoprt/operationLog  - 团队操作日志
+  2.4: support/outlink - 应用分享链接业务
+  2.5: support/permission - 权限相关
+  2.6: support/tmpData - 临时数据存储
+  2.7: support/user - 用户相关
+  2.8: support/wallet - 钱包相关
+3. common - 通用业务
+  3.1: common/bullmq - bullmq 管理
+  3.2: common/file - 文件解析等
+  3.3: common/mongo - MongoDB 数据库
+  3.4: common/redis - redis 管理
+  3.5: common/vectorDB - 向量数据库
+  ....以及字符串处理、系统设置等。 
+
+
+# 代码风格
+
+## 整体风格
+
+- 使用小驼峰命名，例如： userName
+
+## 前端风格
+
+- 优先使用函数式编程，而不是 class
+
+## 后端风格
+
+- 使用 schema 来定义 mongo 数据表

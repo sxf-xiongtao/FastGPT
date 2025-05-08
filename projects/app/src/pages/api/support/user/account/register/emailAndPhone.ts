@@ -14,13 +14,17 @@ import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { AccountRegisterBody } from '@fastgpt/global/support/user/login/api';
 import { NextAPI } from '@/service/middleware/entry';
 import { UserErrEnum } from '@fastgpt/global/common/error/code/user';
-import { getTeamByUsername } from '@/service/support/user/team/controller';
+import type { LoginSuccessResponse } from '../password/updateByCode';
+import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 
-async function handler(req: ApiRequestProps<AccountRegisterBody>, res: NextApiResponse<any>) {
+async function handler(
+  req: ApiRequestProps<AccountRegisterBody>,
+  res: NextApiResponse<any>
+): Promise<LoginSuccessResponse> {
   const { username, code, password, inviterId, bd_vid, fastgpt_sem, sourceDomain } = req.body;
 
   if (!username || !code || !password) {
-    throw new Error('缺少参数');
+    return Promise.reject(CommonErrEnum.invalidParams);
   }
 
   // 验证码校验
@@ -68,12 +72,10 @@ async function handler(req: ApiRequestProps<AccountRegisterBody>, res: NextApiRe
   // 百度转化
   bd_vid && trackBaiduConversion(bd_vid);
 
-  jsonRes(res, {
-    data: {
-      user,
-      token
-    }
-  });
+  return {
+    user,
+    token
+  };
 }
 
 export default NextAPI(handler);
