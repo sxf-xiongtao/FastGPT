@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import crypto from 'crypto';
 import xml2js from 'xml2js';
-import { MongoUserAuth } from '@/service/support/user/auth/schema';
 import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
+import { addAuthCode } from '@fastgpt/service/support/user/auth/controller';
 
 type MessageType = 'event' | 'text' | 'image';
 type EventType = 'SCAN' | 'subscribe';
@@ -38,7 +38,7 @@ function verifyWeChatRequest(req: NextApiRequest) {
 }
 
 export const createLoginAuthCode = ({ openid, code }: { openid: string; code: string }) => {
-  return MongoUserAuth.create({
+  return addAuthCode({
     key: code,
     openid,
     type: UserAuthTypeEnum.wxLogin

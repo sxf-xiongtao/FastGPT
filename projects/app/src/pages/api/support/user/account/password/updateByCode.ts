@@ -2,7 +2,7 @@ import type { NextApiResponse } from 'next';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
 import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
-import { authCode } from '@/service/support/user/auth/controller';
+import { authCode } from '@fastgpt/service/support/user/auth/controller';
 import { getUserDetail } from '@fastgpt/service/support/user/controller';
 import { UserErrEnum } from '@fastgpt/global/common/error/code/user';
 import { NextAPI } from '@/service/middleware/entry';
@@ -33,7 +33,7 @@ async function handler(
 
   // 验证码校验
   await authCode({
-    username,
+    key: username,
     code,
     type: UserAuthTypeEnum.findPassword
   });

@@ -23,7 +23,7 @@ import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
 import { MongoRawTextBuffer } from '@fastgpt/service/common/buffer/rawText/schema';
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
 import { MongoTimerLock } from '@fastgpt/service/common/system/timerLock/schema';
-import { MongoUserAuth } from '@/service/support/user/auth/schema';
+import { MongoUserAuth } from '@fastgpt/service/support/user/auth/schema';
 import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
 import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
 import { MongoTTSBuffer } from '@fastgpt/service/common/buffer/tts/schema';

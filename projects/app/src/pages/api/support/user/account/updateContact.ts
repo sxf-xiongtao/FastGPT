@@ -2,7 +2,7 @@ import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/nex
 import { NextAPI } from '@/service/middleware/entry';
 import { parseHeaderCert } from '@fastgpt/service/support/permission/controller';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { authCode } from '@/service/support/user/auth/controller';
+import { authCode } from '@fastgpt/service/support/user/auth/controller';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 export type UpdateContactQuery = {};
 export type UpdateContactBody = {
@@ -21,7 +21,7 @@ async function handler(
   await authCode({
     type: 'bindNotification',
     code: verifyCode,
-    username: contact
+    key: contact
   });
 
   await MongoUser.findOneAndUpdate(

@@ -1,4 +1,4 @@
-import { MongoUserAuth } from '@/service/support/user/auth/schema';
+import { MongoUserAuth } from '@fastgpt/service/support/user/auth/schema';
 import { customAlphabet } from 'nanoid';
 import requestIp from 'request-ip';
 import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
@@ -9,7 +9,7 @@ import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 import { sendMessage } from '@/service/support/user/inform/sendMessage';
 import { getMessageTemplate } from '@/service/support/user/inform/constants';
 import { checkTimerLock } from '@fastgpt/service/common/system/timerLock/utils';
-import { authCode } from '@/service/support/user/auth/controller';
+import { authCode } from '@fastgpt/service/support/user/auth/controller';
 import { i18nT } from '@fastgpt/web/i18n/utils';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 
@@ -35,7 +35,7 @@ async function handler(
   }
 
   await authCode({
-    username,
+    key: username,
     type: 'captcha',
     code: captcha
   });

@@ -1,5 +1,5 @@
 import { NextApiResponse } from 'next';
-import { MongoUserAuth } from '@/service/support/user/auth/schema';
+import { MongoUserAuth } from '@fastgpt/service/support/user/auth/schema';
 import axios from 'axios';
 import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
 import { usernameLogin } from '@/service/support/user/controller';

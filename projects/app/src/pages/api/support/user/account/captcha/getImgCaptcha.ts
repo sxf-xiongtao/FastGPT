@@ -1,8 +1,8 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
-import { createCanvas, Canvas, DOMMatrix, registerFont } from 'canvas';
-import { MongoUserAuth } from '@/service/support/user/auth/schema';
+import { createCanvas, Canvas, DOMMatrix } from 'canvas';
 import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
+import { addAuthCode } from '@fastgpt/service/support/user/auth/controller';
 
 export type getImgCaptchaQuery = {
   username: string;
@@ -73,19 +73,12 @@ async function handler(
   }
   adjustGlobalContrast(canvas, 0.4);
 
-  await MongoUserAuth.updateOne(
-    {
-      key: username,
-      type: UserAuthTypeEnum.captcha
-    },
-    {
-      code: answer.toLowerCase(),
-      createTime: new Date() // reset time
-    },
-    {
-      upsert: true
-    }
-  );
+  await addAuthCode({
+    key: username,
+    type: UserAuthTypeEnum.captcha,
+    code: answer.toLowerCase()
+  });
+
   const imageSrc = canvas.toDataURL();
 
   return {

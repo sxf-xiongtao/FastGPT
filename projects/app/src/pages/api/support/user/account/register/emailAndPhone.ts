@@ -1,10 +1,9 @@
 import type { NextApiResponse } from 'next';
-import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
 import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
-import { authCode } from '@/service/support/user/auth/controller';
+import { authCode } from '@fastgpt/service/support/user/auth/controller';
 import { authMaxUsers } from '@/service/support/user/auth';
 import { createUserByUsername } from '@/service/support/user/controller';
 import { createOnePromotion } from '@/service/support/activity/promotion/controller';
@@ -29,7 +28,7 @@ async function handler(
 
   // 验证码校验
   await authCode({
-    username,
+    key: username,
     type: UserAuthTypeEnum.register,
     code
   });

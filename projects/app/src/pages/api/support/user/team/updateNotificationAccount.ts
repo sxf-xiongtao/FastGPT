@@ -1,7 +1,7 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
-import { authCode } from '@/service/support/user/auth/controller';
+import { authCode } from '@fastgpt/service/support/user/auth/controller';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { OwnerPermissionVal } from '@fastgpt/global/support/permission/constant';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
@@ -22,7 +22,7 @@ async function handler(
   await authCode({
     type: 'bindNotification',
     code: verifyCode,
-    username: account
+    key: account
   });
 
   const team = await MongoTeam.findOneAndUpdate(
