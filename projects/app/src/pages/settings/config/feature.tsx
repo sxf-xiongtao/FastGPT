@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Box, Flex, Input, Textarea } from '@chakra-ui/react';
+import { Box, Flex, Grid, Input, Textarea } from '@chakra-ui/react';
 import { useToast } from '@fastgpt/web/hooks/useToast';
 import { throttle } from '@/utils/tools';
 import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';
@@ -62,95 +62,96 @@ export const Settings = () => {
 
   const titles: Array<titleType> = [
     {
-      mainTitle: '基础配置',
-      subTitles: [
-        '前端展示配置',
-        '个性化配置',
-        '全局Script脚本',
-        '系统参数',
-        'PDF 解析配置',
-        '使用限制',
-        '侧边栏配置'
-      ]
+      mainTitle: '基础功能',
+      subTitles: []
+    },
+    {
+      mainTitle: '第三方知识库',
+      subTitles: []
+    },
+    {
+      mainTitle: '第三方发布渠道',
+      subTitles: []
     }
   ];
 
   return (
     <SettingPage titles={titles} loading={isLoading} onSubmit={onSubmit}>
       <FirstTitle title="功能清单" />
-      <SecondTitle title="功能展示配置" />
-      <Box
-        px={6}
-        mb={4}
-        _notLast={{
-          borderBottomWidth: '1.5px',
-          borderBottomColor: 'myGray.200'
-        }}
-      >
-        <Flex px={6} wrap="wrap" justifyContent="space-between" my={3}>
-          <Flex alignItems={'center'} my={3} w={['100%', '48%']}>
-            <FormLabel title="展示团队分享" description="" mb={2} minW={'240px'} />
+
+      <>
+        <SecondTitle title="功能展示配置" />
+        <Grid gridTemplateColumns={['1fr', '1fr 1fr']} px={[6, 8]}>
+          <Flex alignItems={'center'} my={3}>
+            <FormLabel title="展示团队分享" description="" minW={'240px'} />
             <Switch control={control} name="feConfigs.show_team_chat" />
           </Flex>
-          <Flex alignItems={'center'} my={3} w={['100%', '48%']}>
-            <FormLabel title="展示聊天空白页（都关闭即可）" description="" mb={2} minW={'240px'} />
+          <Flex alignItems={'center'} my={3}>
+            <FormLabel title="展示聊天空白页（都关闭即可）" description="" minW={'240px'} />
             <Switch control={control} name="feConfigs.show_emptyChat" />
           </Flex>
-          <Flex alignItems={'center'} my={3} w={['100%', '48%']}>
-            <FormLabel title="展示邀请好友活动" description="" mb={2} minW={'240px'} />
+          <Flex alignItems={'center'} my={3}>
+            <FormLabel title="展示邀请好友活动" description="" minW={'240px'} />
             <Switch control={control} name="feConfigs.show_promotion" />
           </Flex>
-          <Flex alignItems={'center'} my={3} w={['100%', '48%']}>
-            <FormLabel title="前端是否展示合规提示文案" description="" mb={2} minW={'240px'} />
+          <Flex alignItems={'center'} my={3}>
+            <FormLabel title="前端是否展示合规提示文案" description="" minW={'240px'} />
             <Switch control={control} name="feConfigs.show_compliance_copywriting" />
           </Flex>
-          <Flex alignItems={'center'} my={3} w={['100%', '48%']}>
+        </Grid>
+      </>
+
+      <>
+        <SecondTitle title="第三方知识库" />
+        <Grid gridTemplateColumns={['1fr', '1fr 1fr']} px={[6, 8]}>
+          <Flex alignItems={'center'} my={3}>
             <FormLabel
-              title="展示飞书数据集"
+              title="飞书知识库"
               description="![](https://oss.laf.dev/lk63dw-fastgpt/show_dataset_feishu.png)\n关闭后，创建数据库时不再显示飞书数据库"
-              mb={2}
               minW={'240px'}
             />
             <Switch control={control} name="feConfigs.show_dataset_feishu" />
           </Flex>
-          <Flex alignItems={'center'} my={3} w={['100%', '48%']}>
+          <Flex alignItems={'center'} my={3}>
             <FormLabel
-              title="展示语雀数据集"
+              title="语雀知识库"
               description="![](https://oss.laf.dev/lk63dw-fastgpt/show_dataset_yuque.png)\n关闭后，创建数据库时不再显示语雀数据库"
-              mb={2}
               minW={'240px'}
             />
             <Switch control={control} name="feConfigs.show_dataset_yuque" />
           </Flex>
-          <Flex alignItems={'center'} my={3} w={['100%', '48%']}>
+        </Grid>
+      </>
+
+      <>
+        <SecondTitle title="第三方发布渠道" />
+        <Grid gridTemplateColumns={['1fr', '1fr 1fr']} px={[6, 8]}>
+          <Flex alignItems={'center'} my={3}>
             <FormLabel
-              title="展示飞书发布渠道"
+              title="飞书发布渠道"
               description="![](https://oss.laf.dev/lk63dw-fastgpt/show_publish_feishu.png)\n关闭后，发布渠道中不再显示飞书发布渠道"
-              mb={2}
               minW={'240px'}
             />
             <Switch control={control} name="feConfigs.show_publish_feishu" />
           </Flex>
-          <Flex alignItems={'center'} my={3} w={['100%', '48%']}>
+          <Flex alignItems={'center'} my={3}>
             <FormLabel
-              title="展示钉钉发布渠道"
+              title="钉钉发布渠道"
               description="![](https://oss.laf.dev/lk63dw-fastgpt/show_publish_dingtalk.png)\n关闭后，发布渠道中不再显示钉钉发布渠道"
-              mb={2}
               minW={'240px'}
             />
             <Switch control={control} name="feConfigs.show_publish_dingtalk" />
           </Flex>
-          <Flex alignItems={'center'} my={3} w={['100%', '48%']}>
+          <Flex alignItems={'center'} my={3}>
             <FormLabel
-              title="展示公众号发布渠道"
+              title="公众号发布渠道"
               description="![](https://oss.laf.dev/lk63dw-fastgpt/show_publish_offiaccount.png)\n关闭后，发布渠道中不再显示公众号发布渠道"
-              mb={2}
               minW={'240px'}
             />
             <Switch control={control} name="feConfigs.show_publish_offiaccount" />
           </Flex>
-        </Flex>
-      </Box>
+        </Grid>
+      </>
     </SettingPage>
   );
 };

@@ -89,14 +89,14 @@ const LIST = [
     icon: 'common/settingLight',
     subItems: [
       {
-        activeLink: '/settings/config/feature',
-        name: '功能清单',
-        icon: 'core/workflow/debugResult'
-      },
-      {
         activeLink: '/settings/config/basic',
         name: '基础配置',
         icon: 'core/workflow/debugResult'
+      },
+      {
+        activeLink: '/settings/config/feature',
+        name: '功能清单',
+        icon: 'common/check'
       },
       {
         activeLink: '/settings/config/model',
