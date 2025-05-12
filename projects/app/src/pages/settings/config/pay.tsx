@@ -157,31 +157,19 @@ export const ModelSettings = () => {
       <SecondTitle title="微信支付配置" />
       <FormItem
         title="appid"
-        description="微信支付相关材料\nhttps://pay.weixin.qq.com/index.php/core/home/login?return_url=https%3A%2F%2Fpay.weixin.qq.com%2Findex.php%2Fextend%2Femployee\n自行注册微信支付，目前需要wx扫码支付\nappid: ![](https://oss.laf.dev/lk63dw-fastgpt/appid.png)"
+        description="微信支付相关材料\nhttps://pay.weixin.qq.com/index.php/core/home/login?return_url=https%3A%2F%2Fpay.weixin.qq.com%2Findex.php%2Fextend%2Femployee\n自行注册微信支付，目前需要wx扫码支付\nappid: ![](/config/appid.png)"
       >
         <Input
           {...register('wx.WX_APPID')}
-          placeholder="微信支付相关材料\nhttps://pay.weixin.qq.com/index.php/core/home/login?return_url=https%3A%2F%2Fpay.weixin.qq.com%2Findex.php%2Fextend%2Femployee\n自行注册微信支付，目前需要wx扫码支付\nappid: ![](https://oss.laf.dev/lk63dw-fastgpt/appid.png)"
+          placeholder="微信支付相关材料\nhttps://pay.weixin.qq.com/index.php/core/home/login?return_url=https%3A%2F%2Fpay.weixin.qq.com%2Findex.php%2Fextend%2Femployee\n自行注册微信支付，目前需要wx扫码支付\nappid: ![](/config/appid.png)"
         />
       </FormItem>
-      <FormItem
-        title="Merchant ID"
-        description="![](https://oss.laf.dev/lk63dw-fastgpt/wx_mchid.png)"
-      >
-        <Input
-          {...register('wx.WX_MCHID')}
-          placeholder="![](https://oss.laf.dev/lk63dw-fastgpt/wx_mchid.png)"
-        />
+      <FormItem title="Merchant ID" description="![](/config/wx_mchid.png)">
+        <Input {...register('wx.WX_MCHID')} placeholder="![](/config/wx_mchid.png)" />
       </FormItem>
 
-      <FormItem
-        title="V3 Code"
-        description="![](https://oss.laf.dev/lk63dw-fastgpt/ws_v3_code.png)"
-      >
-        <Input
-          {...register('wx.WX_V3_CODE')}
-          placeholder="![](https://oss.laf.dev/lk63dw-fastgpt/ws_v3_code.png)"
-        />
+      <FormItem title="V3 Code" description="![](/config/ws_v3_code.png)">
+        <Input {...register('wx.WX_V3_CODE')} placeholder="![](/config/ws_v3_code.png)" />
       </FormItem>
 
       <FormItem title="Notify URL" description="没用到，随便填个">
@@ -190,17 +178,17 @@ export const ModelSettings = () => {
 
       <FormItem
         title="Serial Number"
-        description="点管理证书进去看到\n![](https://oss.laf.dev/lk63dw-fastgpt/wx_serial_no.png)"
+        description="点管理证书进去看到\n![](/config/wx_serial_no.png)"
       >
         <Input
           {...register('wx.WX_SERIAL_NO')}
-          placeholder="点管理证书进去看到\n![](https://oss.laf.dev/lk63dw-fastgpt/wx_serial_no.png)"
+          placeholder="点管理证书进去看到\n![](/config/wx_serial_no.png)"
         />
       </FormItem>
 
       <FormItem
         title="Private Key"
-        description="按微信教程拿到这几个文件，txt打开key\n![](https://oss.laf.dev/lk63dw-fastgpt/wx_private_key.png)"
+        description="按微信教程拿到这几个文件，txt打开key\n![](/config/wx_private_key.png)"
       >
         <Textarea
           {...register('wx.WX_PRIVATE_KEY')}
@@ -208,7 +196,7 @@ export const ModelSettings = () => {
           rows={8}
           whiteSpace="pre-wrap"
           wordBreak={'break-word'}
-          placeholder="按微信教程拿到这几个文件，txt打开key\n![](https://oss.laf.dev/lk63dw-fastgpt/wx_private_key.png)"
+          placeholder="按微信教程拿到这几个文件，txt打开key\n![](/config/wx_private_key.png)"
         />
       </FormItem>
       <SecondTitle title="支付宝支付配置" />

@@ -107,7 +107,7 @@ export const Settings = () => {
           <Flex alignItems={'center'} my={3}>
             <FormLabel
               title="飞书知识库"
-              description="![](https://oss.laf.dev/lk63dw-fastgpt/show_dataset_feishu.png)\n关闭后，创建数据库时不再显示飞书数据库"
+              description="![](/config/show_dataset_feishu.png)\n关闭后，创建数据库时不再显示飞书数据库"
               minW={'240px'}
             />
             <Switch control={control} name="feConfigs.show_dataset_feishu" />
@@ -115,7 +115,7 @@ export const Settings = () => {
           <Flex alignItems={'center'} my={3}>
             <FormLabel
               title="语雀知识库"
-              description="![](https://oss.laf.dev/lk63dw-fastgpt/show_dataset_yuque.png)\n关闭后，创建数据库时不再显示语雀数据库"
+              description="![](/config/show_dataset_yuque.png)\n关闭后，创建数据库时不再显示语雀数据库"
               minW={'240px'}
             />
             <Switch control={control} name="feConfigs.show_dataset_yuque" />
@@ -129,7 +129,7 @@ export const Settings = () => {
           <Flex alignItems={'center'} my={3}>
             <FormLabel
               title="飞书发布渠道"
-              description="![](https://oss.laf.dev/lk63dw-fastgpt/show_publish_feishu.png)\n关闭后，发布渠道中不再显示飞书发布渠道"
+              description="![](/config/show_publish_feishu.png)\n关闭后，发布渠道中不再显示飞书发布渠道"
               minW={'240px'}
             />
             <Switch control={control} name="feConfigs.show_publish_feishu" />
@@ -137,7 +137,7 @@ export const Settings = () => {
           <Flex alignItems={'center'} my={3}>
             <FormLabel
               title="钉钉发布渠道"
-              description="![](https://oss.laf.dev/lk63dw-fastgpt/show_publish_dingtalk.png)\n关闭后，发布渠道中不再显示钉钉发布渠道"
+              description="![](/config/show_publish_dingtalk.png)\n关闭后，发布渠道中不再显示钉钉发布渠道"
               minW={'240px'}
             />
             <Switch control={control} name="feConfigs.show_publish_dingtalk" />
@@ -145,7 +145,7 @@ export const Settings = () => {
           <Flex alignItems={'center'} my={3}>
             <FormLabel
               title="公众号发布渠道"
-              description="![](https://oss.laf.dev/lk63dw-fastgpt/show_publish_offiaccount.png)\n关闭后，发布渠道中不再显示公众号发布渠道"
+              description="![](/config/show_publish_offiaccount.png)\n关闭后，发布渠道中不再显示公众号发布渠道"
               minW={'240px'}
             />
             <Switch control={control} name="feConfigs.show_publish_offiaccount" />

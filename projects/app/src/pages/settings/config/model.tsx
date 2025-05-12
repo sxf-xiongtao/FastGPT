@@ -72,11 +72,11 @@ export const ModelSettings = () => {
       <Box mt={4}></Box>
       <FormItem
         title="百度安全 id"
-        description="![](https://oss.laf.dev/lk63dw-fastgpt/baidu_censor.png)\nhttps://console.bce.baidu.com/ai/?_=1693133074333#/ai/antiporn/overview/index 注册百度安全校验账号，并创建对应应用。提供应用的 id 和 secret"
+        description="![](/config/baidu_censor.png)\nhttps://console.bce.baidu.com/ai/?_=1693133074333#/ai/antiporn/overview/index 注册百度安全校验账号，并创建对应应用。提供应用的 id 和 secret"
       >
         <Input
           {...register('censor.BAIDU_TEXT_CENSOR_CLIENTID')}
-          placeholder="![](https://oss.laf.dev/lk63dw-fastgpt/baidu_censor.png)\nhttps://console.bce.baidu.com/ai/?_=1693133074333#/ai/antiporn/overview/index 注册百度安全校验账号，并创建对应应用。提供应用的 id 和 secret"
+          placeholder="![](/config/baidu_censor.png)\nhttps://console.bce.baidu.com/ai/?_=1693133074333#/ai/antiporn/overview/index 注册百度安全校验账号，并创建对应应用。提供应用的 id 和 secret"
         />
       </FormItem>
       <Divider my="4" />
