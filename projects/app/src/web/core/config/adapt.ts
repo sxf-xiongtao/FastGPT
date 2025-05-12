@@ -37,6 +37,11 @@ export function formatConfigStore2FormSchema({
     navbarItems = [],
     appTemplateCourse = '',
     show_compliance_copywriting = false,
+    show_dataset_feishu = true,
+    show_dataset_yuque = true,
+    show_publish_feishu = true,
+    show_publish_dingtalk = true,
+    show_publish_offiaccount = true,
     mcpServerProxyEndpoint = '',
     ...feConfigsProps
   } = feConfigs || {};
@@ -62,6 +67,11 @@ export function formatConfigStore2FormSchema({
         show_team_chat,
         show_openai_account,
         show_promotion,
+        show_dataset_feishu,
+        show_dataset_yuque,
+        show_publish_feishu,
+        show_publish_dingtalk,
+        show_publish_offiaccount,
         favicon,
         docUrl,
         systemPluginCourseUrl,

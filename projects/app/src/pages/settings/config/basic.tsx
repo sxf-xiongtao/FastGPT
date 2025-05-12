@@ -79,33 +79,6 @@ export const Settings = () => {
     <SettingPage titles={titles} loading={isLoading} onSubmit={onSubmit}>
       <FirstTitle title="基础配置" />
       <SecondTitle title="前端展示配置" />
-      <Box
-        px={6}
-        mb={4}
-        _notLast={{
-          borderBottomWidth: '1.5px',
-          borderBottomColor: 'myGray.200'
-        }}
-      >
-        <Flex px={6} wrap="wrap" justifyContent="space-between" my={3}>
-          <Flex alignItems={'center'} my={3} w={['100%', '48%']}>
-            <FormLabel title="展示团队分享" description="" mb={2} minW={'240px'} />
-            <Switch control={control} name="feConfigs.show_team_chat" />
-          </Flex>
-          <Flex alignItems={'center'} my={3} w={['100%', '48%']}>
-            <FormLabel title="展示聊天空白页（都关闭即可）" description="" mb={2} minW={'240px'} />
-            <Switch control={control} name="feConfigs.show_emptyChat" />
-          </Flex>
-          <Flex alignItems={'center'} my={3} w={['100%', '48%']}>
-            <FormLabel title="展示邀请好友活动" description="" mb={2} minW={'240px'} />
-            <Switch control={control} name="feConfigs.show_promotion" />
-          </Flex>
-          <Flex alignItems={'center'} my={3} w={['100%', '48%']}>
-            <FormLabel title="前端是否展示合规提示文案" description="" mb={2} minW={'240px'} />
-            <Switch control={control} name="feConfigs.show_compliance_copywriting" />
-          </Flex>
-        </Flex>
-      </Box>
       <FormItem title="系统名" description="">
         <Input {...register('feConfigs.systemTitle')} placeholder="" />
       </FormItem>

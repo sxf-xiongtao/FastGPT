@@ -23,6 +23,11 @@ export type ConfigFormType = {
       show_openai_account: boolean;
       show_compliance_copywriting: boolean;
       show_promotion: boolean;
+      show_dataset_feishu: boolean;
+      show_dataset_yuque: boolean;
+      show_publish_feishu: boolean;
+      show_publish_dingtalk: boolean;
+      show_publish_offiaccount: boolean;
       favicon: string;
       docUrl: string;
       systemPluginCourseUrl: string;
