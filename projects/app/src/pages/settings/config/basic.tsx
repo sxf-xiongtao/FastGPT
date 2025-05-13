@@ -1,12 +1,8 @@
-import React, { useState, useRef } from 'react';
-import { Box, Flex, Input, Textarea } from '@chakra-ui/react';
-import { useToast } from '@fastgpt/web/hooks/useToast';
-import { throttle } from '@/utils/tools';
+import React, { useState } from 'react';
+import { Box, Input, Textarea } from '@chakra-ui/react';
 import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';
 import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
 import { getInitFormData, postUpdateConfig } from '@/web/core/config/api';
-import FormLabel from './components/FormLabel';
-import Switch from '@/pageComponents/Settings/Switch';
 import { useForm } from 'react-hook-form';
 import { serviceSideProps } from '@/web/common/i18n/utils';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
@@ -14,12 +10,10 @@ import FirstTitle from '@/pageComponents/Settings/FirstTitle';
 import SettingPage from '@/pageComponents/Settings/SettingPage';
 import SecondTitle from '@/pageComponents/Settings/SecondTitle';
 import FormItem from '@/pageComponents/Settings/FormItem';
-import { compressImgFileAndUpload } from '@/web/common/file/utils';
-import MyImage from '@fastgpt/web/components/common/Image/MyImage';
-import { AddIcon } from '@chakra-ui/icons';
 import JsonEditor from '@fastgpt/web/components/common/Textarea/JsonEditor';
 import NavbarItems from './components/FormField/NavbarItems';
 import ImageInput from '@/pageComponents/Settings/ImageInput';
+
 interface titleType {
   mainTitle: string;
   subTitles: string[];
@@ -145,9 +139,9 @@ export const Settings = () => {
         <Box className="mb-8" w={'100%'}>
           <JsonEditor
             value={watch('scripts')}
-            onChange={throttle((e) => {
+            onChange={(e) => {
               setValue('scripts', e || '');
-            }, 1000)}
+            }}
             defaultHeight={250}
             resize
           />
