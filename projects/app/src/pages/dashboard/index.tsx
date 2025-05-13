@@ -80,45 +80,52 @@ export default function DashBoard() {
     async () => {
       const startTime = dayjs().subtract(dateRange, 'day').add(1, 'day').startOf('day').format();
 
+      // 创建完整日期列表
+      const diff = dayjs().diff(dayjs(startTime).startOf('day'), 'day') + 1;
+      const completeDateList = Array.from({ length: diff }, (_, i) =>
+        dayjs(startTime).add(i, 'day').format('MM/DD')
+      );
+
+      // 创建日期映射函数
+      const createCompleteDateData = <T extends FetchChatData>(
+        sourceData: T[],
+        defaultValues: Omit<T, 'date'>
+      ) => {
+        return completeDateList.map((date) => {
+          const existingData = sourceData.find((item) => item.date === date);
+          return existingData || ({ date, ...defaultValues } as T);
+        });
+      };
+
       const [userResponse, payResponse, chatResponse, pointResponse] = await Promise.all([
         GET<FetchChatData[]>(`/admin/routes/dashboard/getUserFormData`, {
-          startTime: startTime
+          startTime
         }).then((res) => res.map((item) => ({ ...item, date: dayjs(item.date).format('MM/DD') }))),
         GET<FetchChatData[]>(`/admin/routes/dashboard/getPaysFormData`, {
-          startTime: startTime
+          startTime
         }).then((res) => res.map((item) => ({ ...item, date: dayjs(item.date).format('MM/DD') }))),
         GET<FetchChatData[]>(`/admin/routes/dashboard/getChatFormData`, {
-          startTime: startTime
+          startTime
         }).then((res) => res.map((item) => ({ ...item, date: dayjs(item.date).format('MM/DD') }))),
         GET<FetchChatData[]>(`/admin/routes/dashboard/getPointUsages`, {
-          startTime: startTime
+          startTime
         }).then((res) => res.map((item) => ({ ...item, date: dayjs(item.date).format('MM/DD') })))
       ]);
 
-      // 如果没有对应日期的数据，自动补 0
-      const diff = dayjs().diff(dayjs(startTime).startOf('day'), 'day') + 1;
-      for (let i = 0; i < diff; i++) {
-        const date = dayjs(startTime).add(i, 'day').format('MM/DD');
-        if (!userResponse.find((item) => item.date === date)) {
-          userResponse.push({ date, count: 0, increase: 0 });
-        }
-      }
+      // 补充缺失日期数据
+      const completeUserData = createCompleteDateData(userResponse, { count: 0, increase: 0 });
+      const completePayData = createCompleteDateData(payResponse, { count: 0 });
+      const completeChatData = createCompleteDateData(chatResponse, { count: 0 });
+      const completePointData = createCompleteDateData(pointResponse, { count: 0 });
 
-      const data = userResponse.map((item, i) => {
-        const pay = payResponse.find((payItem) => payItem.date === item.date);
-        const chat = chatResponse.find((chatItem) => chatItem.date === item.date);
-        const point = pointResponse.find((pointItem) => pointItem.date === item.date);
-
-        return {
-          date: dayjs(item.date).format('MM/DD'),
-          userCount: item.count,
-          userIncrease: item.increase,
-          payCount: pay ? pay.count / PRICE_SCALE : 0,
-          chatCount: chat ? chat.count : 0,
-          totalPoints: point ? +point.count.toFixed(2) : 0
-        };
-      });
-      return data;
+      return completeDateList.map((date, i) => ({
+        date,
+        userCount: completeUserData[i].count,
+        userIncrease: completeUserData[i].increase,
+        payCount: completePayData[i].count / PRICE_SCALE,
+        chatCount: completeChatData[i].count,
+        totalPoints: +completePointData[i].count.toFixed(2)
+      }));
     },
     {
       manual: false,
