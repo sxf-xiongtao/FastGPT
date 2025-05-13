@@ -106,13 +106,13 @@ export default function UserEditModal(props: { data: any; getData: any }) {
                 validate: (val) => {
                   if (!val) return true;
                   if (!checkPasswordRule(val)) {
-                    return '密码至少 6 位，且至少包含两种组合：数字、字母或特殊字符';
+                    return '密码至少 8 位，且至少包含两种组合：数字、字母或特殊字符';
                   }
                   return true;
                 }
               })}
               variant="outline"
-              placeholder="密码至少 6 位，且至少包含两种组合：数字、字母或特殊字符"
+              placeholder="密码至少 8 位，且至少包含两种组合：数字、字母或特殊字符"
             />
           </FormControl>
           <FormControl className="mt-4">
