@@ -4,10 +4,11 @@ import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema
 import { adminCert } from '@/service/support/permission/adminCert';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { ConfigStoreType } from '@/global/admin/config';
-import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
 import { addMonths } from 'date-fns';
 import { initFastGPTConfig } from '@fastgpt/service/common/system/tools';
 import { beforeUpdateConfig } from '@/service/admin/settings/hooks';
+import { updateSystemConfig } from '@/service/common/system/config';
+import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -19,21 +20,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       throw new Error('fastgpt and fastgptPro cannot be empty');
     }
 
-    await beforeUpdateConfig(fastgpt, fastgptPro);
+    beforeUpdateConfig(fastgpt, fastgptPro);
 
-    await Promise.all([
-      MongoSystemConfigs.create({
-        type: SystemConfigsTypeEnum.fastgpt,
-        value: fastgpt
-      }),
-      MongoSystemConfigs.create({
-        type: SystemConfigsTypeEnum.fastgptPro,
-        value: fastgptPro
-      }),
-      MongoSystemConfigs.deleteMany({
-        createTime: { $lte: addMonths(new Date(), -1) }
-      })
-    ]);
+    await updateSystemConfig({
+      fastgpt,
+      fastgptPro
+    });
+    await MongoSystemConfigs.deleteMany({
+      type: { $in: [SystemConfigsTypeEnum.fastgpt, SystemConfigsTypeEnum.fastgptPro] },
+      createTime: { $lte: addMonths(new Date(), -1) }
+    });
 
     // update env
     global.systemConfig = fastgptPro;

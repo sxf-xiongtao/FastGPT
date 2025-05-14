@@ -54,6 +54,20 @@ const matchAndParseTextImageUrl = async (text: string) => {
 };
 
 export async function generateImageAnnotion(): Promise<any> {
+  if (global.licenseData?.functions?.datasetEnhance === false) {
+    await MongoDatasetTraining.updateMany(
+      {
+        mode: TrainingModeEnum.image
+      },
+      {
+        $set: {
+          mode: TrainingModeEnum.chunk
+        }
+      }
+    );
+    return;
+  }
+
   const max = global.systemEnv?.vlmMaxProcess || 10;
   if (global.imageParseQueueLen >= max) return;
   global.imageParseQueueLen++;

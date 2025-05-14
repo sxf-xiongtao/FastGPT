@@ -18,12 +18,14 @@ pnpm i
 # 安装依赖
 pnpm i
 
-# 启动商业版
-make dev name=app
-# 启动开源版
+# 启动
+# 1. 启动开源版
 cd FastGPT
 make dev name=app
-make dev name=sandbox
+# make dev name=sandbox
+# 2. 启动商业版
+make dev name=app
+# 3. 第一次启动时候，会提示填写 License
 ```
 
 ## build

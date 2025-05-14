@@ -7,6 +7,7 @@ import { notifyAllExpireSoon } from '@/service/support/user/team/timerTask/expir
 import { checkFreeAccount } from '@/service/support/user/team/timerTask/freeAccount';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { syncCollectionTask } from '@/service/core/dataset/sync';
+import { authLicense } from '../license/auth';
 
 const setTrainingCron = () => {
   setCron('*/1 * * * *', () => {
@@ -82,6 +83,11 @@ const syncMemberAndOrgCron = () => {
   }
 };
 
+// Auth license
+const authLicenseCron = () => {
+  setCron('15 */1 * * *', authLicense);
+};
+
 export const startCron = () => {
   setTrainingCron();
   updateSubPlanCron();
@@ -89,4 +95,5 @@ export const startCron = () => {
   freeAccountCron();
   syncCollectionCron();
   syncMemberAndOrgCron();
+  authLicenseCron();
 };

@@ -1,3 +1,4 @@
+'use client';
 import { Box, Button, Flex, useDisclosure } from '@chakra-ui/react';
 import { AppTypeEnum } from '@fastgpt/global/core/app/constants';
 import MySelect from '@fastgpt/web/components/common/MySelect';

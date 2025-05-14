@@ -1,6 +1,6 @@
 import { Box, HStack, StackProps } from '@chakra-ui/react';
 import QuestionTip from '@fastgpt/web/components/common/MyTooltip/QuestionTip';
-import MarkdownModal from '@/components/MarkDownModal/MarkDownModal';
+import MarkdownModal from '@/components/common/markdown/MarkDownModal';
 
 export const Description: React.FC<any> = ({ description }: { description?: string }) => {
   if (!description) {

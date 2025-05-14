@@ -34,6 +34,20 @@ const returnQueue = (delay = 0) => {
 };
 
 export async function generateAutoTraining(): Promise<any> {
+  if (global.licenseData?.functions?.datasetEnhance === false) {
+    await MongoDatasetTraining.updateMany(
+      {
+        mode: TrainingModeEnum.auto
+      },
+      {
+        $set: {
+          mode: TrainingModeEnum.chunk
+        }
+      }
+    );
+    return;
+  }
+
   const max = global.systemEnv?.qaMaxProcess || 10;
   if (global.autoTrainingLen >= max) return;
   global.autoTrainingLen++;

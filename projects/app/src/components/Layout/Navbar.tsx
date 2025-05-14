@@ -1,7 +1,8 @@
 import { useRouter } from 'next/router';
 import { Box, BoxProps, Flex, LinkProps } from '@chakra-ui/react';
 import MyIcon from '@fastgpt/web/components/common/Icon';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useSystemStore } from '@/web/common/system/useSystemStore';
 
 const itemStyles: BoxProps & LinkProps = {
   h: 9,
@@ -18,130 +19,146 @@ const itemStyles: BoxProps & LinkProps = {
   }
 };
 
-const LIST = [
-  {
-    activeLink: '/dashboard',
-    name: '数据面板',
-    icon: 'common/overviewLight'
-  },
-  {
-    activeLink: '/inform',
-    name: '通知管理',
-    icon: 'support/user/informLight'
-  },
-  {
-    activeLink: '/log',
-    name: '日志管理',
-    icon: 'core/app/logsLight'
-  },
-  {
-    activeLink: '/users',
-    name: '用户管理',
-    icon: 'common/administrator',
-    subItems: [
-      {
-        activeLink: '/users/users',
-        icon: 'common/userInfo',
-        name: '用户信息'
-      },
-      {
-        activeLink: '/users/teams',
-        icon: 'support/team/group',
-        name: '团队管理'
-      },
-      {
-        activeLink: '/users/plans',
-        icon: 'support/account/plans',
-        name: '套餐管理'
-      },
-      {
-        activeLink: '/users/pays',
-        icon: 'support/bill/payRecordLight',
-        name: '支付记录'
-      },
-      {
-        activeLink: '/users/invoice',
-        icon: 'common/billing',
-        name: '开票管理'
-      }
-    ]
-  },
-  {
-    activeLink: '/resources',
-    name: '资源管理',
-    icon: 'book',
-    subItems: [
-      {
-        activeLink: '/resources/apps',
-        name: '应用管理',
-        icon: 'core/app/aiLightSmall'
-      },
-      {
-        activeLink: '/resources/datasets',
-        name: '知识库管理',
-        icon: 'core/dataset/datasetLightSmall'
-      }
-    ]
-  },
-  {
-    activeLink: '/settings/config',
-    name: '系统配置',
-    icon: 'common/settingLight',
-    subItems: [
-      {
-        activeLink: '/settings/config/basic',
-        name: '基础配置',
-        icon: 'core/workflow/debugResult'
-      },
-      {
-        activeLink: '/settings/config/feature',
-        name: '功能清单',
-        icon: 'common/check'
-      },
-      {
-        activeLink: '/settings/config/model',
-        name: '安全审查',
-        icon: 'common/model'
-      },
-      {
-        activeLink: '/settings/config/thirdParty',
-        name: '第三方提供商',
-        icon: 'common/thirdParty'
-      },
-      {
-        activeLink: '/settings/config/user',
-        name: '用户配置',
-        icon: 'support/user/userLightSmall'
-      },
-      {
-        activeLink: '/settings/config/pay',
-        name: '套餐 & 充值',
-        icon: 'support/bill/priceLight'
-      }
-    ]
-  },
-  {
-    activeLink: '/settings/templates',
-    name: '模板 & 工具',
-    icon: 'common/layer',
-    subItems: [
-      {
-        activeLink: '/settings/templates/app',
-        name: '模板市场',
-        icon: 'common/templateMarket'
-      },
-      {
-        activeLink: '/settings/templates/toolkit',
-        name: '工具箱',
-        icon: 'common/toolkit'
-      }
-    ]
-  }
-];
-
 export default function Navbar({ onClose }: { onClose?: () => void }) {
   const router = useRouter();
   const [expandItems, setExpandItems] = useState<string[]>([]);
+  const { licenseData } = useSystemStore();
+
+  const LIST = useMemo(
+    () => [
+      {
+        activeLink: '/dashboard',
+        name: '数据面板',
+        icon: 'common/overviewLight'
+      },
+      {
+        activeLink: '/inform',
+        name: '通知管理',
+        icon: 'support/user/informLight'
+      },
+      {
+        activeLink: '/log',
+        name: '日志管理',
+        icon: 'core/app/logsLight'
+      },
+      {
+        activeLink: '/users',
+        name: '用户管理',
+        icon: 'common/administrator',
+        subItems: [
+          {
+            activeLink: '/users/users',
+            icon: 'common/userInfo',
+            name: '用户信息'
+          },
+          {
+            activeLink: '/users/teams',
+            icon: 'support/team/group',
+            name: '团队管理'
+          },
+          ...(licenseData?.functions?.pay
+            ? [
+                {
+                  activeLink: '/users/plans',
+                  icon: 'support/account/plans',
+                  name: '套餐管理'
+                },
+                {
+                  activeLink: '/users/pays',
+                  icon: 'support/bill/payRecordLight',
+                  name: '支付记录'
+                },
+                {
+                  activeLink: '/users/invoice',
+                  icon: 'common/billing',
+                  name: '开票管理'
+                }
+              ]
+            : [])
+        ]
+      },
+      {
+        activeLink: '/resources',
+        name: '资源管理',
+        icon: 'book',
+        subItems: [
+          {
+            activeLink: '/resources/apps',
+            name: '应用管理',
+            icon: 'core/app/aiLightSmall'
+          },
+          {
+            activeLink: '/resources/datasets',
+            name: '知识库管理',
+            icon: 'core/dataset/datasetLightSmall'
+          }
+        ]
+      },
+      {
+        activeLink: '/settings/config',
+        name: '系统配置',
+        icon: 'common/settingLight',
+        subItems: [
+          {
+            activeLink: '/settings/config/basic',
+            name: '基础配置',
+            icon: 'core/workflow/debugResult'
+          },
+          {
+            activeLink: '/settings/config/feature',
+            name: '功能清单',
+            icon: 'common/check'
+          },
+          {
+            activeLink: '/settings/config/model',
+            name: '安全审查',
+            icon: 'common/model'
+          },
+          {
+            activeLink: '/settings/config/thirdParty',
+            name: '第三方提供商',
+            icon: 'common/thirdParty'
+          },
+          {
+            activeLink: '/settings/config/user',
+            name: '用户配置',
+            icon: 'support/user/userLightSmall'
+          },
+          ...(licenseData?.functions?.pay
+            ? [
+                {
+                  activeLink: '/settings/config/pay',
+                  name: '套餐 & 充值',
+                  icon: 'support/bill/priceLight'
+                }
+              ]
+            : [])
+        ]
+      },
+      ...(licenseData?.functions?.customTemplates
+        ? [
+            {
+              activeLink: '/settings/templates',
+              name: '模板 & 工具',
+              icon: 'common/layer',
+              subItems: [
+                {
+                  activeLink: '/settings/templates/app',
+                  name: '模板市场',
+                  icon: 'common/templateMarket'
+                },
+                {
+                  activeLink: '/settings/templates/toolkit',
+                  name: '工具箱',
+                  icon: 'common/toolkit'
+                }
+              ]
+            }
+          ]
+        : [])
+    ],
+    [licenseData]
+  );
 
   const handleItemClick = (item: any) => {
     if (item.subItems) {

@@ -100,18 +100,10 @@ export type SystemConfigType = {
   teamMode?: `${TeamModeEnum}`;
 };
 
-export type LicenseDataType = {
-  startTime: string;
-  expTime: string;
-  company: string;
-  maxRegister: number;
-};
-
 declare global {
   var systemConfig: SystemConfigType;
 
   var store: Record<string, any>;
-  var licenseData: LicenseDataType;
 
   var sendInformQueue: (() => Promise<void>)[];
   var sendInformQueueLen: number;

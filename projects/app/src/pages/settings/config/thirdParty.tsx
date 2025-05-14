@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import { Box, Divider, Flex } from '@chakra-ui/react';
 import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';

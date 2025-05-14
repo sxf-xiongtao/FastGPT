@@ -1,6 +1,6 @@
 import { TeamModeEnum } from '@/global/settings/constants';
 import { changeOwner } from '@/service/core/changeOwner';
-import { authMaxUsers } from '@/service/support/user/auth';
+import { licenseAuth } from '@/service/common/license/auth';
 import { getNanoid, hashStr } from '@fastgpt/global/common/string/tools';
 import { GroupMemberRole } from '@fastgpt/global/support/permission/memberGroup/constant';
 import { TeamReadPermissionVal } from '@fastgpt/global/support/permission/user/constant';
@@ -81,7 +81,7 @@ export async function createUserByUsername({
       ? [String((await getTeamByUsername('root'))._id)]
       : _defaultTeamIdList;
 
-  await authMaxUsers();
+  await licenseAuth.authMaxUsers();
   const { user, tmb } = await mongoSessionRun(async (session) => {
     //1. create user
     const [user] = await MongoUser.create(

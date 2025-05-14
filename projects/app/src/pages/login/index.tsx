@@ -1,3 +1,4 @@
+'use client';
 import {
   Button,
   FormControl,
@@ -14,7 +15,7 @@ import { POST } from '@/service/common/request';
 import { hashStr } from '@fastgpt/global/common/string/tools';
 import { serviceSideProps } from '@/web/common/i18n/utils';
 import { useToast } from '@fastgpt/web/hooks/useToast';
-import { useUserStore } from '@/web/support/user/useUserStore';
+import { useSystemStore } from '@/web/common/system/useSystemStore';
 
 type FormData = {
   account: string;
@@ -26,7 +27,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
-  const { initLicenseData } = useUserStore();
+  const { initLicenseData } = useSystemStore();
 
   const {
     register,

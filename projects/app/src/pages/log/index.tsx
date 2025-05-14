@@ -1,3 +1,4 @@
+'use client';
 import BoxCard from '@/components/common/BoxContainer/Card';
 import {
   Table,

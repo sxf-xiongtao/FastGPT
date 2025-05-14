@@ -4,12 +4,13 @@ import Navbar from './Navbar';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
 import Header from './Header';
 import { useRouter } from 'next/router';
-import { useUserStore } from '@/web/support/user/useUserStore';
+import { useSystemStore } from '@/web/common/system/useSystemStore';
 import dynamic from 'next/dynamic';
 
 const ManualCopyModal = dynamic(() =>
   import('@fastgpt/web/hooks/useCopyData').then((mod) => mod.ManualCopyModal)
 );
+const LicenseInput = dynamic(() => import('@/components/common/License/Input'));
 
 const unLoginPage: Record<string, boolean> = {
   '/users/invoice': true
@@ -18,7 +19,7 @@ const unLoginPage: Record<string, boolean> = {
 const Layout = ({ children }: { children: JSX.Element }) => {
   const router = useRouter();
   const { isPc } = useSystem();
-  const { licenseData } = useUserStore();
+  const { licenseData } = useSystemStore();
 
   const isUnLoginPage = unLoginPage[router.pathname];
 
@@ -55,6 +56,7 @@ const Layout = ({ children }: { children: JSX.Element }) => {
       )}
 
       <ManualCopyModal />
+      {!licenseData && <LicenseInput />}
     </>
   );
 };

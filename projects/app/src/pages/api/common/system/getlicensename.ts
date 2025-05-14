@@ -12,7 +12,7 @@ async function handler(
   res: ApiResponseType<any>
 ): Promise<getlicensenameResponse> {
   return {
-    name: global.licenseData.company
+    name: global.licenseData?.company
   };
 }
 

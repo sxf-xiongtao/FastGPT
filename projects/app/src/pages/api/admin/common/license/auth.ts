@@ -1,18 +1,34 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
-import { NextAPI } from '@/service/middleware/entry';
-import { authLicense } from '@/service/core/license';
 import { adminCert } from '@/service/support/permission/adminCert';
+import { jsonRes } from '@fastgpt/service/common/response';
 
 export type LicenseAuthQuery = {};
 export type LicenseAuthBody = {};
-export type LicenseAuthResponse = {};
+export type LicenseAuthResponse = any;
 
 async function handler(
   req: ApiRequestProps<LicenseAuthBody, LicenseAuthQuery>,
   res: ApiResponseType<any>
 ): Promise<LicenseAuthResponse> {
-  await adminCert({ req, authToken: true });
+  // 未激活状态
+  if (!global.licenseData) {
+    jsonRes(res);
+    return;
+  }
 
-  return global.licenseData;
+  try {
+    await adminCert({ req, authToken: true });
+
+    return jsonRes(res, {
+      data: global.licenseData
+    });
+  } catch (error) {
+    // 未登录，仅返回一个数据
+    return jsonRes(res, {
+      data: {
+        company: global.licenseData.company
+      }
+    });
+  }
 }
-export default NextAPI(handler);
+export default handler;

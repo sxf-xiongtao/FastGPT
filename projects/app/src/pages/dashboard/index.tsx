@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
 import { Box, Flex, Grid, GridItem, HStack } from '@chakra-ui/react';

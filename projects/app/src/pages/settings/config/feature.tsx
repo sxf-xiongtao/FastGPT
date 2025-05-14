@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useRef } from 'react';
 import { Box, Flex, Grid, Input, Textarea } from '@chakra-ui/react';
 import { useToast } from '@fastgpt/web/hooks/useToast';

@@ -11,15 +11,10 @@ import {
   DatasetTrainingSchemaType
 } from '@fastgpt/global/core/dataset/type';
 import { TrainingModeEnum } from '@fastgpt/global/core/dataset/constants';
-import { splitText2Chunks } from '@fastgpt/global/common/string/textSplitter';
 import { generateImageAnnotion } from './imageParse';
 import { DatasetDataIndexTypeEnum } from '@fastgpt/global/core/dataset/data/constants';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { LLMModelItemType } from '@fastgpt/global/core/ai/model.d';
-import {
-  chunkAutoChunkSize,
-  getLLMMaxChunkSize
-} from '@fastgpt/global/core/dataset/training/utils';
 
 export const startTrainingProcess = () => {
   generateAutoTraining();

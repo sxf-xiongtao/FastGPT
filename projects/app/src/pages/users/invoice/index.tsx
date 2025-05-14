@@ -1,3 +1,4 @@
+'use client';
 import BoxCard from '@/components/common/BoxContainer/Card';
 import { finishInvoice, getInvoiceList } from '@/web/support/wallet/invoice/api';
 import {

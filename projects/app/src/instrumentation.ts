@@ -7,29 +7,33 @@ export async function register() {
         { connectMongo },
         { connectionMongo, connectionLogMongo, MONGO_URL, MONGO_LOG_URL },
         { initGlobalVariables, getProInitData },
+        { loadSystemModels },
         { startCron },
         { concatBillTimer, reduceAiPointsTimer },
         { authLicense },
         { getSystemPluginCb },
         { startTrainingProcess },
         { startMongoWatch },
-        { initBullMQWorkers }
+        { initBullMQWorkers },
+        { preLoadWorker }
       ] = await Promise.all([
         import('@fastgpt/service/common/mongo/init'),
         import('@fastgpt/service/common/mongo/index'),
         import('@/service/init'),
+        import('@fastgpt/service/core/ai/config/utils'),
         import('@/service/common/system/cron'),
         import('@/service/support/wallet/controller'),
-        import('@/service/core/license'),
+        import('@/service/common/license/auth'),
         import('@/service/core/workflow/systemPlugins/register'),
         import('@/service/core/dataset/training/utils'),
         import('@/service/middleware/volumnMongoWatch'),
-        import('@/service/common/bullmq/index')
+        import('@/service/common/bullmq/index'),
+        import('@fastgpt/service/worker/preload')
       ]);
 
       initGlobalVariables();
 
-      // Connect to MongoDB
+      // Connect DB
       await Promise.all([connectMongo(connectionMongo, MONGO_URL), initBullMQWorkers()]);
       connectMongo(connectionLogMongo, MONGO_LOG_URL);
 
@@ -38,10 +42,25 @@ export async function register() {
       reduceAiPointsTimer();
       concatBillTimer();
 
-      await Promise.all([getProInitData(), authLicense(), getSystemPluginCb(true)]);
+      // License checker
+      try {
+        global.licenseData = await authLicense();
+      } catch (error) {
+        console.log('Init system error', error);
+      }
+
+      // Init system from local or db
+      await Promise.all([getProInitData(), getSystemPluginCb(true), loadSystemModels()]);
 
       startTrainingProcess();
       startMongoWatch();
+
+      // Preload worker
+      try {
+        await preLoadWorker();
+      } catch (error) {
+        console.error('Preload worker error', error);
+      }
 
       console.log('Init system success');
     }

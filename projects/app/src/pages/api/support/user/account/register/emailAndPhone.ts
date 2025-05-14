@@ -4,7 +4,7 @@ import { createJWT, setCookie } from '@fastgpt/service/support/permission/contro
 import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import { authCode } from '@fastgpt/service/support/user/auth/controller';
-import { authMaxUsers } from '@/service/support/user/auth';
+import { licenseAuth } from '@/service/common/license/auth';
 import { createUserByUsername } from '@/service/support/user/controller';
 import { createOnePromotion } from '@/service/support/activity/promotion/controller';
 import { Types } from '@fastgpt/service/common/mongo';
@@ -43,7 +43,7 @@ async function handler(
   }
 
   // 商业版用户数量相知
-  await authMaxUsers();
+  await licenseAuth.authMaxUsers();
 
   const user = await createUserByUsername({
     username,

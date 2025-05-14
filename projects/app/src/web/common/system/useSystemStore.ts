@@ -1,7 +1,7 @@
 import { create, devtools, immer } from '@fastgpt/web/common/zustand';
 
-import { LicenseDataType } from '@/types';
-import { getLicenseData } from '@/web/admin/common/api';
+import { LicenseDataType } from '@fastgpt/global/common/system/types';
+import { getLicenseData } from '../license/api';
 
 type State = {
   licenseData?: LicenseDataType;
@@ -9,13 +9,29 @@ type State = {
   clearLicenseData: () => void;
 };
 
-export const useUserStore = create<State>()(
+const defaultLicenseData = {
+  company: '',
+  startTime: '',
+  expiredTime: '',
+  functions: {
+    sso: false,
+    pay: false,
+    customTemplates: false,
+    datasetEnhance: false,
+    batchEval: false
+  }
+};
+
+export const useSystemStore = create<State>()(
   devtools(
     immer((set, get) => ({
-      licenseData: undefined,
+      licenseData: defaultLicenseData,
       clearLicenseData: () => {
         set((state) => {
-          state.licenseData = undefined;
+          state.licenseData = {
+            ...defaultLicenseData,
+            company: state.licenseData?.company || ''
+          };
         });
       },
       initLicenseData: async () => {

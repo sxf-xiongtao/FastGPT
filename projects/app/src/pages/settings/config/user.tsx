@@ -1,3 +1,4 @@
+'use client';
 import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
 import { TeamModeEnum } from '@/global/settings/constants';
 import FirstTitle from '@/pageComponents/Settings/FirstTitle';
@@ -7,6 +8,7 @@ import SecondTitle from '@/pageComponents/Settings/SecondTitle';
 import SettingPage from '@/pageComponents/Settings/SettingPage';
 import Switch from '@/pageComponents/Settings/Switch';
 import { serviceSideProps } from '@/web/common/i18n/utils';
+import { useSystemStore } from '@/web/common/system/useSystemStore';
 import { formatConfigStore2FormSchema, formatFormData2ConfigStore } from '@/web/core/config/adapt';
 import { getInitFormData, postUpdateConfig } from '@/web/core/config/api';
 import { Box, Divider, Input, Textarea } from '@chakra-ui/react';
@@ -22,6 +24,7 @@ interface titleType {
 
 const UserSetting = () => {
   const [rawData, setRawData] = useState<ConfigFormType>();
+  const { licenseData } = useSystemStore();
 
   const { setValue, reset, watch, register, handleSubmit, control } =
     useForm<ConfigFormType['loginSettings']>();
@@ -55,7 +58,7 @@ const UserSetting = () => {
   });
 
   const isLoading = loadingConfig || loadingSave;
-  const hasSSOURL = !!watch('sso.url');
+  const hasSSOURL = !!watch('sso.url') && licenseData?.functions?.sso;
   const teamMode = watch('teamMode');
   const teamModeOptions = useMemo(
     () => [
@@ -75,15 +78,19 @@ const UserSetting = () => {
           '邮箱通知配置(注册、套餐通知)',
           '阿里云短信配置',
           '阿里云短信模板CODE（SMS_xxx）',
-          '微信服务号登陆',
-          'GitHub 登录配置',
-          'Google 登陆配置',
-          '微软登陆配置',
-          '快速登陆（不推荐）'
+          ...(licenseData?.functions?.sso
+            ? [
+                '微信服务号登陆',
+                'GitHub 登录配置',
+                'Google 登陆配置',
+                '微软登陆配置',
+                '快速登陆（不推荐）'
+              ]
+            : [])
         ]
       }
     ],
-    [hasSSOURL]
+    [hasSSOURL, licenseData?.functions?.sso]
   );
 
   return (
@@ -172,94 +179,77 @@ const UserSetting = () => {
       <FormItem title="免费版用户清理警告">
         <Input {...register('sms.FREE_CLEAN')} placeholder="免费版用户清理警告" />
       </FormItem>
-      <SecondTitle title="微信服务号登陆" />
-      <FormItem
-        title="AppID"
-        description="服务号的 Appid。微信服务号的验证地址填写：商业版域名//api/support/user/account/login/wx/callback"
-      >
-        <Input {...register('wechat.appID')} placeholder="AppID" />
-      </FormItem>
-      <FormItem title="AppSecret" description="服务号的 Secret">
-        <Input {...register('wechat.appSecret')} placeholder="AppSecret" />
-      </FormItem>
 
-      {/* <SecondTitle title="钉钉登录配置" />
-      <FormItem title="Client ID" description="钉钉应用的 Client ID">
-        <Input {...register('dingtalk.clientId')} placeholder="Client ID" />
-      </FormItem>
-      <FormItem title="Client Secret" description="钉钉应用的 Client Secret">
-        <Input {...register('dingtalk.secret')} placeholder="Client Secret" />
-      </FormItem>
-      <SecondTitle title="企业微信配置" />
-      <FormItem title="企业微信应用 CorpID" description="对应企业微信企业的「CorpID」">
-        <Input {...register('wecom.corpid')} placeholder="企业微信应用 CorpID" />
-      </FormItem>
-      <FormItem title="企业微信应用 AgentId" description="对应企业微信应用的「AgentId」">
-        <Input {...register('wecom.agentid')} placeholder="企业微信应用 AgentId" />
-      </FormItem>
-      <FormItem title="企业微信应用 Secret" description="对应企业微信应用的「Secret」">
-        <Input {...register('wecom.secret')} placeholder="企业微信应用 Secret" />
-      </FormItem>
-      <FormItem title="企业微信通讯录同步助手的Secret" description="用于访问企业微信通讯录">
-        <Input {...register('wecom.syncSecret')} placeholder="企业微信通讯录同步助手的Secret" />
-      </FormItem>
-      <FormItem
-        title="是否开启从企业微信同步用户"
-        description="开启后，将无法使用注册功能。将每 24 小时从企业微信同步一次用户信息，也可以在前端手动进行同步。"
-      >
-        <Box>{watch('wecom.isSync') ? '开启' : '关闭'}</Box>
-        <Switch control={control} name="wecom.isSync" />
-      </FormItem>
-      <Divider /> */}
-      <SecondTitle title="GitHub 登录配置" />
-
-      <FormItem
-        title="GitHub Client ID"
-        description="https://github.com/settings/developers，注册一个 oauth，\nHomepage: 域名\nCallbackurl: 域名/login/provider\n提供：\nclientId: \nclientSecret:"
-      >
-        <Input {...register('github.clientId')} placeholder="GitHub Client ID" />
-      </FormItem>
-      <FormItem title="GitHub Secret">
-        <Input {...register('github.secret')} placeholder="GitHub Secret" />
-      </FormItem>
-      <Divider />
-      <SecondTitle title="Google 登陆配置" />
-      <FormItem title="Google Client ID">
-        <Input {...register('google.clientId')} placeholder="Google Client ID" />
-      </FormItem>
-      <FormItem title="Google Secret">
-        <Input {...register('google.secret')} placeholder="Google Secret" />
-      </FormItem>
-      <Divider />
-      <SecondTitle title="微软登陆配置" />
-
-      <FormItem
-        title="Microsoft Client ID"
-        description="对应 Microsoft 应用的「应用程序(客户端) ID」"
-      >
-        <Input {...register('microsoft.clientId')} placeholder="Microsoft Client ID" />
-      </FormItem>
-      <FormItem title="Microsoft Client Secret">
-        <Input {...register('microsoft.secret')} placeholder="Microsoft Client Secret" />
-      </FormItem>
-      <FormItem
-        title="Microsoft Tenant ID"
-        description="对应 Microsoft 应用的「租户 ID」, 若使用默认的 common 可不用填写"
-      >
-        <Input {...register('microsoft.tenantId')} placeholder="Microsoft Tenant ID" />
-      </FormItem>
-      <FormItem
-        title="自定义按钮名"
-        description="自定义按钮的名称，若不填写则使用默认的 Microsoft 按钮"
-      >
-        <Input {...register('microsoft.customButton')} placeholder="自定义按钮名" />
-      </FormItem>
-      <Divider />
-
-      <SecondTitle title="快速登陆（不推荐）" />
-      <FormItem>
-        <Textarea {...register('fastLogin')} placeholder="快速登陆（不推荐）" />
-      </FormItem>
+      {licenseData?.functions?.sso && (
+        <>
+          <>
+            <SecondTitle title="微信服务号登陆" />
+            <FormItem
+              title="AppID"
+              description="服务号的 Appid。微信服务号的验证地址填写：商业版域名//api/support/user/account/login/wx/callback"
+            >
+              <Input {...register('wechat.appID')} placeholder="AppID" />
+            </FormItem>
+            <FormItem title="AppSecret" description="服务号的 Secret">
+              <Input {...register('wechat.appSecret')} placeholder="AppSecret" />
+            </FormItem>
+          </>
+          <>
+            <SecondTitle title="GitHub 登录配置" />
+            <FormItem
+              title="GitHub Client ID"
+              description="https://github.com/settings/developers，注册一个 oauth，\nHomepage: 域名\nCallbackurl: 域名/login/provider\n提供：\nclientId: \nclientSecret:"
+            >
+              <Input {...register('github.clientId')} placeholder="GitHub Client ID" />
+            </FormItem>
+            <FormItem title="GitHub Secret">
+              <Input {...register('github.secret')} placeholder="GitHub Secret" />
+            </FormItem>
+          </>
+          <>
+            <Divider />
+            <SecondTitle title="Google 登陆配置" />
+            <FormItem title="Google Client ID">
+              <Input {...register('google.clientId')} placeholder="Google Client ID" />
+            </FormItem>
+            <FormItem title="Google Secret">
+              <Input {...register('google.secret')} placeholder="Google Secret" />
+            </FormItem>
+          </>
+          <>
+            <Divider />
+            <SecondTitle title="微软登陆配置" />
+            <FormItem
+              title="Microsoft Client ID"
+              description="对应 Microsoft 应用的「应用程序(客户端) ID」"
+            >
+              <Input {...register('microsoft.clientId')} placeholder="Microsoft Client ID" />
+            </FormItem>
+            <FormItem title="Microsoft Client Secret">
+              <Input {...register('microsoft.secret')} placeholder="Microsoft Client Secret" />
+            </FormItem>
+            <FormItem
+              title="Microsoft Tenant ID"
+              description="对应 Microsoft 应用的「租户 ID」, 若使用默认的 common 可不用填写"
+            >
+              <Input {...register('microsoft.tenantId')} placeholder="Microsoft Tenant ID" />
+            </FormItem>
+            <FormItem
+              title="自定义按钮名"
+              description="自定义按钮的名称，若不填写则使用默认的 Microsoft 按钮"
+            >
+              <Input {...register('microsoft.customButton')} placeholder="自定义按钮名" />
+            </FormItem>
+          </>
+          <>
+            <Divider />
+            <SecondTitle title="快速登陆（不推荐）" />
+            <FormItem>
+              <Textarea {...register('fastLogin')} placeholder="快速登陆（不推荐）" />
+            </FormItem>
+          </>
+        </>
+      )}
     </SettingPage>
   );
 };
