@@ -12,7 +12,11 @@ export function beforeUpdateConfig(
     if (fastgptPro.teamMode === 'sync') {
       fastgptPro.teamMode = 'single'; // reset the teamMode
     }
-  } else if (fastgpt.feConfigs?.sso && fastgpt.feConfigs?.sso?.url !== externalUserSystemBaseUrl) {
+  } else {
+    // Ensure the sso object exists, initialize it if it doesn't
+    if (!fastgpt.feConfigs.sso) {
+      fastgpt.feConfigs.sso = {};
+    }
     fastgpt.feConfigs.sso.url = externalUserSystemBaseUrl;
   }
 
