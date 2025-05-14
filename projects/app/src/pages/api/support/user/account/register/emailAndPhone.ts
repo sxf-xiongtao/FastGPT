@@ -1,6 +1,6 @@
 import type { NextApiResponse } from 'next';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
+import { setCookie } from '@fastgpt/service/support/permission/controller';
 import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import { authCode } from '@fastgpt/service/support/user/auth/controller';
@@ -15,6 +15,8 @@ import { NextAPI } from '@/service/middleware/entry';
 import { UserErrEnum } from '@fastgpt/global/common/error/code/user';
 import type { LoginSuccessResponse } from '../password/updateByCode';
 import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
+import { createUserSession } from '@fastgpt/service/support/user/session';
+import requestIp from 'request-ip';
 
 async function handler(
   req: ApiRequestProps<AccountRegisterBody>,
@@ -56,7 +58,12 @@ async function handler(
     passwordUpdateTime: new Date()
   });
 
-  const token = createJWT(user);
+  const token = await createUserSession({
+    userId: user._id,
+    teamId: user.team.teamId,
+    tmbId: user.team.tmbId,
+    ip: requestIp.getClientIp(req)
+  });
   setCookie(res, token);
 
   if (!username.includes('@') && inviterId && Types.ObjectId.isValid(inviterId)) {

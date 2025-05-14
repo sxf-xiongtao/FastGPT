@@ -5,6 +5,7 @@ import axios from 'axios';
 import { setCookie } from '@fastgpt/service/support/permission/controller';
 import { usernameLogin } from '@/service/support/user/controller';
 import type { FastLoginProps } from '@fastgpt/global/support/user/api';
+import requestIp from 'request-ip';
 
 type FastLoginAuthResponse = {
   success: boolean;
@@ -42,7 +43,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
     const { user, token: loginToken } = await usernameLogin({
       username,
-      avatar: data.data.avatar
+      avatar: data.data.avatar,
+      ip: requestIp.getClientIp(req)
     });
 
     setCookie(res, loginToken);

@@ -3,10 +3,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { authUserExistTeam } from '@/service/support/user/team/controller';
-import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
+import { setCookie } from '@fastgpt/service/support/permission/controller';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { NextAPI } from '@/service/middleware/entry';
+import { createUserSession } from '@fastgpt/service/support/user/session';
+import requestIp from 'request-ip';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { teamId = '' } = req.body as { teamId: string };
@@ -21,9 +23,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   // update user lastLoginTmbId
   await MongoUser.findByIdAndUpdate(userId, { lastLoginTmbId: tmb._id });
 
-  const token = createJWT({
-    _id: userId,
-    team: { teamId: tmb.teamId, tmbId: tmb._id }
+  const token = await createUserSession({
+    userId,
+    teamId: tmb.teamId,
+    tmbId: tmb._id,
+    ip: requestIp.getClientIp(req)
   });
   setCookie(res, token);
 

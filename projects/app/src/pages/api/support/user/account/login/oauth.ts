@@ -11,6 +11,7 @@ import type { OauthLoginProps } from '@fastgpt/global/support/user/api';
 import { UserErrEnum } from '@fastgpt/global/common/error/code/user';
 import { trackBaiduConversion } from '@/service/common/tracking/baidu';
 import { pushTrack } from '@fastgpt/service/common/middle/tracks/utils';
+import requestIp from 'request-ip';
 
 type OauthResponse = {
   username: string;
@@ -44,7 +45,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
       inviterId,
       fastgpt_sem,
-      sourceDomain
+      sourceDomain,
+      ip: requestIp.getClientIp(req)
     });
 
     // 百度转化

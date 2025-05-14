@@ -29,14 +29,14 @@ const licenseDefaultData: LicenseDataType['functions'] = {
 };
 
 export async function authLicense(license?: string) {
+  const licenseStr = await (async () => {
+    if (license && typeof license === 'string') return license;
+
+    const data = await MongoSystemConfigs.findOne({ type: SystemConfigsTypeEnum.license });
+    if (data) return data.value?.license as string;
+  })();
+
   try {
-    const licenseStr = await (async () => {
-      if (license) return license;
-
-      const data = await MongoSystemConfigs.findOne({ type: SystemConfigsTypeEnum.license });
-      if (data) return data.value?.license as string;
-    })();
-
     if (!licenseStr) {
       return Promise.reject('未读取到 License');
     }
@@ -84,6 +84,7 @@ export async function authLicense(license?: string) {
     return licenseData;
   } catch (error) {
     console.log(error);
+    console.log(licenseStr, 111);
     global.licenseData = undefined;
     return Promise.reject('License 不合法');
   }

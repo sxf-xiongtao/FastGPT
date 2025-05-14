@@ -85,7 +85,9 @@ const syncMemberAndOrgCron = () => {
 
 // Auth license
 const authLicenseCron = () => {
-  setCron('15 */1 * * *', authLicense);
+  setCron('15 */1 * * *', () => {
+    authLicense();
+  });
 };
 
 export const startCron = () => {

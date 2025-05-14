@@ -4,8 +4,6 @@ declare global {
       // # 二级路由
       NEXT_PUBLIC_BASE_URL: string;
       // # DB_MAX_LINK=5
-      // # token
-      TOKEN_KEY: string;
       // # root key, 最高权限
       ROOT_KEY: string;
       // # OneAPI 的地址

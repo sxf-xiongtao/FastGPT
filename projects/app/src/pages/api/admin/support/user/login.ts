@@ -1,12 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { createJWT, setCookie } from '@fastgpt/service/support/permission/controller';
+import { setCookie } from '@fastgpt/service/support/permission/controller';
+import { createUserSession } from '@fastgpt/service/support/user/session';
 
 import type { PostLoginProps } from '@fastgpt/global/support/user/api.d';
 import { getUserDetail } from '@fastgpt/service/support/user/controller';
 import { NextAPI } from '@/service/middleware/entry';
 import { useIPFrequencyLimit } from '@fastgpt/service/common/middle/reqFrequencyLimit';
+import requestIp from 'request-ip';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -41,7 +43,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       userId: user._id
     });
 
-    const token = createJWT(userDetail);
+    const token = await createUserSession({
+      userId: user._id,
+      teamId: userDetail.team.teamId,
+      tmbId: userDetail.team.tmbId,
+      isRoot: true,
+      ip: requestIp.getClientIp(req)
+    });
     setCookie(res, token);
 
     jsonRes(res, {

@@ -9,6 +9,7 @@ import { getWechatLoginConfig } from '@/service/support/user/login/wx';
 import { NextAPI } from '@/service/middleware/entry';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
 import type { UserType } from '@fastgpt/global/support/user/type';
+import requestIp from 'request-ip';
 
 export async function authWechat(openid: string) {
   const { APP_ID, APP_SECRET } = await getWechatLoginConfig();
@@ -61,7 +62,8 @@ async function handler(
   const { user, token } = await usernameLogin({
     username,
     avatar: avatarUrl,
-    inviterId
+    inviterId,
+    ip: requestIp.getClientIp(req)
   });
 
   setCookie(res, token);

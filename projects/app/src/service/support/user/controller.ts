@@ -16,7 +16,6 @@ import { UserType } from '@fastgpt/global/support/user/type';
 import { ClientSession, Types } from '@fastgpt/service/common/mongo';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { addLog } from '@fastgpt/service/common/system/log';
-import { createJWT } from '@fastgpt/service/support/permission/controller';
 import { getGroupsByTmbId } from '@fastgpt/service/support/permission/memberGroup/controllers';
 import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
 import { MongoOrgMemberModel } from '@fastgpt/service/support/permission/org/orgMemberSchema';
@@ -28,6 +27,7 @@ import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSc
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { sendInform2OneUser } from './inform/controller';
 import { getAndCreateUserDefaultTeam, getTeamByUsername } from './team/controller';
+import { createUserSession } from '@fastgpt/service/support/user/session';
 
 type UserProps = {
   username: string;
@@ -190,10 +190,12 @@ export async function usernameLogin({
 
   inviterId,
   fastgpt_sem,
-  sourceDomain
+  sourceDomain,
+  ip
 }: UserProps & {
   teamName?: string;
   memberName?: string;
+  ip?: string | null;
 }) {
   // try to login
   const user = await MongoUser.findOne({ username });
@@ -228,7 +230,12 @@ export async function usernameLogin({
 
     return {
       user,
-      token: createJWT(user)
+      token: await createUserSession({
+        userId: user._id,
+        teamId: user.team.teamId,
+        tmbId: user.team.tmbId,
+        ip
+      })
     };
   }
 
@@ -261,7 +268,12 @@ export async function usernameLogin({
   // login
   const userInfo = await getUserDetail({ tmbId: user.lastLoginTmbId, userId: user._id });
 
-  const token = createJWT(userInfo);
+  const token = await createUserSession({
+    userId: user._id,
+    teamId: userInfo.team.teamId,
+    tmbId: userInfo.team.tmbId,
+    ip
+  });
 
   return {
     user: userInfo,
