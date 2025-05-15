@@ -15,7 +15,8 @@ import {
 import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
 import { loadRequestMessages } from '@fastgpt/service/core/chat/utils';
 import { llmCompletionsBodyFormat, formatLLMResponse } from '@fastgpt/service/core/ai/utils';
-import { formatSplitText2Index } from './utils';
+import { DatasetDataIndexItemType } from '@fastgpt/global/core/dataset/type';
+import { DatasetDataIndexTypeEnum } from '@fastgpt/global/core/dataset/data/constants';
 
 const reduceQueue = () => {
   global.autoTrainingLen = global.autoTrainingLen > 0 ? global.autoTrainingLen - 1 : 0;
@@ -159,7 +160,7 @@ export async function generateAutoTraining(): Promise<any> {
     const outputTokens = usage?.completion_tokens || (await countPromptTokens(answer));
 
     // 3. Format answer to indexes and concat
-    const autoIndexResult = formatSplitText2Index({ answer, rawText: text, llmModel: modelData }); // 格式化后的索引
+    const autoIndexResult = formatSplitText2Index({ answer }); // 格式化后的索引
     const newIndexes = data.indexes.concat(autoIndexResult);
 
     // 4. Update training data to chunk queue
@@ -198,3 +199,45 @@ export async function generateAutoTraining(): Promise<any> {
     returnQueue(1000);
   }
 }
+
+export const formatSplitText2Index = ({
+  answer
+}: {
+  answer: string;
+}): Omit<DatasetDataIndexItemType, 'dataId'>[] => {
+  answer = answer.trim();
+
+  // 有些模型会偷懒，不输出 </Summary>
+  if (!answer.includes('</Summary>') && answer.includes('<Summary>')) {
+    answer += '</Summary>';
+  }
+
+  // 解析<Questions>和<Summary>
+  const question = answer.match(/<Questions>([\s\S]*?)<\/Questions>/)?.[1]?.trim();
+  const summary = answer.match(/<Summary>([\s\S]*?)<\/Summary>/)?.[1]?.trim();
+
+  const indexes = [
+    ...(question
+      ? [
+          {
+            text: question,
+            type: DatasetDataIndexTypeEnum.question
+          }
+        ]
+      : []),
+    ...(summary
+      ? [
+          {
+            text: summary,
+            type: DatasetDataIndexTypeEnum.summary
+          }
+        ]
+      : [])
+  ];
+
+  if (!question || !summary) {
+    addLog.warn('[Auto Training] No question or summary', { answer });
+  }
+
+  return indexes;
+};

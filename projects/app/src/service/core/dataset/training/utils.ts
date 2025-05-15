@@ -6,15 +6,10 @@ import { generateAutoTraining } from './autoTrainingProcess';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { InformLevelEnum } from '@fastgpt/global/support/user/inform/constants';
 import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
-import {
-  DatasetDataIndexItemType,
-  DatasetTrainingSchemaType
-} from '@fastgpt/global/core/dataset/type';
+import { DatasetTrainingSchemaType } from '@fastgpt/global/core/dataset/type';
 import { TrainingModeEnum } from '@fastgpt/global/core/dataset/constants';
 import { generateImageAnnotion } from './imageParse';
-import { DatasetDataIndexTypeEnum } from '@fastgpt/global/core/dataset/data/constants';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
-import { LLMModelItemType } from '@fastgpt/global/core/ai/model.d';
 
 export const startTrainingProcess = () => {
   generateAutoTraining();
@@ -67,49 +62,4 @@ export const createDatasetTrainingMongoWatch = () => {
       }
     } catch (error) {}
   });
-};
-
-/**
- * Parse format answer
-    ## Question
-    ## Summary
- */
-const parseFormatAnswer = (answer: string) => {
-  // Match content between "## Question(s)" and the next "##" or end of string
-  const question = answer.match(/## Questions?\s*\n([\s\S]*?)(?=\s*##|$)/i)?.[1];
-  // Match content after "## Summary" until the end of string
-  const summary = answer.match(/## Summary\s*\n([\s\S]*?)$/i)?.[1];
-  return { question: question?.trim() || '', summary: summary?.trim() || '' };
-};
-export const formatSplitText2Index = ({
-  answer,
-  rawText,
-  llmModel
-}: {
-  answer: string;
-  rawText: string;
-  llmModel: LLMModelItemType;
-}): Omit<DatasetDataIndexItemType, 'dataId'>[] => {
-  const { question, summary } = parseFormatAnswer(answer);
-
-  const indexes = [
-    ...(question
-      ? [
-          {
-            text: question,
-            type: DatasetDataIndexTypeEnum.question
-          }
-        ]
-      : []),
-    ...(summary
-      ? [
-          {
-            text: summary,
-            type: DatasetDataIndexTypeEnum.summary
-          }
-        ]
-      : [])
-  ];
-
-  return indexes;
 };
