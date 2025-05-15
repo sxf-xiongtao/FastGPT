@@ -23,25 +23,7 @@ async function handler(
 ): Promise<listResponse> {
   const { pageNum = 1, pageSize = 10, search } = req.body;
 
-  const match = await (async () => {
-    if (search) {
-      const users = await MongoUser.find({
-        username: new RegExp(search, 'i')
-      });
-      const match = {
-        $or: [
-          { name: new RegExp(search, 'i') },
-          { ownerId: { $in: users.map((user: { _id: string }) => user._id) } }
-        ]
-      };
-      const records = await MongoTeam.find(match).select({ _id: 1 });
-      return {
-        teamId: { $in: records.map((record) => record._id) }
-      };
-    }
-
-    return {};
-  })();
+  const match = search ? { teamName: new RegExp(search, 'i') } : {};
 
   const [records, total] = await Promise.all([
     MongoInvoice.find(match, undefined, {
