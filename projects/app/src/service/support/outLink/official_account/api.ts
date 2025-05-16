@@ -48,18 +48,23 @@ export async function requestReply({
   content: string;
   access_token: string;
 }) {
-  return axios.request({
-    url: replyURL,
-    method: 'POST',
-    data: {
-      touser: toUserName,
-      msgtype: 'text',
-      text: {
-        content
+  return axios
+    .request<{
+      errcode: number;
+      errmsg: string;
+    }>({
+      url: replyURL,
+      method: 'POST',
+      data: {
+        touser: toUserName,
+        msgtype: 'text',
+        text: {
+          content
+        }
+      },
+      params: {
+        access_token
       }
-    },
-    params: {
-      access_token
-    }
-  });
+    })
+    .then((res) => res.data);
 }

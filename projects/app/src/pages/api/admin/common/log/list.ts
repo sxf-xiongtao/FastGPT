@@ -23,12 +23,14 @@ async function handler(
   await adminCert({ req, authToken: true });
   const { search, logLevel = [3] } = req.body;
   const { offset, pageSize } = parsePaginationRequest(req);
+
   const match = {
     level: {
       $in: logLevel
     },
     ...(search && { text: new RegExp(search, 'i') })
   };
+
   const [records, total] = await Promise.all([
     getMongoLog()
       .find(match, undefined, {
@@ -36,9 +38,10 @@ async function handler(
         limit: pageSize,
         ...readFromSecondary
       })
-      .sort({ time: -1 }),
+      .sort({ _id: -1 }),
     getMongoLog().countDocuments(match, { ...readFromSecondary })
   ]);
+
   return {
     list: records,
     total

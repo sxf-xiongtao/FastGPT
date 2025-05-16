@@ -72,6 +72,7 @@ export type outLinkInvokeChatProps<T extends OutlinkAppType> = {
   replyCallback: (replyContent: string) => Promise<any>;
 };
 const DEFAULT_REPLY = 'This is default reply';
+
 export async function outlinkInvokeChat<T extends OutlinkAppType>({
   outLinkConfig,
   chatId,
@@ -96,7 +97,7 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
     // Check whether the chatId is valid
     if (userQuestion === RESET_CHAT_INPUT) {
       await resetChat({ appId: outLinkConfig.appId, chatId });
-      replyCallback(RESET_CHAT_REPLY);
+      await replyCallback(RESET_CHAT_REPLY);
       return;
     }
 
@@ -170,41 +171,68 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
     // Remove quote references like [id](CITE)
     responseContent = removeDatasetCiteText(responseContent, false);
 
+    const replyResult = await (async () => {
+      try {
+        const result = await replyCallback(responseContent);
+
+        if (result.errcode !== 0) {
+          addLog.error(`[Official account] reply error`, {
+            errmsg: result.errmsg
+          });
+          return {
+            success: false,
+            errmsg: result.errmsg
+          };
+        }
+
+        addLog.debug(`[Official account] reply success`, {
+          responseContent,
+          result
+        });
+        return {
+          success: true,
+          data: result
+        };
+      } catch (error) {
+        addLog.error(`[Official account] reply error`, error);
+        return {
+          success: false,
+          errmsg: getErrText(error)
+        };
+      }
+    })();
+
     // Save and reply
-    const [_, replyResult] = await Promise.all([
-      saveChat({
-        chatId,
-        appId: app._id,
-        teamId: outLinkConfig.teamId,
-        tmbId: outLinkConfig.tmbId,
-        nodes,
-        appChatConfig: chatConfig,
-        variables: newVariables,
-        isUpdateUseTime: true, // owner update use time
-        newTitle: userQuestion.slice(0, 8),
-        shareId: outLinkConfig.shareId,
-        source: getChatSourceByPublishChannel(outLinkConfig.type),
-        sourceName: outLinkConfig.name,
-        content: [
-          {
-            dataId: messageId,
-            obj: ChatRoleEnum.Human,
-            value: dispatchQuery
-          },
-          {
-            obj: ChatRoleEnum.AI,
-            value: assistantResponses,
-            [DispatchNodeResponseKeyEnum.nodeResponse]: flowResponses
-          }
-        ],
-        metadata: {
-          chatId
+    await saveChat({
+      chatId,
+      appId: app._id,
+      teamId: outLinkConfig.teamId,
+      tmbId: outLinkConfig.tmbId,
+      outLinkUid: chatUserId,
+      nodes,
+      appChatConfig: chatConfig,
+      variables: newVariables,
+      isUpdateUseTime: true, // owner update use time
+      newTitle: userQuestion.slice(0, 8),
+      shareId: outLinkConfig.shareId,
+      source: getChatSourceByPublishChannel(outLinkConfig.type),
+      sourceName: outLinkConfig.name,
+      content: [
+        {
+          dataId: messageId,
+          obj: ChatRoleEnum.Human,
+          value: dispatchQuery
         },
-        durationSeconds
-      }),
-      replyCallback(responseContent)
-    ]);
-    addLog.info('Reply result', { responseContent, replyResult: replyResult?.data });
+        {
+          obj: ChatRoleEnum.AI,
+          value: assistantResponses,
+          [DispatchNodeResponseKeyEnum.nodeResponse]: flowResponses
+        }
+      ],
+      metadata: {},
+      durationSeconds,
+      errorMsg: replyResult.success ? undefined : replyResult.errmsg
+    });
 
     // Create usage
     const { totalPoints } = createChatUsage({
@@ -220,7 +248,7 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
       totalPoints: totalPoints
     });
   } catch (error) {
-    addLog.error('Outlink app chat error', error);
-    await replyCallback(`App run error: ${getErrText(error, JSON.stringify(error))}`);
+    addLog.error('[Official account] response error', error);
+    await replyCallback(`App run error: ${getErrText(error)}`);
   }
 }
