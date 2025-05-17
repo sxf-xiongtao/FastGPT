@@ -38,7 +38,7 @@ export async function getAccessToken({ appId, secret }: { appId: string; secret:
   return res.data.access_token;
 }
 
-// this api need the provided official accound to be verified
+// this api need the provided official account to be verified
 export async function requestReply({
   toUserName,
   content,

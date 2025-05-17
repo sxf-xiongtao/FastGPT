@@ -3,9 +3,10 @@ import { NextAPI } from '@/service/middleware/entry';
 import { authOutLinkValid } from '@fastgpt/service/support/permission/publish/authLink';
 import { OffiAccountAppType } from '@fastgpt/global/support/outLink/type';
 import {
+  formatTextReply,
   getSignature,
-  parseBody,
-  passiveReply
+  offiaccountWelcome,
+  parseBody
 } from '@/service/support/outLink/official_account/utils';
 import { outlinkInvokeChat } from '@/service/support/outLink/utils';
 import { getAccessToken, requestReply } from '@/service/support/outLink/official_account/api';
@@ -24,7 +25,8 @@ type Body = {
   FromUserName: string;
   Content: string;
   MsgId: string;
-  MsgType: 'text'; // only support text for now
+  MsgType: 'text' | 'event';
+  Event?: 'subscribe' | 'unsubscribe';
 };
 
 async function handler(
@@ -45,10 +47,21 @@ async function handler(
   // handle message
   const body = await parseBody<Body>(req.body, CallbackEncodingAesKey);
 
+  if (body.MsgType === 'event' && body.Event === 'subscribe') {
+    // Reply with welcome message when user subscribes
+    return {
+      message: await offiaccountWelcome({
+        outLinkConfig,
+        fromUserName: body.toUserName,
+        toUserName: body.FromUserName
+      })
+    };
+  }
+
   if (body.MsgType !== 'text') {
     // only support text for now
     return {
-      message: passiveReply({
+      message: formatTextReply({
         content: `暂不支持非文字消息`,
         fromUserName: body.toUserName,
         toUserName: body.FromUserName

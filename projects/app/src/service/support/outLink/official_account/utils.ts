@@ -1,6 +1,8 @@
+import { OutlinkAppType, OutLinkSchema } from '@fastgpt/global/support/outLink/type';
+import { getAppLatestVersion } from '@fastgpt/service/core/app/version/controller';
 import { decrypt } from '@wecom/crypto';
 import crypto from 'crypto';
-import { XMLParser, XMLBuilder } from 'fast-xml-parser';
+import { XMLParser } from 'fast-xml-parser';
 
 const Parser = new XMLParser();
 
@@ -46,7 +48,7 @@ export async function parseBody<T>(
   };
 }
 
-export function passiveReply({
+export function formatTextReply({
   toUserName,
   fromUserName,
   content
@@ -64,4 +66,62 @@ export function passiveReply({
   <Content><![CDATA[${content}]]></Content>
 </xml>
 `;
+}
+
+export function formatImageReply({
+  toUserName,
+  fromUserName,
+  mediaId
+}: {
+  toUserName: string;
+  fromUserName: string;
+  mediaId: string;
+}): string {
+  return `
+  <xml>
+  <ToUserName><![CDATA[${toUserName}]]></ToUserName>
+  <FromUserName><![CDATA[${fromUserName}]]></FromUserName>
+  <CreateTime>${Date.now()}</CreateTime>
+  <MsgType><![CDATA[image]]></MsgType>
+  <Image>
+    <MediaId><![CDATA[${mediaId}]]></MediaId>
+  </Image>
+</xml>
+`;
+}
+
+export async function offiaccountWelcome({
+  outLinkConfig,
+
+  toUserName,
+  fromUserName
+}: {
+  outLinkConfig: OutLinkSchema<OutlinkAppType>;
+
+  toUserName: string;
+  fromUserName: string;
+}): Promise<string> {
+  const { chatConfig } = await getAppLatestVersion(outLinkConfig.appId);
+  const welcome = chatConfig?.welcomeText || '';
+
+  // Regular expression to match media ID format: ![OFFIACCOUNT_MEDIA](media_id)
+  const mediaIdRegex = /^!\[OFFIACCOUNT_MEDIA\]\((.*?)\)([\s\S]*)/;
+  const match = welcome.match(mediaIdRegex);
+
+  if (match && match[1]) {
+    // If welcome message contains a media ID, send an image reply
+    const mediaId = match[1].trim();
+    return formatImageReply({
+      toUserName,
+      fromUserName,
+      mediaId
+    });
+  } else {
+    // Otherwise, send a regular text reply with the welcome message
+    return formatTextReply({
+      toUserName,
+      fromUserName,
+      content: welcome
+    });
+  }
 }
