@@ -26,6 +26,7 @@ import { BillPayWayEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { createPaymentController } from '@/service/support/wallet/bill/pay/base';
 import { CheckPayResultResponse } from '@fastgpt/global/support/wallet/bill/api';
 import { i18nT } from '@fastgpt/web/i18n/utils';
+import { PayResult } from '@/service/support/wallet/bill/pay/type';
 
 /* 校验支付结果 */
 async function handler(req: NextApiRequest, res: NextApiResponse): Promise<CheckPayResultResponse> {
@@ -55,8 +56,53 @@ async function handler(req: NextApiRequest, res: NextApiResponse): Promise<Check
     };
   }
 
-  const paymentProcessor = await createPaymentController(payOrder.metadata.payWay);
-  const payRes = await paymentProcessor.getPayResult(payOrder.orderId);
+  // 支付宝和微信都去查一遍（如果有配置的话）
+  const { payRes, payWay } = await (async () => {
+    const hasWxPay = !!global.feConfigs?.payConfig?.wx;
+    const hasAlipay = !!global.feConfigs?.payConfig?.alipay;
+    let payRes: PayResult | null = null;
+
+    // 查微信支付
+    if (hasWxPay) {
+      try {
+        const paymentProcessor = await createPaymentController(BillPayWayEnum.wx);
+        payRes = await paymentProcessor.getPayResult(payOrder.orderId);
+        if (payRes.status === BillStatusEnum.SUCCESS) {
+          return {
+            payRes,
+            payWay: BillPayWayEnum.wx
+          };
+        }
+      } catch (error) {
+        console.log('微信支付检查失败', error);
+      }
+    }
+
+    // 查支付宝支付
+    if (hasAlipay) {
+      try {
+        const paymentProcessor = await createPaymentController(BillPayWayEnum.alipay);
+        payRes = await paymentProcessor.getPayResult(payOrder.orderId);
+        if (payRes.status === BillStatusEnum.SUCCESS) {
+          return {
+            payRes,
+            payWay: BillPayWayEnum.alipay
+          };
+        }
+      } catch (error) {
+        console.log('支付宝支付检查失败', error);
+      }
+    }
+
+    if (!payRes) {
+      return Promise.reject(i18nT('common:bill_not_pay_processed'));
+    }
+
+    return {
+      payRes,
+      payWay: payOrder.metadata.payWay
+    };
+  })();
 
   //  重点检查：支付成功
   if (payRes.status === BillStatusEnum.SUCCESS) {
@@ -68,7 +114,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse): Promise<Check
           status: 'NOTPAY'
         },
         {
-          status: 'SUCCESS'
+          status: 'SUCCESS',
+          'metadata.payWay': payWay
         },
         {
           session,

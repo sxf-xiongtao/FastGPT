@@ -158,5 +158,4 @@ async function sendFeishuWebhook({
       }
     }
   });
-  console.log(result);
 }

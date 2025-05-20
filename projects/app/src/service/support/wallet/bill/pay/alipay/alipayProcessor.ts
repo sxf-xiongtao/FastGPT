@@ -41,7 +41,8 @@ export const createAlipayProcessor = (config: AlipayConfig, systemTitle: string)
           bizContent: { out_trade_no: payId }
         });
 
-        if (res.code !== '10000') {
+        // 未支付/交易不存在
+        if (!['10000', '40004'].includes(res.code)) {
           addLog.warn('Alipay processor error');
           console.log(res);
         }
@@ -60,7 +61,7 @@ export const createAlipayProcessor = (config: AlipayConfig, systemTitle: string)
           status,
           description: res.msg
         };
-      } catch (error) {
+      } catch (error: any) {
         addLog.warn('Alipay processor error');
         console.log(error);
         return {

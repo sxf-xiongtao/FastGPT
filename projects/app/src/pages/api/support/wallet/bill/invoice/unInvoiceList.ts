@@ -30,7 +30,7 @@ async function handler(
       'metadata.payWay': { $in: [BillPayWayEnum.alipay, BillPayWayEnum.wx, BillPayWayEnum.bank] }
     },
     { price: 1, type: 1, createTime: 1, orderId: 1 }
-  );
+  ).sort({ _id: -1 });
   return unInvoiceList;
 }
 

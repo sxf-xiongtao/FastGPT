@@ -35,6 +35,10 @@ async function handler(
     return Promise.reject('订单未支付');
   }
 
+  if (bill.hasInvoice) {
+    return Promise.reject('订单已开票，无法直接退款');
+  }
+
   const billReadPrice = bill.price / PRICE_SCALE;
 
   if (billReadPrice < amount) {
