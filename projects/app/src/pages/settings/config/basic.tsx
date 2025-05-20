@@ -174,8 +174,29 @@ export const Settings = () => {
       <FormItem title="图片理解模型最大处理进程" description="">
         <Input type="number" {...register('systemEnv.vlmMaxProcess')} placeholder="" />
       </FormItem>
-      <FormItem title="HNSW ef_search" description="没有特殊设置过索引的，默认 100 即可">
-        <Input type="number" {...register('systemEnv.hnswEfSearch')} placeholder="" />
+      <FormItem
+        title="HNSW ef_search"
+        description="HNSW 参数。越大召回率越高，性能越差，默认为 100，具体可见：https://github.com/pgvector/pgvector"
+      >
+        <Input
+          type="number"
+          {...register('systemEnv.hnswEfSearch', {
+            valueAsNumber: true
+          })}
+          placeholder=""
+        />
+      </FormItem>
+      <FormItem
+        title="HNSW max_scan_tuples"
+        description="迭代搜索最大数量，越大召回率越高，性能越差，默认为 100000，具体可见：https://github.com/pgvector/pgvector"
+      >
+        <Input
+          type="number"
+          {...register('systemEnv.hnswMaxScanTuples', {
+            valueAsNumber: true
+          })}
+          placeholder=""
+        />
       </FormItem>
       <FormItem title="token计算最大进程（通常多少并发设置多少）" description="">
         <Input type="number" {...register('systemEnv.tokenWorkers')} placeholder="" />

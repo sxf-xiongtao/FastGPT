@@ -51,6 +51,7 @@ export type ConfigFormType = {
       qaMaxProcess: number;
       vlmMaxProcess: number;
       hnswEfSearch: number;
+      hnswMaxScanTuples: number;
       tokenWorkers: number;
       customPdfParse?: customPdfParseType;
     };
