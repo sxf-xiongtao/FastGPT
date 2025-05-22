@@ -42,9 +42,9 @@ async function handler(req: ApiRequestProps<ExternalFileCreateDatasetCollectionP
     tmbId,
     type: DatasetSourceReadTypeEnum.externalFile,
     sourceId: externalFileUrl,
-    isQAImport: false,
     customPdfParse,
-    externalFileId
+    externalFileId,
+    getFormatText: true
   });
 
   const { collectionId, insertResults } = await createCollectionAndInsertData({
