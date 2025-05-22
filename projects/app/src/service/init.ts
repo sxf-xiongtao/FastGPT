@@ -1,10 +1,4 @@
 import { censorCheckRequest } from '@/pages/api/common/censor/check';
-import {
-  getProApiDatasetFileContentRequest,
-  getProApiDatasetFileDetailRequest,
-  getProApiDatasetFileListRequest,
-  getProApiDatasetFilePreviewUrlRequest
-} from '@/pages/api/core/dataset/systemApiDataset';
 import { openapiAuthLimitRequest } from '@/pages/api/support/openapi/authLimit';
 import { initFastGPTConfig } from '@fastgpt/service/common/system/tools';
 import { deepRagSearch } from './core/dataset/search';
@@ -65,11 +59,6 @@ export function initGlobalVariables() {
     global.authOpenApiHandler = openapiAuthLimitRequest;
     global.createUsageHandler = createUsageRequest;
     global.concatUsageHandler = concatUsageRequest;
-
-    global.getProApiDatasetFileList = getProApiDatasetFileListRequest;
-    global.getProApiDatasetFileContent = getProApiDatasetFileContentRequest;
-    global.getProApiDatasetFilePreviewUrl = getProApiDatasetFilePreviewUrlRequest;
-    global.getProApiDatasetFileDetail = getProApiDatasetFileDetailRequest;
   }
 
   global.sendInformQueue = [];
