@@ -1,6 +1,5 @@
 {
   "author": "",
-  "version": "486",
   "name": "Dalle 3 绘图",
   "avatar": "common/openai",
   "intro": "调用 Dalle3 接口绘图",

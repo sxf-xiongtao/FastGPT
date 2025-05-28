@@ -20,7 +20,7 @@ import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
 import { MongoFrequencyLimit } from '@fastgpt/service/common/system/frequencyLimit/schema';
 import { MongoOpenApi } from '@fastgpt/service/support/openapi/schema';
 import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
-import { MongoRawTextBuffer } from '@fastgpt/service/common/buffer/rawText/schema';
+import { MongoRawTextBufferSchema } from '@fastgpt/service/common/buffer/rawText/schema';
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
 import { MongoTimerLock } from '@fastgpt/service/common/system/timerLock/schema';
 import { MongoUserAuth } from '@fastgpt/service/support/user/auth/schema';
@@ -70,7 +70,7 @@ async function handler(
     MongoFrequencyLimit.syncIndexes();
     MongoOpenApi.syncIndexes();
     MongoOutLink.syncIndexes();
-    MongoRawTextBuffer.syncIndexes();
+    MongoRawTextBufferSchema.syncIndexes();
     MongoTimerLock.syncIndexes();
     MongoUserAuth.syncIndexes();
     MongoApp.syncIndexes();
