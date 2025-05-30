@@ -16,6 +16,22 @@ const OAuth2ContactMap = process.env.OAUTH2_CONTACT_MAP || '';
 
 let cache_redirect_uri = '';
 
+function getNestedValue(obj: any, path: string): any {
+  if (!path) return undefined;
+
+  const keys = path.split('.');
+  let current = obj;
+
+  for (const key of keys) {
+    if (current === null || current === undefined) {
+      return undefined;
+    }
+    current = current[key];
+  }
+
+  return current;
+}
+
 export const oauth2_redirectFn: RedirectFn = async ({ redirect_uri, state }) => {
   // parse the redirect_uri
   const url = new URL(OAuth2AuthorizeURL);
@@ -61,10 +77,10 @@ export const oauth2_getUserInfo: GetUserInfoFn = async (code: string) => {
     }
   });
 
-  const username = data[OAuth2UsernameMap];
-  const avatar = data[OAuth2AvatarMap];
-  const memberName = data[OAuth2MemberNameMap];
-  const contact = data[OAuth2ContactMap];
+  const username = getNestedValue(data, OAuth2UsernameMap);
+  const avatar = getNestedValue(data, OAuth2AvatarMap);
+  const memberName = getNestedValue(data, OAuth2MemberNameMap);
+  const contact = getNestedValue(data, OAuth2ContactMap);
 
   return {
     username,
