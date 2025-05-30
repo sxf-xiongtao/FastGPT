@@ -104,7 +104,7 @@ async function handler(
       }
     },
     {
-      $sort: { statusOrder: 1 }
+      $sort: { statusOrder: 1, _id: 1 }
     }
   ];
 
