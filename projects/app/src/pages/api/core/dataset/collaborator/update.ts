@@ -21,7 +21,13 @@ import {
 import { getGroupsByTmbId } from '@fastgpt/service/support/permission/memberGroup/controllers';
 import { getOrgsByTmbId } from '@fastgpt/service/support/permission/org/controllers';
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
+import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
+import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
+import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
+import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
+import { getI18nDatasetType } from '@fastgpt/service/support/operationLog/util';
 
 async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
   // Authorization
@@ -236,6 +242,32 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
       permission
     });
   });
+
+  (async () => {
+    const teamMembers = await MongoTeamMember.find({ _id: { $in: tmbIds } }, 'name').lean();
+    const memberNames = teamMembers.map((member) => member.name);
+
+    const groups = await MongoMemberGroupModel.find({ _id: { $in: groupIds } }, 'name').lean();
+    const groupNames = groups.map((group) => group.name);
+
+    const orgs = await MongoOrgModel.find({ _id: { $in: orgIds } }, 'name').lean();
+    const orgNames = orgs.map((org) => org.name);
+    const datasetType = getI18nDatasetType(dataset.type);
+
+    addOperationLog({
+      tmbId,
+      teamId,
+      event: OperationLogEventEnum.UPDATE_DATASET_COLLABORATOR,
+      params: {
+        datasetName: dataset.name,
+        datasetType: datasetType,
+        tmbList: memberNames,
+        groupList: groupNames,
+        orgList: orgNames,
+        permission: String(permission)
+      }
+    });
+  })();
 }
 
 export default NextAPI(handler);

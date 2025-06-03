@@ -17,12 +17,25 @@ import {
   syncCollaborators
 } from '@fastgpt/service/support/permission/inheritPermission';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
+import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
+import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
+import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
+import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
+import {
+  getI18nCollaboratorItemType,
+  getI18nDatasetType
+} from '@fastgpt/service/support/operationLog/util';
 
 async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>) {
   // Authorization
   const { datasetId, tmbId, groupId, orgId } = req.query;
 
-  const { teamId, dataset } = await authDataset({
+  const {
+    teamId,
+    dataset,
+    tmbId: operatorTmbId
+  } = await authDataset({
     req,
     authToken: true,
     datasetId,
@@ -53,7 +66,12 @@ async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>
         folderTypeList: [DatasetTypeEnum.folder],
         resourceType: PerResourceTypeEnum.dataset,
         resourceModel: MongoDataset,
-        collaborators: folderClbsAndGroups.filter((clb) => String(clb.tmbId) !== tmbId),
+        collaborators: folderClbsAndGroups.filter(
+          (item) =>
+            String(item.tmbId) !== tmbId &&
+            String(item.groupId) !== groupId &&
+            String(item.orgId) !== orgId
+        ),
         session
       });
     } else {
@@ -70,18 +88,39 @@ async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>
           resourceId: datasetId,
           resourceType: PerResourceTypeEnum.dataset,
           session,
-          collaborators: parentClbsAndGroups.filter((clb) => String(clb.tmbId) !== tmbId)
+          collaborators: parentClbsAndGroups.filter(
+            (item) =>
+              String(item.tmbId) !== tmbId &&
+              String(item.groupId) !== groupId &&
+              String(item.orgId) !== orgId
+          )
         });
       } else {
-        await delResourcePermission({
-          resourceType: PerResourceTypeEnum.dataset,
-          teamId,
-          tmbId,
-          groupId,
-          orgId,
-          resourceId: dataset._id,
-          session
-        });
+        await delResourcePermission(
+          tmbId
+            ? {
+                resourceType: PerResourceTypeEnum.dataset,
+                teamId,
+                tmbId,
+                resourceId: dataset._id,
+                session
+              }
+            : groupId
+              ? {
+                  resourceType: PerResourceTypeEnum.dataset,
+                  teamId,
+                  groupId: groupId,
+                  resourceId: dataset._id,
+                  session
+                }
+              : {
+                  resourceType: PerResourceTypeEnum.dataset,
+                  teamId,
+                  orgId: orgId!,
+                  resourceId: dataset._id,
+                  session
+                }
+        );
       }
     }
 
@@ -94,6 +133,39 @@ async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>
       ).session(session);
     }
   });
+
+  (async () => {
+    const getItemName = async () => {
+      if (tmbId) {
+        const member = await MongoTeamMember.findOne({ _id: tmbId }, 'name').exec();
+        return member?.name || tmbId;
+      }
+      if (groupId) {
+        const group = await MongoMemberGroupModel.findOne({ _id: groupId }, 'name').exec();
+        return group?.name || groupId;
+      }
+      if (orgId) {
+        const org = await MongoOrgModel.findOne({ _id: orgId }, 'name').exec();
+        return org?.name || orgId;
+      }
+      return '';
+    };
+
+    const itemType = getI18nCollaboratorItemType(tmbId, groupId, orgId);
+    const itemName = await getItemName();
+    const datasetType = getI18nDatasetType(dataset.type);
+    addOperationLog({
+      tmbId: operatorTmbId,
+      teamId,
+      event: OperationLogEventEnum.DELETE_DATASET_COLLABORATOR,
+      params: {
+        datasetName: dataset.name,
+        itemName: itemType,
+        itemValueName: itemName,
+        datasetType: datasetType
+      }
+    });
+  })();
 }
 
 export default NextAPI(handler);

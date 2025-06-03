@@ -14,7 +14,8 @@ import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { replaceRegChars } from '@fastgpt/global/common/string/tools';
 import { NextAPI } from '@/service/middleware/entry';
 import { useIPFrequencyLimit } from '@fastgpt/service/common/middle/reqFrequencyLimit';
-
+import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
+import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
 const getAppName = (appName: string, appNameMap: Record<string, string>) =>
   appName in appNameMap ? appNameMap[appName] : appName;
 
@@ -102,6 +103,15 @@ async function handler(req: ApiRequestProps<ExportUsageBody, {}>, res: NextApiRe
   cursor.on('end', () => {
     cursor.close();
     res.end();
+
+    (async () => {
+      addOperationLog({
+        tmbId,
+        teamId,
+        event: OperationLogEventEnum.EXPORT_BILL_RECORDS,
+        params: {}
+      });
+    })();
   });
 
   cursor.on('error', (err) => {

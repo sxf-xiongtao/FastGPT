@@ -7,7 +7,9 @@ import { OwnerPermissionVal } from '@fastgpt/global/support/permission/constant'
 import { AppErrEnum } from '@fastgpt/global/common/error/code/app';
 import { DatasetErrEnum } from '@fastgpt/global/common/error/code/dataset';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
-
+import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
+import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { getI18nDatasetType } from '@fastgpt/service/support/operationLog/util';
 export type AppChangeOwnerQuery = {};
 export type AppChangeOwnerBody = {
   ownerId: string;
@@ -24,7 +26,7 @@ async function handler(
     return Promise.reject(CommonErrEnum.missingParams);
   }
 
-  const { dataset } = await authDataset({
+  const { dataset, tmbId, teamId } = await authDataset({
     req,
     datasetId,
     authToken: true,
@@ -37,19 +39,34 @@ async function handler(
 
   const oldOwnerId = dataset.tmbId; // the old owner id before changing
   const newOwner = await MongoTeamMember.findById(ownerId); // the new owner
+  const oldOwner = await MongoTeamMember.findById(oldOwnerId); // the old owner
 
-  // it is forbidden to change the owner to a user who is not in the same team
   if (!newOwner || String(newOwner.teamId) !== String(dataset.teamId)) {
     return Promise.reject(AppErrEnum.invalidOwner);
   }
 
-  return changeOwner({
+  await changeOwner({
     changeOwnerType: 'dataset',
     resourceId: dataset._id,
     newOwnerId: ownerId,
     oldOwnerId: oldOwnerId,
     teamId: dataset.teamId
   });
+
+  const datasetType = getI18nDatasetType(dataset.type);
+  addOperationLog({
+    tmbId,
+    teamId,
+    event: OperationLogEventEnum.TRANSFER_DATASET_OWNERSHIP,
+    params: {
+      datasetName: dataset.name,
+      datasetType: datasetType,
+      oldOwnerName: oldOwner?.name || 'Unknown',
+      newOwnerName: newOwner.name
+    }
+  });
+
+  return {};
 }
 
 export default NextAPI(handler);

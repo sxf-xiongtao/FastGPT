@@ -4,7 +4,8 @@ import type { TeamInvoiceHeaderType } from '@fastgpt/global/support/user/team/ty
 import { MongoTeamInvoiceTitle } from '@/service/support/user/team/invoiceAccount/teamInvoiceSchema';
 import { authMember } from '@/service/support/permission/team/auth';
 import { OwnerPermissionVal } from '@fastgpt/global/support/permission/constant';
-
+import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
+import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
 export type updateQuery = {};
 
 export type updateBody = TeamInvoiceHeaderType;
@@ -15,11 +16,21 @@ async function handler(
   req: ApiRequestProps<updateBody, updateQuery>,
   res: ApiResponseType<any>
 ): Promise<updateResponse> {
-  const { teamId } = await authMember({ req, authToken: true, per: OwnerPermissionVal });
+  const { teamId, tmbId } = await authMember({ req, authToken: true, per: OwnerPermissionVal });
   const handleRes = await MongoTeamInvoiceTitle.updateOne({ teamId }, req.body, {
     upsert: true
   });
-  if (handleRes) return {};
+  if (handleRes) {
+    (async () => {
+      addOperationLog({
+        tmbId,
+        teamId,
+        event: OperationLogEventEnum.SET_INVOICE_HEADER,
+        params: {}
+      });
+    })();
+    return {};
+  }
   return Promise.reject('update fail');
 }
 

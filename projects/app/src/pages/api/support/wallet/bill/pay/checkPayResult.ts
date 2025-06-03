@@ -27,12 +27,14 @@ import { createPaymentController } from '@/service/support/wallet/bill/pay/base'
 import { CheckPayResultResponse } from '@fastgpt/global/support/wallet/bill/api';
 import { i18nT } from '@fastgpt/web/i18n/utils';
 import { PayResult } from '@/service/support/wallet/bill/pay/type';
+import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
+import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
 
 /* 校验支付结果 */
 async function handler(req: NextApiRequest, res: NextApiResponse): Promise<CheckPayResultResponse> {
   const { payId } = req.query as { payId: string };
 
-  await authCert({ req, authToken: true });
+  const { tmbId, teamId } = await authCert({ req, authToken: true });
 
   // 查找订单记录校验
   const payOrder = await MongoBill.findById<BillSchemaType>(payId).lean();
@@ -154,6 +156,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse): Promise<Check
         });
       }
     } catch (error) {}
+
+    (async () => {
+      addOperationLog({
+        tmbId,
+        teamId,
+        event: OperationLogEventEnum.PURCHASE_PLAN,
+        params: {}
+      });
+    })();
 
     return {
       status: BillStatusEnum.SUCCESS,

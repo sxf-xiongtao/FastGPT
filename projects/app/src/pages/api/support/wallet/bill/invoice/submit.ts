@@ -10,7 +10,8 @@ import { ClientSession } from '@fastgpt/service/common/mongo';
 import { InvoiceStatusEnum } from '@fastgpt/global/support/wallet/bill/invoice/constants';
 import axios from 'axios';
 import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
-
+import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
+import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
 export type submitQuery = {};
 export type submitBody = InvoiceType;
 
@@ -46,7 +47,7 @@ async function handler(
     teamName,
     contactPhone
   } = req.body;
-  const { teamId } = await authMember({ req, authToken: true, per: ManagePermissionVal });
+  const { teamId, tmbId } = await authMember({ req, authToken: true, per: ManagePermissionVal });
   const totalAmount = await getBillIdListTotalAmount(billIdList, teamId);
 
   if (totalAmount < 0 || totalAmount !== amount) return Promise.reject('invalid billIdList');
@@ -87,6 +88,15 @@ async function handler(
       amount: formatStorePrice2Read(totalAmount),
       session
     });
+
+    (async () => {
+      addOperationLog({
+        tmbId,
+        teamId,
+        event: OperationLogEventEnum.CREATE_INVOICE,
+        params: {}
+      });
+    })();
   });
 
   return {};

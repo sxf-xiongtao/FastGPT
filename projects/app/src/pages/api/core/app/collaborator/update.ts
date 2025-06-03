@@ -23,7 +23,12 @@ import {
 import { getGroupsByTmbId } from '@fastgpt/service/support/permission/memberGroup/controllers';
 import { getOrgsByTmbId } from '@fastgpt/service/support/permission/org/controllers';
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
-
+import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
+import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
+import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
+import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
+import { getI18nAppType } from '@fastgpt/service/support/operationLog/util';
 /*
   增加或修改协作者
   1. 继承态目录：关闭继承态，更新新的协作者，同步其子目录协作者
@@ -256,6 +261,45 @@ async function handler(req: NextApiRequest) {
       permission
     });
   });
+
+  (async () => {
+    const appType = getI18nAppType(app.type);
+
+    const tmbNames = await Promise.all(
+      tmbIds.map(async (tmbId) => {
+        const member = await MongoTeamMember.findOne({ _id: tmbId }, 'name').exec();
+        return member?.name || tmbId;
+      })
+    );
+
+    const groupNames = await Promise.all(
+      groupIds.map(async (groupId) => {
+        const group = await MongoMemberGroupModel.findOne({ _id: groupId }, 'name').exec();
+        return group?.name || groupId;
+      })
+    );
+
+    const orgNames = await Promise.all(
+      orgIds.map(async (orgId) => {
+        const org = await MongoOrgModel.findOne({ _id: orgId }, 'name').exec();
+        return org?.name || orgId;
+      })
+    );
+
+    addOperationLog({
+      tmbId,
+      teamId,
+      event: OperationLogEventEnum.UPDATE_APP_COLLABORATOR,
+      params: {
+        appName: app.name,
+        appType: appType,
+        tmbList: tmbNames,
+        groupList: groupNames,
+        orgList: orgNames,
+        permission: String(permission)
+      }
+    });
+  })();
 }
 
 export default NextAPI(handler);
