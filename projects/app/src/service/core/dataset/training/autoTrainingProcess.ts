@@ -17,6 +17,7 @@ import { loadRequestMessages } from '@fastgpt/service/core/chat/utils';
 import { llmCompletionsBodyFormat, formatLLMResponse } from '@fastgpt/service/core/ai/utils';
 import { DatasetDataIndexItemType } from '@fastgpt/global/core/dataset/type';
 import { DatasetDataIndexTypeEnum } from '@fastgpt/global/core/dataset/data/constants';
+import { getErrText } from '@fastgpt/global/common/error/utils';
 
 const reduceQueue = () => {
   global.autoTrainingLen = global.autoTrainingLen > 0 ? global.autoTrainingLen - 1 : 0;
@@ -48,6 +49,8 @@ export async function generateAutoTraining(): Promise<any> {
     );
     return;
   }
+
+  addLog.debug(`[Auto Training Queue] Size: ${global.autoTrainingLen}`);
 
   const max = global.systemEnv?.qaMaxProcess || 10;
   if (global.autoTrainingLen >= max) return;
@@ -196,6 +199,19 @@ export async function generateAutoTraining(): Promise<any> {
     return returnQueue();
   } catch (err: any) {
     addLog.error(`[Auto Training Queue] Error`, err);
+
+    await MongoDatasetTraining.updateOne(
+      {
+        teamId: data.teamId,
+        datasetId: data.datasetId,
+        _id: data._id
+      },
+      {
+        lockTime: addMinutes(new Date(), -9),
+        errorMsg: getErrText(err, 'unknown error')
+      }
+    );
+
     returnQueue(1000);
   }
 }

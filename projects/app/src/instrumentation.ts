@@ -52,7 +52,7 @@ export async function register() {
       // Init system from local or db
       await Promise.all([getProInitData(), getSystemPluginCb(true), loadSystemModels()]);
 
-      startTrainingProcess();
+      startTrainingProcess(true);
       startMongoWatch();
 
       // Preload worker

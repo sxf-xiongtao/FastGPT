@@ -11,9 +11,12 @@ import { TrainingModeEnum } from '@fastgpt/global/core/dataset/constants';
 import { generateImageAnnotion } from './imageParse';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 
-export const startTrainingProcess = () => {
-  generateAutoTraining();
-  generateImageAnnotion();
+export const startTrainingProcess = (fast = false) => {
+  const max = global.systemEnv?.qaMaxProcess || 10;
+  for (let i = 0; i < (fast ? max : 1); i++) {
+    generateAutoTraining();
+    generateImageAnnotion();
+  }
 };
 
 export const checkTeamAiPointsAndLock = async (teamId: string) => {

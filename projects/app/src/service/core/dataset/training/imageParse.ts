@@ -17,6 +17,7 @@ import { loadRequestMessages } from '@fastgpt/service/core/chat/utils';
 import { llmCompletionsBodyFormat, formatLLMResponse } from '@fastgpt/service/core/ai/utils';
 import { getImageBase64 } from '@fastgpt/service/common/file/image/utils';
 import { DatasetDataIndexTypeEnum } from '@fastgpt/global/core/dataset/data/constants';
+import { getErrText } from '@fastgpt/global/common/error/utils';
 
 const reduceQueue = () => {
   global.imageParseQueueLen = global.imageParseQueueLen > 0 ? global.imageParseQueueLen - 1 : 0;
@@ -67,6 +68,8 @@ export async function generateImageAnnotion(): Promise<any> {
     );
     return;
   }
+
+  addLog.debug(`[Image parse queue] Size: ${global.imageParseQueueLen}`);
 
   const max = global.systemEnv?.vlmMaxProcess || 10;
   if (global.imageParseQueueLen >= max) return;
@@ -131,6 +134,13 @@ export async function generateImageAnnotion(): Promise<any> {
     return;
   }
   if (error) {
+    return reduceQueueAndReturn();
+  }
+
+  if (!data.dataset || !data.collection) {
+    addLog.info(`[Image parse queue] Dataset or collection not found`, data);
+    // Delete data
+    await MongoDatasetTraining.deleteOne({ _id: data._id });
     return reduceQueueAndReturn();
   }
 
@@ -255,6 +265,17 @@ export async function generateImageAnnotion(): Promise<any> {
     reduceQueueAndReturn();
   } catch (err: any) {
     addLog.error(`[Image parse queue] Error`, err);
+    await MongoDatasetTraining.updateOne(
+      {
+        teamId: data.teamId,
+        datasetId: data.datasetId,
+        _id: data._id
+      },
+      {
+        lockTime: addMinutes(new Date(), -9),
+        errorMsg: getErrText(err, 'unknown error')
+      }
+    );
     reduceQueueAndReturn(1000);
   }
 }
