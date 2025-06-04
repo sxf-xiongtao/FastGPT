@@ -28,9 +28,7 @@ const LicenseInput = ({ onClose }: { onClose?: () => void }) => {
         <HStack px="6" py="3" bgColor="primary.50" borderRadius="md">
           <Icon name="common/info" w="1.2rem" color="primary.600" />
           <Box fontSize={'sm'}>
-            <Markdown
-              source={`你需要使用 License 激活系统后才可继续使用，Licese 获取请联系：[FastGPT 团队](https://fael3z0zfze.feishu.cn/share/base/form/shrcnRxj3utrzjywsom96Px4sud)`}
-            ></Markdown>
+            <Markdown source={`你需要使用 License 激活系统后才可继续使用。`}></Markdown>
             <Flex gap={3}>
               <Box>当前域名为:</Box>
               <Box color={'primary.600'} textDecoration={'underline'} userSelect={'all'}>
