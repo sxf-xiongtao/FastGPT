@@ -8,14 +8,16 @@ import { InformLevelEnum } from '@fastgpt/global/support/user/inform/constants';
 import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
 import { DatasetTrainingSchemaType } from '@fastgpt/global/core/dataset/type';
 import { TrainingModeEnum } from '@fastgpt/global/core/dataset/constants';
-import { generateImageAnnotion } from './imageParse';
+import { generateImageIndex } from './imageIndex';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
+import { imageParseTraining } from './imageParse';
 
 export const startTrainingProcess = (fast = false) => {
   const max = global.systemEnv?.qaMaxProcess || 10;
   for (let i = 0; i < (fast ? max : 1); i++) {
     generateAutoTraining();
-    generateImageAnnotion();
+    generateImageIndex();
+    imageParseTraining();
   }
 };
 
@@ -60,7 +62,9 @@ export const createDatasetTrainingMongoWatch = () => {
         if (mode === TrainingModeEnum.auto) {
           generateAutoTraining();
         } else if (mode === TrainingModeEnum.image) {
-          generateImageAnnotion();
+          generateImageIndex();
+        } else if (mode === TrainingModeEnum.imageParse) {
+          imageParseTraining();
         }
       }
     } catch (error) {}

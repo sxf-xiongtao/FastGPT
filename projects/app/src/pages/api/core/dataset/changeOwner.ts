@@ -45,7 +45,7 @@ async function handler(
     return Promise.reject(AppErrEnum.invalidOwner);
   }
 
-  await changeOwner({
+  const result = await changeOwner({
     changeOwnerType: 'dataset',
     resourceId: dataset._id,
     newOwnerId: ownerId,
@@ -53,20 +53,19 @@ async function handler(
     teamId: dataset.teamId
   });
 
-  const datasetType = getI18nDatasetType(dataset.type);
   addOperationLog({
     tmbId,
     teamId,
     event: OperationLogEventEnum.TRANSFER_DATASET_OWNERSHIP,
     params: {
       datasetName: dataset.name,
-      datasetType: datasetType,
+      datasetType: getI18nDatasetType(dataset.type),
       oldOwnerName: oldOwner?.name || 'Unknown',
       newOwnerName: newOwner.name
     }
   });
 
-  return {};
+  return result;
 }
 
 export default NextAPI(handler);

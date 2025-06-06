@@ -243,17 +243,56 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
     });
   });
 
-  (async () => {
+  auditLog({
+    teamId,
+    tmbId,
+    tmbIds,
+    groupIds,
+    orgIds,
+    dataset,
+    permission
+  });
+}
+
+export default NextAPI(handler);
+
+const auditLog = async ({
+  tmbId,
+  teamId,
+  tmbIds,
+  groupIds,
+  orgIds,
+  dataset,
+  permission
+}: {
+  tmbId: string;
+  teamId: string;
+  tmbIds: string[];
+  groupIds: string[];
+  orgIds: string[];
+  dataset: {
+    name: string;
+    type: string;
+  };
+  permission: number;
+}) => {
+  try {
+    // Get team member names
     const teamMembers = await MongoTeamMember.find({ _id: { $in: tmbIds } }, 'name').lean();
     const memberNames = teamMembers.map((member) => member.name);
 
+    // Get group names
     const groups = await MongoMemberGroupModel.find({ _id: { $in: groupIds } }, 'name').lean();
     const groupNames = groups.map((group) => group.name);
 
+    // Get organization names
     const orgs = await MongoOrgModel.find({ _id: { $in: orgIds } }, 'name').lean();
     const orgNames = orgs.map((org) => org.name);
+
+    // Get localized dataset type
     const datasetType = getI18nDatasetType(dataset.type);
 
+    // Add operation log
     addOperationLog({
       tmbId,
       teamId,
@@ -267,7 +306,7 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
         permission: String(permission)
       }
     });
-  })();
-}
-
-export default NextAPI(handler);
+  } catch (error) {
+    console.log('Add audit error: dataset collaborator', error);
+  }
+};

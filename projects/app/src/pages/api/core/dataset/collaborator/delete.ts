@@ -66,12 +66,7 @@ async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>
         folderTypeList: [DatasetTypeEnum.folder],
         resourceType: PerResourceTypeEnum.dataset,
         resourceModel: MongoDataset,
-        collaborators: folderClbsAndGroups.filter(
-          (item) =>
-            String(item.tmbId) !== tmbId &&
-            String(item.groupId) !== groupId &&
-            String(item.orgId) !== orgId
-        ),
+        collaborators: folderClbsAndGroups.filter((clb) => String(clb.tmbId) !== tmbId),
         session
       });
     } else {
@@ -88,39 +83,18 @@ async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>
           resourceId: datasetId,
           resourceType: PerResourceTypeEnum.dataset,
           session,
-          collaborators: parentClbsAndGroups.filter(
-            (item) =>
-              String(item.tmbId) !== tmbId &&
-              String(item.groupId) !== groupId &&
-              String(item.orgId) !== orgId
-          )
+          collaborators: parentClbsAndGroups.filter((clb) => String(clb.tmbId) !== tmbId)
         });
       } else {
-        await delResourcePermission(
-          tmbId
-            ? {
-                resourceType: PerResourceTypeEnum.dataset,
-                teamId,
-                tmbId,
-                resourceId: dataset._id,
-                session
-              }
-            : groupId
-              ? {
-                  resourceType: PerResourceTypeEnum.dataset,
-                  teamId,
-                  groupId: groupId,
-                  resourceId: dataset._id,
-                  session
-                }
-              : {
-                  resourceType: PerResourceTypeEnum.dataset,
-                  teamId,
-                  orgId: orgId!,
-                  resourceId: dataset._id,
-                  session
-                }
-        );
+        await delResourcePermission({
+          resourceType: PerResourceTypeEnum.dataset,
+          teamId,
+          tmbId,
+          groupId,
+          orgId,
+          resourceId: dataset._id,
+          session
+        });
       }
     }
 

@@ -29,6 +29,7 @@ import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSc
 import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
 import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
 import { getI18nAppType } from '@fastgpt/service/support/operationLog/util';
+import { AppDetailType } from '@fastgpt/global/core/app/type';
 /*
   增加或修改协作者
   1. 继承态目录：关闭继承态，更新新的协作者，同步其子目录协作者
@@ -262,7 +263,37 @@ async function handler(req: NextApiRequest) {
     });
   });
 
-  (async () => {
+  auditLog({
+    tmbId,
+    teamId,
+    tmbIds,
+    groupIds,
+    orgIds,
+    app,
+    permission
+  });
+}
+
+export default NextAPI(handler);
+
+const auditLog = async ({
+  tmbId,
+  teamId,
+  tmbIds,
+  groupIds,
+  orgIds,
+  app,
+  permission
+}: {
+  tmbId: string;
+  teamId: string;
+  tmbIds: string[];
+  groupIds: string[];
+  orgIds: string[];
+  app: AppDetailType;
+  permission: number;
+}) => {
+  try {
     const appType = getI18nAppType(app.type);
 
     const tmbNames = await Promise.all(
@@ -299,7 +330,7 @@ async function handler(req: NextApiRequest) {
         permission: String(permission)
       }
     });
-  })();
-}
-
-export default NextAPI(handler);
+  } catch (error) {
+    console.log('Add audit error: app collaborator', error);
+  }
+};

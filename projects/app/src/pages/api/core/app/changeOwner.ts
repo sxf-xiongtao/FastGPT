@@ -39,7 +39,7 @@ async function handler(
   }
 
   // get the apps, whose ownerID are the oldOwnerId.
-  await changeOwner({
+  const result = await changeOwner({
     changeOwnerType: 'app',
     resourceId: app._id,
     newOwnerId: ownerId,
@@ -47,20 +47,19 @@ async function handler(
     teamId: app.teamId
   });
 
-  const appType = getI18nAppType(app.type);
   addOperationLog({
     tmbId,
     teamId,
     event: OperationLogEventEnum.TRANSFER_APP_OWNERSHIP,
     params: {
       appName: app.name,
-      appType: appType,
+      appType: getI18nAppType(app.type),
       oldOwnerName: oldOwner?.name || 'Unknown',
       newOwnerName: newOwner.name
     }
   });
 
-  return {};
+  return result;
 }
 
 export default NextAPI(handler);

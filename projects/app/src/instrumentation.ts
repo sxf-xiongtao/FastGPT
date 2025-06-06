@@ -33,6 +33,13 @@ export async function register() {
 
       initGlobalVariables();
 
+      // Preload worker
+      try {
+        await preLoadWorker();
+      } catch (error) {
+        console.error('Preload worker error', error);
+      }
+
       // Connect DB
       await Promise.all([connectMongo(connectionMongo, MONGO_URL), initBullMQWorkers()]);
       connectMongo(connectionLogMongo, MONGO_LOG_URL);
@@ -54,13 +61,6 @@ export async function register() {
 
       startTrainingProcess(true);
       startMongoWatch();
-
-      // Preload worker
-      try {
-        await preLoadWorker();
-      } catch (error) {
-        console.error('Preload worker error', error);
-      }
 
       console.log('Init system success');
     }

@@ -16,14 +16,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const oldName = await MongoTeamMember.findOne({ _id: tmbId }, { name: 1 })
     .lean()
     .then((doc) => {
-      if (!doc) {
-        throw new Error('Member not found');
-      }
-      return doc.name;
+      return doc?.name || '';
     });
 
+  const newName = name.slice(0, 50);
   await MongoTeamMember.findByIdAndUpdate(tmbId, {
-    name: name.slice(0, 20)
+    name: newName
   });
 
   (async () => {
@@ -33,7 +31,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       event: OperationLogEventEnum.CHANGE_MEMBER_NAME_ACCOUNT,
       params: {
         oldName: oldName,
-        newName: name.slice(0, 20)
+        newName
       }
     });
   })();

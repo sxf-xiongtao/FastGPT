@@ -27,7 +27,7 @@ async function handler(
       maxSize: global.feConfigs?.uploadFileMaxSize
     });
 
-    const { file, metadata } = await upload.doUpload(req, res);
+    const { file, metadata } = await upload.getUploadFile(req, res);
     filePaths.push(file.path);
 
     const fileData = await fs.promises.readFile(file.path);

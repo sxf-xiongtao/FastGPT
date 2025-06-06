@@ -37,7 +37,7 @@ export const pushAutoTrainingUsage = async ({
   return { totalPoints };
 };
 
-export const pushImageParseUsage = async ({
+export const pushVLMParseUsage = async ({
   teamId,
   tmbId,
   model,
