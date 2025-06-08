@@ -19,7 +19,7 @@ async function handler(req: NextApiRequest) {
   const { _id } = await createOneTag({
     datasetId,
     teamId,
-    tagContent: tag
+    tagContent: tag.trim()
   });
   return _id;
 }
