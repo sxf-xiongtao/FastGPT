@@ -28,7 +28,6 @@ const PROMPT = `## 任务描述
 3. 每个目录项应包含以下字段：
     - "line_number"：该标题在原始文档中对应的行号（从该标题第一行的 "[数字]" 中提取）
     - "content"：该标题文本，并用 Markdown 标题语法标注其层级（如："# 一级标题"、"## 二级标题" 等）
-    - "is_origin_title"：是否是原始标题，0表示不是，1表示是（即该行是否是原始内容的输出）
 4. 层级识别参考标准如下（模型可以灵活判断）：
     - 一级标题（"#"）：通常为整篇文档的主标题、大章节名称
     - 二级标题（"##"）：章节内部的子模块、小节、规则名称等
@@ -43,13 +42,11 @@ const PROMPT = `## 任务描述
 [
     {
         "line_number": "3",
-        "content": "# 标题一",
-        "is_origin_title": 1
+        "content": "# 标题一"
     },
     {
         "line_number": "8",
-        "content": "### 事件描述",
-        "is_origin_title": 0
+        "content": "### 事件描述"
     }
 ]
 `;
@@ -61,7 +58,7 @@ export const llmPargraph = async ({ rawText, model }: { rawText: string; model: 
   }
 
   const start = Date.now();
-  addLog.debug(`[LLM pargraph] start, model: ${model}`);
+  addLog.debug(`[LLM pargraph] start`);
 
   // 1. 原文每一行前面增加一个行号, 并删除原来的标题
   let lineRawText = rawText
@@ -103,7 +100,7 @@ export const llmPargraph = async ({ rawText, model }: { rawText: string; model: 
         body: llmCompletionsBodyFormat(
           {
             model: modelData.model,
-            temperature: 0.3,
+            temperature: 0.1,
             messages: await loadRequestMessages({ messages, useVision: false }),
             stream: true
           },
@@ -121,28 +118,35 @@ export const llmPargraph = async ({ rawText, model }: { rawText: string; model: 
       };
     })
   );
-
   const totalInputTokens = results.reduce((acc, item) => acc + item.inputTokens, 0);
   const totalOutputTokens = results.reduce((acc, item) => acc + item.outputTokens, 0);
   const answerResults = results
     .map((item) => {
       try {
-        return json5.parse(item.answer);
+        const result = json5.parse(item.answer) as { line_number: string; content: string }[];
+        return result.map((item) => ({
+          line_number: Number(item.line_number),
+          content: item.content
+        }));
       } catch (error) {
         return [];
       }
     })
-    .flat() as { line_number: string; content: string; is_origin_title: number }[];
+    .flat()
+    .sort((a, b) => a.line_number - b.line_number);
 
   // 4. 删除每行开头的 [num]
   lineRawText.forEach((item, index) => {
     lineRawText[index] = item.replace(/^\[\d+\]\s*/, '');
   });
 
-  // 5. 解析模型结果
+  // 5. 将模型结果赋值给原文
   answerResults.forEach((item, index) => {
-    const line = Number(item.line_number) - 1;
+    const line = item.line_number - 1;
     const title = item.content;
+
+    if (!lineRawText[line]) return;
+
     // 提取 title 正文（过滤掉 # 标题符号）
     const titleText = title.replace(/^#+\s*/, '').trim();
     // 删除 lineRawText[line] 开头和提取结果相同的部分
@@ -156,7 +160,7 @@ export const llmPargraph = async ({ rawText, model }: { rawText: string; model: 
   // 6. 获取最终结果
   const resultText = lineRawText.join('\n');
 
-  addLog.debug(`[LLM pargraph] end, model: ${model}, time: ${Date.now() - start}ms`);
+  addLog.debug(`[LLM pargraph] finish, time: ${Date.now() - start}ms`);
 
   return {
     resultText,

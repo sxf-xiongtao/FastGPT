@@ -1,5 +1,4 @@
 import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
-import { pushVLMParseUsage } from '@/service/support/wallet/usage/push';
 import { TrainingModeEnum } from '@fastgpt/global/core/dataset/constants';
 import { createChatCompletion } from '@fastgpt/service/core/ai/config';
 import type { ChatCompletionMessageParam } from '@fastgpt/global/core/ai/type.d';
@@ -17,6 +16,7 @@ import { loadRequestMessages } from '@fastgpt/service/core/chat/utils';
 import { llmCompletionsBodyFormat, formatLLMResponse } from '@fastgpt/service/core/ai/utils';
 import { getImageBase64 } from '@fastgpt/service/common/file/image/utils';
 import { DatasetDataIndexTypeEnum } from '@fastgpt/global/core/dataset/data/constants';
+import { pushLLMTrainingUsage } from '@fastgpt/service/support/wallet/usage/controller';
 
 const reduceQueue = () => {
   global.imageParseQueueLen = global.imageParseQueueLen > 0 ? global.imageParseQueueLen - 1 : 0;
@@ -94,12 +94,12 @@ export async function generateImageIndex(): Promise<any> {
         }
       )
         .populate<{
-          dataset: { vectorModel: string; agentModel: string };
+          dataset: { vectorModel: string; agentModel: string; vlmModel: string };
           collection: { autoIndexes?: boolean };
         }>([
           {
             path: 'dataset',
-            select: 'vectorModel agentModel'
+            select: 'vectorModel agentModel vlmModel'
           },
           {
             path: 'collection',
@@ -173,9 +173,9 @@ export async function generateImageIndex(): Promise<any> {
   }
 
   // Get model and check
-  const modelData = getVlmModel(data.model);
+  const modelData = getVlmModel(data.dataset.vlmModel);
   if (!modelData) {
-    addLog.info(`[Image index queue] Model not found: ${data.model}`);
+    addLog.info(`[Image index queue] Model not found: ${data.dataset.vlmModel}`);
     await updateImageQueueToChunkQueue();
     return reduceQueueAndReturn();
   }
@@ -252,13 +252,14 @@ export async function generateImageIndex(): Promise<any> {
     );
 
     // 5. Add usage
-    pushVLMParseUsage({
+    pushLLMTrainingUsage({
       teamId: data.teamId,
       tmbId: data.tmbId,
       inputTokens,
       outputTokens,
       billId: data.billId,
-      model: modelData.model
+      model: modelData.model,
+      mode: 'imageIndex'
     });
 
     reduceQueueAndReturn();

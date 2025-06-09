@@ -1,5 +1,4 @@
 import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
-import { pushVLMParseUsage } from '@/service/support/wallet/usage/push';
 import { TrainingModeEnum } from '@fastgpt/global/core/dataset/constants';
 import { createChatCompletion } from '@fastgpt/service/core/ai/config';
 import type { ChatCompletionMessageParam } from '@fastgpt/global/core/ai/type.d';
@@ -17,6 +16,7 @@ import { loadRequestMessages } from '@fastgpt/service/core/chat/utils';
 import { llmCompletionsBodyFormat, formatLLMResponse } from '@fastgpt/service/core/ai/utils';
 import { getErrText } from '@fastgpt/global/common/error/utils';
 import { getDatasetImageBase64 } from '@fastgpt/service/core/dataset/image/controller';
+import { pushLLMTrainingUsage } from '@fastgpt/service/support/wallet/usage/controller';
 
 const reduceQueue = () => {
   global.imageParseQueueLen = global.imageParseQueueLen > 0 ? global.imageParseQueueLen - 1 : 0;
@@ -66,11 +66,11 @@ export async function imageParseTraining(): Promise<any> {
         }
       )
         .populate<{
-          dataset: { vectorModel: string };
+          dataset: { vectorModel: string; vlmModel: string };
         }>([
           {
             path: 'dataset',
-            select: 'vectorModel'
+            select: 'vectorModel vlmModel'
           }
         ])
         .lean();
@@ -123,9 +123,9 @@ export async function imageParseTraining(): Promise<any> {
   }
 
   // Get model and check
-  const modelData = getVlmModel(data.model);
+  const modelData = getVlmModel(data.dataset.vlmModel);
   if (!modelData) {
-    addLog.info(`[Image parse queue] Model not found: ${data.model}`);
+    addLog.info(`[Image parse queue] Model not found: ${data.dataset.vlmModel}`);
     await MongoDatasetTraining.updateMany(
       {
         mode: TrainingModeEnum.imageParse
@@ -191,13 +191,14 @@ export async function imageParseTraining(): Promise<any> {
     );
 
     // 4. Add usage
-    pushVLMParseUsage({
+    pushLLMTrainingUsage({
       teamId: data.teamId,
       tmbId: data.tmbId,
       inputTokens,
       outputTokens,
       billId: data.billId,
-      model: modelData.model
+      model: modelData.model,
+      mode: 'imageParse'
     });
 
     reduceQueueAndReturn();

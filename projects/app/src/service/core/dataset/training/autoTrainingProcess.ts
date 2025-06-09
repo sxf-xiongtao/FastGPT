@@ -1,5 +1,4 @@
 import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
-import { pushAutoTrainingUsage } from '@/service/support/wallet/usage/push';
 import { TrainingModeEnum } from '@fastgpt/global/core/dataset/constants';
 import { createChatCompletion } from '@fastgpt/service/core/ai/config';
 import type { ChatCompletionMessageParam } from '@fastgpt/global/core/ai/type.d';
@@ -18,6 +17,7 @@ import { llmCompletionsBodyFormat, formatLLMResponse } from '@fastgpt/service/co
 import { DatasetDataIndexItemType } from '@fastgpt/global/core/dataset/type';
 import { DatasetDataIndexTypeEnum } from '@fastgpt/global/core/dataset/data/constants';
 import { getErrText } from '@fastgpt/global/common/error/utils';
+import { pushLLMTrainingUsage } from '@fastgpt/service/support/wallet/usage/controller';
 
 const reduceQueue = () => {
   global.autoTrainingLen = global.autoTrainingLen > 0 ? global.autoTrainingLen - 1 : 0;
@@ -181,13 +181,14 @@ export async function generateAutoTraining(): Promise<any> {
     );
 
     // 5. Push bill
-    pushAutoTrainingUsage({
+    pushLLMTrainingUsage({
       teamId: data.teamId,
       tmbId: data.tmbId,
       inputTokens,
       outputTokens,
       billId: data.billId,
-      model: modelData.model
+      model: modelData.model,
+      mode: 'autoIndex'
     });
 
     addLog.info(`[Auto index queue] Finish`, {
