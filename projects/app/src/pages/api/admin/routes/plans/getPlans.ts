@@ -5,8 +5,24 @@ import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { NextAPI } from '@/service/middleware/entry';
+import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 
-type ResponseType = PaginationResponse<any>;
+type ResponseItemType = {
+  id: string;
+  teamId: string;
+  type: `${SubTypeEnum}`;
+  level: StandardSubLevelEnum;
+  totalPoints: number;
+  surplusPoints: number;
+  extraDatasetSize: number;
+  startTime: Date;
+  expiredTime: Date;
+
+  maxTeamMember?: number;
+  maxApp?: number;
+  maxDataset?: number;
+};
+type ResponseType = PaginationResponse<ResponseItemType>;
 
 async function handler(req: NextApiRequest, res: NextApiResponse): Promise<ResponseType> {
   await adminCert({ req, authToken: true });
@@ -35,7 +51,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse): Promise<Respo
   ]);
 
   const plans = await Promise.all(
-    records.map(async (plan) => {
+    records.map<Promise<ResponseItemType>>(async (plan) => {
       const team = await MongoTeam.findOne({
         _id: plan.teamId
       });
@@ -53,6 +69,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse): Promise<Respo
         totalPoints: plan.totalPoints,
         surplusPoints: plan.surplusPoints,
         extraDatasetSize: plan.currentExtraDatasetSize,
+        maxTeamMember: plan.maxTeamMember,
+        maxApp: plan.maxApp,
+        maxDataset: plan.maxDataset,
+
         startTime: plan.startTime,
         expiredTime: plan.expiredTime,
         teamName: team?.name,

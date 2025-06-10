@@ -5,7 +5,6 @@ import { adminCert } from '@/service/support/permission/adminCert';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
-import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { NextApiResponse } from 'next';
@@ -20,6 +19,10 @@ export type UpdatePlanBody = {
   surplusPoints?: number;
   extraDatasetSize?: number;
   level?: number;
+
+  maxTeamMember?: number;
+  maxApp?: number;
+  maxDataset?: number;
 };
 
 async function handler(req: ApiRequestProps<UpdatePlanBody>, res: NextApiResponse<any>) {
@@ -34,7 +37,10 @@ async function handler(req: ApiRequestProps<UpdatePlanBody>, res: NextApiRespons
     totalPoints,
     surplusPoints,
     extraDatasetSize,
-    level
+    level,
+    maxTeamMember,
+    maxApp,
+    maxDataset
   } = req.body;
 
   const sub = await MongoTeamSub.findById(id);
@@ -80,7 +86,11 @@ async function handler(req: ApiRequestProps<UpdatePlanBody>, res: NextApiRespons
           price: price * PRICE_SCALE,
           currentSubLevel: level,
           totalPoints,
-          surplusPoints
+          surplusPoints,
+
+          maxTeamMember: maxTeamMember || null,
+          maxApp: maxApp || null,
+          maxDataset: maxDataset || null
         },
         {
           session

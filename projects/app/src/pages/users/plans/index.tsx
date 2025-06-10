@@ -39,6 +39,10 @@ export type PlanType = {
   totalPoints: number;
   surplusPoints: number;
   extraDatasetSize: number;
+
+  maxTeamMember?: number;
+  maxApp?: number;
+  maxDataset?: number;
 };
 
 const PlanTable = () => {

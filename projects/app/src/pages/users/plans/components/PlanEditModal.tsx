@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   FormControl,
   FormLabel,
@@ -16,6 +17,7 @@ import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/walle
 import MySelect from '@fastgpt/web/components/common/MySelect';
 import { PlanType } from '@/pages/users/plans';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
+import MyDivider from '@fastgpt/web/components/common/MyDivider';
 
 function transformDate(date: string) {
   const initialDate = new Date(date);
@@ -94,9 +96,15 @@ export default function PlanEditModal(props: {
         编辑
       </Button>
 
-      <MyModal isOpen={isOpen} onClose={onClose} title={'编辑套餐'} maxW={['90vw', '700px']}>
+      <MyModal
+        isOpen={isOpen}
+        onClose={onClose}
+        iconSrc={'support/account/plans'}
+        title={'编辑套餐'}
+        maxW={['90vw', '700px']}
+      >
         <ModalBody>
-          <FormControl className="mt-4">
+          <FormControl mt={4}>
             <FormLabel htmlFor="startTime" className="!font-bold text-grayModern-700">
               开始时间
             </FormLabel>
@@ -108,7 +116,7 @@ export default function PlanEditModal(props: {
               })}
             />
           </FormControl>
-          <FormControl className="mt-4">
+          <FormControl mt={4}>
             <FormLabel htmlFor="expiredTime" className="!font-bold text-grayModern-700">
               结束时间
             </FormLabel>
@@ -122,7 +130,7 @@ export default function PlanEditModal(props: {
           </FormControl>
           {subType === SubTypeEnum.standard && (
             <>
-              <FormControl className="mt-4">
+              <FormControl mt={4}>
                 <FormLabel htmlFor="level" className="!font-bold text-grayModern-700">
                   套餐等级
                 </FormLabel>
@@ -147,7 +155,7 @@ export default function PlanEditModal(props: {
             </>
           )}
           {subType === SubTypeEnum.extraDatasetSize ? (
-            <FormControl className="mt-4">
+            <FormControl mt={4}>
               <FormLabel htmlFor="extraDatasetSize" className="!font-bold text-grayModern-700">
                 额外知识库容量
                 {errors && !!errors?.extraDatasetSize && (
@@ -167,7 +175,7 @@ export default function PlanEditModal(props: {
             </FormControl>
           ) : (
             <>
-              <FormControl className="mt-4">
+              <FormControl mt={4}>
                 <FormLabel htmlFor="totalPoints" className="!font-bold text-grayModern-700">
                   总积分
                 </FormLabel>
@@ -182,7 +190,7 @@ export default function PlanEditModal(props: {
                   type="number"
                 />
               </FormControl>
-              <FormControl className="mt-4">
+              <FormControl mt={4}>
                 <FormLabel htmlFor="surplusPoints" className="!font-bold text-grayModern-700">
                   剩余积分
                 </FormLabel>
@@ -194,6 +202,48 @@ export default function PlanEditModal(props: {
                   id="surplusPoints"
                   variant="outline"
                   placeholder="剩余积分"
+                  type="number"
+                />
+              </FormControl>
+            </>
+          )}
+          {subType === SubTypeEnum.standard && (
+            <>
+              <MyDivider />
+              <Box mt={4}>下面的值会覆盖套餐配置，不填则会用套餐的标准值</Box>
+              <FormControl>
+                <FormLabel htmlFor="totalPoints" fontWeight={'bold'}>
+                  团队成员上限
+                </FormLabel>
+                <Input
+                  {...register('maxTeamMember')}
+                  className="!text-xl"
+                  id="totalPoints"
+                  variant="outline"
+                  type="number"
+                />
+              </FormControl>
+              <FormControl mt={4}>
+                <FormLabel htmlFor="totalPoints" fontWeight={'bold'}>
+                  应用上限
+                </FormLabel>
+                <Input
+                  {...register('maxApp')}
+                  className="!text-xl"
+                  id="totalPoints"
+                  variant="outline"
+                  type="number"
+                />
+              </FormControl>
+              <FormControl mt={4}>
+                <FormLabel htmlFor="totalPoints" fontWeight={'bold'}>
+                  知识库上限
+                </FormLabel>
+                <Input
+                  {...register('maxDataset')}
+                  className="!text-xl"
+                  id="totalPoints"
+                  variant="outline"
                   type="number"
                 />
               </FormControl>

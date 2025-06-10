@@ -2,7 +2,7 @@ import type { NextApiResponse } from 'next';
 import { authDataset } from '@fastgpt/service/support/permission/dataset/auth';
 import { PostWebsiteSyncParams } from '@fastgpt/global/core/dataset/api.d';
 import { updateWebSyncLimit } from '@fastgpt/service/support/user/utils';
-import { checkTeamWebSyncPermission } from '@/service/support/permission/teamLimit';
+import { checkTeamWebSyncPermission } from '@fastgpt/service/support/permission/teamLimit';
 import { ManagePermissionVal } from '@fastgpt/global/support/permission/constant';
 import { NextAPI } from '@/service/middleware/entry';
 import { ApiRequestProps } from '@fastgpt/service/type/next';

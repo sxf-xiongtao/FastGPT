@@ -6,7 +6,7 @@ import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSc
 import { parseHeaderCert } from '@fastgpt/service/support/permission/controller';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { TeamMemberStatusEnum } from '@fastgpt/global/support/user/team/constant';
-import { checkTeamMaxMembersPermission } from '@/service/support/permission/teamLimit';
+import { checkTeamMemberLimit } from '@fastgpt/service/support/permission/teamLimit';
 import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
 import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
 
@@ -33,7 +33,7 @@ async function handler(
     return Promise.reject(TeamErrEnum.invitationLinkInvalid);
   }
 
-  await checkTeamMaxMembersPermission(invitation.teamId, 1);
+  await checkTeamMemberLimit(invitation.teamId, 1);
 
   // accept
   await mongoSessionRun(async (session) => {
