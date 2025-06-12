@@ -3,6 +3,7 @@ import { NextAPI } from '@/service/middleware/entry';
 import { MongoInvoice } from '@/service/support/wallet/bill/invoiceSchema';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { TeamManagePermissionVal } from '@fastgpt/global/support/permission/user/constant';
+import type { InvoiceFileInfo } from '@fastgpt/global/support/wallet/bill/invoice/type';
 
 export type readFileQuery = {
   id: string;
@@ -10,17 +11,10 @@ export type readFileQuery = {
 
 export type readFileBody = {};
 
-export type readFileResponse = {
-  data: string; // base64 encoded file data
-  mimeType: string;
-  filename: string;
-  size: number;
-};
-
 async function handler(
   req: ApiRequestProps<readFileBody, readFileQuery>,
-  res: ApiResponseType<readFileResponse>
-): Promise<readFileResponse> {
+  res: ApiResponseType<InvoiceFileInfo>
+): Promise<InvoiceFileInfo> {
   // Is the user a team administrator
   const { teamId, permission } = await authUserPer({
     req,
@@ -47,7 +41,7 @@ async function handler(
   const base64Data = fileBuffer.toString('base64');
   const filename = `${record.teamName}.pdf`;
 
-  const response: readFileResponse = {
+  const response: InvoiceFileInfo = {
     data: base64Data,
     mimeType: 'application/pdf',
     filename: filename,
