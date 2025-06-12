@@ -50,7 +50,6 @@ async function handler(req: ApiRequestProps<ExternalFileCreateDatasetCollectionP
   const { collectionId, insertResults } = await createCollectionAndInsertData({
     dataset,
     rawText,
-    relatedId: externalFileId,
     createCollectionParams: {
       ...body,
       teamId,
