@@ -10,11 +10,16 @@ export type readFileQuery = {
 
 export type readFileBody = {};
 
-export type readFileResponse = {};
+export type readFileResponse = {
+  data: string; // base64 encoded file data
+  mimeType: string;
+  filename: string;
+  size: number;
+};
 
 async function handler(
   req: ApiRequestProps<readFileBody, readFileQuery>,
-  res: ApiResponseType<any>
+  res: ApiResponseType<readFileResponse>
 ): Promise<readFileResponse> {
   // Is the user a team administrator
   const { teamId, permission } = await authUserPer({
@@ -38,18 +43,18 @@ async function handler(
     return Promise.reject('Invoice not found');
   }
 
-  // 返回 PDF 文件
-  res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Cache-Control', 'public, max-age=31536000');
-  res.setHeader(
-    'Content-Disposition',
-    `inline; filename="${encodeURIComponent(record.teamName)}.pdf"`
-  );
-
   const fileBuffer = record.file;
-  res.send(fileBuffer);
+  const base64Data = fileBuffer.toString('base64');
+  const filename = `${record.teamName}.pdf`;
 
-  return {};
+  const response: readFileResponse = {
+    data: base64Data,
+    mimeType: 'application/pdf',
+    filename: filename,
+    size: fileBuffer.length
+  };
+
+  return response;
 }
 
 export default NextAPI(handler);
