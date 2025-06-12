@@ -130,32 +130,38 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
       }
     ];
 
-    const { assistantResponses, newVariables, flowResponses, flowUsages, durationSeconds } =
-      await dispatchWorkFlow({
-        res,
-        mode: 'chat',
-        runningAppInfo: {
-          id: String(app._id),
-          teamId: app.teamId,
-          tmbId: app.tmbId
-        },
-        runningUserInfo: {
-          teamId: outLinkConfig.teamId,
-          tmbId: outLinkConfig.tmbId
-        },
-        uid: chatUserId || outLinkConfig.tmbId,
-        timezone,
-        externalProvider,
-        chatId,
-        variables: {},
-        histories,
-        query: dispatchQuery,
-        chatConfig,
-        stream: false,
-        runtimeEdges: storeEdges2RuntimeEdges(edges),
-        runtimeNodes: storeNodes2RuntimeNodes(nodes, getWorkflowEntryNodeIds(nodes)),
-        maxRunTimes: WORKFLOW_MAX_RUN_TIMES
-      });
+    const {
+      assistantResponses,
+      newVariables,
+      flowResponses,
+      flowUsages,
+      durationSeconds,
+      system_memories
+    } = await dispatchWorkFlow({
+      res,
+      mode: 'chat',
+      runningAppInfo: {
+        id: String(app._id),
+        teamId: app.teamId,
+        tmbId: app.tmbId
+      },
+      runningUserInfo: {
+        teamId: outLinkConfig.teamId,
+        tmbId: outLinkConfig.tmbId
+      },
+      uid: chatUserId || outLinkConfig.tmbId,
+      timezone,
+      externalProvider,
+      chatId,
+      variables: {},
+      histories,
+      query: dispatchQuery,
+      chatConfig,
+      stream: false,
+      runtimeEdges: storeEdges2RuntimeEdges(edges),
+      runtimeNodes: storeNodes2RuntimeNodes(nodes, getWorkflowEntryNodeIds(nodes)),
+      maxRunTimes: WORKFLOW_MAX_RUN_TIMES
+    });
 
     // Format results
     let responseContent = assistantResponses
@@ -226,7 +232,8 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
         {
           obj: ChatRoleEnum.AI,
           value: assistantResponses,
-          [DispatchNodeResponseKeyEnum.nodeResponse]: flowResponses
+          [DispatchNodeResponseKeyEnum.nodeResponse]: flowResponses,
+          memories: system_memories
         }
       ],
       metadata: {},
