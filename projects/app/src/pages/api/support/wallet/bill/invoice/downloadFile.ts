@@ -3,7 +3,6 @@ import { NextAPI } from '@/service/middleware/entry';
 import { MongoInvoice } from '@/service/support/wallet/bill/invoiceSchema';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { TeamManagePermissionVal } from '@fastgpt/global/support/permission/user/constant';
-import type { InvoiceFileInfo } from '@fastgpt/global/support/wallet/bill/invoice/type';
 
 export type readFileQuery = {
   id: string;
@@ -13,8 +12,8 @@ export type readFileBody = {};
 
 async function handler(
   req: ApiRequestProps<readFileBody, readFileQuery>,
-  res: ApiResponseType<InvoiceFileInfo>
-): Promise<InvoiceFileInfo> {
+  res: ApiResponseType<any>
+) {
   // Is the user a team administrator
   const { teamId, permission } = await authUserPer({
     req,
@@ -37,18 +36,16 @@ async function handler(
     return Promise.reject('Invoice not found');
   }
 
+  // 返回 PDF 文件
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Cache-Control', 'public, max-age=31536000');
+  res.setHeader(
+    'Content-Disposition',
+    `inline; filename="${encodeURIComponent(record.teamName)}.pdf"`
+  );
+
   const fileBuffer = record.file;
-  const base64Data = fileBuffer.toString('base64');
-  const filename = `${record.teamName}.pdf`;
-
-  const response: InvoiceFileInfo = {
-    data: base64Data,
-    mimeType: 'application/pdf',
-    filename: filename,
-    size: fileBuffer.length
-  };
-
-  return response;
+  res.send(fileBuffer);
 }
 
 export default NextAPI(handler);
