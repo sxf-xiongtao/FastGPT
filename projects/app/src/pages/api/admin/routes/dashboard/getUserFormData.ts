@@ -1,4 +1,3 @@
-import { getDashboardDataStartTime } from '@/service/admin/common/dashboard/utils';
 import { NextAPI } from '@/service/middleware/entry';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
@@ -6,13 +5,14 @@ import { NextApiResponse } from 'next';
 import { GetDataChartsQuery } from './type';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { getMongoTimezoneCode } from '@fastgpt/global/common/time/timezone';
-import dayjs from 'dayjs';
 
 export type GetUserFormDataResponse = {
-  date: Date;
-  count: number;
-  increase: number;
-}[];
+  startUserCount: number;
+  registeredUserCount: {
+    date: string;
+    count: number;
+  }[];
+};
 
 async function handler(
   req: ApiRequestProps<{}, GetDataChartsQuery>,
@@ -52,20 +52,17 @@ async function handler(
   ]);
 
   // 计算用户总数
-  let startCount = await MongoUser.countDocuments({
+  const startUserCount = await MongoUser.countDocuments({
     createTime: { $lt: new Date(startTime) }
   });
 
-  const formatResults = usersRaw.map((item) => {
-    startCount += item.count;
-    return {
-      date: item.date,
-      count: startCount,
-      increase: item.count
-    };
-  });
-
-  return formatResults;
+  return {
+    startUserCount,
+    registeredUserCount: usersRaw.map((item) => ({
+      date: item.date.toISOString(),
+      count: item.count
+    }))
+  };
 }
 
 export default NextAPI(handler);

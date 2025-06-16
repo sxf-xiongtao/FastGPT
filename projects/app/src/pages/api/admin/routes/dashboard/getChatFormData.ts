@@ -7,9 +7,16 @@ import { GetDataChartsQuery } from './type';
 import { getMongoTimezoneCode } from '@fastgpt/global/common/time/timezone';
 
 export type GetChatFormDataResponse = {
-  date: Date;
-  count: number;
-}[];
+  chatAmounts: {
+    date: string;
+    totalCount: number;
+  }[];
+  chatItemAmounts: {
+    date: string;
+    totalCount: number;
+    averageCount: number;
+  }[];
+};
 
 async function handler(
   req: ApiRequestProps<{}, GetDataChartsQuery>,
@@ -19,8 +26,7 @@ async function handler(
   const startTime = req.query.startTime;
   const timezone = getMongoTimezoneCode(startTime);
 
-  // 获取对话总数 - 优化后的查询
-  const chatsRaw = await MongoChatItem.aggregate([
+  const chatItemsRaw = (await MongoChatItem.aggregate([
     {
       $match: {
         obj: 'Human',
@@ -35,26 +41,56 @@ async function handler(
             date: '$time',
             timezone
           }
-        }
+        },
+        appId: 1,
+        chatId: 1
       }
     },
     {
       $group: {
         _id: '$localTime',
-        count: { $sum: 1 }
+        chatItemCount: { $sum: 1 },
+        uniqueChats: {
+          $addToSet: {
+            $cond: {
+              if: { $and: [{ $ne: ['$appId', null] }, { $ne: ['$chatId', null] }] },
+              then: { $concat: [{ $toString: '$appId' }, '-', '$chatId'] },
+              else: null
+            }
+          }
+        }
       }
     },
     {
       $project: {
         _id: 0,
         date: { $dateFromString: { dateString: '$_id' } },
-        count: 1
+        chatItemCount: 1,
+        // 过滤掉 null 值
+        chatCount: {
+          $size: {
+            $filter: {
+              input: '$uniqueChats',
+              cond: { $ne: ['$$this', null] }
+            }
+          }
+        }
       }
     },
     { $sort: { date: 1 } }
-  ]).hint({ obj: 1, time: -1 });
+  ])) as unknown as { date: string; chatItemCount: number; chatCount: number }[];
 
-  return chatsRaw;
+  return {
+    chatAmounts: chatItemsRaw.map((item) => ({
+      date: item.date,
+      totalCount: item.chatCount
+    })),
+    chatItemAmounts: chatItemsRaw.map((item) => ({
+      date: item.date,
+      totalCount: item.chatItemCount,
+      averageCount: +(item.chatItemCount / item.chatCount).toFixed(2)
+    }))
+  };
 }
 
 export default NextAPI(handler);

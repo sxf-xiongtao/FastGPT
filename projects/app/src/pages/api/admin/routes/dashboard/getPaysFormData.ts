@@ -5,12 +5,24 @@ import { NextAPI } from '@/service/middleware/entry';
 import { GetDataChartsQuery } from './type';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { getMongoTimezoneCode } from '@fastgpt/global/common/time/timezone';
-import { BillPayWayEnum } from '@fastgpt/global/support/wallet/bill/constants';
+import { BillPayWayEnum, BillStatusEnum } from '@fastgpt/global/support/wallet/bill/constants';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 
 export type GetPaysFormDataResponse = {
-  date: Date;
-  count: number;
-}[];
+  orderAmounts: {
+    date: string;
+    totalCount: number;
+    successCount: number;
+  }[];
+  payAmounts: {
+    date: string;
+    totalCount: number;
+  }[];
+  payTeams: {
+    date: string;
+    totalCount: number;
+  }[];
+};
 
 async function handler(
   req: ApiRequestProps<{}, GetDataChartsQuery>,
@@ -19,10 +31,11 @@ async function handler(
   await adminCert({ req, authToken: true });
   const startTime = req.query.startTime;
 
-  const paysRaw = await MongoBill.aggregate([
+  // 全部订单数
+  const orderAmounts = (await MongoBill.aggregate([
     {
       $match: {
-        status: 'SUCCESS',
+        status: { $in: [BillStatusEnum.SUCCESS, BillStatusEnum.NOTPAY] },
         'metadata.payWay': { $in: [BillPayWayEnum.wx, BillPayWayEnum.alipay] },
         createTime: {
           $gte: new Date(startTime)
@@ -43,27 +56,56 @@ async function handler(
     {
       $group: {
         _id: '$localTime',
-        count: { $sum: '$price' }
+        payAmount: {
+          $sum: {
+            $cond: {
+              if: { $eq: ['$status', BillStatusEnum.SUCCESS] },
+              then: '$price',
+              else: 0
+            }
+          }
+        },
+        totalCount: { $sum: 1 },
+        successCount: {
+          $sum: { $cond: { if: { $eq: ['$status', BillStatusEnum.SUCCESS] }, then: 1, else: 0 } }
+        },
+        teamIds: { $addToSet: '$teamId' } // Collect unique team IDs for all orders
       }
     },
     {
       $project: {
         _id: 0,
         date: { $dateFromString: { dateString: '$_id' } },
-        count: 1
+        payAmount: 1,
+        totalCount: 1,
+        successCount: 1,
+        teamCount: { $size: '$teamIds' } // Count unique teams that placed orders
       }
     },
     { $sort: { date: 1 } }
-  ]);
+  ])) as {
+    date: string;
+    payAmount: number;
+    totalCount: number;
+    successCount: number;
+    teamCount: 1;
+  }[];
 
-  const countResult = paysRaw.map((item) => {
-    return {
+  return {
+    orderAmounts: orderAmounts.map((item) => ({
       date: item.date,
-      count: item.count
-    };
-  });
-
-  return countResult;
+      totalCount: item.totalCount,
+      successCount: item.successCount
+    })),
+    payAmounts: orderAmounts.map((item) => ({
+      date: item.date,
+      totalCount: item.payAmount / PRICE_SCALE
+    })),
+    payTeams: orderAmounts.map((item) => ({
+      date: item.date,
+      totalCount: item.teamCount
+    }))
+  };
 }
 
 export default NextAPI(handler);

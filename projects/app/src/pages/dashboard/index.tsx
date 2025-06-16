@@ -1,63 +1,35 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import dayjs from 'dayjs';
-import { Box, Flex, Grid, GridItem, HStack } from '@chakra-ui/react';
-import {
-  Line,
-  LineChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-  Legend
-} from 'recharts';
-import { GET } from '@/service/common/request';
-import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
+import { Box, Flex, Grid, GridItem, HStack, useTheme } from '@chakra-ui/react';
+import { GET, POST } from '@/service/common/request';
 import BoxCard from '@/components/common/BoxContainer/Card';
 import FillRowTabs from '@fastgpt/web/components/common/Tabs/FillRowTabs';
-import type { IconNameType } from '@fastgpt/web/components/common/Icon/type';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
 import { serviceSideProps } from '@/web/common/i18n/utils';
+import LineChartComponent from '@fastgpt/web/components/common/charts/LineChartComponent';
+import { getInitFormData } from '@/web/core/config/api';
+import type { GetUserFormDataResponse } from '@/pages/api/admin/routes/dashboard/getUserFormData';
+import MyBox from '@fastgpt/web/components/common/MyBox';
+import type { GetPaysFormDataResponse } from '../api/admin/routes/dashboard/getPaysFormData';
+import { GetChatFormDataResponse } from '../api/admin/routes/dashboard/getChatFormData';
+import { GetCostChartsResponse } from '../api/admin/routes/dashboard/getCostFormData';
 
-type FetchChatData = {
-  date: string;
-  count: number;
-  total?: number;
-  increase?: number;
-  increaseRate?: string;
-};
+// Type definitions
+type ViewMode = 'traffic' | 'active' | 'payment' | 'cost';
+type DateRange = 7 | 30 | 90 | 180;
 
-type chatDataType = {
-  date: string;
-  userCount: number;
-  userIncrease?: number;
-  payCount: number;
-  chatCount: number;
-  totalPoints: number;
-};
-
-type TNumbers = {
-  appsCount: number;
-  datasetsCount: number;
-  usersCount: number;
-};
-
-const DataItem = ({
-  icon,
-  title,
-  count = 0,
-  bg
-}: {
-  icon: IconNameType;
+type DataItemProps = {
+  icon: string;
   title: string;
   count?: number;
   bg: string;
-}) => {
+};
+const DataItem = ({ icon, title, count = 0, bg }: DataItemProps) => {
   return (
     <HStack bg={bg} px={8} py={3} borderRadius={'lg'} spacing={5}>
-      <MyIcon name={icon} w={'2rem'} h={'2rem'} />
+      <MyIcon name={icon as any} w={'2rem'} h={'2rem'} />
       <Box>
         <Box>{title}</Box>
         <Box fontSize={'xl'} fontWeight={'bold'}>
@@ -68,209 +40,451 @@ const DataItem = ({
   );
 };
 
-export default function DashBoard() {
-  const { data: datas, loading: isLoadingGetNumbers } = useRequest2(
-    () => GET<TNumbers>(`/admin/routes/dashboard/getNumbers`),
+const ChartsBoxStyles = {
+  px: 5,
+  pt: 4,
+  pb: 10,
+  h: '400px',
+  border: 'base',
+  borderRadius: 'md',
+  overflow: 'hidden'
+};
+const ChartsContainer = ({
+  dateRange,
+  viewMode,
+  isSubscriptionEnabled
+}: {
+  isSubscriptionEnabled: boolean;
+  dateRange: DateRange;
+  viewMode: ViewMode;
+}) => {
+  const theme = useTheme();
+
+  const startTime = dayjs().subtract(dateRange, 'day').add(1, 'day').startOf('day').format();
+
+  // Date mapping helper function
+  const formatList2ChartsData = <T extends { date: string }>(
+    sourceData: T[],
+    defaultValues: Record<string, number>
+  ): T[] => {
+    const formatResponse = sourceData.map((item) => ({
+      ...item,
+      date: dayjs(item.date).format('MM/DD')
+    }));
+
+    // Create complete date list
+    const diff = dayjs().diff(dayjs(startTime).startOf('day'), 'day') + 1;
+    const completeDateList = Array.from({ length: diff }, (_, i) =>
+      dayjs(startTime).add(i, 'day').format('MM/DD')
+    );
+
+    return completeDateList.map((date) => {
+      const existingData = formatResponse.find((item) => item.date === date);
+      return {
+        ...(existingData || { date, ...defaultValues }),
+        date,
+        x: date,
+        xLabel: date
+      };
+    }) as unknown as T[];
+  };
+
+  const { data: trafficData, loading: isLoadingTraffic } = useRequest2(
+    async () => {
+      if (viewMode !== 'traffic') return;
+
+      return await GET<GetUserFormDataResponse>(`/admin/routes/dashboard/getUserFormData`, {
+        startTime
+      }).then((res) => {
+        return {
+          startUserCount: res.startUserCount,
+          registeredUserCount: formatList2ChartsData(res.registeredUserCount, {
+            count: 0
+          })
+        };
+      });
+    },
     {
-      manual: false
+      manual: false,
+      refreshDeps: [dateRange, viewMode]
     }
   );
-
-  const [dateRange, setDateRange] = useState<number>(7);
-  const { data: chartData = [], loading: isLoadingChart } = useRequest2(
+  const { data: paysData, loading: isLoadingPays } = useRequest2(
     async () => {
-      const startTime = dayjs().subtract(dateRange, 'day').add(1, 'day').startOf('day').format();
-
-      // 创建完整日期列表
-      const diff = dayjs().diff(dayjs(startTime).startOf('day'), 'day') + 1;
-      const completeDateList = Array.from({ length: diff }, (_, i) =>
-        dayjs(startTime).add(i, 'day').format('MM/DD')
-      );
-
-      // 创建日期映射函数
-      const createCompleteDateData = <T extends FetchChatData>(
-        sourceData: T[],
-        defaultValues: Omit<T, 'date'>
-      ) => {
-        return completeDateList.map((date) => {
-          const existingData = sourceData.find((item) => item.date === date);
-          return existingData || ({ date, ...defaultValues } as T);
-        });
-      };
-
-      const [userResponse, payResponse, chatResponse, pointResponse] = await Promise.all([
-        GET<FetchChatData[]>(`/admin/routes/dashboard/getUserFormData`, {
-          startTime
-        }).then((res) => res.map((item) => ({ ...item, date: dayjs(item.date).format('MM/DD') }))),
-        GET<FetchChatData[]>(`/admin/routes/dashboard/getPaysFormData`, {
-          startTime
-        }).then((res) => res.map((item) => ({ ...item, date: dayjs(item.date).format('MM/DD') }))),
-        GET<FetchChatData[]>(`/admin/routes/dashboard/getChatFormData`, {
-          startTime
-        }).then((res) => res.map((item) => ({ ...item, date: dayjs(item.date).format('MM/DD') }))),
-        GET<FetchChatData[]>(`/admin/routes/dashboard/getPointUsages`, {
-          startTime
-        }).then((res) => res.map((item) => ({ ...item, date: dayjs(item.date).format('MM/DD') })))
-      ]);
-
-      // 补充缺失日期数据
-      const completeUserData = createCompleteDateData(userResponse, { count: 0, increase: 0 });
-      const completePayData = createCompleteDateData(payResponse, { count: 0 });
-      const completeChatData = createCompleteDateData(chatResponse, { count: 0 });
-      const completePointData = createCompleteDateData(pointResponse, { count: 0 });
-
-      return completeDateList.map((date, i) => ({
-        date,
-        userCount: completeUserData[i].count,
-        userIncrease: completeUserData[i].increase,
-        payCount: completePayData[i].count / PRICE_SCALE,
-        chatCount: completeChatData[i].count,
-        totalPoints: +completePointData[i].count.toFixed(2)
+      if (viewMode !== 'payment') return;
+      return await GET<GetPaysFormDataResponse>(`/admin/routes/dashboard/getPaysFormData`, {
+        startTime
+      }).then((res) => ({
+        orderAmounts: formatList2ChartsData(res.orderAmounts, {
+          totalCount: 0,
+          successCount: 0
+        }),
+        payAmounts: formatList2ChartsData(res.payAmounts, {
+          totalCount: 0
+        }),
+        payTeams: formatList2ChartsData(res.payTeams, {
+          totalCount: 0
+        })
       }));
     },
     {
       manual: false,
-      refreshDeps: [dateRange]
+      refreshDeps: [dateRange, viewMode]
+    }
+  );
+  const { data: activeData, loading: isLoadingActive } = useRequest2(
+    async () => {
+      if (viewMode !== 'active') return;
+      return await GET<GetChatFormDataResponse>(
+        `/admin/routes/dashboard/getChatFormData`,
+        {
+          startTime
+        },
+        { timeout: 600000 }
+      ).then((res) => ({
+        chatAmounts: formatList2ChartsData(res.chatAmounts, {
+          totalCount: 0
+        }),
+        chatItemAmounts: formatList2ChartsData(res.chatItemAmounts, {
+          totalCount: 0
+        })
+      }));
+    },
+    {
+      manual: false,
+      refreshDeps: [dateRange, viewMode]
+    }
+  );
+  const { data: costData, loading: isLoadingCost } = useRequest2(
+    async () => {
+      if (viewMode !== 'cost') return;
+      return await POST<GetCostChartsResponse>(`/admin/routes/dashboard/getCostFormData`, {
+        startTime
+      }).then((res) => ({
+        pointUsages: formatList2ChartsData(res.pointUsages, {
+          totalCount: 0
+        })
+      }));
+    },
+    {
+      manual: false,
+      refreshDeps: [dateRange, viewMode]
     }
   );
 
-  const isLoading = isLoadingGetNumbers || isLoadingChart;
+  const [orderAmountType, setOrderAmountType] = useState<'all' | 'success'>('success');
+  const orderAmountField = orderAmountType === 'all' ? 'totalCount' : 'successCount';
+
+  const isLoading = isLoadingTraffic || isLoadingPays || isLoadingActive || isLoadingCost;
+
+  return (
+    <MyBox minH={'400px'} isLoading={isLoading}>
+      {trafficData && (
+        <>
+          <Box {...ChartsBoxStyles}>
+            <LineChartComponent
+              data={trafficData.registeredUserCount}
+              startDateValue={trafficData.startUserCount}
+              title={'总用户数'}
+              enableIncremental={false}
+              defaultDisplayMode="cumulative"
+              lines={[
+                {
+                  dataKey: 'count',
+                  name: '总用户数',
+                  color: theme.colors.blue['500']
+                }
+              ]}
+              tooltipItems={[
+                { label: '总用户数', dataKey: 'count', color: theme.colors.blue['500'] }
+              ]}
+            />
+          </Box>
+          <Box {...ChartsBoxStyles} mt={4}>
+            <LineChartComponent
+              data={trafficData.registeredUserCount}
+              title={'注册用户数'}
+              lines={[
+                {
+                  dataKey: 'count',
+                  name: '注册用户数',
+                  color: theme.colors.blue['500']
+                }
+              ]}
+              tooltipItems={[
+                {
+                  label: '注册用户数',
+                  dataKey: 'count',
+                  color: theme.colors.adora['500']
+                }
+              ]}
+            />
+          </Box>
+        </>
+      )}
+      {paysData && isSubscriptionEnabled && (
+        <>
+          <Box {...ChartsBoxStyles}>
+            <LineChartComponent
+              data={paysData.payAmounts}
+              title={'付费金额'}
+              lines={[
+                {
+                  dataKey: 'totalCount',
+                  name: '付费金额',
+                  color: theme.colors.blue['500']
+                }
+              ]}
+              tooltipItems={[
+                {
+                  label: '付费金额',
+                  dataKey: 'totalCount',
+                  color: theme.colors.adora['500']
+                }
+              ]}
+            />
+          </Box>
+          <Box {...ChartsBoxStyles} mt={4}>
+            <LineChartComponent
+              data={paysData.orderAmounts}
+              title={'订单数'}
+              HeaderLeftChildren={
+                <FillRowTabs<'all' | 'success'>
+                  list={[
+                    { label: '全部', value: 'all' },
+                    { label: '成功', value: 'success' }
+                  ]}
+                  py={0.5}
+                  px={2}
+                  value={orderAmountType}
+                  onChange={(val) => setOrderAmountType(val)}
+                />
+              }
+              lines={[
+                {
+                  dataKey: orderAmountField,
+                  name: '订单数',
+                  color: theme.colors.blue['500']
+                }
+              ]}
+              tooltipItems={[
+                { label: '订单数', dataKey: orderAmountField, color: theme.colors.blue['500'] }
+              ]}
+            />
+          </Box>
+          <Box {...ChartsBoxStyles} mt={4}>
+            <LineChartComponent
+              data={paysData.payTeams}
+              title={'付费团队数'}
+              lines={[
+                {
+                  dataKey: 'totalCount',
+                  name: '付费团队数',
+                  color: theme.colors.blue['500']
+                }
+              ]}
+              tooltipItems={[
+                { label: '付费团队数', dataKey: 'totalCount', color: theme.colors.blue['500'] }
+              ]}
+            />
+          </Box>
+        </>
+      )}
+      {activeData && (
+        <>
+          <Box {...ChartsBoxStyles}>
+            <LineChartComponent
+              data={activeData.chatItemAmounts}
+              title={'总对话数'}
+              lines={[
+                {
+                  dataKey: 'totalCount',
+                  name: '总对话数',
+                  color: theme.colors.blue['500']
+                }
+              ]}
+              tooltipItems={[
+                {
+                  label: '总对话数',
+                  dataKey: 'totalCount',
+                  color: theme.colors.adora['500']
+                }
+              ]}
+            />
+          </Box>
+          <Box {...ChartsBoxStyles} mt={4}>
+            <LineChartComponent
+              data={activeData.chatAmounts}
+              title={'总会话数'}
+              lines={[
+                {
+                  dataKey: 'totalCount',
+                  name: '总会话数',
+                  color: theme.colors.blue['500']
+                }
+              ]}
+              tooltipItems={[
+                { label: '总会话数', dataKey: 'totalCount', color: theme.colors.blue['500'] }
+              ]}
+            />
+          </Box>
+          <Box {...ChartsBoxStyles} mt={4}>
+            <LineChartComponent
+              data={activeData.chatItemAmounts}
+              title={'每个会话平均对话数'}
+              lines={[
+                {
+                  dataKey: 'averageCount',
+                  name: '每个会话平均对话数',
+                  color: theme.colors.blue['500']
+                }
+              ]}
+              tooltipItems={[
+                {
+                  label: '每个会话平均对话数',
+                  dataKey: 'averageCount',
+                  color: theme.colors.blue['500']
+                }
+              ]}
+            />
+          </Box>
+        </>
+      )}
+      {costData && (
+        <>
+          <Box {...ChartsBoxStyles}>
+            <LineChartComponent
+              data={costData.pointUsages}
+              title={'积分消耗'}
+              lines={[
+                {
+                  dataKey: 'totalCount',
+                  name: '积分消耗',
+                  color: theme.colors.blue['500']
+                }
+              ]}
+              tooltipItems={[
+                { label: '积分消耗', dataKey: 'totalCount', color: theme.colors.blue['500'] }
+              ]}
+            />
+          </Box>
+        </>
+      )}
+    </MyBox>
+  );
+};
+
+export default function DashBoard(): JSX.Element {
+  const { data: systemConfig } = useRequest2(getInitFormData, {
+    manual: false
+  });
+  // Check if subscription is enabled
+  const isSubscriptionEnabled = useMemo((): boolean => {
+    if (!systemConfig) return false;
+
+    const feConfigs = systemConfig.fastgpt?.feConfigs;
+    const subPlans = systemConfig.fastgpt?.subPlans;
+
+    return Boolean(
+      feConfigs?.show_pay && subPlans?.standard && Object.keys(subPlans.standard).length > 0
+    );
+  }, [systemConfig]);
+
+  const [dateRange, setDateRange] = useState<DateRange>(7);
+  const [viewMode, setViewMode] = useState<ViewMode>('traffic');
+
+  const { data: datas, loading: isLoadingGetNumbers } = useRequest2(
+    () =>
+      GET<{ appsCount: number; datasetsCount: number; usersCount: number }>(
+        `/admin/routes/dashboard/getNumbers`
+      ),
+    {
+      manual: false
+    }
+  );
+  const dataItems = [
+    { icon: 'support/user/userLight', title: '用户总数', count: datas?.usersCount, bg: '#EDFAFF' },
+    {
+      icon: 'core/dataset/datasetLight',
+      title: '知识库总数',
+      count: datas?.datasetsCount,
+      bg: '#F0EEFF'
+    },
+    { icon: 'core/app/aiLight', title: '应用总数', count: datas?.appsCount, bg: '#F0F4FF' }
+  ];
+
+  const isLoading = isLoadingGetNumbers;
 
   return (
     <BoxCard isLoading={isLoading}>
-      {/* Header time range select */}
-      <Flex justify={'space-between'}>
-        <Box fontSize={'lg'} fontWeight={'bold'}>
-          统计数据
-        </Box>
-      </Flex>
-      {/* Data card */}
-      <Grid mt={2} templateColumns={['1fr', 'repeat(3, 1fr)']} gap={6}>
-        <GridItem flex={1}>
-          <DataItem
-            icon={'support/user/userLight'}
-            title={'用户总数'}
-            count={datas?.usersCount}
-            bg={'#EDFAFF'}
-          />
-        </GridItem>
-        <GridItem flex={1}>
-          <DataItem
-            icon={'core/dataset/datasetLight'}
-            title={'知识库总数'}
-            count={datas?.datasetsCount}
-            bg={'#F0EEFF'}
-          />
-        </GridItem>
-        <GridItem flex={1}>
-          <DataItem
-            icon={'core/app/aiLight'}
-            title={'应用总数'}
-            count={datas?.appsCount}
-            bg={'#F0F4FF'}
-          />
-        </GridItem>
-      </Grid>
+      <>
+        <Flex justify={'space-between'}>
+          <Box fontSize={'lg'} fontWeight={'bold'}>
+            统计数据
+          </Box>
+        </Flex>
+        <Grid mt={2} templateColumns={['1fr', 'repeat(3, 1fr)']} gap={6}>
+          {dataItems.map((item, index) => (
+            <GridItem flex={1} key={index}>
+              <DataItem {...item} />
+            </GridItem>
+          ))}
+        </Grid>
+      </>
 
-      {/* charts */}
       <Box mt={5}>
         <Flex mb={4} justify={'space-between'}>
-          <Box fontSize={'lg'} fontWeight={'bold'}>
-            趋势图
-          </Box>
-          <Box>
-            <FillRowTabs<number>
+          <FillRowTabs<ViewMode>
+            list={[
+              {
+                label: '流量',
+                value: 'traffic'
+              },
+              ...(isSubscriptionEnabled
+                ? [
+                    {
+                      label: '付费',
+                      value: 'payment' as const
+                    }
+                  ]
+                : []),
+              {
+                label: '活跃',
+                value: 'active'
+              },
+              {
+                label: '成本',
+                value: 'cost'
+              }
+            ]}
+            py={1.5}
+            value={viewMode}
+            onChange={(val) => setViewMode(val)}
+          />
+          <Box display={'flex'} alignItems={'center'}>
+            <FillRowTabs<DateRange>
               list={[
                 { label: '近7天', value: 7 },
                 { label: '近30天', value: 30 },
-                { label: '近90天', value: 90 }
+                { label: '近90天', value: 90 },
+                { label: '近180天', value: 180 }
               ]}
+              py={0.5}
+              px={2}
               value={dateRange}
-              onChange={setDateRange}
+              onChange={(val: DateRange) => setDateRange(val)}
             />
           </Box>
         </Flex>
-        <UserChart data={chartData} />
+        <ChartsContainer
+          dateRange={dateRange}
+          viewMode={viewMode}
+          isSubscriptionEnabled={isSubscriptionEnabled}
+        />
       </Box>
     </BoxCard>
   );
 }
-
-const CustomTooltip = ({ active, payload }: any) => {
-  const data = payload?.[0]?.payload as chatDataType;
-  if (active && data) {
-    return (
-      <Box bg={'white'} p={3} borderRadius={'md'} boxShadow={'base'}>
-        <Box fontWeight={'bold'} color={'black'}>
-          {data.date}
-        </Box>
-        <HStack>
-          <Box>用户总数:</Box>
-          <Box fontWeight={'bold'}>{data.userCount}</Box>
-        </HStack>
-        <HStack>
-          <Box>今日用户增长数量:</Box>
-          <Box fontWeight={'bold'}>{data.userIncrease}</Box>
-        </HStack>
-        <HStack>
-          <Box>今日对话数量:</Box>
-          <Box fontWeight={'bold'}>{data.chatCount}</Box>
-        </HStack>
-        <HStack>
-          <Box>今日积分消耗:</Box>
-          <Box fontWeight={'bold'}>{data.totalPoints}</Box>
-        </HStack>
-        <HStack>
-          <Box>今日支付:</Box>
-          <Box fontWeight={'bold'}>{data.payCount}元</Box>
-        </HStack>
-      </Box>
-    );
-  }
-  return null;
-};
-
-const UserChart = ({ data }: { data: chatDataType[] }) => {
-  const [hiddenLines, setHiddenLines] = useState<Record<string, boolean>>({});
-
-  const list = [
-    { name: '用户总数', dataKey: 'userCount', stroke: '#11B6FC' },
-    { name: '支付数量', dataKey: 'payCount', stroke: '#E2A5FF' },
-    { name: '对话数量', dataKey: 'chatCount', stroke: '#13C4B9' },
-    { name: '积分消耗', dataKey: 'totalPoints', stroke: '#FDB022' }
-  ];
-  return (
-    <ResponsiveContainer width="100%" height={360} className="mt-4">
-      <LineChart data={data} margin={{ top: 10, right: 30, left: 20, bottom: 0 }}>
-        <XAxis dataKey="date" />
-        <YAxis />
-        <CartesianGrid strokeDasharray="3 3" />
-        <Tooltip content={<CustomTooltip />} />
-        <Legend
-          onClick={(e) => {
-            setHiddenLines((prev) => ({
-              ...prev,
-              // @ts-ignore
-              [e.dataKey]: !prev[e.dataKey]
-            }));
-          }}
-        />
-        {list.map((item) => (
-          <Line
-            key={item.dataKey}
-            type="monotone"
-            name={item.name}
-            dataKey={item.dataKey}
-            stroke={item.stroke}
-            strokeWidth={1.5}
-            dot={false}
-            hide={hiddenLines[item.dataKey]}
-          />
-        ))}
-      </LineChart>
-    </ResponsiveContainer>
-  );
-};
 
 export async function getServerSideProps(content: any) {
   return {

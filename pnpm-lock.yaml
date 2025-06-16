@@ -473,6 +473,9 @@ importers:
       react-photo-view:
         specifier: ^1.2.6
         version: 1.2.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      recharts:
+        specifier: ^2.15.0
+        version: 2.15.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       use-context-selector:
         specifier: ^1.4.4
         version: 1.4.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)
@@ -1034,7 +1037,7 @@ importers:
         specifier: ^9.0.1
         version: 9.1.0(@types/react@18.3.1)(react@18.3.1)
       recharts:
-        specifier: ^2.10.1
+        specifier: ^2.15.0
         version: 2.15.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       rehype-katex:
         specifier: ^7.0.0
