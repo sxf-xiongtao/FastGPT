@@ -1,4 +1,8 @@
-import { ChatItemValueTypeEnum, ChatRoleEnum } from '@fastgpt/global/core/chat/constants';
+import {
+  ChatFileTypeEnum,
+  ChatItemValueTypeEnum,
+  ChatRoleEnum
+} from '@fastgpt/global/core/chat/constants';
 import { UserChatItemValueItemType } from '@fastgpt/global/core/chat/type';
 import { DispatchNodeResponseKeyEnum } from '@fastgpt/global/core/workflow/runtime/constants';
 import {
@@ -66,6 +70,7 @@ export type outLinkInvokeChatProps<T extends OutlinkAppType> = {
   outLinkConfig: OutLinkSchema<T>;
   chatId: string; // specific chat
   userQuestion: string;
+  imgUrl?: string;
   res?: NextApiResponse;
   messageId: string;
   chatUserId: string;
@@ -77,6 +82,7 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
   outLinkConfig,
   chatId,
   userQuestion,
+  imgUrl,
   res,
   messageId,
   chatUserId,
@@ -127,7 +133,19 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
         text: {
           content: userQuestion
         }
-      }
+      },
+      ...(imgUrl
+        ? [
+            {
+              type: ChatItemValueTypeEnum.file as const,
+              file: {
+                type: ChatFileTypeEnum.image,
+                name: '',
+                url: imgUrl
+              }
+            }
+          ]
+        : [])
     ];
 
     const {

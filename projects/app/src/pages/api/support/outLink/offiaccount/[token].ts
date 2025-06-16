@@ -23,10 +23,11 @@ export type OutLinkOffiAccountResponse = {};
 
 type Body = {
   FromUserName: string;
-  Content: string;
   MsgId: string;
-  MsgType: 'text' | 'event';
+  MsgType: 'text' | 'event' | 'image';
+  Content?: string;
   Event?: 'subscribe' | 'unsubscribe';
+  PicUrl?: string;
 };
 
 async function handler(
@@ -58,11 +59,10 @@ async function handler(
     };
   }
 
-  if (body.MsgType !== 'text') {
-    // only support text for now
+  if (body.MsgType !== 'text' && body.MsgType !== 'image') {
     return {
       message: formatTextReply({
-        content: `暂不支持非文字消息`,
+        content: `暂不支持该类型消息`,
         fromUserName: body.toUserName,
         toUserName: body.FromUserName
       })
@@ -75,7 +75,8 @@ async function handler(
     chatId,
     outLinkConfig,
     messageId: body.MsgId,
-    userQuestion: String(body.Content), // Important: must be string. Stupid Wechat could send number which cause errors
+    userQuestion: String(body.Content || ''), // Important: must be string. Stupid Wechat could send number which cause errors
+    imgUrl: body.MsgType === 'image' ? body.PicUrl : undefined,
     chatUserId: body.FromUserName,
     replyCallback: async (content: string) =>
       requestReply({
