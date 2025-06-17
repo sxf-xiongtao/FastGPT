@@ -5,7 +5,7 @@ import {
 } from '@fastgpt/global/support/wallet/sub/constants';
 import { ClientSession } from '@fastgpt/service/common/mongo';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
-import { sortStandPlans } from '@fastgpt/service/support/wallet/sub/utils';
+import { sortStandPlans, clearTeamPointsCache } from '@fastgpt/service/support/wallet/sub/utils';
 import { addDays } from 'date-fns';
 
 /* 
@@ -89,6 +89,9 @@ export const addStandardSub = async ({
 
   // 2. 重新排序标准订阅
   await reComputeStandPlans(teamId, session);
+
+  // 3. 清除积分缓存，确保下次获取时重新计算
+  await clearTeamPointsCache(teamId);
 };
 
 export const addExtraDatasetSizeSub = async ({
@@ -151,4 +154,7 @@ export const addExtraPointsSub = async ({
     ],
     { session }
   );
+
+  // 清除积分缓存，确保下次获取时重新计算
+  await clearTeamPointsCache(teamId);
 };

@@ -6,6 +6,7 @@ import type { ConcatBillQueueItemType } from '@fastgpt/service/support/wallet/us
 import { ClientSession } from '@fastgpt/service/common/mongo';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import { incrTeamPointsCache } from '@fastgpt/service/support/wallet/sub/utils';
 
 const batchUpdateTime = Number(process.env.BATCH_UPDATE_TIME || 3000);
 
@@ -87,6 +88,11 @@ const incTeamAiPoints = async ({
         surplusPoints: -1
       });
     }
+
+    incrTeamPointsCache({
+      teamId,
+      value: totalPoints
+    });
   });
 };
 
