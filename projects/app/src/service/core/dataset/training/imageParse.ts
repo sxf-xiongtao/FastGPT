@@ -66,11 +66,11 @@ export async function imageParseTraining(): Promise<any> {
         }
       )
         .populate<{
-          dataset: { vectorModel: string; vlmModel: string };
+          dataset: { vlmModel: string };
         }>([
           {
             path: 'dataset',
-            select: 'vectorModel vlmModel'
+            select: 'vlmModel'
           }
         ])
         .lean();
@@ -182,7 +182,6 @@ export async function imageParseTraining(): Promise<any> {
       {
         $set: {
           mode: TrainingModeEnum.chunk,
-          model: data.dataset.vectorModel,
           q: answer,
           lockTime: new Date('2000/1/1'),
           retryCount: 5

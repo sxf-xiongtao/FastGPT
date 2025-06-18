@@ -35,6 +35,10 @@ const returnQueue = (delay = 0) => {
   }
 };
 
+type PopulateType = {
+  dataset: { vectorModel: string; agentModel: string };
+};
+
 export async function generateAutoTraining(): Promise<any> {
   if (global.licenseData?.functions?.datasetEnhance === false) {
     await MongoDatasetTraining.updateMany(
@@ -75,12 +79,10 @@ export async function generateAutoTraining(): Promise<any> {
           $inc: { retryCount: -1 }
         }
       )
-        .populate<{
-          dataset: { vectorModel: string };
-        }>([
+        .populate<PopulateType>([
           {
             path: 'dataset',
-            select: 'vectorModel '
+            select: 'vectorModel agentModel'
           }
         ])
         .lean();
@@ -114,6 +116,13 @@ export async function generateAutoTraining(): Promise<any> {
   }
   addLog.info(`[Auto index queue] Start`);
 
+  if (!data.dataset) {
+    addLog.info(`[Auto index queue] Dataset not found`, data);
+    // Delete data
+    await MongoDatasetTraining.deleteOne({ _id: data._id });
+    return returnQueue();
+  }
+
   // auth balance
   if (!(await checkTeamAiPointsAndLock(data.teamId))) {
     return returnQueue();
@@ -122,22 +131,7 @@ export async function generateAutoTraining(): Promise<any> {
   try {
     const startTime = Date.now();
     // 1. Get model
-    const modelData = getLLMModel(data.model);
-    if (!modelData) {
-      addLog.info(`[Auto index queue] Model not found: ${data.model}`);
-      await MongoDatasetTraining.updateOne(
-        { _id: data._id },
-        {
-          $set: {
-            mode: TrainingModeEnum.chunk,
-            model: data.dataset.vectorModel,
-            lockTime: new Date('2000/1/1'),
-            retryCount: 5
-          }
-        }
-      );
-      return returnQueue();
-    }
+    const modelData = getLLMModel(data.dataset.agentModel)!;
 
     // 2. request LLM to get response
     const prompt = getAutoTrainingPrompt({ text });
@@ -172,7 +166,6 @@ export async function generateAutoTraining(): Promise<any> {
       {
         $set: {
           mode: TrainingModeEnum.chunk,
-          model: data.dataset.vectorModel,
           lockTime: new Date('2000/1/1'),
           retryCount: 5,
           indexes: newIndexes
@@ -213,7 +206,7 @@ export async function generateAutoTraining(): Promise<any> {
       }
     );
 
-    returnQueue(1000);
+    returnQueue(500);
   }
 }
 

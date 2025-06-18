@@ -144,15 +144,12 @@ export async function generateImageIndex(): Promise<any> {
   }
 
   const nextMode = data.collection.autoIndexes ? TrainingModeEnum.auto : TrainingModeEnum.chunk;
-  const nextModel =
-    nextMode === TrainingModeEnum.auto ? data.dataset.agentModel : data.dataset.vectorModel;
   const updateImageQueueToChunkQueue = async () => {
     await MongoDatasetTraining.updateOne(
       { _id: data._id },
       {
         $set: {
           mode: nextMode,
-          model: nextModel,
           lockTime: new Date('2000/1/1'),
           retryCount: 5
         }
@@ -184,7 +181,7 @@ export async function generateImageIndex(): Promise<any> {
     const startTime = Date.now();
 
     // 1. Match text image url
-    let images = await matchAndParseTextImageUrl(text);
+    const images = await matchAndParseTextImageUrl(text);
 
     if (images.length === 0) {
       addLog.debug(`[Image index queue] No image url found: ${data._id}`);
@@ -243,7 +240,6 @@ export async function generateImageIndex(): Promise<any> {
       {
         $set: {
           mode: nextMode,
-          model: nextModel,
           lockTime: new Date('2000/1/1'),
           retryCount: 5,
           indexes
