@@ -23,12 +23,12 @@ import {
 import { getGroupsByTmbId } from '@fastgpt/service/support/permission/memberGroup/controllers';
 import { getOrgsByTmbId } from '@fastgpt/service/support/permission/org/controllers';
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
 import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
-import { getI18nAppType } from '@fastgpt/service/support/operationLog/util';
+import { getI18nAppType } from '@fastgpt/service/support/user/audit/util';
 import { AppDetailType } from '@fastgpt/global/core/app/type';
 /*
   增加或修改协作者
@@ -317,10 +317,10 @@ const auditLog = async ({
       })
     );
 
-    addOperationLog({
+    addAuditLog({
       tmbId,
       teamId,
-      event: OperationLogEventEnum.UPDATE_APP_COLLABORATOR,
+      event: AuditEventEnum.UPDATE_APP_COLLABORATOR,
       params: {
         appName: app.name,
         appType: appType,

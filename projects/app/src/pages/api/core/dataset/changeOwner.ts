@@ -7,9 +7,9 @@ import { OwnerPermissionVal } from '@fastgpt/global/support/permission/constant'
 import { AppErrEnum } from '@fastgpt/global/common/error/code/app';
 import { DatasetErrEnum } from '@fastgpt/global/common/error/code/dataset';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
-import { getI18nDatasetType } from '@fastgpt/service/support/operationLog/util';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
+import { getI18nDatasetType } from '@fastgpt/service/support/user/audit/util';
 export type AppChangeOwnerQuery = {};
 export type AppChangeOwnerBody = {
   ownerId: string;
@@ -53,10 +53,10 @@ async function handler(
     teamId: dataset.teamId
   });
 
-  addOperationLog({
+  addAuditLog({
     tmbId,
     teamId,
-    event: OperationLogEventEnum.TRANSFER_DATASET_OWNERSHIP,
+    event: AuditEventEnum.TRANSFER_DATASET_OWNERSHIP,
     params: {
       datasetName: dataset.name,
       datasetType: getI18nDatasetType(dataset.type),

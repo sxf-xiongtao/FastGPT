@@ -18,8 +18,8 @@ import {
   syncCollaborators
 } from '@fastgpt/service/support/permission/inheritPermission';
 import type { NextApiRequest } from 'next';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 import { AppTypeEnum } from '@fastgpt/global/core/app/constants';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
@@ -27,7 +27,7 @@ import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema
 import {
   getI18nAppType,
   getI18nCollaboratorItemType
-} from '@fastgpt/service/support/operationLog/util';
+} from '@fastgpt/service/support/user/audit/util';
 
 async function logDeleteCollaboratorOperation({
   app,
@@ -64,10 +64,10 @@ async function logDeleteCollaboratorOperation({
   const itemType = getI18nCollaboratorItemType(tmbId, groupId, orgId);
   const itemName = await getItemName();
 
-  addOperationLog({
+  addAuditLog({
     tmbId: operatorTmbId,
     teamId,
-    event: OperationLogEventEnum.DELETE_APP_COLLABORATOR,
+    event: AuditEventEnum.DELETE_APP_COLLABORATOR,
     params: {
       appName: app.name,
       appType: appType,

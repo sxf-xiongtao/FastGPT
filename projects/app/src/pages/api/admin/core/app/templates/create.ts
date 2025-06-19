@@ -6,6 +6,9 @@ import { WorkflowTemplateBasicType } from '@fastgpt/global/core/workflow/type';
 import { PluginSourceEnum } from '@fastgpt/global/core/plugin/constants';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
 import { MongoAppTemplate } from '@fastgpt/service/core/app/templates/templateSchema';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
+import { getUserDetail } from '@fastgpt/service/support/user/controller';
 
 export type createTemplateQuery = {};
 
@@ -29,7 +32,7 @@ async function handler(
   req: ApiRequestProps<createTemplateBody, createTemplateQuery>,
   res: ApiResponseType<any>
 ): Promise<createTemplateResponse> {
-  await adminCert({ req, authToken: true });
+  const authResult = await adminCert({ req, authToken: true });
   const { name, intro, avatar, tags, type, isActive, userGuide, workflow } = req.body;
 
   const templateId = `${PluginSourceEnum.commercial}-${getNanoid(12)}`;
@@ -45,6 +48,19 @@ async function handler(
     userGuide,
     workflow
   });
+
+  const userDetail = await getUserDetail({ tmbId: authResult.tmbId });
+  (async () => {
+    addAuditLog({
+      tmbId: authResult.tmbId,
+      teamId: userDetail.team.teamId,
+      event: AdminAuditEventEnum.ADMIN_CREATE_APP_TEMPLATE,
+      params: {
+        name: userDetail.username,
+        templateName: name
+      }
+    });
+  })();
 
   return {};
 }

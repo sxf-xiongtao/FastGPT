@@ -3,6 +3,9 @@ import { adminCert } from '@/service/support/permission/adminCert';
 import { MongoPluginGroups } from '@fastgpt/service/core/app/plugin/pluginGroupSchema';
 import { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { nanoid } from 'nanoid';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
+import { getUserDetail } from '@fastgpt/service/support/user/controller';
 
 export type createPluginGroupQuery = {};
 
@@ -18,7 +21,8 @@ async function handler(
   req: ApiRequestProps<createPluginGroupBody, createPluginGroupQuery>,
   res: ApiResponseType<any>
 ): Promise<createPluginGroupResponse> {
-  await adminCert({ req, authToken: true });
+  const authResult = await adminCert({ req, authToken: true });
+  const userDetail = await getUserDetail({ tmbId: authResult.tmbId });
   const { groupName, groupAvatar, groupOrder } = req.body;
 
   await MongoPluginGroups.create({
@@ -28,6 +32,18 @@ async function handler(
     groupTypes: [],
     groupOrder
   });
+
+  (async () => {
+    addAuditLog({
+      tmbId: authResult.tmbId,
+      teamId: userDetail.team.teamId,
+      event: AdminAuditEventEnum.ADMIN_CREATE_PLUGIN_GROUP,
+      params: {
+        name: groupName,
+        groupName: groupName
+      }
+    });
+  })();
 
   return {};
 }

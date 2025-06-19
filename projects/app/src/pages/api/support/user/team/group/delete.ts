@@ -9,8 +9,8 @@ import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { DefaultGroupName } from '@fastgpt/global/support/user/team/group/constant';
 import { authGroupMemberRole } from '@fastgpt/service/support/permission/memberGroup/controllers';
 import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 
 export type GroupDeleteQuery = {
   groupId: string;
@@ -95,10 +95,10 @@ async function handler(
     );
   });
 
-  addOperationLog({
+  addAuditLog({
     tmbId,
     teamId,
-    event: OperationLogEventEnum.DELETE_GROUP,
+    event: AuditEventEnum.DELETE_GROUP,
     params: {
       groupName: groupName
     }

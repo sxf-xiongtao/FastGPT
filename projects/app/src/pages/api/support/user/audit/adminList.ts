@@ -1,18 +1,18 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
-import { MongoOperationLog } from '@fastgpt/service/support/operationLog/schema';
+import { MongoOperationLog } from '@fastgpt/service/support/user/audit/schema';
 import { NextAPI } from '@/service/middleware/entry';
-import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import type { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { addSourceMember } from '@fastgpt/service/support/user/utils';
-import { OperationListItemType } from '@fastgpt/global/support/operationLog/type';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { OperationListItemType } from '@fastgpt/global/support/user/audit/type';
+import { AdminAuditEventEnum, AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 
-type OperationLogQuery = {
-  pageNum?: number;
-  pageSize?: number;
-  tmbIds?: string[];
-  events?: OperationLogEventEnum[];
+export type OperationLogQuery = {
+  props: PaginationProps & {
+    tmbIds?: string[];
+    events?: AdminAuditEventEnum[];
+  };
 };
 type OperationLogBody = {};
 
@@ -31,20 +31,24 @@ async function handler(
     pageNum: number;
     pageSize: number;
     tmbIds?: string[];
-    events?: OperationLogEventEnum[];
+    events?: AdminAuditEventEnum[];
   };
 
   const filter: Record<string, any> = {
     teamId,
-    ...(tmbIds ? { tmbId: { $in: tmbIds } } : {}),
-    ...(events ? { event: { $in: events } } : {})
+    ...(tmbIds ? { tmbId: { $in: tmbIds } } : { tmbId: { $exists: true } }),
+    ...(events
+      ? { event: { $in: events } }
+      : {
+          event: { $nin: Object.values(AuditEventEnum) }
+        })
   };
 
   const [logs, total] = await Promise.all([
     MongoOperationLog.find(filter, '_id tmbId timestamp event metadata', {
       ...readFromSecondary
     })
-      .sort({ timestamp: -1 })
+      .sort({ _id: -1 })
       .skip((pageNum - 1) * pageSize)
       .limit(pageSize)
       .lean(),

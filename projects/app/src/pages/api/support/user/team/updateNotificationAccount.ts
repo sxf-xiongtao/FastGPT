@@ -5,8 +5,8 @@ import { authCode } from '@fastgpt/service/support/user/auth/controller';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { OwnerPermissionVal } from '@fastgpt/global/support/permission/constant';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 export type UpdateNotificationMethodQuery = {};
 export type UpdateNotificationMethodBody = {
   account: string;
@@ -50,10 +50,10 @@ async function handler(
     }
   }
   (async () => {
-    addOperationLog({
+    addAuditLog({
       tmbId,
       teamId,
-      event: OperationLogEventEnum.CHANGE_NOTIFICATION_SETTINGS,
+      event: AuditEventEnum.CHANGE_NOTIFICATION_SETTINGS,
       params: {}
     });
   })();

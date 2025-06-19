@@ -10,6 +10,10 @@ import { InvoiceStatusEnum } from '@fastgpt/global/support/wallet/bill/invoice/c
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
 import { addLog } from '@fastgpt/service/common/system/log';
+import { adminCert } from '@/service/support/permission/adminCert';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
+import { getUserDetail } from '@fastgpt/service/support/user/controller';
 
 export type finishQuery = {};
 
@@ -21,6 +25,8 @@ async function handler(
   req: ApiRequestProps<finishBody, finishQuery>,
   res: ApiResponseType<any>
 ): Promise<finishResponse> {
+  const authResult = await adminCert({ req, authToken: true });
+
   const filePaths: string[] = [];
   try {
     const upload = getUploadModel({
@@ -64,6 +70,22 @@ async function handler(
         emailAddress: invoice.emailAddress
       });
     });
+
+    const userDetail = await getUserDetail({
+      tmbId: authResult.tmbId,
+      userId: authResult.userId
+    });
+
+    (async () => {
+      addAuditLog({
+        tmbId: authResult.tmbId,
+        teamId: userDetail.team.teamId,
+        event: AdminAuditEventEnum.ADMIN_FINISH_INVOICE,
+        params: {
+          teamName: invoice.teamName
+        }
+      });
+    })();
   } catch (error) {
     jsonRes(res, {
       code: 500,

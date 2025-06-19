@@ -9,12 +9,15 @@ import { initFastGPTConfig } from '@fastgpt/service/common/system/tools';
 import { beforeUpdateConfig } from '@/service/admin/settings/hooks';
 import { updateSystemConfig } from '@/service/common/system/config';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
+import { getUserDetail } from '@fastgpt/service/support/user/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { fastgpt, fastgptPro } = req.body as ConfigStoreType;
 
-    await adminCert({ req, authToken: true });
+    const authResult = await adminCert({ req, authToken: true });
 
     if (!fastgpt && !fastgptPro) {
       throw new Error('fastgpt and fastgptPro cannot be empty');
@@ -36,6 +39,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     initFastGPTConfig(fastgpt);
 
     console.log(fastgptPro, fastgpt);
+
+    const userDetail = await getUserDetail({ tmbId: authResult.tmbId });
+    (async () => {
+      addAuditLog({
+        tmbId: authResult.tmbId,
+        teamId: userDetail.team.teamId,
+        event: AdminAuditEventEnum.ADMIN_UPDATE_SYSTEM_CONFIG,
+        params: { name: userDetail.username }
+      });
+    })();
 
     jsonRes(res, {
       data: 'success'

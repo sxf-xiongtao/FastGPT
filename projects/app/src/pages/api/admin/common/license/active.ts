@@ -22,7 +22,6 @@ async function handler(
 
     const data = await authLicense(license);
 
-    // 写入数据库
     await MongoSystemConfigs.updateOne(
       { type: SystemConfigsTypeEnum.license },
       {

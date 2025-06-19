@@ -9,6 +9,9 @@ import { MongoSystemPlugin } from '@fastgpt/service/core/app/plugin/systemPlugin
 import { getNanoid } from '@fastgpt/global/common/string/tools';
 import { isEqual } from 'lodash';
 import { getSystemPluginCb } from '@/service/core/workflow/systemPlugins/register';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
+import { getUserDetail } from '@fastgpt/service/support/user/controller';
 
 export type updatePluginQuery = {};
 
@@ -38,7 +41,8 @@ async function handler(
   req: ApiRequestProps<updatePluginBody, updatePluginQuery>,
   res: ApiResponseType<any>
 ): Promise<updatePluginResponse> {
-  await adminCert({ req, authToken: true });
+  const authResult = await adminCert({ req, authToken: true });
+  const userDetail = await getUserDetail({ tmbId: authResult.tmbId });
   const { pluginId, ...updateFields } = req.body;
 
   // 查找插件
@@ -91,6 +95,18 @@ async function handler(
 
   // 重新获取插件
   await getSystemPluginCb(true);
+
+  (async () => {
+    addAuditLog({
+      tmbId: authResult.tmbId,
+      teamId: userDetail.team.teamId,
+      event: AdminAuditEventEnum.ADMIN_UPDATE_PLUGIN,
+      params: {
+        name: updateFields.name,
+        pluginName: updateFields.name || pluginId
+      }
+    });
+  })();
 
   return {};
 }

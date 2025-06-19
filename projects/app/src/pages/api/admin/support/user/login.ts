@@ -9,6 +9,8 @@ import { getUserDetail } from '@fastgpt/service/support/user/controller';
 import { NextAPI } from '@/service/middleware/entry';
 import { useIPFrequencyLimit } from '@fastgpt/service/common/middle/reqFrequencyLimit';
 import requestIp from 'request-ip';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -58,6 +60,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         token
       }
     });
+
+    (async () => {
+      addAuditLog({
+        tmbId: userDetail.team.tmbId,
+        teamId: userDetail.team.teamId,
+        event: AdminAuditEventEnum.ADMIN_LOGIN,
+        params: {}
+      });
+    })();
   } catch (err) {
     jsonRes(res, {
       code: 500,

@@ -52,12 +52,12 @@ FastGPT 是一个 AI Agent 构建平台，支持数据处理、模型调用、�
 2. suppoprt - 支撑业务
   2.1: suppoprt/mcp - mcp 相关业务
   2.2: suppoprt/openapi - 应用对外提供 api 服务业务
-  2.3: suppoprt/operationLog  - 团队操作日志
-  2.4: support/outlink - 应用分享链接业务
-  2.5: support/permission - 权限相关
-  2.6: support/tmpData - 临时数据存储
-  2.7: support/user - 用户相关
-  2.8: support/wallet - 钱包相关
+  2.3: support/outlink - 应用分享链接业务
+  2.4: support/permission - 权限相关
+  2.5: support/tmpData - 临时数据存储
+  2.6: support/user - 用户相关
+  2.6.1: suppoprt/user/audit  - 团队操作日志
+  2.7: support/wallet - 钱包相关
 3. common - 通用业务
   3.1: common/bullmq - bullmq 管理
   3.2: common/file - 文件解析等

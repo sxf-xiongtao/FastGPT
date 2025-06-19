@@ -6,8 +6,8 @@ import { authOrgMember } from '@fastgpt/service/support/permission/auth/org';
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { refreshSourceAvatar } from '@fastgpt/service/common/file/image/controller';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 
 export type OrgUpdateQuery = {};
 export type OrgUpdateBody = putUpdateOrgData;
@@ -44,10 +44,10 @@ async function handler(
     await refreshSourceAvatar(avatar, org?.avatar, session);
   });
 
-  addOperationLog({
+  addAuditLog({
     tmbId,
     teamId,
-    event: OperationLogEventEnum.CHANGE_DEPARTMENT,
+    event: AuditEventEnum.CHANGE_DEPARTMENT,
     params: {
       departmentName: name
     }

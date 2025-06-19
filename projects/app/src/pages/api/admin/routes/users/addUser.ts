@@ -5,10 +5,13 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
+import { getUserDetail } from '@fastgpt/service/support/user/controller';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    await adminCert({ req, authToken: true });
+    const authResult = await adminCert({ req, authToken: true });
 
     const { username, password } = req.body;
     if (!username || !password) {
@@ -30,6 +33,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       username,
       password
     });
+
+    const userDetail = await getUserDetail({
+      tmbId: authResult.tmbId,
+      userId: authResult.userId
+    });
+
+    (async () => {
+      addAuditLog({
+        tmbId: authResult.tmbId,
+        teamId: userDetail.team.teamId,
+        event: AdminAuditEventEnum.ADMIN_ADD_USER,
+        params: {
+          userName: username
+        }
+      });
+    })();
 
     jsonRes(res, {
       data: {

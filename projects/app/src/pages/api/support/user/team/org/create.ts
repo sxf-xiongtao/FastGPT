@@ -8,8 +8,8 @@ import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { authOrgMember } from '@fastgpt/service/support/permission/auth/org';
 import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 
 export type OrgCreateQuery = {};
 export type OrgCreateBody = postCreateOrgData;
@@ -58,10 +58,10 @@ async function handler(
     );
   });
 
-  addOperationLog({
+  addAuditLog({
     tmbId,
     teamId,
-    event: OperationLogEventEnum.CREATE_DEPARTMENT,
+    event: AuditEventEnum.CREATE_DEPARTMENT,
     params: {
       departmentName: name
     }

@@ -155,7 +155,12 @@ export default function Navbar({ onClose }: { onClose?: () => void }) {
               ]
             }
           ]
-        : [])
+        : []),
+      {
+        activeLink: '/audit',
+        name: '审计日志',
+        icon: 'common/audit'
+      }
     ],
     [licenseData]
   );

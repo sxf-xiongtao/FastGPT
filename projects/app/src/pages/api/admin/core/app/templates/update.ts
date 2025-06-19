@@ -7,6 +7,9 @@ import { adminCert } from '@/service/support/permission/adminCert';
 import { NextAPI } from '@/service/middleware/entry';
 import { isCommunityTemplate } from '@fastgpt/templates/register';
 import { AppTemplateSchemaType } from '@fastgpt/global/core/app/type';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
+import { getUserDetail } from '@fastgpt/service/support/user/controller';
 
 export type updateTemplateQuery = {};
 
@@ -17,7 +20,7 @@ async function handler(
   req: ApiRequestProps<updateTemplateBody, updateTemplateQuery>,
   res: ApiResponseType<any>
 ): Promise<updateTemplateResponse> {
-  await adminCert({ req, authToken: true });
+  const authResult = await adminCert({ req, authToken: true });
   const { templateId, name, intro, avatar, tags, type, isActive, userGuide, workflow, author } =
     req.body;
 
@@ -26,6 +29,19 @@ async function handler(
     : { name, intro, avatar, tags, type, isActive, userGuide, workflow, author };
 
   await MongoAppTemplate.updateOne({ templateId }, { $set: updateData }, { upsert: true });
+
+  const userDetail = await getUserDetail({ tmbId: authResult.tmbId });
+  (async () => {
+    addAuditLog({
+      tmbId: authResult.tmbId,
+      teamId: userDetail.team.teamId,
+      event: AdminAuditEventEnum.ADMIN_UPDATE_APP_TEMPLATE,
+      params: {
+        name: userDetail.username,
+        templateName: name || 'Unknown Template'
+      }
+    });
+  })();
 
   return {};
 }

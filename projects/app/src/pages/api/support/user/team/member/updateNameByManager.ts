@@ -5,8 +5,8 @@ import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { TeamManagePermissionVal } from '@fastgpt/global/support/permission/user/constant';
 import { sendInform2OneUser } from '@/service/support/user/inform/controller';
 import { InformLevelEnum } from '@fastgpt/global/support/user/inform/constants';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 
 async function handler(req: NextApiRequest, _res: NextApiResponse) {
   const { tmbId: memberId, name: newName } = req.body as { tmbId: string; name: string };
@@ -51,10 +51,10 @@ async function handler(req: NextApiRequest, _res: NextApiResponse) {
     userId
   });
 
-  addOperationLog({
+  addAuditLog({
     tmbId,
     teamId,
-    event: OperationLogEventEnum.CHANGE_MEMBER_NAME,
+    event: AuditEventEnum.CHANGE_MEMBER_NAME,
     params: {
       memberName: oldName,
       newName

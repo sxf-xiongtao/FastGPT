@@ -21,13 +21,13 @@ import {
 import { getGroupsByTmbId } from '@fastgpt/service/support/permission/memberGroup/controllers';
 import { getOrgsByTmbId } from '@fastgpt/service/support/permission/org/controllers';
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
 import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
-import { getI18nDatasetType } from '@fastgpt/service/support/operationLog/util';
+import { getI18nDatasetType } from '@fastgpt/service/support/user/audit/util';
 
 async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
   // Authorization
@@ -293,10 +293,10 @@ const auditLog = async ({
     const datasetType = getI18nDatasetType(dataset.type);
 
     // Add operation log
-    addOperationLog({
+    addAuditLog({
       tmbId,
       teamId,
-      event: OperationLogEventEnum.UPDATE_DATASET_COLLABORATOR,
+      event: AuditEventEnum.UPDATE_DATASET_COLLABORATOR,
       params: {
         datasetName: dataset.name,
         datasetType: datasetType,

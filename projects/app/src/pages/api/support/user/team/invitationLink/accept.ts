@@ -7,8 +7,8 @@ import { parseHeaderCert } from '@fastgpt/service/support/permission/controller'
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { TeamMemberStatusEnum } from '@fastgpt/global/support/user/team/constant';
 import { checkTeamMemberLimit } from '@fastgpt/service/support/permission/teamLimit';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 
 export type InvitationLinkAcceptQuery = {};
 export type InvitationLinkAcceptBody = {
@@ -79,10 +79,10 @@ async function handler(
     );
   });
 
-  addOperationLog({
+  addAuditLog({
     tmbId,
     teamId: invitation.teamId,
-    event: OperationLogEventEnum.JOIN_TEAM,
+    event: AuditEventEnum.JOIN_TEAM,
     params: {
       link: invitation.description
     }

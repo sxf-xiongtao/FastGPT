@@ -7,8 +7,8 @@ import { MongoInvitationLink } from '@/service/support/user/team/invitationLink/
 import { addDays, addMinutes, addYears } from 'date-fns';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { MaxInvitationLinksAmount } from '@fastgpt/service/support/user/team/invitationLink/constants';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 
 export type CreateInvitationLinkQuery = {};
 export type CreateInvitationLinkBody = InvitationLinkCreateType;
@@ -61,10 +61,10 @@ async function handler(
     })()
   });
 
-  addOperationLog({
+  addAuditLog({
     tmbId,
     teamId,
-    event: OperationLogEventEnum.CREATE_INVITATION_LINK,
+    event: AuditEventEnum.CREATE_INVITATION_LINK,
     params: {
       link: invitationLink.description
     }

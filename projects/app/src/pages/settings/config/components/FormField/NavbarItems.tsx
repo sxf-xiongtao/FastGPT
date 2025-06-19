@@ -53,7 +53,7 @@ const NavbarItems = ({
     if (!Array.isArray(navbarList)) {
       onChange([]);
     }
-  }, [navbarList]);
+  }, [navbarList, onChange]);
 
   return (
     <>

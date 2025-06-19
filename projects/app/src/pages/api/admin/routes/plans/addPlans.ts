@@ -10,6 +10,9 @@ import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
+import { getUserDetail } from '@fastgpt/service/support/user/controller';
 
 export type AddTeamPlanBody = {
   teamId: string; // 团队id
@@ -24,7 +27,7 @@ export type AddTeamPlanBody = {
 };
 
 async function handler(req: ApiRequestProps<AddTeamPlanBody>, res: NextApiResponse) {
-  await adminCert({ req, authToken: true });
+  const authResult = await adminCert({ req, authToken: true });
 
   const {
     teamId,
@@ -103,6 +106,22 @@ async function handler(req: ApiRequestProps<AddTeamPlanBody>, res: NextApiRespon
       await reComputeStandPlans(teamId, session);
     });
   }
+
+  const userDetail = await getUserDetail({
+    tmbId: authResult.tmbId,
+    userId: authResult.userId
+  });
+
+  (async () => {
+    addAuditLog({
+      tmbId: authResult.tmbId,
+      teamId: userDetail.team.teamId,
+      event: AdminAuditEventEnum.ADMIN_ADD_PLAN,
+      params: {
+        teamId: teamId
+      }
+    });
+  })();
 
   jsonRes(res, {
     data: {

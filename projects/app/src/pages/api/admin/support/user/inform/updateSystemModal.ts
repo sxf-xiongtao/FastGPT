@@ -4,7 +4,8 @@ import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/cons
 import { getNanoid } from '@fastgpt/global/common/string/tools';
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
-
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 export type UpdateSystemModalQuery = {};
 export type UpdateSystemModalBody = { content: string };
 export type UpdateSystemModalResponse = {};
@@ -14,7 +15,7 @@ async function handler(
   _res: ApiResponseType<any>
 ): Promise<UpdateSystemModalResponse> {
   const { content } = req.body;
-  await adminCert({ req, authToken: true });
+  const { tmbId, teamId } = await adminCert({ req, authToken: true });
 
   const res = await MongoSystemConfigs.updateOne(
     {
@@ -35,6 +36,15 @@ async function handler(
   if (!res.upsertedId) {
     Promise.reject('更新失败');
   }
+
+  (async () => {
+    addAuditLog({
+      tmbId,
+      teamId,
+      event: AdminAuditEventEnum.ADMIN_UPDATE_SYSTEM_MODAL,
+      params: {}
+    });
+  })();
 
   return {
     message: '发送通知成功'

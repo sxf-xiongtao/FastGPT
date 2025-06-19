@@ -6,9 +6,9 @@ import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSc
 import { AppErrEnum } from '@fastgpt/global/common/error/code/app';
 import { changeOwner } from '@/service/core/changeOwner';
 import { AppTypeEnum } from '@fastgpt/global/core/app/constants';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
-import { getI18nAppType } from '@fastgpt/service/support/operationLog/util';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
+import { getI18nAppType } from '@fastgpt/service/support/user/audit/util';
 export type AppChangeOwnerQuery = {};
 export type AppChangeOwnerBody = {
   ownerId: string;
@@ -47,10 +47,10 @@ async function handler(
     teamId: app.teamId
   });
 
-  addOperationLog({
+  addAuditLog({
     tmbId,
     teamId,
-    event: OperationLogEventEnum.TRANSFER_APP_OWNERSHIP,
+    event: AuditEventEnum.TRANSFER_APP_OWNERSHIP,
     params: {
       appName: app.name,
       appType: getI18nAppType(app.type),

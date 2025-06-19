@@ -7,8 +7,8 @@ import { OwnerPermissionVal } from '@fastgpt/global/support/permission/constant'
 import { NextAPI } from '@/service/middleware/entry';
 import { removeUserFromTeam } from '@/service/support/user/controller';
 import { TeamManagePermissionVal } from '@fastgpt/global/support/permission/user/constant';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 
@@ -50,10 +50,10 @@ async function handler(
         return doc.name;
       });
 
-    addOperationLog({
+    addAuditLog({
       tmbId,
       teamId,
-      event: OperationLogEventEnum.KICK_OUT_TEAM,
+      event: AuditEventEnum.KICK_OUT_TEAM,
       params: {
         memberName: memberName
       }

@@ -11,8 +11,8 @@ import { TeamPermission } from '@fastgpt/global/support/permission/user/controll
 import { UpdateClbPermissionProps } from '@fastgpt/global/support/permission/collaborator';
 import { PermissionValueType } from '@fastgpt/global/support/permission/type';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
 import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
@@ -201,10 +201,10 @@ async function handler(
       })
     );
 
-    addOperationLog({
+    addAuditLog({
       tmbId,
       teamId,
-      event: OperationLogEventEnum.ASSIGN_PERMISSION,
+      event: AuditEventEnum.ASSIGN_PERMISSION,
       params: {
         objectName: targetNames.join(', '),
         permission: updatePer.value.toString()

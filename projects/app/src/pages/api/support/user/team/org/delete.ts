@@ -8,8 +8,8 @@ import { MongoOrgMemberModel } from '@fastgpt/service/support/permission/org/org
 import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 
 export type OrgDeleteQuery = {
   orgId: string;
@@ -72,10 +72,10 @@ async function handler(
     );
   });
 
-  addOperationLog({
+  addAuditLog({
     tmbId,
     teamId,
-    event: OperationLogEventEnum.DELETE_DEPARTMENT,
+    event: AuditEventEnum.DELETE_DEPARTMENT,
     params: {
       departmentName: orgName
     }

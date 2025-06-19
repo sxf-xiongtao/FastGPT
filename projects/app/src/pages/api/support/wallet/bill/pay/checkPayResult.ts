@@ -27,8 +27,8 @@ import { createPaymentController } from '@/service/support/wallet/bill/pay/base'
 import { CheckPayResultResponse } from '@fastgpt/global/support/wallet/bill/api';
 import { i18nT } from '@fastgpt/web/i18n/utils';
 import { PayResult } from '@/service/support/wallet/bill/pay/type';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 
 /* 校验支付结果 */
 async function handler(req: NextApiRequest, res: NextApiResponse): Promise<CheckPayResultResponse> {
@@ -158,10 +158,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse): Promise<Check
     } catch (error) {}
 
     (async () => {
-      addOperationLog({
+      addAuditLog({
         tmbId,
         teamId,
-        event: OperationLogEventEnum.PURCHASE_PLAN,
+        event: AuditEventEnum.PURCHASE_PLAN,
         params: {}
       });
     })();

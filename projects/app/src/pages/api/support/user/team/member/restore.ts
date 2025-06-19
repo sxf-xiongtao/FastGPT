@@ -6,8 +6,8 @@ import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSc
 import { TeamMemberStatusEnum } from '@fastgpt/global/support/user/team/constant';
 import { TeamModeEnum } from '@/global/settings/constants';
 import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 export type MemberRestoreQuery = {};
 export type MemberRestoreBody = {
   tmbId: string;
@@ -49,10 +49,10 @@ async function handler(
         return doc.name;
       });
 
-    addOperationLog({
+    addAuditLog({
       tmbId,
       teamId,
-      event: OperationLogEventEnum.RECOVER_TEAM_MEMBER,
+      event: AuditEventEnum.RECOVER_TEAM_MEMBER,
       params: {
         memberName: memberName
       }

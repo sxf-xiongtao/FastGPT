@@ -4,8 +4,8 @@ import type { TeamInvoiceHeaderType } from '@fastgpt/global/support/user/team/ty
 import { MongoTeamInvoiceTitle } from '@/service/support/user/team/invoiceAccount/teamInvoiceSchema';
 import { authMember } from '@/service/support/permission/team/auth';
 import { OwnerPermissionVal } from '@fastgpt/global/support/permission/constant';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 export type updateQuery = {};
 
 export type updateBody = TeamInvoiceHeaderType;
@@ -22,10 +22,10 @@ async function handler(
   });
   if (handleRes) {
     (async () => {
-      addOperationLog({
+      addAuditLog({
         tmbId,
         teamId,
-        event: OperationLogEventEnum.SET_INVOICE_HEADER,
+        event: AuditEventEnum.SET_INVOICE_HEADER,
         params: {}
       });
     })();

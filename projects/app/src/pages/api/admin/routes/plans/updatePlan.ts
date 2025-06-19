@@ -8,6 +8,9 @@ import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { ApiRequestProps } from '@fastgpt/service/type/next';
 import { NextApiResponse } from 'next';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
+import { getUserDetail } from '@fastgpt/service/support/user/controller';
 
 export type UpdatePlanBody = {
   id: string;
@@ -26,7 +29,7 @@ export type UpdatePlanBody = {
 };
 
 async function handler(req: ApiRequestProps<UpdatePlanBody>, res: NextApiResponse<any>) {
-  await adminCert({ req, authToken: true });
+  const authResult = await adminCert({ req, authToken: true });
 
   const {
     id,
@@ -99,6 +102,22 @@ async function handler(req: ApiRequestProps<UpdatePlanBody>, res: NextApiRespons
       await reComputeStandPlans(sub.teamId, session);
     });
   }
+
+  const userDetail = await getUserDetail({
+    tmbId: authResult.tmbId,
+    userId: authResult.userId
+  });
+
+  (async () => {
+    addAuditLog({
+      tmbId: authResult.tmbId,
+      teamId: userDetail.team.teamId,
+      event: AdminAuditEventEnum.ADMIN_UPDATE_PLAN,
+      params: {
+        teamId: sub.teamId
+      }
+    });
+  })();
 
   return result;
 }

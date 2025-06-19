@@ -17,15 +17,15 @@ import {
   syncCollaborators
 } from '@fastgpt/service/support/permission/inheritPermission';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
 import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
 import {
   getI18nCollaboratorItemType,
   getI18nDatasetType
-} from '@fastgpt/service/support/operationLog/util';
+} from '@fastgpt/service/support/user/audit/util';
 
 async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>) {
   // Authorization
@@ -128,10 +128,10 @@ async function handler(req: ApiRequestProps<{}, DatasetCollaboratorDeleteParams>
     const itemType = getI18nCollaboratorItemType(tmbId, groupId, orgId);
     const itemName = await getItemName();
     const datasetType = getI18nDatasetType(dataset.type);
-    addOperationLog({
+    addAuditLog({
       tmbId: operatorTmbId,
       teamId,
-      event: OperationLogEventEnum.DELETE_DATASET_COLLABORATOR,
+      event: AuditEventEnum.DELETE_DATASET_COLLABORATOR,
       params: {
         datasetName: dataset.name,
         itemName: itemType,

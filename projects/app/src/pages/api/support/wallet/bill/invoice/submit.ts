@@ -10,8 +10,8 @@ import { ClientSession } from '@fastgpt/service/common/mongo';
 import { InvoiceStatusEnum } from '@fastgpt/global/support/wallet/bill/invoice/constants';
 import axios from 'axios';
 import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 export type submitQuery = {};
 export type submitBody = InvoiceType;
 
@@ -90,10 +90,10 @@ async function handler(
     });
 
     (async () => {
-      addOperationLog({
+      addAuditLog({
         tmbId,
         teamId,
-        event: OperationLogEventEnum.CREATE_INVOICE,
+        event: AuditEventEnum.CREATE_INVOICE,
         params: {}
       });
     })();

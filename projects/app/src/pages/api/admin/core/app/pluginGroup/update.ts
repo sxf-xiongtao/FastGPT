@@ -5,6 +5,9 @@ import { MongoPluginGroups } from '@fastgpt/service/core/app/plugin/pluginGroupS
 import { TGroupType } from '@fastgpt/service/core/app/plugin/type';
 import { MongoSystemPlugin } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
+import { getUserDetail } from '@fastgpt/service/support/user/controller';
 
 export type updatePluginGroupQuery = {};
 
@@ -22,7 +25,8 @@ async function handler(
   req: ApiRequestProps<updatePluginGroupBody, updatePluginGroupQuery>,
   res: ApiResponseType<any>
 ): Promise<updatePluginGroupResponse> {
-  await adminCert({ req, authToken: true });
+  const authResult = await adminCert({ req, authToken: true });
+  const userDetail = await getUserDetail({ tmbId: authResult.tmbId });
   const { groupId, groupName, groupAvatar, groupTypes, groupOrder } = req.body;
 
   const group = await MongoPluginGroups.findOne({ groupId });
@@ -60,6 +64,18 @@ async function handler(
       { session }
     );
   });
+
+  (async () => {
+    addAuditLog({
+      tmbId: authResult.tmbId,
+      teamId: userDetail.team.teamId,
+      event: AdminAuditEventEnum.ADMIN_UPDATE_PLUGIN_GROUP,
+      params: {
+        name: groupName || group.groupName,
+        groupName: groupName || group.groupName
+      }
+    });
+  })();
 
   return {};
 }

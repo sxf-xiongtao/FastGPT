@@ -6,6 +6,9 @@ import { MongoSystemPlugin } from '@fastgpt/service/core/app/plugin/systemPlugin
 import { getNanoid } from '@fastgpt/global/common/string/tools';
 import { PluginSourceEnum } from '@fastgpt/global/core/plugin/constants';
 import { getSystemPluginCb } from '@/service/core/workflow/systemPlugins/register';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
+import { getUserDetail } from '@fastgpt/service/support/user/controller';
 
 export type createPluginQuery = {};
 
@@ -29,7 +32,8 @@ async function handler(
   req: ApiRequestProps<createPluginBody, createPluginQuery>,
   res: ApiResponseType<any>
 ): Promise<createPluginResponse> {
-  await adminCert({ req, authToken: true });
+  const authResult = await adminCert({ req, authToken: true });
+  const userDetail = await getUserDetail({ tmbId: authResult.tmbId });
   const {
     name,
     avatar,
@@ -67,6 +71,15 @@ async function handler(
 
   // 重新获取插件
   await getSystemPluginCb(true);
+
+  (async () => {
+    addAuditLog({
+      tmbId: authResult.tmbId,
+      teamId: userDetail.team.teamId,
+      event: AdminAuditEventEnum.ADMIN_CREATE_PLUGIN,
+      params: { name, pluginName: name }
+    });
+  })();
 
   return {};
 }

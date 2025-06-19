@@ -9,8 +9,8 @@ import { getChildrenByOrg } from '@fastgpt/service/support/permission/org/contro
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { getOrgChildrenPath } from '@fastgpt/global/support/user/team/org/constant';
 import { getRootOrg } from '@/service/support/user/team/org/utils';
-import { addOperationLog } from '@fastgpt/service/support/operationLog/addOperationLog';
-import { OperationLogEventEnum } from '@fastgpt/global/support/operationLog/constants';
+import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 
 export type OrgMoveBody = putMoveOrgType;
 export type OrgMoveQuery = {};
@@ -76,10 +76,10 @@ async function handler(
     );
   });
 
-  addOperationLog({
+  addAuditLog({
     tmbId,
     teamId,
-    event: OperationLogEventEnum.RELOCATE_DEPARTMENT,
+    event: AuditEventEnum.RELOCATE_DEPARTMENT,
     params: {
       departmentName: org.name
     }
