@@ -223,8 +223,8 @@ export const formatSplitText2Index = ({
   }
 
   // 解析<Questions>和<Summary>
-  const question = answer.match(/<Questions>([\s\S]*?)<\/Questions>/)?.[1]?.trim();
-  const summary = answer.match(/<Summary>([\s\S]*?)<\/Summary>/)?.[1]?.trim();
+  const question = answer.match(/<Questions>([\s\S]*?)<\/Questions>/i)?.[1]?.trim();
+  const summary = answer.match(/<Summary>([\s\S]*?)<\/Summary>/i)?.[1]?.trim();
 
   const indexes = [
     ...(question

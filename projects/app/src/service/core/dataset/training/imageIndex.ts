@@ -35,22 +35,89 @@ const reduceQueueAndReturn = (delay = 0) => {
 };
 
 const matchAndParseTextImageUrl = async (text: string) => {
-  // 匹配 ![](xxx)的图片格式，提取出 url
+  // 匹配 ![](xxx)的图片格式，提取出 url 和位置信息
   const regex = /!\[(.*?)\]\((.*?)\)/g;
-  const matches = text.matchAll(regex);
-  const images: string[] = [];
+  const matches = Array.from(text.matchAll(regex));
 
-  for await (const match of matches) {
+  type MessageContent =
+    | { type: 'text'; text: string }
+    | { type: 'image_url'; image_url: { url: string }; originalUrl: string };
+
+  const messages: MessageContent[] = [];
+  let lastIndex = 0;
+
+  if (matches.length === 0) {
+    messages.push({
+      type: 'text',
+      text: text
+    });
+    return messages;
+  }
+
+  for (const match of matches) {
+    const matchIndex = match.index || 0;
     const url = match[2];
+
     if (!url) continue;
+
+    // Add text content before the image (if any)
+    const textBefore = text.slice(lastIndex, matchIndex).trim();
+    if (textBefore) {
+      messages.push({
+        type: 'text',
+        text: textBefore
+      });
+    }
 
     try {
       const { completeBase64: base64 } = await getImageBase64(url);
-      images.push(base64);
-    } catch (error) {}
+      messages.push({
+        type: 'image_url',
+        image_url: {
+          url: base64
+        },
+        originalUrl: url // Store the original URL
+      });
+    } catch (error) {
+      // If image loading fails, treat it as text
+      messages.push({
+        type: 'text',
+        text: match[0] // Keep the original markdown format
+      });
+    }
+
+    lastIndex = matchIndex + match[0].length;
   }
 
-  return images;
+  // Add remaining text after the last image (if any)
+  const remainingText = text.slice(lastIndex).trim();
+  if (remainingText) {
+    messages.push({
+      type: 'text',
+      text: remainingText
+    });
+  }
+
+  return messages;
+};
+
+const formatImageParseResult = (result: string) => {
+  const summaryMatch = result.match(/<Summary>([\s\S]*?)<\/Summary>/i);
+  const summary = summaryMatch ? summaryMatch[1].trim() : result;
+
+  // Extract content inside all Chunk tags
+  const chunkMatches = result.match(/<Chunk>([\s\S]*?)<\/Chunk>/gi);
+  const chunks = chunkMatches
+    ? chunkMatches.map((match) => {
+        const content = match.match(/<Chunk>([\s\S]*?)<\/Chunk>/i);
+        return content ? content[1].trim() : '';
+      })
+    : [];
+
+  return {
+    summary,
+    chunks
+  };
 };
 
 export async function generateImageIndex(): Promise<any> {
@@ -181,9 +248,11 @@ export async function generateImageIndex(): Promise<any> {
     const startTime = Date.now();
 
     // 1. Match text image url
-    const images = await matchAndParseTextImageUrl(text);
+    const contentMessages = await matchAndParseTextImageUrl(text);
 
-    if (images.length === 0) {
+    // Check if there are any images
+    const hasImages = contentMessages.some((msg) => msg.type === 'image_url');
+    if (!hasImages) {
       addLog.debug(`[Image index queue] No image url found: ${data._id}`);
       await updateImageQueueToChunkQueue();
       return reduceQueueAndReturn();
@@ -197,18 +266,7 @@ export async function generateImageIndex(): Promise<any> {
       },
       {
         role: ChatCompletionRequestMessageRoleEnum.User,
-        content: [
-          ...images.map((base64) => ({
-            type: 'image_url' as const,
-            image_url: {
-              url: base64
-            }
-          })),
-          {
-            type: 'text',
-            text: text
-          }
-        ]
+        content: contentMessages
       }
     ];
     const { response: chatResponse } = await createChatCompletion({
@@ -223,22 +281,37 @@ export async function generateImageIndex(): Promise<any> {
       )
     });
     const { text: answer, usage } = await formatLLMResponse(chatResponse);
+    const { summary, chunks } = formatImageParseResult(answer);
+
     const inputTokens = usage?.prompt_tokens || (await countGptMessagesTokens(messages));
     const outputTokens = usage?.completion_tokens || (await countPromptTokens(answer));
 
     // 3. Concat indexes
     const indexes = data.indexes.concat({
-      text: answer,
+      text: summary,
       type: DatasetDataIndexTypeEnum.image
     });
 
     addLog.info(`[Image index queue] Finish: ${(Date.now() - startTime) / 1000}s`);
 
     // 4. Update training data to chunk queue
+    const imageUrls = contentMessages
+      .map((msg) => (msg.type === 'image_url' ? msg.originalUrl : ''))
+      .filter(Boolean); // Use original URL instead of base64
     await MongoDatasetTraining.updateOne(
       { _id: data._id },
       {
         $set: {
+          imageDescMap: chunks.reduce(
+            (acc, chunk, index) => {
+              if (chunk.length > 10000) return acc;
+              if (imageUrls[index]) {
+                acc[imageUrls[index]] = chunk;
+              }
+              return acc;
+            },
+            {} as Record<string, string>
+          ),
           mode: nextMode,
           lockTime: new Date('2000/1/1'),
           retryCount: 5,

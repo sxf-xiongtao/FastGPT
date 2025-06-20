@@ -28,8 +28,8 @@ import UserBox from '@fastgpt/web/components/common/UserBox';
 import MultipleSelect from '@fastgpt/web/components/common/MySelect/MultipleSelect';
 import Avatar from '@fastgpt/web/components/common/Avatar';
 import { getTeamMembers } from '@/web/admin/team/api';
-import { specialProcessors } from './processors';
-import { defaultMetadataProcessor } from './processors/commonProcessor';
+import { specialProcessors } from '../../pageComponents/audit';
+import { defaultMetadataProcessor } from '../../pageComponents/audit/commonProcessor';
 import { serviceSideProps } from '@/web/common/i18n/utils';
 import type { OperationListItemType } from '@fastgpt/global/support/user/audit/type';
 
