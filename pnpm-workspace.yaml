@@ -1,6 +1,6 @@
 packages:
   - 'FastGPT'
-  - 'FastGPT/projects/*'
   - 'FastGPT/packages/*'
-  - 'FastGPT/scripts/*'
   - 'projects/*'
+  - 'FastGPT/projects/*'
+  - 'FastGPT/scripts/*'
