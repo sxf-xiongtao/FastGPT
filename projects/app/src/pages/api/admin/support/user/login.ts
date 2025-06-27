@@ -21,14 +21,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     if (username !== 'root') {
-      throw new Error('用户不存在');
+      throw new Error('用户或密码错误');
     }
 
     const authCert = await MongoUser.findOne({
       username
     });
     if (!authCert) {
-      throw new Error('用户未注册');
+      throw new Error('用户或密码错误');
     }
 
     const user = await MongoUser.findOne({
@@ -37,7 +37,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     });
 
     if (!user) {
-      throw new Error('密码错误');
+      throw new Error('用户或密码错误');
     }
 
     const userDetail = await getUserDetail({
