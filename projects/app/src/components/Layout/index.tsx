@@ -11,6 +11,7 @@ const ManualCopyModal = dynamic(() =>
   import('@fastgpt/web/hooks/useCopyData').then((mod) => mod.ManualCopyModal)
 );
 const LicenseInput = dynamic(() => import('@/components/common/License/Input'));
+const Auth = dynamic(() => import('./Auth'));
 
 const unLoginPage: Record<string, boolean> = {
   '/users/invoice': true
@@ -30,7 +31,7 @@ const Layout = ({ children }: { children: JSX.Element }) => {
           {children}
         </Box>
       ) : (
-        <>
+        <Auth>
           <Flex h={'100%'} bg={'myGray.100'} flexDirection={'column'}>
             <Header />
             <Flex w={'full'} flex={'1 0 0'} overflow={'auto'}>
@@ -52,7 +53,7 @@ const Layout = ({ children }: { children: JSX.Element }) => {
               </Box>
             </Flex>
           </Flex>
-        </>
+        </Auth>
       )}
 
       <ManualCopyModal />

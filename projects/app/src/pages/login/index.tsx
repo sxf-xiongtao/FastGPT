@@ -16,6 +16,7 @@ import { hashStr } from '@fastgpt/global/common/string/tools';
 import { serviceSideProps } from '@/web/common/i18n/utils';
 import { useToast } from '@fastgpt/web/hooks/useToast';
 import { useSystemStore } from '@/web/common/system/useSystemStore';
+import { useAdminStore } from '@/store/useAdminStore';
 
 type FormData = {
   account: string;
@@ -28,6 +29,7 @@ const Login = () => {
   const router = useRouter();
   const { toast } = useToast();
   const { initLicenseData } = useSystemStore();
+  const { initAdminInfo } = useAdminStore();
 
   const {
     register,
@@ -49,8 +51,12 @@ const Login = () => {
       });
 
       if (response.token) {
-        initLicenseData();
-        router.push('/dashboard');
+        await Promise.all([initLicenseData(), initAdminInfo()]);
+
+        const lastRoute = router.query.lastRoute as string;
+        const redirectUrl = lastRoute ? decodeURIComponent(lastRoute) : '/dashboard';
+
+        router.push(redirectUrl);
         toast({
           title: '登录成功!',
           status: 'success'

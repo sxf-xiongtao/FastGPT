@@ -117,7 +117,9 @@ function responseError(err: any) {
   if (err?.code in TOKEN_ERROR_CODE || err?.response?.data?.code in TOKEN_ERROR_CODE) {
     if (window.location.pathname !== '/login') {
       clearToken();
-      window.location.replace(getWebReqUrl(`/login`));
+      window.location.replace(
+        getWebReqUrl(`/login?lastRoute=${encodeURIComponent(location.pathname + location.search)}`)
+      );
     }
     return Promise.reject({ message: 'token过期，重新登录' });
   }

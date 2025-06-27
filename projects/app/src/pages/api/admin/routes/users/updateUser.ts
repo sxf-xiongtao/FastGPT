@@ -6,6 +6,7 @@ import { NextAPI } from '@/service/middleware/entry';
 import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
 import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 import { getUserDetail } from '@fastgpt/service/support/user/controller';
+import { delUserAllSession } from '@fastgpt/service/support/user/session';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const authResult = await adminCert({ req, authToken: true });
@@ -22,6 +23,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     ...(password && { password }),
     ...(status !== undefined && { status })
   });
+
+  if (password) {
+    await delUserAllSession(id);
+  }
 
   const userDetail = await getUserDetail({
     tmbId: authResult.tmbId,

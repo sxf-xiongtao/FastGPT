@@ -9,6 +9,35 @@ const nextConfig = {
   output: 'standalone',
   reactStrictMode: process.env.NODE_ENV === 'development' ? false : true,
   compress: true,
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block'
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin'
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'geolocation=(self), microphone=(self), camera=(self)'
+          }
+        ]
+      }
+    ];
+  },
   webpack(config, { isServer, nextRuntime }) {
     Object.assign(config.resolve.alias, {
       '@mongodb-js/zstd': false,

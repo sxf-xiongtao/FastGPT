@@ -16,6 +16,8 @@ import { NextAPI } from '@/service/middleware/entry';
 import { useIPFrequencyLimit } from '@fastgpt/service/common/middle/reqFrequencyLimit';
 import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
 import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
+import { sanitizeCsvField } from '@fastgpt/service/common/file/csv';
+
 const getAppName = (appName: string, appNameMap: Record<string, string>) =>
   appName in appNameMap ? appNameMap[appName] : appName;
 
@@ -95,7 +97,13 @@ async function handler(req: ApiRequestProps<ExportUsageBody, {}>, res: NextApiRe
     const appName = getAppName(doc.appName, appNameMap);
     const totalPoints = doc.totalPoints;
 
-    const res = `\n"${time}","${memberName}","${source}","${appName}","${totalPoints}"`;
+    const sanitizedTime = sanitizeCsvField(time);
+    const sanitizedMemberName = sanitizeCsvField(memberName);
+    const sanitizedSource = sanitizeCsvField(source);
+    const sanitizedAppName = sanitizeCsvField(appName);
+    const sanitizedTotalPoints = sanitizeCsvField(totalPoints);
+
+    const res = `\n${sanitizedTime},${sanitizedMemberName},${sanitizedSource},${sanitizedAppName},${sanitizedTotalPoints}`;
 
     write(res);
   });
