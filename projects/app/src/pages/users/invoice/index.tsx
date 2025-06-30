@@ -84,6 +84,7 @@ const InvoiceManageTable = () => {
                 <Th>提交时间/完成时间</Th>
                 <Th>金额</Th>
                 <Th>抬头</Th>
+                <Th>联系方式</Th>
                 <Th>操作</Th>
                 <Th>Team Id</Th>
               </Tr>
@@ -109,6 +110,7 @@ const InvoiceManageTable = () => {
                   </Td>
                   <Td>{formatStorePrice2Read(item.amount)}元</Td>
                   <Td>{item.teamName}</Td>
+                  <Td>{item.contactPhone || '-'}</Td>
                   <Td>
                     {item.status === InvoiceStatusEnum.submitted ? (
                       <Button onClick={() => setUploadInvoiceId(item._id)} size={'sm'}>
