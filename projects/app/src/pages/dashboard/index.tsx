@@ -13,8 +13,8 @@ import { getInitFormData } from '@/web/core/config/api';
 import type { GetUserFormDataResponse } from '@/pages/api/admin/routes/dashboard/getUserFormData';
 import MyBox from '@fastgpt/web/components/common/MyBox';
 import type { GetPaysFormDataResponse } from '../api/admin/routes/dashboard/getPaysFormData';
-import { GetChatFormDataResponse } from '../api/admin/routes/dashboard/getChatFormData';
-import { GetCostChartsResponse } from '../api/admin/routes/dashboard/getCostFormData';
+import type { GetChatFormDataResponse } from '../api/admin/routes/dashboard/getChatFormData';
+import type { GetCostChartsResponse } from '../api/admin/routes/dashboard/getCostFormData';
 
 // Type definitions
 type ViewMode = 'traffic' | 'active' | 'payment' | 'cost';

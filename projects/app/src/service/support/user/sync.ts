@@ -1,4 +1,4 @@
-import { TeamMemberSchema } from '@fastgpt/global/support/user/team/type';
+import type { TeamMemberSchema } from '@fastgpt/global/support/user/team/type';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { MongoUser } from '@fastgpt/service/support/user/schema';

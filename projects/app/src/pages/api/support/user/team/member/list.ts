@@ -7,16 +7,17 @@ import {
 import { getRootOrg } from '@/service/support/user/team/org/utils';
 import { replaceRegChars } from '@fastgpt/global/common/string/tools';
 import { TeamMemberStatusEnum } from '@fastgpt/global/support/user/team/constant';
-import { TeamMemberItemType, TeamMemberSchema } from '@fastgpt/global/support/user/team/type';
+import type { TeamMemberItemType, TeamMemberSchema } from '@fastgpt/global/support/user/team/type';
 import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
-import { PipelineStage, Types } from '@fastgpt/service/common/mongo';
+import type { PipelineStage } from '@fastgpt/service/common/mongo';
+import { Types } from '@fastgpt/service/common/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
 import { MongoOrgMemberModel } from '@fastgpt/service/support/permission/org/orgMemberSchema';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
-import { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import type { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
 
 export type MemberListQuery = {};
 export type MemberListBody = PaginationProps<{

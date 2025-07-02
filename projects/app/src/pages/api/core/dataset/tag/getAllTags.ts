@@ -2,7 +2,7 @@ import { authDataset } from '@fastgpt/service/support/permission/dataset/auth';
 import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
 import { NextAPI } from '@/service/middleware/entry';
 import { MongoDatasetCollectionTags } from '@fastgpt/service/core/dataset/tag/schema';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
 
 async function handler(
   req: ApiRequestProps<

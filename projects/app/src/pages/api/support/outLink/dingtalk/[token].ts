@@ -1,10 +1,10 @@
 import { NextAPI } from '@/service/middleware/entry';
 import { replyMessage, verifySignature } from '@/service/support/outLink/dingtalk/utils';
 import { outlinkInvokeChat } from '@/service/support/outLink/utils';
-import { DingtalkAppType } from '@fastgpt/global/support/outLink/type';
+import type { DingtalkAppType } from '@fastgpt/global/support/outLink/type';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { authOutLinkValid } from '@fastgpt/service/support/permission/publish/authLink';
-import { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
+import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 
 export type DingtalkBody = {
   senderPlatform: string;

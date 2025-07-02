@@ -1,9 +1,5 @@
-import axios, {
-  Method,
-  InternalAxiosRequestConfig,
-  AxiosResponse,
-  AxiosProgressEvent
-} from 'axios';
+import type { Method, InternalAxiosRequestConfig, AxiosResponse, AxiosProgressEvent } from 'axios';
+import axios from 'axios';
 import { TOKEN_ERROR_CODE } from '@fastgpt/global/common/error/errorCode';
 import { getWebReqUrl } from '@fastgpt/web/common/system/utils';
 import { getNanoid } from '@fastgpt/global/common/string/tools';

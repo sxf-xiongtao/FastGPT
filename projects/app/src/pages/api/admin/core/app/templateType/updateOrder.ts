@@ -2,7 +2,7 @@ import { NextAPI } from '@/service/middleware/entry';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { AppTemplateTypeEnum } from '@fastgpt/global/core/app/constants';
 import { MongoTemplateTypes } from '@fastgpt/service/core/app/templates/templateTypeSchema';
-import { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
+import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 
 export type updateTemplateTypeOrderQuery = {};
 

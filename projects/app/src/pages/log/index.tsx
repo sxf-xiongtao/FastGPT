@@ -25,7 +25,7 @@ import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import { useSystem } from '@fastgpt/web/hooks/useSystem';
-import { SystemLogType } from '@fastgpt/service/common/system/log/type';
+import type { SystemLogType } from '@fastgpt/service/common/system/log/type';
 import { getSystemLogList } from '@/web/admin/common/api';
 import { LogLevelEnum } from '@fastgpt/service/common/system/log/constant';
 import { serviceSideProps } from '@/web/common/i18n/utils';

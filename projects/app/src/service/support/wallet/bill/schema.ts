@@ -1,5 +1,5 @@
 import { getMongoModel, Schema } from '@fastgpt/service/common/mongo';
-import { BillSchemaType } from '@fastgpt/global/support/wallet/bill/type.d';
+import type { BillSchemaType } from '@fastgpt/global/support/wallet/bill/type.d';
 import {
   TeamCollectionName,
   TeamMemberCollectionName

@@ -1,17 +1,16 @@
-import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
-import {
-  SystemPluginTemplateItemType,
-  WorkflowTemplateBasicType
-} from '@fastgpt/global/core/workflow/type/index';
 import { adminCert } from '@/service/support/permission/adminCert';
-import { MongoSystemPlugin } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
+import type { I18nStringType } from '@fastgpt/global/common/i18n/type';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
+import type { WorkflowTemplateBasicType } from '@fastgpt/global/core/workflow/type/index';
+import { MongoSystemPlugin } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
+import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { isEqual } from 'lodash';
-import { getSystemPluginCb } from '@/service/core/workflow/systemPlugins/register';
 import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
 import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 import { getUserDetail } from '@fastgpt/service/support/user/controller';
+import { getLocale } from '@fastgpt/service/common/middle/i18n';
+import { parseI18nString } from '@fastgpt/global/common/i18n/utils';
 
 export type updatePluginQuery = {};
 
@@ -22,11 +21,12 @@ export type updatePluginBody = {
   currentCost?: number;
   hasTokenFee?: boolean;
   isActive?: boolean;
-  inputConfig?: SystemPluginTemplateItemType['inputConfig'];
+  inputListVal?: Record<string, any>;
+
   // 自定义插件字段
-  name?: string;
+  name?: I18nStringType | string;
   avatar?: string;
-  intro?: string;
+  intro?: I18nStringType | string;
   weight?: number;
   workflow?: WorkflowTemplateBasicType;
   templateType?: string;
@@ -55,7 +55,7 @@ async function handler(
   const baseUpdateFields = {
     pluginId,
     isActive: updateFields.isActive,
-    inputConfig: updateFields.inputConfig,
+    inputListVal: updateFields.inputListVal,
     originCost: updateFields.originCost,
     currentCost: updateFields.currentCost,
     hasTokenFee: updateFields.hasTokenFee
@@ -64,11 +64,10 @@ async function handler(
   // 如果是自定义插件,需要更新 customConfig
   if (plugin && plugin.customConfig) {
     const isUpdateVersion =
-      !isEqual(plugin.customConfig.workflow, updateFields.workflow) ||
       plugin.customConfig.name !== updateFields.name ||
       plugin.customConfig.avatar !== updateFields.avatar ||
       plugin.customConfig.intro !== updateFields.intro ||
-      !isEqual(plugin.inputConfig, updateFields.inputConfig);
+      !isEqual(plugin.inputListVal, updateFields.inputListVal);
 
     await MongoSystemPlugin.findOneAndUpdate(
       { pluginId },
@@ -93,8 +92,7 @@ async function handler(
     await MongoSystemPlugin.updateOne({ pluginId }, baseUpdateFields, { upsert: true });
   }
 
-  // 重新获取插件
-  await getSystemPluginCb(true);
+  const lang = getLocale(req);
 
   (async () => {
     addAuditLog({
@@ -102,8 +100,8 @@ async function handler(
       teamId: userDetail.team.teamId,
       event: AdminAuditEventEnum.ADMIN_UPDATE_PLUGIN,
       params: {
-        name: updateFields.name,
-        pluginName: updateFields.name || pluginId
+        name: parseI18nString(updateFields.name, lang),
+        pluginName: parseI18nString(updateFields.name, lang) || pluginId
       }
     });
   })();

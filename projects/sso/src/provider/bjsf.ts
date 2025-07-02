@@ -1,6 +1,7 @@
 import { promises } from 'fs';
-import { AssertFn, GetUserInfoFn, RedirectFn } from 'type';
-import { Profile, SAML } from '@node-saml/node-saml';
+import type { AssertFn, GetUserInfoFn, RedirectFn } from 'type';
+import type { Profile } from '@node-saml/node-saml';
+import { SAML } from '@node-saml/node-saml';
 import { getTmpValue, setTmpValue } from 'global';
 import axios from 'axios';
 import { parseIDPMetadataFromString } from 'metadata-saml2';

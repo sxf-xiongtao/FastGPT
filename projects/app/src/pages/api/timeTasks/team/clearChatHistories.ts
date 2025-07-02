@@ -4,7 +4,7 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
-import { TeamSubSchema } from '@fastgpt/global/support/wallet/sub/type';
+import type { TeamSubSchema } from '@fastgpt/global/support/wallet/sub/type';
 import { addDays } from 'date-fns';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import {

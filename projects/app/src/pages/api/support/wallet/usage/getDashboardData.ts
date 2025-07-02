@@ -1,7 +1,7 @@
 import { NextAPI } from '@/service/middleware/entry';
 import { getMongoTimezoneCode } from '@fastgpt/global/common/time/timezone';
 import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
-import {
+import type {
   GetUsageDashboardProps,
   GetUsageDashboardResponseItem
 } from '@fastgpt/global/support/wallet/usage/api';
@@ -9,9 +9,9 @@ import { Types } from '@fastgpt/service/common/mongo';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
 import dayjs from 'dayjs';
-import { NextApiResponse } from 'next';
+import type { NextApiResponse } from 'next';
 
 async function handler(
   req: ApiRequestProps<GetUsageDashboardProps>,

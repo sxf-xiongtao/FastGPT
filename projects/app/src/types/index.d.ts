@@ -5,7 +5,7 @@ import {
   FastGPTFeConfigsType,
   SystemEnvType
 } from '@fastgpt/global/common/system/types';
-import { TeamModeEnum } from '@/global/settings/constants';
+import type { TeamModeEnum } from '@/global/settings/constants';
 
 export type SystemConfigType = {
   // license: string;

@@ -2,7 +2,7 @@ import { NextAPI } from '@/service/middleware/entry';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { MongoAppTemplate } from '@fastgpt/service/core/app/templates/templateSchema';
 import { MongoTemplateTypes } from '@fastgpt/service/core/app/templates/templateTypeSchema';
-import { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
+import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
 import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';

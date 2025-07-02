@@ -5,7 +5,8 @@ import MyImage from '@fastgpt/web/components/common/Image/MyImage';
 import { title } from 'process';
 import FormLabel from './FormLabel';
 import React from 'react';
-import { Control, FieldValues, useController, UseControllerProps } from 'react-hook-form';
+import type { FieldValues, UseControllerProps } from 'react-hook-form';
+import { Control, useController } from 'react-hook-form';
 
 function ImageInput<T extends FieldValues>({ control, name }: UseControllerProps<T>) {
   const toast = useToast();

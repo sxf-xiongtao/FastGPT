@@ -1,8 +1,8 @@
-import {
+import type {
   InformLevelEnum,
   SendInformTemplateCodeEnum
 } from '@fastgpt/global/support/user/inform/constants';
-import { MessageTemplateParamsType } from './constants';
+import type { MessageTemplateParamsType } from './constants';
 
 type _sendInformProps<
   Key extends SendInformTemplateCodeEnum | undefined,

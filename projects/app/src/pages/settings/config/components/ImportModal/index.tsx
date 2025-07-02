@@ -1,4 +1,4 @@
-import { ConfigFormType } from '@/global/admin/config';
+import type { ConfigFormType } from '@/global/admin/config';
 import { formatConfigStore2FormSchema } from '@/web/core/config/adapt';
 import {
   Button,

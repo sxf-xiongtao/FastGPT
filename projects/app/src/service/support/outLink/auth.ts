@@ -6,7 +6,7 @@ import type {
 } from '@fastgpt/global/support/outLink/api.d';
 import axios from 'axios';
 import { OutLinkErrEnum } from '@fastgpt/global/common/error/code/outLink';
-import { OutLinkSchema } from '@fastgpt/global/support/outLink/type';
+import type { OutLinkSchema } from '@fastgpt/global/support/outLink/type';
 import { addMinutes } from 'date-fns';
 
 export type TokenAuthResponseType = {

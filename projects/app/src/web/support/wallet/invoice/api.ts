@@ -1,6 +1,6 @@
 import { POST } from '@/service/common/request';
-import { InvoiceSchemaType } from '@fastgpt/global/support/wallet/bill/type';
-import { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import type { InvoiceSchemaType } from '@fastgpt/global/support/wallet/bill/type';
+import type { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
 
 export const getInvoiceList = (data: PaginationProps<{ search?: string }>) =>
   POST<PaginationResponse<InvoiceSchemaType>>('/admin/support/wallet/bill/invoice/list', data);

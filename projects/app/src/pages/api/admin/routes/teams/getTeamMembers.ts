@@ -1,10 +1,10 @@
 import { adminCert } from '@/service/support/permission/adminCert';
-import { TeamMemberItemType } from '@fastgpt/global/support/user/team/type';
+import type { TeamMemberItemType } from '@fastgpt/global/support/user/team/type';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

@@ -1,6 +1,7 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
-import { createCanvas, Canvas, DOMMatrix } from 'canvas';
+import type { Canvas } from 'canvas';
+import { createCanvas, DOMMatrix } from 'canvas';
 import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
 import { addAuthCode } from '@fastgpt/service/support/user/auth/controller';
 

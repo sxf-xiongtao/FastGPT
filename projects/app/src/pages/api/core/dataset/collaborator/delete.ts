@@ -4,12 +4,12 @@ import {
   PerResourceTypeEnum,
   ManagePermissionVal
 } from '@fastgpt/global/support/permission/constant';
-import { DatasetCollaboratorDeleteParams } from '@fastgpt/global/core/dataset/collaborator';
+import type { DatasetCollaboratorDeleteParams } from '@fastgpt/global/core/dataset/collaborator';
 import {
   delResourcePermission,
   getResourceClbsAndGroups
 } from '@fastgpt/service/support/permission/controller';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { DatasetTypeEnum } from '@fastgpt/global/core/dataset/constants';
 import {

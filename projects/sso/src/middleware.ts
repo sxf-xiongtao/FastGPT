@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 
 export function auth(req: Request, res: Response, next: Function) {
   const auth = req.headers.authorization;

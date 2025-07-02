@@ -1,13 +1,13 @@
 import React from 'react';
 import { Box, Button, HStack, Input, ModalBody, ModalFooter, Switch } from '@chakra-ui/react';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
-import type { SystemPluginTemplateItemType } from '@fastgpt/global/core/workflow/type';
 import MyModal from '@fastgpt/web/components/common/MyModal';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import QuestionTip from '@fastgpt/web/components/common/MyTooltip/QuestionTip';
 import { FlowNodeTemplateTypeEnum } from '@fastgpt/global/core/workflow/constants';
 import MyNumberInput from '@fastgpt/web/components/common/Input/NumberInput';
 import { putUpdatePlugin } from '@/web/core/app/plugin/api';
+import type { SystemPluginTemplateItemType } from '@fastgpt/global/core/app/plugin/type';
 
 const defaultPlugin: SystemPluginTemplateItemType = {
   id: '',
@@ -22,10 +22,7 @@ const defaultPlugin: SystemPluginTemplateItemType = {
   currentCost: 0,
   hasTokenFee: false,
   templateType: FlowNodeTemplateTypeEnum.other,
-  customWorkflow: '',
-  isTool: false,
   isActive: false,
-  inputConfig: [],
   pluginOrder: 0
 };
 
@@ -34,7 +31,7 @@ type FormType = {
   originCost: number;
   currentCost: number;
   hasTokenFee: boolean;
-  inputConfig: SystemPluginTemplateItemType['inputConfig'];
+  inputListVal: Record<string, any>;
 };
 
 const SystemPluginConfig = ({
@@ -46,15 +43,10 @@ const SystemPluginConfig = ({
   onSuccess: () => void;
   onClose: () => void;
 }) => {
-  const { register, control, handleSubmit, setValue, watch } = useForm<FormType>({
+  const { register, handleSubmit, setValue, watch } = useForm<FormType>({
     defaultValues: plugin
   });
   const currentCost = watch('currentCost');
-
-  const { fields: inputs } = useFieldArray({
-    control, // control props comes from useForm (optional: if you are using FormProvider)
-    name: 'inputConfig' // unique name for your Field Array
-  });
 
   const { runAsync: onSubmit, loading } = useRequest2(
     async (e: FormType) => {
@@ -64,7 +56,7 @@ const SystemPluginConfig = ({
         originCost: e.originCost,
         currentCost: e.currentCost,
         hasTokenFee: e.hasTokenFee,
-        inputConfig: e.inputConfig
+        inputListVal: e.inputListVal
       }).then(onSuccess);
     },
     {
@@ -103,22 +95,46 @@ const SystemPluginConfig = ({
             ml={8}
           />
         </HStack>
-        {inputs?.map((item, i) => (
-          <Box key={item.key} mt={5}>
-            <HStack>
-              <Box position={'relative'} fontSize={'sm'} fontWeight={'medium'}>
-                <Box position={'absolute'} color={'red.600'} left={'-2'} top={'-1'}>
-                  *
+        {plugin?.inputList?.map((item, i) => {
+          if (item.inputType === 'switch') {
+            return (
+              <Box key={item.key} mt={5}>
+                <HStack>
+                  <Box position={'relative'} fontSize={'sm'} fontWeight={'medium'}>
+                    <Box position={'absolute'} color={'red.600'} left={'-2'} top={'-1'}>
+                      *
+                    </Box>
+                    {item.label}
+                  </Box>
+                  {item.description && <QuestionTip label={item.description} pt={1} />}
+                </HStack>
+                <Box mt={1}>
+                  <Switch {...register(`inputListVal.${item.key}`)} />
                 </Box>
-                {item.label}
               </Box>
-              {item.description && <QuestionTip label={item.description} pt={1} />}
-            </HStack>
-            <Box mt={1}>
-              <Input bg={'myGray.50'} {...register(`inputConfig.${i}.value`, { required: true })} />
-            </Box>
-          </Box>
-        ))}
+            );
+          } else {
+            return (
+              <Box key={item.key} mt={5}>
+                <HStack>
+                  <Box position={'relative'} fontSize={'sm'} fontWeight={'medium'}>
+                    <Box position={'absolute'} color={'red.600'} left={'-2'} top={'-1'}>
+                      *
+                    </Box>
+                    {item.label}
+                  </Box>
+                  {item.description && <QuestionTip label={item.description} pt={1} />}
+                </HStack>
+                <Box mt={1}>
+                  <Input
+                    bg={'myGray.50'}
+                    {...register(`inputListVal.${item.key}`, { required: true })}
+                  />
+                </Box>
+              </Box>
+            );
+          }
+        })}
       </ModalBody>
       <ModalFooter>
         <Button isLoading={loading} onClick={handleSubmit(onSubmit)}>

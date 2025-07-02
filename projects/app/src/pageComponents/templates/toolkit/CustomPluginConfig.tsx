@@ -44,9 +44,10 @@ export const defaultCustomPluginForm: EditCustomPluginType = {
   hasTokenFee: false,
   originCost: 0,
   currentCost: 0,
-  inputConfig: [],
-  workflow: '',
-  userGuide: ''
+  userGuide: '',
+
+  inputList: [],
+  inputListVal: {}
 };
 
 const CustomPluginConfig = ({
@@ -137,12 +138,7 @@ const CustomPluginConfig = ({
         name: data.name,
         avatar: data.avatar,
         intro: data.intro,
-        inputConfig: data.inputConfig.map((item) => ({
-          key: item.key,
-          label: item.key,
-          description: item.key,
-          value: item.value
-        })),
+        inputListVal: data.inputListVal,
         templateType: data.templateType || pluginTypeSelectList?.[0].value,
         isActive: data.isActive,
         hasTokenFee: data.hasTokenFee,

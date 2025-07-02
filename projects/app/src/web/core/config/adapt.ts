@@ -1,7 +1,7 @@
-import { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
+import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
 import { TeamModeEnum } from '@/global/settings/constants';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
-import { FastGPTFeConfigsType } from '@fastgpt/global/common/system/types';
+import type { FastGPTFeConfigsType } from '@fastgpt/global/common/system/types';
 import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 
 export function formatConfigStore2FormSchema({

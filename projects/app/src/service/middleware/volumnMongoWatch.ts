@@ -1,18 +1,16 @@
 import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema';
 import { getProInitData } from '../init';
-import { MongoSystemPlugin } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
-import { getSystemPluginCb } from '../core/workflow/systemPlugins/register';
-import { debounce } from 'lodash';
 import { watchSystemModelUpdate } from '@fastgpt/service/core/ai/config/utils';
 import { createDatasetTrainingMongoWatch } from '../core/dataset/training/utils';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
 import { authLicense } from '../common/license/auth';
+import { refetchSystemPlugins } from '@fastgpt/service/core/app/plugin/controller';
 
 export const startMongoWatch = async () => {
   reloadSystemConfigWatch();
-  refetchSystemPlugins();
   createDatasetTrainingMongoWatch();
   watchSystemModelUpdate();
+  refetchSystemPlugins();
 };
 
 const reloadSystemConfigWatch = () => {
@@ -36,18 +34,4 @@ const reloadSystemConfigWatch = () => {
       }
     } catch (error) {}
   });
-};
-
-const refetchSystemPlugins = () => {
-  const changeStream = MongoSystemPlugin.watch();
-
-  changeStream.on(
-    'change',
-    debounce(async (change) => {
-      try {
-        console.log('refresh system plugins');
-        getSystemPluginCb(true);
-      } catch (error) {}
-    }, 500)
-  );
 };

@@ -2,8 +2,8 @@ import { adminCert } from '@/service/support/permission/adminCert';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
-import { UserModelSchema } from '@fastgpt/global/support/user/type';
-import { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import type { UserModelSchema } from '@fastgpt/global/support/user/type';
+import type { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
 
 export type AdminGetUsersQuery = {};

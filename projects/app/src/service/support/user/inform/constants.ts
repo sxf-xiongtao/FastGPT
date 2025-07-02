@@ -1,7 +1,7 @@
 import { SendInformTemplateCodeEnum } from '@fastgpt/global/support/user/inform/constants';
+import type { EmailTemplateType } from './templates/emailTemplates';
 import {
   CustomTemplate,
-  EmailTemplateType,
   expiredTemplate,
   expireSoonTemplate,
   FreeCleanTemplate,
@@ -12,8 +12,8 @@ import {
   ManageRenameTemplate
 } from './templates/emailTemplates';
 
+import type { InformTemplateType } from './templates/informTemplates';
 import {
-  InformTemplateType,
   expiredTemplate as InformExpiredTemplate,
   expireSoonTemplate as InformExpireSoonTemplate,
   FreeCleanTemplate as InformFreeCleanTemplate,

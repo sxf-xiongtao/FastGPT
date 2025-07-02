@@ -10,7 +10,7 @@ import {
   postUpdateSystemMsgModal
 } from '@/web/common/system/api';
 import { useForm } from 'react-hook-form';
-import { SendInformProps } from '@fastgpt/global/support/user/inform/type';
+import type { SendInformProps } from '@fastgpt/global/support/user/inform/type';
 import { useQuery } from '@tanstack/react-query';
 import MySelect from '@fastgpt/web/components/common/MySelect';
 import { InformLevelEnum } from '@fastgpt/global/support/user/inform/constants';

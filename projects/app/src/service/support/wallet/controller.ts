@@ -3,7 +3,7 @@ import { addLog } from '@fastgpt/service/common/system/log';
 import { delay, retryFn } from '@fastgpt/global/common/system/utils';
 import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
 import type { ConcatBillQueueItemType } from '@fastgpt/service/support/wallet/usage/type';
-import { ClientSession } from '@fastgpt/service/common/mongo';
+import type { ClientSession } from '@fastgpt/service/common/mongo';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import { incrTeamPointsCache } from '@fastgpt/service/support/wallet/sub/utils';

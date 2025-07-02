@@ -1,6 +1,9 @@
 import { updateTeamBalance } from '../controller';
-import { ClientSession } from '@fastgpt/service/common/mongo';
-import { StandardSubLevelEnum, SubModeEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import type { ClientSession } from '@fastgpt/service/common/mongo';
+import type {
+  StandardSubLevelEnum,
+  SubModeEnum
+} from '@fastgpt/global/support/wallet/sub/constants';
 import { MongoBill } from '../bill/schema';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
 import {

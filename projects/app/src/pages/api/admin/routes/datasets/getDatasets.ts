@@ -1,6 +1,6 @@
 import { adminCert } from '@/service/support/permission/adminCert';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
@@ -8,7 +8,7 @@ import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
 import { NextAPI } from '@/service/middleware/entry';
 import { MongoDatasetData } from '@fastgpt/service/core/dataset/data/schema';
 import { getVectorCountByDatasetId } from '@fastgpt/service/common/vectorDB/controller';
-import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import type { PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
 
 export type GetDatasetsResponseData = PaginationResponse<{

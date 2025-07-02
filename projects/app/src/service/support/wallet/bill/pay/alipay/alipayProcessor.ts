@@ -2,8 +2,8 @@
 import { BillStatusEnum, QR_CODE_SIZE } from '@fastgpt/global/support/wallet/bill/constants';
 import { AlipaySdk } from 'alipay-sdk';
 import { getPaymentDescription } from '../constants';
-import { AlipayConfig, CreatePayOrderParams, PayController, PayResult } from '../type';
-import { CreateOrderResponse } from '@fastgpt/global/support/wallet/bill/api';
+import type { AlipayConfig, CreatePayOrderParams, PayController, PayResult } from '../type';
+import type { CreateOrderResponse } from '@fastgpt/global/support/wallet/bill/api';
 import { addLog } from '@fastgpt/service/common/system/log';
 
 export const createAlipayProcessor = (config: AlipayConfig, systemTitle: string): PayController => {

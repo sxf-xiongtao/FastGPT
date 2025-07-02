@@ -6,10 +6,10 @@ import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
-import { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import type { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
-import { UsageItemType } from '@fastgpt/global/support/wallet/usage/type';
-import { GetUsageProps } from '@fastgpt/global/support/wallet/usage/api';
+import type { UsageItemType } from '@fastgpt/global/support/wallet/usage/type';
+import type { GetUsageProps } from '@fastgpt/global/support/wallet/usage/api';
 import { replaceRegChars } from '@fastgpt/global/common/string/tools';
 import { addSourceMember } from '@fastgpt/service/support/user/utils';
 

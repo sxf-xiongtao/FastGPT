@@ -1,5 +1,5 @@
 import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
-import { ChatCompletionMessageParam } from '@fastgpt/global/core/ai/type';
+import type { ChatCompletionMessageParam } from '@fastgpt/global/core/ai/type';
 import { countGptMessagesTokens, countPromptTokens } from '@fastgpt/service/common/string/tiktoken';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { createChatCompletion } from '@fastgpt/service/core/ai/config';

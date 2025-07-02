@@ -1,6 +1,6 @@
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { getUserTeams } from '@/service/support/user/team/controller';
-import { TeamMemberSchema } from '@fastgpt/global/support/user/team/type';
+import type { TeamMemberSchema } from '@fastgpt/global/support/user/team/type';
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
 export type UserTeamListQuery = {

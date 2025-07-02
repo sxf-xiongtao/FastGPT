@@ -5,8 +5,9 @@ import { MongoOperationLog } from '@fastgpt/service/support/user/audit/schema';
 import { NextAPI } from '@/service/middleware/entry';
 import type { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { addSourceMember } from '@fastgpt/service/support/user/utils';
-import { OperationListItemType } from '@fastgpt/global/support/user/audit/type';
-import { AdminAuditEventEnum, AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
+import type { OperationListItemType } from '@fastgpt/global/support/user/audit/type';
+import type { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
+import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 
 export type OperationLogQuery = {
   props: PaginationProps & {

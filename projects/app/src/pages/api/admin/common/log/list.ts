@@ -1,12 +1,12 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
 import { adminCert } from '@/service/support/permission/adminCert';
-import { LogLevelEnum } from '@fastgpt/service/common/system/log/constant';
+import type { LogLevelEnum } from '@fastgpt/service/common/system/log/constant';
 import { getMongoLog } from '@fastgpt/service/common/system/log/schema';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
-import { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import type { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
-import { SystemLogType } from '@fastgpt/service/common/system/log/type';
+import type { SystemLogType } from '@fastgpt/service/common/system/log/type';
 export type listQuery = {};
 
 export type listBody = PaginationProps<{

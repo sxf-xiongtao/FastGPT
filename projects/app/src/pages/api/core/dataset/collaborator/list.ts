@@ -1,9 +1,9 @@
 import { NextAPI } from '@/service/middleware/entry';
 import { authDataset } from '@fastgpt/service/support/permission/dataset/auth';
 import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
-import { CollaboratorItemType } from '@fastgpt/global/support/permission/collaborator';
+import type { CollaboratorItemType } from '@fastgpt/global/support/permission/collaborator';
 import { DatasetPermission } from '@fastgpt/global/support/permission/dataset/controller';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
 import { DatasetTypeEnum } from '@fastgpt/global/core/dataset/constants';
 import { getClbsAndGroupsWithInfo } from '@fastgpt/service/support/permission/controller';
 import { DEFAULT_ORG_AVATAR } from '@fastgpt/global/common/system/constants';

@@ -1,5 +1,5 @@
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { adminCert } from '@/service/support/permission/adminCert';
 import { NextAPI } from '@/service/middleware/entry';

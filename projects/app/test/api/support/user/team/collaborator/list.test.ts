@@ -1,7 +1,7 @@
 import listHandler from '@/pages/api/support/user/team/collaborator/list';
 import type * as ListTypes from '@/pages/api/support/user/team/collaborator/list';
 import updateHandler from '@/pages/api/support/user/team/collaborator/update';
-import * as UpdateTypes from '@/pages/api/support/user/team/collaborator/update';
+import type * as UpdateTypes from '@/pages/api/support/user/team/collaborator/update';
 import { TeamReadPermissionVal } from '@fastgpt/global/support/permission/user/constant';
 
 import { getFakeGroups, getFakeOrgs, getFakeUsers } from '@test/datas/users';

@@ -1,12 +1,12 @@
-import { NavbarItemType } from '@/pages/settings/config/components/FormField/NavbarItems';
-import { SystemConfigType } from '@/types';
-import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
-import {
+import type { NavbarItemType } from '@/pages/settings/config/components/FormField/NavbarItems';
+import type { SystemConfigType } from '@/types';
+import type { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
+import type {
   FastGPTConfigFileType,
   ExternalProviderWorkflowVarType,
   customPdfParseType
 } from '@fastgpt/global/common/system/types';
-import { TeamModeEnum } from '../settings/constants';
+import type { TeamModeEnum } from '../settings/constants';
 
 export type ConfigStoreType = {
   [SystemConfigsTypeEnum.fastgpt]: FastGPTConfigFileType;

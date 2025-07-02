@@ -7,8 +7,8 @@ import { getUserDetail } from '@fastgpt/service/support/user/controller';
 import { UserErrEnum } from '@fastgpt/global/common/error/code/user';
 import { NextAPI } from '@/service/middleware/entry';
 import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
-import { UserType } from '@fastgpt/global/support/user/type';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { UserType } from '@fastgpt/global/support/user/type';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
 import { createUserSession, delUserAllSession } from '@fastgpt/service/support/user/session';
 import requestIp from 'request-ip';
 

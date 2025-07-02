@@ -1,14 +1,12 @@
-import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
-import { SystemPluginTemplateItemType } from '@fastgpt/global/core/workflow/type/index';
 import { adminCert } from '@/service/support/permission/adminCert';
-import { MongoSystemPlugin } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
-import { PluginSourceEnum } from '@fastgpt/global/core/plugin/constants';
-import { getSystemPluginCb } from '@/service/core/workflow/systemPlugins/register';
+import { PluginSourceEnum } from '@fastgpt/global/core/app/plugin/constants';
 import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
 import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 import { getUserDetail } from '@fastgpt/service/support/user/controller';
+import { MongoSystemPlugin } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
+import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 
 export type createPluginQuery = {};
 
@@ -20,7 +18,7 @@ export type createPluginBody = {
   originCost?: number;
   currentCost?: number;
   hasTokenFee?: boolean;
-  inputConfig: SystemPluginTemplateItemType['inputConfig'];
+  inputListVal?: Record<string, any>;
   associatedPluginId?: string;
   userGuide?: string;
   author?: string;
@@ -39,7 +37,7 @@ async function handler(
     avatar,
     intro,
     templateType,
-    inputConfig,
+    inputListVal,
     originCost,
     currentCost,
     hasTokenFee,
@@ -53,7 +51,7 @@ async function handler(
   await MongoSystemPlugin.create({
     pluginId,
     isActive: true,
-    inputConfig,
+    inputListVal,
     originCost,
     currentCost,
     hasTokenFee,
@@ -68,9 +66,6 @@ async function handler(
       author
     }
   });
-
-  // 重新获取插件
-  await getSystemPluginCb(true);
 
   (async () => {
     addAuditLog({

@@ -1,8 +1,8 @@
 import { BillStatusEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { getPaymentDescription } from '../constants';
-import { WxPayConfig, CreatePayOrderParams, PayController, PayResult } from '../type';
+import type { WxPayConfig, CreatePayOrderParams, PayController, PayResult } from '../type';
 import { Payment } from './wxPayment';
-import { CreateOrderResponse } from '@fastgpt/global/support/wallet/bill/api';
+import type { CreateOrderResponse } from '@fastgpt/global/support/wallet/bill/api';
 import { addLog } from '@fastgpt/service/common/system/log';
 
 export const createWxPayProcessor = async (

@@ -1,7 +1,7 @@
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
-import { FastGPTConfigFileType } from '@fastgpt/global/common/system/types';
+import type { FastGPTConfigFileType } from '@fastgpt/global/common/system/types';
 import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema';
-import { SystemConfigType } from '@/types';
+import type { SystemConfigType } from '@/types';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 
 export const updateSystemConfig = ({

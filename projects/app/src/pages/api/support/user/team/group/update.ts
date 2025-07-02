@@ -3,7 +3,7 @@ import { NextAPI } from '@/service/middleware/entry';
 import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
-import { putUpdateGroupData } from '@fastgpt/global/support/user/team/group/api';
+import type { putUpdateGroupData } from '@fastgpt/global/support/user/team/group/api';
 import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 import { DefaultGroupName } from '@fastgpt/global/support/user/team/group/constant';
 import {

@@ -2,7 +2,7 @@ import { getFakeUsers } from '@test/datas/users';
 import { Call } from '@test/utils/request';
 import { describe, expect, it } from 'vitest';
 import * as getTeamPlans from '@/pages/api/support/user/team/plan/getTeamPlans';
-import { TeamSubSchema } from '@fastgpt/global/support/wallet/sub/type';
+import type { TeamSubSchema } from '@fastgpt/global/support/wallet/sub/type';
 import dayjs from 'dayjs';
 import {
   addStandardSub,

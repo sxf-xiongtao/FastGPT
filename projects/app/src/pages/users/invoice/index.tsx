@@ -20,7 +20,7 @@ import {
   ModalBody,
   ModalFooter
 } from '@chakra-ui/react';
-import { InvoiceSchemaType } from '@fastgpt/global/support/wallet/bill/type';
+import type { InvoiceSchemaType } from '@fastgpt/global/support/wallet/bill/type';
 import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import MyModal from '@fastgpt/web/components/common/MyModal';

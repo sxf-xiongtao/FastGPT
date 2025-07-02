@@ -3,10 +3,11 @@ import Dysmsapi, * as dysmsapi from '@alicloud/dysmsapi20170525';
 import * as OpenApi from '@alicloud/openapi-client';
 import * as Util from '@alicloud/tea-util';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
-import { getMessageTemplate, MessageTemplateParamsType } from './constants';
-import { RequireOnlyOne } from '@fastgpt/global/common/type/utils';
+import type { MessageTemplateParamsType } from './constants';
+import { getMessageTemplate } from './constants';
+import type { RequireOnlyOne } from '@fastgpt/global/common/type/utils';
 import { addLog } from '@fastgpt/service/common/system/log';
-import { SendInformTemplateCodeEnum } from '@fastgpt/global/support/user/inform/constants';
+import type { SendInformTemplateCodeEnum } from '@fastgpt/global/support/user/inform/constants';
 import axios from 'axios';
 import { retryFn } from '@fastgpt/global/common/system/utils';
 

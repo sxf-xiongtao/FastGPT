@@ -3,7 +3,7 @@ import { NextAPI } from '@/service/middleware/entry';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { TeamReadPermissionVal } from '@fastgpt/global/support/permission/user/constant';
 import { DEFAULT_ORG_AVATAR } from '@fastgpt/global/common/system/constants';
-import { CollaboratorItemType } from '@fastgpt/global/support/permission/collaborator';
+import type { CollaboratorItemType } from '@fastgpt/global/support/permission/collaborator';
 import { getClbsAndGroupsWithInfo } from '@fastgpt/service/support/permission/controller';
 import { TeamPermission } from '@fastgpt/global/support/permission/user/controller';
 import { TeamMemberRoleEnum } from '@fastgpt/global/support/user/team/constant';

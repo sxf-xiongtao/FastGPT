@@ -3,10 +3,11 @@ import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
 import { MongoOperationLog } from '@fastgpt/service/support/user/audit/schema';
 import { NextAPI } from '@/service/middleware/entry';
-import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import type { PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { addSourceMember } from '@fastgpt/service/support/user/utils';
-import { OperationListItemType } from '@fastgpt/global/support/user/audit/type';
-import { AdminAuditEventEnum, AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
+import type { OperationListItemType } from '@fastgpt/global/support/user/audit/type';
+import type { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
+import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 
 type OperationLogQuery = {
   pageNum?: number;

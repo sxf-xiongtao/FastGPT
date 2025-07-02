@@ -1,8 +1,8 @@
 import { adminCert } from '@/service/support/permission/adminCert';
 import { NextAPI } from '@/service/middleware/entry';
-import { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
+import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { MongoPluginGroups } from '@fastgpt/service/core/app/plugin/pluginGroupSchema';
-import { TGroupType } from '@fastgpt/service/core/app/plugin/type';
+import type { TGroupType } from '@fastgpt/service/core/app/plugin/type';
 import { MongoSystemPlugin } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { addAuditLog } from '@fastgpt/service/support/user/audit/util';

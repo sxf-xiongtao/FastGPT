@@ -13,7 +13,7 @@ import {
   postSaveTemplateType,
   putUpdateTemplateTypeOrder
 } from '@/web/core/app/templates/api';
-import { TemplateTypeSchemaType } from '@fastgpt/global/core/app/type';
+import type { TemplateTypeSchemaType } from '@fastgpt/global/core/app/type';
 import { nanoid } from 'nanoid';
 import dynamic from 'next/dynamic';
 

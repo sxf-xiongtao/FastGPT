@@ -1,7 +1,7 @@
 import { DatasetErrEnum } from '@fastgpt/global/common/error/code/dataset';
 import { delay } from '@fastgpt/global/common/system/utils';
 import { DatasetCollectionTypeEnum } from '@fastgpt/global/core/dataset/constants';
-import { DatasetSchemaType } from '@fastgpt/global/core/dataset/type';
+import type { DatasetSchemaType } from '@fastgpt/global/core/dataset/type';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { MongoDatasetCollection } from '@fastgpt/service/core/dataset/collection/schema';
 import { syncCollection } from '@fastgpt/service/core/dataset/collection/utils';

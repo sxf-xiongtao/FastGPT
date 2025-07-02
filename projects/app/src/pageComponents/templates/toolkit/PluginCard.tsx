@@ -1,13 +1,19 @@
-import { EditCustomPluginType } from '@/global/core/workflow/plugin/type';
+import type { EditCustomPluginType } from '@/global/core/workflow/plugin/type';
 import { putUpdatePlugin } from '@/web/core/app/plugin/api';
 import { Box, Flex, Switch } from '@chakra-ui/react';
-import { SystemPluginTemplateItemType } from '@fastgpt/global/core/workflow/type';
 import Avatar from '@fastgpt/web/components/common/Avatar';
-import { DraggableProvided, DraggableStateSnapshot } from '@fastgpt/web/components/common/DndDrag';
+import type {
+  DraggableProvided,
+  DraggableStateSnapshot
+} from '@fastgpt/web/components/common/DndDrag';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import MyBox from '@fastgpt/web/components/common/MyBox';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
 import { useTranslation } from 'next-i18next';
+import type {
+  SystemPluginTemplateItemType,
+  SystemPluginTemplateListItemType
+} from '@fastgpt/global/core/app/plugin/type';
 
 const PluginCard = ({
   plugin,
@@ -17,7 +23,9 @@ const PluginCard = ({
   provided,
   snapshot
 }: {
-  plugin: SystemPluginTemplateItemType & { typeLabel?: string };
+  plugin: SystemPluginTemplateListItemType & {
+    typeLabel?: string;
+  };
   setEditCustomPlugin: (value: React.SetStateAction<EditCustomPluginType | undefined>) => void;
   setConfigPlugin: (value: React.SetStateAction<SystemPluginTemplateItemType | undefined>) => void;
   refreshPlugins: () => void;
@@ -60,25 +68,7 @@ const PluginCard = ({
       fontSize={'mini'}
       alignItems={'center'}
       onClick={() => {
-        if (plugin?.customWorkflow) {
-          setEditCustomPlugin({
-            id: plugin?.id,
-            templateType: plugin?.templateType,
-            name: plugin?.name,
-            intro: plugin?.intro,
-            avatar: plugin?.avatar,
-            isActive: plugin?.isActive ?? false,
-            inputConfig: plugin?.inputConfig ?? [],
-            workflow: plugin?.customWorkflow,
-            associatedPluginId: plugin?.associatedPluginId,
-            userGuide: plugin?.userGuide,
-            author: plugin?.author,
-            hasTokenFee: plugin?.hasTokenFee,
-            currentCost: plugin?.currentCost
-          });
-        } else {
-          setConfigPlugin(plugin);
-        }
+        setConfigPlugin(plugin);
       }}
     >
       <Box display={'flex'} w={2 / 10} pr={6}>

@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { ConfigStoreType } from '@/global/admin/config';
+import type { ConfigStoreType } from '@/global/admin/config';
 import { addMonths } from 'date-fns';
 import { initFastGPTConfig } from '@fastgpt/service/common/system/tools';
 import { beforeUpdateConfig } from '@/service/admin/settings/hooks';

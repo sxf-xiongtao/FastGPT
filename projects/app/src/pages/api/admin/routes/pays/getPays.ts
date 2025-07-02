@@ -1,14 +1,14 @@
 import { adminCert } from '@/service/support/permission/adminCert';
-import { NextApiResponse } from 'next';
+import type { NextApiResponse } from 'next';
 import { MongoBill } from '@/service/support/wallet/bill/schema';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { BillStatusEnum, BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
+import type { BillStatusEnum, BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { NextAPI } from '@/service/middleware/entry';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
-import { BillSchemaType } from '@fastgpt/global/support/wallet/bill/type';
-import { UserModelSchema } from '@fastgpt/global/support/user/type';
-import { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { BillSchemaType } from '@fastgpt/global/support/wallet/bill/type';
+import type { UserModelSchema } from '@fastgpt/global/support/user/type';
+import type { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
 
 export type GetPaysBody = PaginationProps<{

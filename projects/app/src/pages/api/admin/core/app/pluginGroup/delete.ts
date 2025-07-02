@@ -3,7 +3,7 @@ import { adminCert } from '@/service/support/permission/adminCert';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { MongoPluginGroups } from '@fastgpt/service/core/app/plugin/pluginGroupSchema';
 import { MongoSystemPlugin } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
-import { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
+import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
 import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 import { getUserDetail } from '@fastgpt/service/support/user/controller';

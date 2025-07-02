@@ -1,5 +1,6 @@
-import { Request, Response } from 'express';
-import { CrawlDataItemType, crawlDynamicWebsite } from '../lib/crawler';
+import type { Request, Response } from 'express';
+import type { CrawlDataItemType } from '../lib/crawler';
+import { crawlDynamicWebsite } from '../lib/crawler';
 
 const queue: dynamicWebsiteCrawlerTask[] = [];
 

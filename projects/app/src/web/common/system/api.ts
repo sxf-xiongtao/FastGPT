@@ -1,6 +1,6 @@
 import { GET, POST } from '@/service/common/request';
-import { SendInformProps } from '@fastgpt/global/support/user/inform/type.d';
-import { SystemMsgModalValueType } from '@fastgpt/service/support/user/inform/type';
+import type { SendInformProps } from '@fastgpt/global/support/user/inform/type.d';
+import type { SystemMsgModalValueType } from '@fastgpt/service/support/user/inform/type';
 
 export const postSendSystemMsg = (data: SendInformProps) =>
   POST('/admin/support/user/inform/sendSystemInform', data);

@@ -1,6 +1,6 @@
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { adminCert } from '@/service/support/permission/adminCert';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';

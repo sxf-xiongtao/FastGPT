@@ -1,4 +1,4 @@
-import { RedirectFn, GetUserInfoFn, OrgListType, GetUserListFn, GetOrgListFn } from '../type';
+import type { RedirectFn, GetUserInfoFn, OrgListType, GetUserListFn, GetOrgListFn } from '../type';
 import axios from 'axios';
 import { UserPrefix } from '../userPrefix';
 

@@ -1,4 +1,4 @@
-import { RedirectFn, GetUserInfoFn } from '../type';
+import type { RedirectFn, GetUserInfoFn } from '../type';
 import axios from 'axios';
 
 export const leapmotor_redirectFn: RedirectFn = async ({ state }) => {

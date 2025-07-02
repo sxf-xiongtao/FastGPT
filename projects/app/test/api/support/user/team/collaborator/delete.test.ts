@@ -1,7 +1,7 @@
 import updateHandler from '@/pages/api/support/user/team/collaborator/update';
-import * as UpdateTypes from '@/pages/api/support/user/team/collaborator/update';
+import type * as UpdateTypes from '@/pages/api/support/user/team/collaborator/update';
 import deleteHandler from '@/pages/api/support/user/team/collaborator/delete';
-import * as DeleteTypes from '@/pages/api/support/user/team/collaborator/delete';
+import type * as DeleteTypes from '@/pages/api/support/user/team/collaborator/delete';
 import {
   TeamManagePermissionVal,
   TeamReadPermissionVal

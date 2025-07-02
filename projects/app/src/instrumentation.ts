@@ -11,7 +11,6 @@ export async function register() {
         { startCron },
         { concatBillTimer, reduceAiPointsTimer },
         { authLicense },
-        { getSystemPluginCb },
         { startTrainingProcess },
         { startMongoWatch },
         { initBullMQWorkers },
@@ -24,7 +23,6 @@ export async function register() {
         import('@/service/common/system/cron'),
         import('@/service/support/wallet/controller'),
         import('@/service/common/license/auth'),
-        import('@/service/core/workflow/systemPlugins/register'),
         import('@/service/core/dataset/training/utils'),
         import('@/service/middleware/volumnMongoWatch'),
         import('@/service/common/bullmq/index'),
@@ -57,7 +55,7 @@ export async function register() {
       }
 
       // Init system from local or db
-      await Promise.all([getProInitData(), getSystemPluginCb(true), loadSystemModels()]);
+      await Promise.all([getProInitData(), loadSystemModels()]);
 
       startTrainingProcess(true);
       startMongoWatch();

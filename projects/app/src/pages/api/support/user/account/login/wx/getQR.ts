@@ -1,7 +1,7 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { getWeChatAccessToken } from '@/service/support/user/login/wx';
-import { GetWXLoginQRResponse } from '@fastgpt/global/support/user/login/api';
+import type { GetWXLoginQRResponse } from '@fastgpt/global/support/user/login/api';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

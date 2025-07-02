@@ -2,22 +2,20 @@ import { NextAPI } from '@/service/middleware/entry';
 import { updateResourcePermission } from '@/service/support/permission/controller';
 import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 import { DatasetErrEnum } from '@fastgpt/global/common/error/code/dataset';
-import { UpdateDatasetCollaboratorBody } from '@fastgpt/global/core/dataset/collaborator';
+import type { UpdateDatasetCollaboratorBody } from '@fastgpt/global/core/dataset/collaborator';
 import { DatasetTypeEnum } from '@fastgpt/global/core/dataset/constants';
 import {
   ManagePermissionVal,
   PerResourceTypeEnum
 } from '@fastgpt/global/support/permission/constant';
 import { DatasetPermission } from '@fastgpt/global/support/permission/dataset/controller';
-import { ResourcePermissionType } from '@fastgpt/global/support/permission/type';
+import type { ResourcePermissionType } from '@fastgpt/global/support/permission/type';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { getResourceClbsAndGroups } from '@fastgpt/service/support/permission/controller';
 import { authDataset } from '@fastgpt/service/support/permission/dataset/auth';
-import {
-  syncChildrenPermission,
-  UpdateCollaboratorItem
-} from '@fastgpt/service/support/permission/inheritPermission';
+import type { UpdateCollaboratorItem } from '@fastgpt/service/support/permission/inheritPermission';
+import { syncChildrenPermission } from '@fastgpt/service/support/permission/inheritPermission';
 import { getGroupsByTmbId } from '@fastgpt/service/support/permission/memberGroup/controllers';
 import { getOrgsByTmbId } from '@fastgpt/service/support/permission/org/controllers';
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
@@ -26,7 +24,7 @@ import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
 import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
 import { getI18nDatasetType } from '@fastgpt/service/support/user/audit/util';
 
 async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {

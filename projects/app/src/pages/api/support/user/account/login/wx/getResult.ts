@@ -1,13 +1,13 @@
-import { NextApiResponse } from 'next';
+import type { NextApiResponse } from 'next';
 import { MongoUserAuth } from '@fastgpt/service/support/user/auth/schema';
 import axios from 'axios';
 import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';
 import { usernameLogin } from '@/service/support/user/controller';
-import { WxLoginProps } from '@fastgpt/global/support/user/api';
+import type { WxLoginProps } from '@fastgpt/global/support/user/api';
 import { setCookie } from '@fastgpt/service/support/permission/controller';
 import { getWechatLoginConfig } from '@/service/support/user/login/wx';
 import { NextAPI } from '@/service/middleware/entry';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
 import type { UserType } from '@fastgpt/global/support/user/type';
 import requestIp from 'request-ip';
 

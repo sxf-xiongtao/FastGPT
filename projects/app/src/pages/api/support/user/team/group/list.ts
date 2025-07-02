@@ -3,7 +3,7 @@ import { NextAPI } from '@/service/middleware/entry';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { TeamReadPermissionVal } from '@fastgpt/global/support/permission/user/constant';
 import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
-import {
+import type {
   GroupMemberSchemaType,
   MemberGroupListItemType
 } from '@fastgpt/global/support/permission/memberGroup/type';
@@ -11,8 +11,8 @@ import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/membe
 import { DefaultGroupName } from '@fastgpt/global/support/user/team/group/constant';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { replaceRegChars } from '@fastgpt/global/common/string/tools';
-import { TeamMemberSchema } from '@fastgpt/global/support/user/team/type';
-import { GetGroupListBody } from '@fastgpt/global/support/permission/memberGroup/api';
+import type { TeamMemberSchema } from '@fastgpt/global/support/user/team/type';
+import type { GetGroupListBody } from '@fastgpt/global/support/permission/memberGroup/api';
 import { getTeamOwner } from '@fastgpt/service/support/user/team/controller';
 import { Permission } from '@fastgpt/global/support/permission/controller';
 import { ManagePermissionVal, NullPermission } from '@fastgpt/global/support/permission/constant';

@@ -6,7 +6,7 @@ import {
   PerResourceTypeEnum
 } from '@fastgpt/global/support/permission/constant';
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
-import { RequireOnlyOne } from '@fastgpt/global/common/type/utils';
+import type { RequireOnlyOne } from '@fastgpt/global/common/type/utils';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { TeamManagePermissionVal } from '@fastgpt/global/support/permission/user/constant';
 import { TeamPermission } from '@fastgpt/global/support/permission/user/controller';

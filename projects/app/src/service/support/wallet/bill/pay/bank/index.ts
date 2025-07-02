@@ -1,6 +1,6 @@
 import { BillStatusEnum } from '@fastgpt/global/support/wallet/bill/constants';
-import { CreatePayOrderParams, PayController, PayResult } from '../type';
-import { CreateOrderResponse } from '@fastgpt/global/support/wallet/bill/api';
+import type { CreatePayOrderParams, PayController, PayResult } from '../type';
+import type { CreateOrderResponse } from '@fastgpt/global/support/wallet/bill/api';
 
 export const createBankPayController = (
   config: {

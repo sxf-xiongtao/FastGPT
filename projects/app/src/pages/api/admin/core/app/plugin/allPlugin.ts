@@ -1,7 +1,7 @@
 import { MongoApp } from '@fastgpt/service/core/app/schema';
-import { SystemPluginListItemType } from '@fastgpt/global/core/app/type';
+import type { SystemPluginListItemType } from '@fastgpt/global/core/app/type';
 import { NextAPI } from '@/service/middleware/entry';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
 import { AppTypeEnum } from '@fastgpt/global/core/app/constants';
 import { replaceRegChars } from '@fastgpt/global/common/string/tools';
 import { adminCert } from '@/service/support/permission/adminCert';

@@ -1,8 +1,8 @@
 import { NextAPI } from '@/service/middleware/entry';
 import { adminCert } from '@/service/support/permission/adminCert';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
-import { NextApiResponse } from 'next';
-import { GetDataChartsQuery } from './type';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { NextApiResponse } from 'next';
+import type { GetDataChartsQuery } from './type';
 import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
 import { getMongoTimezoneCode } from '@fastgpt/global/common/time/timezone';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';

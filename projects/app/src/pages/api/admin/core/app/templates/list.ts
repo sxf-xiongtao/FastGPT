@@ -1,7 +1,7 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
 import { getAppTemplatesAndLoadThem } from '@fastgpt/templates/register';
-import { AppTemplateSchemaType } from '@fastgpt/global/core/app/type';
+import type { AppTemplateSchemaType } from '@fastgpt/global/core/app/type';
 import { adminCert } from '@/service/support/permission/adminCert';
 
 export type getSystemTemplatesQuery = {};

@@ -1,5 +1,5 @@
 import { MongoDatasetCollectionTags } from '@fastgpt/service/core/dataset/tag/schema';
-import { ClientSession } from 'mongoose';
+import type { ClientSession } from 'mongoose';
 
 export async function createOneTag({
   tagContent,

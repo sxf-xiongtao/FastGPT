@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
-import { Box, BoxProps, Flex, LinkProps } from '@chakra-ui/react';
+import type { BoxProps, LinkProps } from '@chakra-ui/react';
+import { Box, Flex } from '@chakra-ui/react';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { useMemo, useState } from 'react';
 import { useSystemStore } from '@/web/common/system/useSystemStore';

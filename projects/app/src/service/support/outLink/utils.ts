@@ -3,7 +3,7 @@ import {
   ChatItemValueTypeEnum,
   ChatRoleEnum
 } from '@fastgpt/global/core/chat/constants';
-import { UserChatItemValueItemType } from '@fastgpt/global/core/chat/type';
+import type { UserChatItemValueItemType } from '@fastgpt/global/core/chat/type';
 import { DispatchNodeResponseKeyEnum } from '@fastgpt/global/core/workflow/runtime/constants';
 import {
   getWorkflowEntryNodeIds,
@@ -11,14 +11,14 @@ import {
   storeEdges2RuntimeEdges,
   storeNodes2RuntimeNodes
 } from '@fastgpt/global/core/workflow/runtime/utils';
-import { OutlinkAppType, OutLinkSchema } from '@fastgpt/global/support/outLink/type';
+import type { OutlinkAppType, OutLinkSchema } from '@fastgpt/global/support/outLink/type';
 import { getAppLatestVersion } from '@fastgpt/service/core/app/version/controller';
 import { MongoApp } from '@fastgpt/service/core/app/schema';
 import { getChatItems } from '@fastgpt/service/core/chat/controller';
 import { saveChat } from '@fastgpt/service/core/chat/saveChat';
 import { dispatchWorkFlow } from '@fastgpt/service/core/workflow/dispatch';
 import { getUserChatInfoAndAuthTeamPoints } from '@fastgpt/service/support/permission/auth/team';
-import { NextApiResponse } from 'next';
+import type { NextApiResponse } from 'next';
 import { authOutLinkLimit } from './auth';
 import { addOutLinkUsage } from '@fastgpt/service/support/outLink/tools';
 import { createChatUsage } from '@fastgpt/service/support/wallet/usage/controller';

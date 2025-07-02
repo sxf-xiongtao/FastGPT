@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { jsonRes } from '@fastgpt/service/common/response';
-import { CreateUsageProps } from '@fastgpt/global/support/wallet/usage/api.d';
+import type { CreateUsageProps } from '@fastgpt/global/support/wallet/usage/api.d';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { createUsage } from '@fastgpt/service/support/wallet/usage/controller';
 import { NextAPI } from '@/service/middleware/entry';

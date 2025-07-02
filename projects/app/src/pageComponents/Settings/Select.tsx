@@ -1,6 +1,6 @@
 import { Select } from '@chakra-ui/react';
 import React from 'react';
-import { ChangeHandler } from 'react-hook-form';
+import type { ChangeHandler } from 'react-hook-form';
 
 const MySelect = React.forwardRef<
   HTMLSelectElement,

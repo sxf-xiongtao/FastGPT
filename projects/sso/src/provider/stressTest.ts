@@ -1,4 +1,4 @@
-import { GetOrgListFn, GetUserInfoFn, GetUserListFn, RedirectFn } from '../type';
+import type { GetOrgListFn, GetUserInfoFn, GetUserListFn, RedirectFn } from '../type';
 
 // 用于存储生成的code和对应的用户信息
 const codeMap = new Map();

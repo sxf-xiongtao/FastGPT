@@ -4,16 +4,18 @@ import { filterGPTMessageByMaxContext } from '@fastgpt/service/core/chat/utils';
 import { replaceVariable } from '@fastgpt/global/common/string/tools';
 import { createChatCompletion } from '@fastgpt/service/core/ai/config';
 import { llmCompletionsBodyFormat, formatLLMResponse } from '@fastgpt/service/core/ai/utils';
-import { ChatCompletionMessageParam } from '@fastgpt/global/core/ai/type';
-import { SearchDataResponseItemType } from '@fastgpt/global/core/dataset/type';
-import {
-  datasetDataReRank,
+import type { ChatCompletionMessageParam } from '@fastgpt/global/core/ai/type';
+import type { SearchDataResponseItemType } from '@fastgpt/global/core/dataset/type';
+import type {
   DeepRagSearchProps,
-  filterDatasetDataByMaxTokens,
-  searchDatasetData,
   SearchDatasetDataResponse
 } from '@fastgpt/service/core/dataset/search/controller';
-import { LLMModelItemType } from '@fastgpt/global/core/ai/model.d';
+import {
+  datasetDataReRank,
+  filterDatasetDataByMaxTokens,
+  searchDatasetData
+} from '@fastgpt/service/core/dataset/search/controller';
+import type { LLMModelItemType } from '@fastgpt/global/core/ai/model.d';
 import json5 from 'json5';
 import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
 import { countGptMessagesTokens } from '@fastgpt/service/common/string/tiktoken';

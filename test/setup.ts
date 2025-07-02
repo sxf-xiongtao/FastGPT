@@ -1,4 +1,5 @@
-import { connectionLogMongo, connectionMongo, Mongoose } from '@fastgpt/service/common/mongo';
+import type { Mongoose } from '@fastgpt/service/common/mongo';
+import { connectionLogMongo, connectionMongo } from '@fastgpt/service/common/mongo';
 import { connectMongo } from '@fastgpt/service/common/mongo/init';
 import { afterAll, beforeAll, beforeEach, vi, inject, onTestFinished } from 'vitest';
 import '@test/mocks';

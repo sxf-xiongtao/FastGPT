@@ -1,6 +1,6 @@
 import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
 import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
-import { ClientSession } from 'mongoose';
+import type { ClientSession } from 'mongoose';
 
 /**
  * Add a member to a group

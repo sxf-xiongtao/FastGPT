@@ -1,4 +1,4 @@
-import { ConfigStoreType } from '@/global/admin/config';
+import type { ConfigStoreType } from '@/global/admin/config';
 
 export function beforeUpdateConfig(
   fastgpt: ConfigStoreType['fastgpt'],

@@ -1,4 +1,5 @@
-import { Job, UnrecoverableError } from '@fastgpt/service/common/bullmq';
+import type { Job } from '@fastgpt/service/common/bullmq';
+import { UnrecoverableError } from '@fastgpt/service/common/bullmq';
 import { crawlWebsite, type CrawlDataItemType } from '@/service/common/crawler';
 import {
   DatasetCollectionTypeEnum,
@@ -7,7 +8,10 @@ import {
   DataChunkSplitModeEnum
 } from '@fastgpt/global/core/dataset/constants';
 import { retryFn } from '@fastgpt/global/common/system/utils';
-import { DatasetCollectionSchemaType, DatasetSchemaType } from '@fastgpt/global/core/dataset/type';
+import type {
+  DatasetCollectionSchemaType,
+  DatasetSchemaType
+} from '@fastgpt/global/core/dataset/type';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { crawlDynamicWebsite } from '@/service/common/crawler/crawlDynamicWebsite';
 import {

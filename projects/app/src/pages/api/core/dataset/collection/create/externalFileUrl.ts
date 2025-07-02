@@ -10,7 +10,7 @@ import {
 } from '@fastgpt/global/core/dataset/constants';
 import { readDatasetSourceRawText } from '@fastgpt/service/core/dataset/read';
 import { NextAPI } from '@/service/middleware/entry';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
 import { WritePermissionVal } from '@fastgpt/global/support/permission/constant';
 
 async function handler(req: ApiRequestProps<ExternalFileCreateDatasetCollectionParams>): Promise<{

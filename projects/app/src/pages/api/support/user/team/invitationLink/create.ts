@@ -1,6 +1,6 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
-import { InvitationLinkCreateType } from '@fastgpt/service/support/user/team/invitationLink/type';
+import type { InvitationLinkCreateType } from '@fastgpt/service/support/user/team/invitationLink/type';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { TeamManagePermissionVal } from '@fastgpt/global/support/permission/user/constant';
 import { MongoInvitationLink } from '@/service/support/user/team/invitationLink/schema';

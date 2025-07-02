@@ -11,11 +11,11 @@ import { addLog } from '@fastgpt/service/common/system/log';
 import { BillStatusEnum, BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { subModeMap } from '@fastgpt/global/support/wallet/sub/constants';
-import { ClientSession } from '@fastgpt/service/common/mongo';
+import type { ClientSession } from '@fastgpt/service/common/mongo';
 import { NextAPI } from '@/service/middleware/entry';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { getStandardPlanConfig } from '@fastgpt/service/support/wallet/sub/utils';
-import { UserModelSchema } from '@fastgpt/global/support/user/type';
+import type { UserModelSchema } from '@fastgpt/global/support/user/type';
 import { useIPFrequencyLimit } from '@fastgpt/service/common/middle/reqFrequencyLimit';
 import {
   addExtraDatasetSizeSub,
@@ -24,9 +24,9 @@ import {
 } from '@/service/support/wallet/sub/controller';
 import { BillPayWayEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { createPaymentController } from '@/service/support/wallet/bill/pay/base';
-import { CheckPayResultResponse } from '@fastgpt/global/support/wallet/bill/api';
+import type { CheckPayResultResponse } from '@fastgpt/global/support/wallet/bill/api';
 import { i18nT } from '@fastgpt/web/i18n/utils';
-import { PayResult } from '@/service/support/wallet/bill/pay/type';
+import type { PayResult } from '@/service/support/wallet/bill/pay/type';
 import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
 import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 

@@ -1,4 +1,5 @@
-import { Box, HStack, StackProps } from '@chakra-ui/react';
+import type { StackProps } from '@chakra-ui/react';
+import { Box, HStack } from '@chakra-ui/react';
 import MarkDownModal from '@/components/common/markdown/MarkDownModal';
 import QuestionTip from '@fastgpt/web/components/common/MyTooltip/QuestionTip';
 

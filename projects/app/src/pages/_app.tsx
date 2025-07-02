@@ -15,9 +15,9 @@ import 'tailwindcss/tailwind.css';
 import 'nprogress/nprogress.css';
 import '../styles/reset.scss';
 import SystemStoreContextProvider from '@fastgpt/web/context/useSystem';
-import { AppProps } from 'next/app';
-import { NextPage } from 'next';
-import { ReactElement } from 'react';
+import type { AppProps } from 'next/app';
+import type { NextPage } from 'next';
+import type { ReactElement } from 'react';
 
 //Binding events.
 Router.events.on('routeChangeStart', () => NProgress.start());

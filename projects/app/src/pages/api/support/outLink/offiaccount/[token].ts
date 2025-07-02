@@ -1,7 +1,7 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
 import { authOutLinkValid } from '@fastgpt/service/support/permission/publish/authLink';
-import { OffiAccountAppType } from '@fastgpt/global/support/outLink/type';
+import type { OffiAccountAppType } from '@fastgpt/global/support/outLink/type';
 import {
   formatTextReply,
   getSignature,

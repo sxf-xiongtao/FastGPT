@@ -3,7 +3,7 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { NextAPI } from '@/service/middleware/entry';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
-import { TeamMemberSchema } from '@fastgpt/global/support/user/team/type';
+import type { TeamMemberSchema } from '@fastgpt/global/support/user/team/type';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { updateResourcePermission } from '@/service/support/permission/controller';
 import {

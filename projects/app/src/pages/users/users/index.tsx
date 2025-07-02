@@ -23,7 +23,7 @@ import MyModal from '@fastgpt/web/components/common/MyModal';
 import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import { getUsers } from '@/web/admin/users/api';
 import UserEditModal from './components/UserEditModal';
-import { UserModelSchema } from '@fastgpt/global/support/user/type';
+import type { UserModelSchema } from '@fastgpt/global/support/user/type';
 import UserAddModal from './components/UserAddModal';
 import BoxCard from '@/components/common/BoxContainer/Card';
 import { serviceSideProps } from '@/web/common/i18n/utils';

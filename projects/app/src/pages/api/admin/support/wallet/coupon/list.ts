@@ -1,7 +1,7 @@
 import { NextAPI } from '@/service/middleware/entry';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoTeamCoupon } from '@fastgpt/service/support/wallet/coupon/schema';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   await authCert({ req, authRoot: true });

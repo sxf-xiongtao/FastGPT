@@ -2,7 +2,7 @@ import { sendInform2AllUser } from '@/service/support/user/inform/controller';
 import { adminCert } from '@/service/support/permission/adminCert';
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
-import { InformLevelEnum } from '@fastgpt/global/support/user/inform/constants';
+import type { InformLevelEnum } from '@fastgpt/global/support/user/inform/constants';
 import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
 import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 

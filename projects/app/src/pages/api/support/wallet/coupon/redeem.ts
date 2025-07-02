@@ -1,7 +1,7 @@
 import type { NextApiResponse } from 'next';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { NextAPI } from '@/service/middleware/entry';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
 import { MongoTeamCoupon } from '@fastgpt/service/support/wallet/coupon/schema';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import {

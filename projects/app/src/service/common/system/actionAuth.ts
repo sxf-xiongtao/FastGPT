@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { Obj2Query } from '@/utils/tools';
-import { AuthGoogleTokenProps } from '@fastgpt/global/common/system/api';
+import type { AuthGoogleTokenProps } from '@fastgpt/global/common/system/api';
 
 // service run
 export const authGoogleToken = async (data: AuthGoogleTokenProps) => {

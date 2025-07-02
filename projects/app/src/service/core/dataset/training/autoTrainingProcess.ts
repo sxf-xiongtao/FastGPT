@@ -14,7 +14,7 @@ import {
 import { ChatCompletionRequestMessageRoleEnum } from '@fastgpt/global/core/ai/constants';
 import { loadRequestMessages } from '@fastgpt/service/core/chat/utils';
 import { llmCompletionsBodyFormat, formatLLMResponse } from '@fastgpt/service/core/ai/utils';
-import { DatasetDataIndexItemType } from '@fastgpt/global/core/dataset/type';
+import type { DatasetDataIndexItemType } from '@fastgpt/global/core/dataset/type';
 import { DatasetDataIndexTypeEnum } from '@fastgpt/global/core/dataset/data/constants';
 import { getErrText } from '@fastgpt/global/common/error/utils';
 import { pushLLMTrainingUsage } from '@fastgpt/service/support/wallet/usage/controller';

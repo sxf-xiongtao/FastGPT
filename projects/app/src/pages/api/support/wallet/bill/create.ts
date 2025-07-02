@@ -10,10 +10,10 @@ import {
   MAX_WX_PAY_AMOUNT
 } from '@fastgpt/global/support/wallet/bill/constants';
 import { getExtraDatasetSizePrice, getExtraPointsPrice } from '@/service/support/wallet/sub/utils';
-import { CreateBillProps, CreateBillResponse } from '@fastgpt/global/support/wallet/bill/api';
+import type { CreateBillProps, CreateBillResponse } from '@fastgpt/global/support/wallet/bill/api';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
 import { NextAPI } from '@/service/middleware/entry';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { ManagePermissionVal } from '@fastgpt/global/support/permission/constant';
 import { getStandardPlanConfig } from '@fastgpt/service/support/wallet/sub/utils';

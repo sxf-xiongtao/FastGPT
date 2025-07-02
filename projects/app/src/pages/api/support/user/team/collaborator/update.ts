@@ -8,8 +8,8 @@ import { MongoResourcePermission } from '@fastgpt/service/support/permission/sch
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { TeamDefaultPermissionVal } from '@fastgpt/global/support/permission/user/constant';
 import { TeamPermission } from '@fastgpt/global/support/permission/user/controller';
-import { UpdateClbPermissionProps } from '@fastgpt/global/support/permission/collaborator';
-import { PermissionValueType } from '@fastgpt/global/support/permission/type';
+import type { UpdateClbPermissionProps } from '@fastgpt/global/support/permission/collaborator';
+import type { PermissionValueType } from '@fastgpt/global/support/permission/type';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
 import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';

@@ -1,7 +1,7 @@
 import { getNanoid } from '@fastgpt/global/common/string/tools';
 import { TeamCollectionName } from '@fastgpt/global/support/user/team/constant';
 import { connectionMongo, getMongoModel } from '@fastgpt/service/common/mongo';
-import { InvitationSchemaType } from '@fastgpt/service/support/user/team/invitationLink/type';
+import type { InvitationSchemaType } from '@fastgpt/service/support/user/team/invitationLink/type';
 const { Schema } = connectionMongo;
 
 export const InvitationCollectionName = 'team_invitation_links';

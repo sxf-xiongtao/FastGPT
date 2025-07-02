@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { getTeamMember } from '@/service/support/user/team/controller';
-import { DelMemberProps } from '@fastgpt/global/support/user/team/controller';
+import type { DelMemberProps } from '@fastgpt/global/support/user/team/controller';
 import { authMemberPermission } from '@/service/support/permission/team/auth';
 import { OwnerPermissionVal } from '@fastgpt/global/support/permission/constant';
 import { NextAPI } from '@/service/middleware/entry';
@@ -10,7 +10,7 @@ import { TeamManagePermissionVal } from '@fastgpt/global/support/permission/user
 import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
 import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
-import { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
+import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 
 export type MemberDeleteQuery = DelMemberProps;
 export type MemberDeleteBody = {};

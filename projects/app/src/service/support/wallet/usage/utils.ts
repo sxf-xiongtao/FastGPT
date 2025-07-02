@@ -1,4 +1,4 @@
-import { ConcatUsageProps, CreateUsageProps } from '@fastgpt/global/support/wallet/usage/api';
+import type { ConcatUsageProps, CreateUsageProps } from '@fastgpt/global/support/wallet/usage/api';
 import { Types } from '@fastgpt/service/common/mongo';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';

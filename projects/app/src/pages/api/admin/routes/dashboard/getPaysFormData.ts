@@ -1,9 +1,9 @@
 import { adminCert } from '@/service/support/permission/adminCert';
 import { MongoBill } from '@/service/support/wallet/bill/schema';
-import { NextApiResponse } from 'next';
+import type { NextApiResponse } from 'next';
 import { NextAPI } from '@/service/middleware/entry';
-import { GetDataChartsQuery } from './type';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { GetDataChartsQuery } from './type';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
 import { getMongoTimezoneCode } from '@fastgpt/global/common/time/timezone';
 import { BillPayWayEnum, BillStatusEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';

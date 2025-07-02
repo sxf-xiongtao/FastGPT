@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 export async function licenseCheck(req: NextApiRequest, res: NextApiResponse) {
   if (!global.licenseData) {

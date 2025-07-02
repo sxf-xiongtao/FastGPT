@@ -1,5 +1,5 @@
 import updateHandler from '@/pages/api/support/user/team/collaborator/update';
-import * as UpdateTypes from '@/pages/api/support/user/team/collaborator/update';
+import type * as UpdateTypes from '@/pages/api/support/user/team/collaborator/update';
 import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import {

@@ -6,7 +6,7 @@ import { generateAutoTraining } from './autoTrainingProcess';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { InformLevelEnum } from '@fastgpt/global/support/user/inform/constants';
 import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
-import { DatasetTrainingSchemaType } from '@fastgpt/global/core/dataset/type';
+import type { DatasetTrainingSchemaType } from '@fastgpt/global/core/dataset/type';
 import { TrainingModeEnum } from '@fastgpt/global/core/dataset/constants';
 import { generateImageIndex } from './imageIndex';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';

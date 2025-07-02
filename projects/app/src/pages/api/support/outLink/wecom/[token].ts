@@ -1,7 +1,7 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
 import { authOutLinkValid } from '@fastgpt/service/support/permission/publish/authLink';
-import { WecomAppType } from '@fastgpt/global/support/outLink/type';
+import type { WecomAppType } from '@fastgpt/global/support/outLink/type';
 import { getSignature, decrypt } from '@wecom/crypto';
 import { parseBody } from '@/service/support/outLink/wecom/utils';
 import { getAccessToken, replyMessage } from '@/service/support/outLink/wecom/api';

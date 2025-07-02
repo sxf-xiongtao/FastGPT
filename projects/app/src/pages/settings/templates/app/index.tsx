@@ -14,7 +14,7 @@ import DndDrag, { Draggable } from '@fastgpt/web/components/common/DndDrag';
 import EmptyTip from '@fastgpt/web/components/common/EmptyTip';
 import { defaultTemplate } from './components/ItemConfigModal';
 import { serviceSideProps } from '@/web/common/i18n/utils';
-import { AppTemplateSchemaType } from '@fastgpt/global/core/app/type';
+import type { AppTemplateSchemaType } from '@fastgpt/global/core/app/type';
 import MyBox from '@fastgpt/web/components/common/MyBox';
 import TemplateConfigModal from './components/ItemConfigModal';
 import QuickTemplateModal from './components/QuickTemplateModal';

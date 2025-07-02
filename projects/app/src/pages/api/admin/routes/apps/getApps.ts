@@ -3,8 +3,8 @@ import { NextAPI } from '@/service/middleware/entry';
 import { MongoApp } from '@fastgpt/service/core/app/schema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { adminCert } from '@/service/support/permission/adminCert';
-import { UserModelSchema } from '@fastgpt/global/support/user/type';
-import { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import type { UserModelSchema } from '@fastgpt/global/support/user/type';
+import type { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
 
 type AppType = {

@@ -4,8 +4,8 @@ import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoUserInform } from '@/service/support/user/inform/schema';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
 import { NextAPI } from '@/service/middleware/entry';
-import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
-import { UserInformSchema } from '@fastgpt/global/support/user/inform/type';
+import type { PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import type { UserInformSchema } from '@fastgpt/global/support/user/inform/type';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 
 async function handler(

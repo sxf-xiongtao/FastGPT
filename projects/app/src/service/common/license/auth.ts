@@ -1,6 +1,6 @@
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import crypto from 'crypto';
-import { LicenseDataType } from '@fastgpt/global/common/system/types';
+import type { LicenseDataType } from '@fastgpt/global/common/system/types';
 import { MongoSystemConfigs } from '@fastgpt/service/common/system/config/schema';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
 

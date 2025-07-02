@@ -1,4 +1,4 @@
-import { LicenseDataType } from '@fastgpt/global/common/system/types';
+import type { LicenseDataType } from '@fastgpt/global/common/system/types';
 import { Box, Flex } from '@chakra-ui/react';
 import Avatar from '@fastgpt/web/components/common/Avatar';
 import React from 'react';

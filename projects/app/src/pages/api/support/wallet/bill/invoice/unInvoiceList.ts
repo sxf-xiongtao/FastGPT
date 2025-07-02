@@ -3,7 +3,8 @@ import { NextAPI } from '@/service/middleware/entry';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
 import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
 import { MongoBill } from '@/service/support/wallet/bill/schema';
-import { BillPayWayEnum, BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
+import type { BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
+import { BillPayWayEnum } from '@fastgpt/global/support/wallet/bill/constants';
 
 export type unInvoiceListQuery = {};
 

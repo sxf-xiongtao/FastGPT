@@ -1,6 +1,6 @@
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
-import { TeamSubSchema } from '@fastgpt/global/support/wallet/sub/type';
+import type { TeamSubSchema } from '@fastgpt/global/support/wallet/sub/type';
 import { addDays, differenceInDays } from 'date-fns';
 import { systemUseTeamPlanning } from '@/service/support/wallet/sub/utils';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';

@@ -1,11 +1,11 @@
 import { authDataset } from '@fastgpt/service/support/permission/dataset/auth';
 import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
 import { NextAPI } from '@/service/middleware/entry';
-import { DatasetTagType } from '@fastgpt/global/core/dataset/type';
+import type { DatasetTagType } from '@fastgpt/global/core/dataset/type';
 import { CommonErrEnum } from '@fastgpt/global/common/error/code/common';
 import { MongoDatasetCollectionTags } from '@fastgpt/service/core/dataset/tag/schema';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
-import { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { PaginationProps, PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { replaceRegChars } from '@fastgpt/global/common/string/tools';
 import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
 

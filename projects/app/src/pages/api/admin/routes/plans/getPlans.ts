@@ -1,11 +1,14 @@
 import { adminCert } from '@/service/support/permission/adminCert';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
-import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import type { PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { NextAPI } from '@/service/middleware/entry';
-import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import type {
+  StandardSubLevelEnum,
+  SubTypeEnum
+} from '@fastgpt/global/support/wallet/sub/constants';
 
 type ResponseItemType = {
   id: string;

@@ -13,7 +13,7 @@ import * as redeem from '@/pages/api/support/wallet/coupon/redeem';
 import { type RedeemCouponQuery } from '@/pages/api/support/wallet/coupon/redeem';
 import { MongoTeamCoupon } from '@fastgpt/service/support/wallet/coupon/schema';
 import * as getTeamPlans from '@/pages/api/support/user/team/plan/getTeamPlans';
-import { TeamSubSchema } from '@fastgpt/global/support/wallet/sub/type';
+import type { TeamSubSchema } from '@fastgpt/global/support/wallet/sub/type';
 import dayjs from 'dayjs';
 
 describe('Redeem coupon', async () => {

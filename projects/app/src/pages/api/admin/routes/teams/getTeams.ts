@@ -2,10 +2,10 @@ import { adminCert } from '@/service/support/permission/adminCert';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { formatStorePrice2Read } from '@fastgpt/global/support/wallet/usage/tools';
-import { UserModelSchema } from '@fastgpt/global/support/user/type';
-import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import type { UserModelSchema } from '@fastgpt/global/support/user/type';
+import type { PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { NextAPI } from '@/service/middleware/entry';
 
 type Team = {

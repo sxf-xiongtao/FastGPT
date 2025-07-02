@@ -1,5 +1,4 @@
 import { syncUserAndOrg } from '@/service/support/user/sync';
-import { getTeamByUsername } from '@/service/support/user/team/controller';
 import { createStandardSubBill } from '@/service/support/wallet/sub/bill';
 import { TeamMemberRoleEnum } from '@fastgpt/global/support/user/team/constant';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
@@ -8,10 +7,9 @@ import {
   SubModeEnum,
   SubTypeEnum
 } from '@fastgpt/global/support/wallet/sub/constants';
-import { TeamSubSchema } from '@fastgpt/global/support/wallet/sub/type';
+import type { TeamSubSchema } from '@fastgpt/global/support/wallet/sub/type';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { addLog } from '@fastgpt/service/common/system/log';
-import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';

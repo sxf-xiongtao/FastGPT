@@ -1,6 +1,7 @@
+import { SecretValueType } from '@fastgpt/global/common/secret/type';
 import { AppListItemType, SystemPluginListItemType } from '@fastgpt/global/core/app/type';
 import { FlowNodeTemplateTypeEnum } from '@fastgpt/global/core/workflow/constants';
-import { SystemPluginTemplateItemType } from '@fastgpt/global/core/workflow/type';
+import type { FlowNodeInputItemType } from '@fastgpt/global/core/workflow/type/io';
 
 export type EditCustomPluginType = {
   id?: string;
@@ -12,12 +13,13 @@ export type EditCustomPluginType = {
   currentCost?: number;
   hasTokenFee?: boolean;
   isActive: boolean;
-  inputConfig: {
-    key: string;
-    value?: string;
-  }[];
-  workflow: string;
   associatedPluginId?: string;
   userGuide?: string;
   author?: string;
+
+  inputList?: FlowNodeInputItemType['inputList'];
+  inputListVal?: Record<string, any>;
+
+  // @deprecated
+  workflow?: string;
 };

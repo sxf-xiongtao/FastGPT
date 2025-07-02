@@ -1,9 +1,9 @@
-import { ApiRequestProps } from '@fastgpt/service/type/next';
-import { ApiResponseType } from '@fastgpt/service/type/next';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
 import { adminCert } from '@/service/support/permission/adminCert';
-import { WorkflowTemplateBasicType } from '@fastgpt/global/core/workflow/type';
-import { PluginSourceEnum } from '@fastgpt/global/core/plugin/constants';
+import type { WorkflowTemplateBasicType } from '@fastgpt/global/core/workflow/type';
+import { PluginSourceEnum } from '@fastgpt/global/core/app/plugin/constants';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
 import { MongoAppTemplate } from '@fastgpt/service/core/app/templates/templateSchema';
 import { addAuditLog } from '@fastgpt/service/support/user/audit/util';

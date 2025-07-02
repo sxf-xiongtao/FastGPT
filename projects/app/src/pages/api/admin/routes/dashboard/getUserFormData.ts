@@ -1,9 +1,9 @@
 import { NextAPI } from '@/service/middleware/entry';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { NextApiResponse } from 'next';
-import { GetDataChartsQuery } from './type';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { NextApiResponse } from 'next';
+import type { GetDataChartsQuery } from './type';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
 import { getMongoTimezoneCode } from '@fastgpt/global/common/time/timezone';
 
 export type GetUserFormDataResponse = {

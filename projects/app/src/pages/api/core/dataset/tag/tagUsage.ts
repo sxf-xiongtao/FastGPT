@@ -7,7 +7,7 @@ import { MongoDatasetCollection } from '@fastgpt/service/core/dataset/collection
 import { authDataset } from '@fastgpt/service/support/permission/dataset/auth';
 import { NextAPI } from '@/service/middleware/entry';
 import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
-import { TagUsageType } from '@fastgpt/global/core/dataset/type';
+import type { TagUsageType } from '@fastgpt/global/core/dataset/type';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<TagUsageType>) {
   const { datasetId } = req.query as { datasetId: string };

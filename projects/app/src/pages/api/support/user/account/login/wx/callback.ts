@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import crypto from 'crypto';
 import xml2js from 'xml2js';
 import { UserAuthTypeEnum } from '@fastgpt/global/support/user/auth/constants';

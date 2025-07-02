@@ -1,4 +1,4 @@
-import { ConfigStoreType } from '@/global/admin/config';
+import type { ConfigStoreType } from '@/global/admin/config';
 import { GET, POST } from '@/service/common/request';
 
 export const getInitFormConfig = () => GET('/admin/common/system/getInitForm');

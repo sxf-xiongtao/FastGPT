@@ -1,7 +1,7 @@
 import { MongoAppTemplate } from '@fastgpt/service/core/app/templates/templateSchema';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { NextAPI } from '@/service/middleware/entry';
-import { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
+import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 
 export type updateTemplateOrderQuery = {};
 

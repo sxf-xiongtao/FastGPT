@@ -7,7 +7,8 @@
     "format": "prettier --config \"./.prettierrc.js\" --write \"./projects/**/src/**/*.{ts,tsx,scss}\"",
     "gen:theme-typings": "chakra-cli tokens FastGPT/packages/web/styles/theme.ts --out node_modules/.pnpm/node_modules/@chakra-ui/styled-system/dist/theming.types.d.ts",
     "postinstall": "pnpm gen:theme-typings",
-    "test": "vitest run"
+    "test": "vitest run",
+    "lint": "eslint \"**/*.{ts,tsx}\" --fix --ignore-path .eslintignore"
   },
   "devDependencies": {
     "@chakra-ui/cli": "^2.4.1",
@@ -20,13 +21,22 @@
     "next-i18next": "15.4.2",
     "prettier": "3.2.4",
     "react-i18next": "14.1.2",
-    "vitest": "^3.0.9"
+    "vitest": "^3.0.9",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "8.56.0",
+    "eslint-config-next": "14.2.26"
   },
   "resolutions": {
     "mdast-util-gfm-autolink-literal": "2.0.0"
   },
   "lint-staged": {
-    "./projects/**/**/*.{ts,tsx,scss}": "npm run format"
+    "./**/**/*.{ts,tsx,scss}": [
+      "pnpm format"
+    ],
+    "./**/**/*.{ts,tsx}": [
+      "pnpm lint"
+    ]
   },
   "engines": {
     "node": ">=18.0.0"

@@ -29,7 +29,7 @@ import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSc
 import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
 import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
 import { getI18nAppType } from '@fastgpt/service/support/user/audit/util';
-import { AppDetailType } from '@fastgpt/global/core/app/type';
+import type { AppDetailType } from '@fastgpt/global/core/app/type';
 /*
   增加或修改协作者
   1. 继承态目录：关闭继承态，更新新的协作者，同步其子目录协作者

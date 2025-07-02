@@ -1,4 +1,5 @@
-import { Box, BoxProps } from '@chakra-ui/react';
+import type { BoxProps } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import MyBox from '@fastgpt/web/components/common/MyBox';
 import React from 'react';
 

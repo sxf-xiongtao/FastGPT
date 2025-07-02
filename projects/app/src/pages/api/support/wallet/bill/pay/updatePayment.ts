@@ -5,8 +5,11 @@ import {
   BillPayWayEnum,
   MAX_WX_PAY_AMOUNT
 } from '@fastgpt/global/support/wallet/bill/constants';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
-import { CreateOrderResponse, UpdatePaymentProps } from '@fastgpt/global/support/wallet/bill/api';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
+import type {
+  CreateOrderResponse,
+  UpdatePaymentProps
+} from '@fastgpt/global/support/wallet/bill/api';
 import { NextAPI } from '@/service/middleware/entry';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 import { createPaymentController } from '@/service/support/wallet/bill/pay/base';

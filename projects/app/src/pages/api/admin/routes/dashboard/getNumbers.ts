@@ -3,7 +3,7 @@ import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoApp } from '@fastgpt/service/core/app/schema';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

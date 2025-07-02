@@ -1,13 +1,13 @@
-import { createTemplateBody } from '@/pages/api/admin/core/app/templates/create';
-import { deleteTemplateQuery } from '@/pages/api/admin/core/app/templates/delete';
-import { getSystemTemplatesResponse } from '@/pages/api/admin/core/app/templates/list';
-import { updateTemplateBody } from '@/pages/api/admin/core/app/templates/update';
-import { updateTemplateOrderBody } from '@/pages/api/admin/core/app/templates/updateOrder';
-import { updateQuickTemplateBody } from '@/pages/api/admin/core/app/templates/updateQuickTemplate';
-import { deleteTemplateTypeQuery } from '@/pages/api/admin/core/app/templateType/delete';
-import { SaveTemplateTypeBody } from '@/pages/api/admin/core/app/templateType/save';
-import { updateTemplateTypeOrderBody } from '@/pages/api/admin/core/app/templateType/updateOrder';
-import { getTemplateTypesResponse } from '@/pages/api/core/app/template/getTemplateTypes';
+import type { createTemplateBody } from '@/pages/api/admin/core/app/templates/create';
+import type { deleteTemplateQuery } from '@/pages/api/admin/core/app/templates/delete';
+import type { getSystemTemplatesResponse } from '@/pages/api/admin/core/app/templates/list';
+import type { updateTemplateBody } from '@/pages/api/admin/core/app/templates/update';
+import type { updateTemplateOrderBody } from '@/pages/api/admin/core/app/templates/updateOrder';
+import type { updateQuickTemplateBody } from '@/pages/api/admin/core/app/templates/updateQuickTemplate';
+import type { deleteTemplateTypeQuery } from '@/pages/api/admin/core/app/templateType/delete';
+import type { SaveTemplateTypeBody } from '@/pages/api/admin/core/app/templateType/save';
+import type { updateTemplateTypeOrderBody } from '@/pages/api/admin/core/app/templateType/updateOrder';
+import type { getTemplateTypesResponse } from '@/pages/api/core/app/template/getTemplateTypes';
 import { DELETE, GET, POST, PUT } from '@/service/common/request';
 
 export const getSystemTemplates = () =>

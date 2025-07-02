@@ -8,7 +8,7 @@ import {
   Switch,
   Textarea
 } from '@chakra-ui/react';
-import { ExternalProviderWorkflowVarType } from '@fastgpt/global/common/system/types';
+import type { ExternalProviderWorkflowVarType } from '@fastgpt/global/common/system/types';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { useState } from 'react';
 import { getNanoid } from '@fastgpt/global/common/string/tools';

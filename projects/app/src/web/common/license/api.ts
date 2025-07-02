@@ -1,6 +1,6 @@
-import { activeBody } from '@/pages/api/admin/common/license/active';
+import type { activeBody } from '@/pages/api/admin/common/license/active';
 import { GET, POST } from '@/service/common/request';
-import { LicenseDataType } from '@fastgpt/global/common/system/types';
+import type { LicenseDataType } from '@fastgpt/global/common/system/types';
 
 export const getLicenseData = () => GET<LicenseDataType>('/admin/common/license/auth');
 

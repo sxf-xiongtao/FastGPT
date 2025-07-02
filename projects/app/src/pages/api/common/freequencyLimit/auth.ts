@@ -1,6 +1,6 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
-import { AuthFrequencyLimitProps } from '@fastgpt/global/common/frequenctLimit/type';
+import type { AuthFrequencyLimitProps } from '@fastgpt/global/common/frequenctLimit/type';
 import { authFrequencyLimit } from '@fastgpt/service/common/system/frequencyLimit/utils';
 
 export type authQuery = {};

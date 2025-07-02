@@ -12,13 +12,13 @@ import type {
   CreateTeamProps,
   UpdateTeamProps
 } from '@fastgpt/global/support/user/team/controller.d';
-import {
+import type {
   TeamMemberItemType,
   TeamMemberSchema,
   TeamTmbItemType
 } from '@fastgpt/global/support/user/team/type';
 import type { TeamMemberWithTeamAndUserSchema } from '@fastgpt/global/support/user/team/type.d';
-import { ClientSession } from '@fastgpt/service/common/mongo';
+import type { ClientSession } from '@fastgpt/service/common/mongo';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { concatPer, getResourcePermission } from '@fastgpt/service/support/permission/controller';
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
@@ -27,10 +27,10 @@ import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { initTeamFreePlan } from '@fastgpt/service/support/wallet/sub/utils';
 import _ from 'lodash';
 
-import { PermissionValueType } from '@fastgpt/global/support/permission/type';
+import type { PermissionValueType } from '@fastgpt/global/support/permission/type';
 import { DefaultGroupName } from '@fastgpt/global/support/user/team/group/constant';
-import { TeamSchema } from '@fastgpt/global/support/user/team/type';
-import { UserModelSchema } from '@fastgpt/global/support/user/type';
+import type { TeamSchema } from '@fastgpt/global/support/user/team/type';
+import type { UserModelSchema } from '@fastgpt/global/support/user/type';
 import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
 import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
 import { MongoOrgMemberModel } from '@fastgpt/service/support/permission/org/orgMemberSchema';

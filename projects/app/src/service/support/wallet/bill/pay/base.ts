@@ -1,6 +1,6 @@
 import { BillPayWayEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { createAlipayProcessor } from './alipay/alipayProcessor';
-import { AlipayConfig, WxPayConfig, PayController } from './type';
+import type { AlipayConfig, WxPayConfig, PayController } from './type';
 import { createWxPayProcessor } from './wx/wxPayProcessor';
 import { createBankPayController } from './bank';
 

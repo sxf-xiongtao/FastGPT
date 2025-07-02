@@ -13,7 +13,7 @@ import { useToast } from '@fastgpt/web/hooks/useToast';
 import { getErrText } from '@fastgpt/global/common/error/utils';
 import MyTooltip from '@fastgpt/web/components/common/MyTooltip';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
-import { NavbarItemType } from '@fastgpt/global/common/system/types';
+import type { NavbarItemType } from '@fastgpt/global/common/system/types';
 
 const defaultNavbarItem: NavbarItemType = {
   id: '',

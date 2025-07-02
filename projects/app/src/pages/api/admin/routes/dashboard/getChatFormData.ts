@@ -1,9 +1,9 @@
 import { adminCert } from '@/service/support/permission/adminCert';
-import { NextApiResponse } from 'next';
+import type { NextApiResponse } from 'next';
 import { MongoChatItem } from '@fastgpt/service/core/chat/chatItemSchema';
 import { NextAPI } from '@/service/middleware/entry';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
-import { GetDataChartsQuery } from './type';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { GetDataChartsQuery } from './type';
 import { getMongoTimezoneCode } from '@fastgpt/global/common/time/timezone';
 
 export type GetChatFormDataResponse = {

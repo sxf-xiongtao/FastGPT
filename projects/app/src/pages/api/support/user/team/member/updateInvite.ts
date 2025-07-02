@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
-import { UpdateInviteProps } from '@fastgpt/global/support/user/team/controller';
+import type { UpdateInviteProps } from '@fastgpt/global/support/user/team/controller';
 import { NextAPI } from '@/service/middleware/entry';
 
 /* update invite status */

@@ -1,9 +1,9 @@
-import {
+import type {
   StandardSubLevelEnum,
-  SubModeEnum,
-  SubTypeEnum
+  SubModeEnum
 } from '@fastgpt/global/support/wallet/sub/constants';
-import { ClientSession } from '@fastgpt/service/common/mongo';
+import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import type { ClientSession } from '@fastgpt/service/common/mongo';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { sortStandPlans, clearTeamPointsCache } from '@fastgpt/service/support/wallet/sub/utils';
 import { addDays } from 'date-fns';

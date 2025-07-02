@@ -2,7 +2,7 @@ import type { NextApiResponse } from 'next';
 import type { AuthOpenApiLimitProps } from '@fastgpt/service/support/openapi/auth';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { NextAPI } from '@/service/middleware/entry';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
 
 async function handler(req: ApiRequestProps<AuthOpenApiLimitProps>, res: NextApiResponse) {
   await authCert({ req, authRoot: true });

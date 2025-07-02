@@ -1,8 +1,7 @@
-import { adminCert } from '@/service/support/permission/adminCert';
 import { NextAPI } from '@/service/middleware/entry';
-import { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
+import { adminCert } from '@/service/support/permission/adminCert';
 import { MongoSystemPlugin } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
-import { getSystemPluginCb } from '@/service/core/workflow/systemPlugins/register';
+import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 
 export type updatePluginOrderQuery = {};
 
@@ -31,9 +30,6 @@ async function handler(
       }
     }))
   );
-
-  await getSystemPluginCb(true);
-
   return {};
 }
 

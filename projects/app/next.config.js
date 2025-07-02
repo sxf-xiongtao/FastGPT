@@ -70,7 +70,6 @@ const nextConfig = {
     if (isServer) {
       config.externals.push('worker_threads');
       config.externals.push('@node-rs/jieba');
-
       if (nextRuntime === 'nodejs') {
         // config.output.globalObject = 'self';
 
@@ -81,11 +80,7 @@ const nextConfig = {
             const entries = await oldEntry(...args);
             return {
               ...entries,
-              ...getWorkerConfig(),
-              'worker/systemPluginRun': path.resolve(
-                process.cwd(),
-                '../../FastGPT/packages/plugins/runtime/worker.ts'
-              )
+              ...getWorkerConfig()
             };
           }
         };

@@ -1,7 +1,7 @@
 import { MongoTeamTags } from '@fastgpt/service/support/user/team/teamTagsSchema';
 import axios from 'axios';
-import { TeamTagItemType } from '@fastgpt/global/support/user/team/type';
-import { AuthTokenFromTeamDomainResponse } from '@fastgpt/global/support/user/team/tag';
+import type { TeamTagItemType } from '@fastgpt/global/support/user/team/type';
+import type { AuthTokenFromTeamDomainResponse } from '@fastgpt/global/support/user/team/tag';
 
 export const loadTagsFromDomain = async (domain: string) => {
   const { data: result } = await axios.get<{ data: TeamTagItemType[] }>(`${domain}/tag/sync`);

@@ -1,12 +1,12 @@
-import { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
 
-import { ApiResponseType } from '@fastgpt/service/type/next';
+import type { ApiResponseType } from '@fastgpt/service/type/next';
 import { MongoAppTemplate } from '@fastgpt/service/core/app/templates/templateSchema';
 
 import { adminCert } from '@/service/support/permission/adminCert';
 import { NextAPI } from '@/service/middleware/entry';
 import { isCommunityTemplate } from '@fastgpt/templates/register';
-import { AppTemplateSchemaType } from '@fastgpt/global/core/app/type';
+import type { AppTemplateSchemaType } from '@fastgpt/global/core/app/type';
 import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
 import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 import { getUserDetail } from '@fastgpt/service/support/user/controller';

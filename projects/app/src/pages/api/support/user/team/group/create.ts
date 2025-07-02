@@ -5,7 +5,7 @@ import { TeamManagePermissionVal } from '@fastgpt/global/support/permission/user
 import { MongoMemberGroupModel } from '@fastgpt/service/support/permission/memberGroup/memberGroupSchema';
 import { MongoGroupMemberModel } from '@fastgpt/service/support/permission/memberGroup/groupMemberSchema';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
-import { postCreateGroupData } from '@fastgpt/global/support/user/team/group/api';
+import type { postCreateGroupData } from '@fastgpt/global/support/user/team/group/api';
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
 import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';

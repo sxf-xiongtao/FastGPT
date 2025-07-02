@@ -4,7 +4,10 @@ import { Box, Button, Flex, useDisclosure } from '@chakra-ui/react';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
 import { getPluginGroups, getSystemPlugins, putUpdatePluginOrder } from '@/web/core/app/plugin/api';
 import Avatar from '@fastgpt/web/components/common/Avatar';
-import { SystemPluginTemplateItemType } from '@fastgpt/global/core/workflow/type';
+import type {
+  SystemPluginTemplateItemType,
+  SystemPluginTemplateListItemType
+} from '@fastgpt/global/core/app/plugin/type';
 import dynamic from 'next/dynamic';
 import { defaultCustomPluginForm } from '../../../../pageComponents/templates/toolkit/CustomPluginConfig';
 import type { EditCustomPluginType } from '@/global/core/workflow/plugin/type.d';
@@ -17,6 +20,7 @@ import QuestionTip from '@fastgpt/web/components/common/MyTooltip/QuestionTip';
 import EmptyTip from '@fastgpt/web/components/common/EmptyTip';
 import { useTranslation } from 'next-i18next';
 import MyBox from '@fastgpt/web/components/common/MyBox';
+import type { getSystemPluginsResponse } from '@/pages/api/admin/core/app/plugin/list';
 
 const CustomPluginConfig = dynamic(
   () => import('../../../../pageComponents/templates/toolkit/CustomPluginConfig'),
@@ -87,9 +91,15 @@ const SystemPlugin = () => {
     return groups.find((item) => item.groupId === selectedGroup) || groups[0];
   }, [groups, selectedGroup]);
 
-  const [localPlugins, setLocalPlugins] = useState<SystemPluginTemplateItemType[]>([]);
+  const [localPlugins, setLocalPlugins] = useState<getSystemPluginsResponse>([]);
+
   useEffect(() => {
-    const pluginMap = new Map(currentGroup?.groupTypes.map((type) => [type.typeId, type.typeName]));
+    if (!currentGroup?.groupTypes || !plugins.length) {
+      setLocalPlugins([]);
+      return;
+    }
+
+    const pluginMap = new Map(currentGroup.groupTypes.map((type) => [type.typeId, type.typeName]));
 
     const newPlugins = plugins
       .filter((item) => pluginMap.has(item.templateType))
@@ -98,8 +108,13 @@ const SystemPlugin = () => {
         typeLabel: pluginMap.get(item.templateType)
       }));
 
-    setLocalPlugins(newPlugins);
-  }, [currentGroup, plugins]);
+    setLocalPlugins((prevPlugins) => {
+      if (JSON.stringify(prevPlugins) === JSON.stringify(newPlugins)) {
+        return prevPlugins;
+      }
+      return newPlugins;
+    });
+  }, [currentGroup?.groupId, currentGroup?.groupTypes, plugins]);
 
   return (
     <MyBox isLoading={loadingPlugins || loadingGroups}>
@@ -193,8 +208,8 @@ const SystemPlugin = () => {
       </Flex>
 
       <Box overflow={'auto'} mt={2} h={'calc(100vh - 200px)'}>
-        <DndDrag<SystemPluginTemplateItemType>
-          onDragEndCb={async (list: SystemPluginTemplateItemType[]) => {
+        <DndDrag<SystemPluginTemplateListItemType>
+          onDragEndCb={async (list: getSystemPluginsResponse) => {
             const newOrder = list.map((item, index) => ({
               pluginId: item.id,
               pluginOrder: index

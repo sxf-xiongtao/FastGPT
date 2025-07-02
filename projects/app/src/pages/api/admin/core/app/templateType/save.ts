@@ -1,5 +1,5 @@
-import { ApiRequestProps } from '@fastgpt/service/type/next';
-import { ApiResponseType } from '@fastgpt/service/type/next';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { ApiResponseType } from '@fastgpt/service/type/next';
 import { adminCert } from '@/service/support/permission/adminCert';
 import { NextAPI } from '@/service/middleware/entry';
 import { MongoTemplateTypes } from '@fastgpt/service/core/app/templates/templateTypeSchema';

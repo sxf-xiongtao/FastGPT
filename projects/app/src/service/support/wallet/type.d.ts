@@ -1,4 +1,4 @@
-import { ConcatBillQueueItemType } from '@fastgpt/service/support/wallet/usage/type';
+import type { ConcatBillQueueItemType } from '@fastgpt/service/support/wallet/usage/type';
 
 declare global {
   var reduceAiPointsQueue: { teamId: string; totalPoints: number }[];

@@ -15,7 +15,7 @@ import { useToast } from '@fastgpt/web/hooks/useToast';
 import MyModal from '@fastgpt/web/components/common/MyModal';
 import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import MySelect from '@fastgpt/web/components/common/MySelect';
-import { PlanType } from '@/pages/users/plans';
+import type { PlanType } from '@/pages/users/plans';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
 import MyDivider from '@fastgpt/web/components/common/MyDivider';
 

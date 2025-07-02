@@ -1,9 +1,9 @@
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
-import { PermissionValueType } from '@fastgpt/global/support/permission/type';
+import type { PermissionValueType } from '@fastgpt/global/support/permission/type';
 import { getTeamMember } from '../../user/team/controller';
 import { parseHeaderCert } from '@fastgpt/service/support/permission/controller';
-import { TeamMemberItemType } from '@fastgpt/global/support/user/team/type';
-import { AuthModeType, AuthResponseType } from '@fastgpt/service/support/permission/type';
+import type { TeamMemberItemType } from '@fastgpt/global/support/user/team/type';
+import type { AuthModeType, AuthResponseType } from '@fastgpt/service/support/permission/type';
 import { OwnerPermissionVal } from '@fastgpt/global/support/permission/constant';
 
 export const authMember = async ({

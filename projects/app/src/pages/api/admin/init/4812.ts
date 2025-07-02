@@ -19,8 +19,8 @@ import {
   syncChildrenPermission,
   syncCollaborators
 } from '@fastgpt/service/support/permission/inheritPermission';
-import { AppSchema } from '@fastgpt/global/core/app/type';
-import { DatasetSchemaType } from '@fastgpt/global/core/dataset/type';
+import type { AppSchema } from '@fastgpt/global/core/app/type';
+import type { DatasetSchemaType } from '@fastgpt/global/core/dataset/type';
 
 /* 
   1. 更新默认权限：原本有团队可读，团队可写的，都增加一个全员组。

@@ -4,8 +4,8 @@ import { MongoInvoice } from '@/service/support/wallet/bill/invoiceSchema';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
-import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
-import { InvoiceSchemaType } from '@fastgpt/global/support/wallet/bill/type';
+import type { PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import type { InvoiceSchemaType } from '@fastgpt/global/support/wallet/bill/type';
 
 export type listQuery = {};
 

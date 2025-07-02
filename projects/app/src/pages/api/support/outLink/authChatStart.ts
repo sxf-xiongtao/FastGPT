@@ -3,7 +3,7 @@ import { jsonRes } from '@fastgpt/service/common/response';
 
 import { authOutLinkLimit } from '@/service/support/outLink/auth';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
-import { AuthOutLinkResponse } from '@fastgpt/global/support/outLink/api';
+import type { AuthOutLinkResponse } from '@fastgpt/global/support/outLink/api';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

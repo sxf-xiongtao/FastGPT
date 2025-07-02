@@ -1,4 +1,4 @@
-import { ClientSession } from '@fastgpt/service/common/mongo';
+import type { ClientSession } from '@fastgpt/service/common/mongo';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { MongoApp } from '@fastgpt/service/core/app/schema';
 import { findDatasetAndAllChildren } from '@fastgpt/service/core/dataset/controller';

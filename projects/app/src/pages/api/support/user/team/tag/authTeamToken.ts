@@ -3,7 +3,7 @@ import { jsonRes } from '@fastgpt/service/common/response';
 
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { authTokenFromTeamDomain } from '@/service/support/user/team/tagController';
-import { AuthTeamTagTokenProps } from '@fastgpt/global/support/user/team/tag';
+import type { AuthTeamTagTokenProps } from '@fastgpt/global/support/user/team/tag';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

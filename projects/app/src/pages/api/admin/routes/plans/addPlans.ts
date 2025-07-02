@@ -3,13 +3,15 @@ import { NextAPI } from '@/service/middleware/entry';
 
 import { adminCert } from '@/service/support/permission/adminCert';
 import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
-import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import type { StandardSubLevelEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { jsonRes } from '@fastgpt/service/common/response';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { NextApiResponse } from 'next';
+import { NextApiRequest } from 'next';
 import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
 import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 import { getUserDetail } from '@fastgpt/service/support/user/controller';

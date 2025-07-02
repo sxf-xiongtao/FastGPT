@@ -1,5 +1,5 @@
-import { CreateOrderResponse } from '@fastgpt/global/support/wallet/bill/api';
-import { BillStatusEnum, BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
+import type { CreateOrderResponse } from '@fastgpt/global/support/wallet/bill/api';
+import type { BillStatusEnum, BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
 
 export type PayResult = {
   status: BillStatusEnum.SUCCESS | BillStatusEnum.NOTPAY | BillStatusEnum.CLOSED;

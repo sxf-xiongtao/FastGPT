@@ -4,10 +4,12 @@ import createHandler, {
   type CreateInvitationLinkResponse
 } from '@/pages/api/support/user/team/invitationLink/create';
 
-import listHandler, {
-  type InvitationLinkListBody,
+import type {
   InvitationLinkListQuery,
   InvitationLinkListResponse
+} from '@/pages/api/support/user/team/invitationLink/list';
+import listHandler, {
+  type InvitationLinkListBody
 } from '@/pages/api/support/user/team/invitationLink/list';
 
 import acceptHandler, {

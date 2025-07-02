@@ -1,7 +1,7 @@
 import { NextAPI } from '@/service/middleware/entry';
 import { MongoPluginGroups } from '@fastgpt/service/core/app/plugin/pluginGroupSchema';
-import { PluginGroupSchemaType } from '@fastgpt/service/core/app/plugin/type';
-import { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
+import type { PluginGroupSchemaType } from '@fastgpt/service/core/app/plugin/type';
+import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 
 export type getPluginGroupsQuery = {};
 

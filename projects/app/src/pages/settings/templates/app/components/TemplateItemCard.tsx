@@ -1,9 +1,12 @@
 import { putUpdateTemplate } from '@/web/core/app/templates/api';
 import { Box, Checkbox, Flex, Switch } from '@chakra-ui/react';
 import { AppTemplateTypeEnum, AppTypeEnum } from '@fastgpt/global/core/app/constants';
-import { AppTemplateSchemaType } from '@fastgpt/global/core/app/type';
+import type { AppTemplateSchemaType } from '@fastgpt/global/core/app/type';
 import Avatar from '@fastgpt/web/components/common/Avatar';
-import { DraggableProvided, DraggableStateSnapshot } from '@fastgpt/web/components/common/DndDrag';
+import type {
+  DraggableProvided,
+  DraggableStateSnapshot
+} from '@fastgpt/web/components/common/DndDrag';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import MyBox from '@fastgpt/web/components/common/MyBox';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';

@@ -13,7 +13,7 @@ import {
   StandardSubLevelEnum,
   standardSubLevelMap
 } from '@fastgpt/global/support/wallet/sub/constants';
-import {
+import type {
   StandSubPlanLevelMapType,
   TeamStandardSubPlanItemType
 } from '@fastgpt/global/support/wallet/sub/type';

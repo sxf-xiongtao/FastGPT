@@ -1,8 +1,8 @@
 import { NextAPI } from '@/service/middleware/entry';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { MongoTeamCoupon } from '@fastgpt/service/support/wallet/coupon/schema';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
-import { NextApiResponse } from 'next';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { NextApiResponse } from 'next';
 
 export type DisableCouponBody = {
   keys: string[];

@@ -1,4 +1,4 @@
-import { InvoiceSchemaType } from '@fastgpt/global/support/wallet/bill/type';
+import type { InvoiceSchemaType } from '@fastgpt/global/support/wallet/bill/type';
 import { getMongoModel, Schema } from '@fastgpt/service/common/mongo';
 import { teamInvoiceTitleScheme } from '../../user/team/invoiceAccount/teamInvoiceSchema';
 import { InvoiceStatusEnum } from '@fastgpt/global/support/wallet/bill/invoice/constants';

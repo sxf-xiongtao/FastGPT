@@ -1,4 +1,4 @@
-import { OutlinkAppType, OutLinkSchema } from '@fastgpt/global/support/outLink/type';
+import type { OutlinkAppType, OutLinkSchema } from '@fastgpt/global/support/outLink/type';
 import { getAppLatestVersion } from '@fastgpt/service/core/app/version/controller';
 import { decrypt } from '@wecom/crypto';
 import crypto from 'crypto';

@@ -1,7 +1,7 @@
 import { NextAPI } from '@/service/middleware/entry';
-import { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
+import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { MongoTemplateTypes } from '@fastgpt/service/core/app/templates/templateTypeSchema';
-import { TemplateTypeSchemaType } from '@fastgpt/global/core/app/type';
+import type { TemplateTypeSchemaType } from '@fastgpt/global/core/app/type';
 export type getTemplateTypesQuery = {};
 
 export type getTemplateTypesBody = {};

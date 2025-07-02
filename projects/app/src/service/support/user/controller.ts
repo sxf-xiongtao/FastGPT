@@ -11,9 +11,10 @@ import {
   TeamMemberRoleEnum,
   TeamMemberStatusEnum
 } from '@fastgpt/global/support/user/team/constant';
-import { TeamTmbItemType } from '@fastgpt/global/support/user/team/type';
-import { UserType } from '@fastgpt/global/support/user/type';
-import { ClientSession, Types } from '@fastgpt/service/common/mongo';
+import type { TeamTmbItemType } from '@fastgpt/global/support/user/team/type';
+import type { UserType } from '@fastgpt/global/support/user/type';
+import type { ClientSession } from '@fastgpt/service/common/mongo';
+import { Types } from '@fastgpt/service/common/mongo';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { addLog } from '@fastgpt/service/common/system/log';
 import { getGroupsByTmbId } from '@fastgpt/service/support/permission/memberGroup/controllers';

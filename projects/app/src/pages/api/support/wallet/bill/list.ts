@@ -3,11 +3,11 @@ import { jsonRes } from '@fastgpt/service/common/response';
 
 import { MongoBill } from '@/service/support/wallet/bill/schema';
 import { authUserPer } from '@fastgpt/service/support/permission/user/auth';
-import { BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
-import { BillSchemaType } from '@fastgpt/global/support/wallet/bill/type';
+import type { BillTypeEnum } from '@fastgpt/global/support/wallet/bill/constants';
+import type { BillSchemaType } from '@fastgpt/global/support/wallet/bill/type';
 import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
-import { PaginationResponse } from '@fastgpt/web/common/fetch/type';
+import type { PaginationResponse } from '@fastgpt/web/common/fetch/type';
 import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
 import { NextAPI } from '@/service/middleware/entry';
 

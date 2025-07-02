@@ -1,6 +1,6 @@
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 import { NextAPI } from '@/service/middleware/entry';
-import { SearchDatasetDataProps } from '@fastgpt/service/core/dataset/search/controller';
+import type { SearchDatasetDataProps } from '@fastgpt/service/core/dataset/search/controller';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 
 export type deepRagQuery = {};

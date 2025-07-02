@@ -9,7 +9,7 @@ import MyIcon from '@fastgpt/web/components/common/Icon';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
 import { putUpdateQuickTemplate } from '@/web/core/app/templates/api';
 import FillRowTabs from '@fastgpt/web/components/common/Tabs/FillRowTabs';
-import { AppTemplateSchemaType } from '@fastgpt/global/core/app/type';
+import type { AppTemplateSchemaType } from '@fastgpt/global/core/app/type';
 import dynamic from 'next/dynamic';
 
 const QuickTemplateModal = ({
