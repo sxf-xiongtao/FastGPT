@@ -24,16 +24,18 @@ jobs:
         run: git submodule update --init --recursive
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
 
       - name: Cache Docker layers
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          key: ${{ runner.os }}-preview-buildx-${{ github.event.pull_request.head.sha }}
           restore-keys: |
+            ${{ runner.os }}-preview-buildx-${{ github.event.pull_request.base.sha }}
+            ${{ runner.os }}-preview-buildx-
             ${{ runner.os }}-buildx-
 
       - name: Login to Aliyun Container Registry
@@ -48,19 +50,20 @@ jobs:
           echo "DOCKER_REPO_TAGGED=${{ secrets.ALI_IMAGE_NAME }}/fastgpt-pro-pr:${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
 
       - name: Build and publish image
-        env:
-          DOCKER_REPO_TAGGED: ${{ env.DOCKER_REPO_TAGGED }}
-        run: |
-          docker buildx build \
-          -f projects/app/Dockerfile \
-          --build-arg name=app \
-          --label "org.opencontainers.image.source=https://github.com/${{ github.repository_owner }}/fastgpt-pro" \
-          --label "org.opencontainers.image.description=fastgpt-pro image" \
-          --push \
-          --cache-from=type=local,src=/tmp/.buildx-cache \
-          --cache-to=type=local,dest=/tmp/.buildx-cache \
-          -t ${DOCKER_REPO_TAGGED} \
-          .
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: projects/app/Dockerfile
+          build-args: |
+            name=app
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository_owner }}/fastgpt-pro
+            org.opencontainers.image.description=fastgpt-pro image
+          push: true
+          tags: ${{ env.DOCKER_REPO_TAGGED }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+
       - name: '@finleyge/github-tools'
         uses: FinleyGe/github-tools@0.0.1
         id: print-image-label
