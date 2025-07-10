@@ -9,8 +9,9 @@ import { createUserByUsername } from '@/service/support/user/controller';
 import { createOnePromotion } from '@/service/support/activity/promotion/controller';
 import { Types } from '@fastgpt/service/common/mongo';
 import { trackBaiduConversion } from '@/service/common/tracking/baidu';
-import type { ApiRequestProps } from '@fastgpt/service/type/next';
-import type { AccountRegisterBody } from '@fastgpt/global/support/user/login/api';
+import { trackBingConversion } from '@/service/common/tracking/bing';
+import { ApiRequestProps } from '@fastgpt/service/type/next';
+import { AccountRegisterBody } from '@fastgpt/global/support/user/login/api';
 import { NextAPI } from '@/service/middleware/entry';
 import { UserErrEnum } from '@fastgpt/global/common/error/code/user';
 import type { LoginSuccessResponse } from '../password/updateByCode';
@@ -22,7 +23,8 @@ async function handler(
   req: ApiRequestProps<AccountRegisterBody>,
   res: NextApiResponse<any>
 ): Promise<LoginSuccessResponse> {
-  const { username, code, password, inviterId, bd_vid, fastgpt_sem, sourceDomain } = req.body;
+  const { username, code, password, inviterId, bd_vid, msclkid, fastgpt_sem, sourceDomain } =
+    req.body;
 
   if (!username || !code || !password) {
     return Promise.reject(CommonErrEnum.invalidParams);
@@ -77,6 +79,9 @@ async function handler(
 
   // 百度转化
   bd_vid && trackBaiduConversion(bd_vid);
+
+  // Bing转化追踪
+  msclkid && trackBingConversion(msclkid);
 
   return {
     user,

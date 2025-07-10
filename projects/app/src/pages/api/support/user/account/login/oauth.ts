@@ -10,6 +10,7 @@ import { OAuthEnum } from '@fastgpt/global/support/user/constant';
 import type { OauthLoginProps } from '@fastgpt/global/support/user/api';
 import { UserErrEnum } from '@fastgpt/global/common/error/code/user';
 import { trackBaiduConversion } from '@/service/common/tracking/baidu';
+import { trackBingConversion } from '@/service/common/tracking/bing';
 import { pushTrack } from '@fastgpt/service/common/middle/tracks/utils';
 import requestIp from 'request-ip';
 
@@ -24,7 +25,7 @@ type OauthResponse = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
-    const { type, callbackUrl, inviterId, bd_vid, fastgpt_sem, sourceDomain, props } =
+    const { type, callbackUrl, inviterId, bd_vid, msclkid, fastgpt_sem, sourceDomain, props } =
       req.body as OauthLoginProps;
 
     const { username, avatarUrl, concat, phonePrefix, teamName, memberName } = await (async () => {
@@ -51,6 +52,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
     // 百度转化
     bd_vid && trackBaiduConversion(bd_vid);
+
+    // Bing转化追踪
+    msclkid && trackBingConversion(msclkid);
+
     pushTrack.login({
       type,
       uid: user._id,
