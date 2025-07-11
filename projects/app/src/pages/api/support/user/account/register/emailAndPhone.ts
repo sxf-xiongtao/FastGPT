@@ -10,8 +10,8 @@ import { createOnePromotion } from '@/service/support/activity/promotion/control
 import { Types } from '@fastgpt/service/common/mongo';
 import { trackBaiduConversion } from '@/service/common/tracking/baidu';
 import { trackBingConversion } from '@/service/common/tracking/bing';
-import { ApiRequestProps } from '@fastgpt/service/type/next';
-import { AccountRegisterBody } from '@fastgpt/global/support/user/login/api';
+import type { ApiRequestProps } from '@fastgpt/service/type/next';
+import type { AccountRegisterBody } from '@fastgpt/global/support/user/login/api';
 import { NextAPI } from '@/service/middleware/entry';
 import { UserErrEnum } from '@fastgpt/global/common/error/code/user';
 import type { LoginSuccessResponse } from '../password/updateByCode';

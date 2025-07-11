@@ -6,7 +6,6 @@ import { TimerIdEnum } from '@fastgpt/service/common/system/timerLock/constants'
 import { notifyAllExpireSoon } from '@/service/support/user/team/timerTask/expireSoon';
 import { checkFreeAccount } from '@/service/support/user/team/timerTask/freeAccount';
 import { addLog } from '@fastgpt/service/common/system/log';
-import { syncCollectionTask } from '@/service/core/dataset/sync';
 import { authLicense } from '../license/auth';
 
 const setTrainingCron = () => {
@@ -68,11 +67,6 @@ const freeAccountCron = () => {
   });
 };
 
-// 集合同步
-const syncCollectionCron = () => {
-  setCron('15 */1 * * *', syncCollectionTask);
-};
-
 // 成员同步
 const syncMemberAndOrgCron = () => {
   const cron = process.env.SYNC_MEMBER_CRON;
@@ -95,7 +89,6 @@ export const startCron = () => {
   updateSubPlanCron();
   planNotifyCron();
   freeAccountCron();
-  syncCollectionCron();
   syncMemberAndOrgCron();
   authLicenseCron();
 };

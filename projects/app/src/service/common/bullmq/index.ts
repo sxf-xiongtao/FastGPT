@@ -1,7 +1,7 @@
 import { addLog } from '@fastgpt/service/common/system/log';
-import { initWebsiteSyncWorker } from '@/service/core/dataset/website';
+import { initDatasetSyncWorker } from '@/service/core/dataset/dataset/sync';
 
 export const initBullMQWorkers = () => {
   addLog.info('Init BullMQ Workers...');
-  initWebsiteSyncWorker();
+  initDatasetSyncWorker();
 };

@@ -1,19 +1,20 @@
 import type { NextApiResponse } from 'next';
 import { authDataset } from '@fastgpt/service/support/permission/dataset/auth';
-import type { PostWebsiteSyncParams } from '@fastgpt/global/core/dataset/api.d';
+import type { PostDatasetSyncParams } from '@fastgpt/global/core/dataset/api.d';
 import { updateWebSyncLimit } from '@fastgpt/service/support/user/utils';
-import { checkTeamWebSyncPermission } from '@fastgpt/service/support/permission/teamLimit';
+import { checkTeamDatasetSyncPermission } from '@fastgpt/service/support/permission/teamLimit';
 import { ManagePermissionVal } from '@fastgpt/global/support/permission/constant';
 import { NextAPI } from '@/service/middleware/entry';
 import type { ApiRequestProps } from '@fastgpt/service/type/next';
 import {
-  addWebsiteSyncJob,
-  getWebsiteSyncDatasetStatus
-} from '@fastgpt/service/core/dataset/websiteSync';
+  addDatasetSyncJob,
+  getDatasetSyncDatasetStatus
+} from '@fastgpt/service/core/dataset/datasetSync';
 import { DatasetStatusEnum } from '@fastgpt/global/core/dataset/constants';
 import { MongoDatasetTraining } from '@fastgpt/service/core/dataset/training/schema';
+import { DatasetTypeEnum } from '@fastgpt/global/core/dataset/constants';
 
-async function handler(req: ApiRequestProps<PostWebsiteSyncParams>, res: NextApiResponse) {
+async function handler(req: ApiRequestProps<PostDatasetSyncParams>, res: NextApiResponse) {
   const { datasetId } = req.body;
 
   const { dataset, teamId } = await authDataset({
@@ -23,12 +24,8 @@ async function handler(req: ApiRequestProps<PostWebsiteSyncParams>, res: NextApi
     per: ManagePermissionVal
   });
 
-  if (!dataset?.websiteConfig?.url) {
-    throw new Error('Dataset is not website dataset');
-  }
-
   // Check it is already syncing
-  const { status } = await getWebsiteSyncDatasetStatus(datasetId);
+  const { status } = await getDatasetSyncDatasetStatus(datasetId);
   if (status === DatasetStatusEnum.syncing) {
     return Promise.reject('Dataset is syncing');
   }
@@ -42,11 +39,15 @@ async function handler(req: ApiRequestProps<PostWebsiteSyncParams>, res: NextApi
     return Promise.reject('Dataset is training');
   }
 
-  await checkTeamWebSyncPermission(teamId);
+  if (dataset.type === DatasetTypeEnum.websiteDataset) {
+    await checkTeamDatasetSyncPermission(teamId);
+  }
 
-  await addWebsiteSyncJob({ datasetId: dataset._id.toString() });
+  await addDatasetSyncJob({ datasetId: dataset._id.toString() });
 
-  updateWebSyncLimit(teamId);
+  if (dataset.type === DatasetTypeEnum.websiteDataset) {
+    updateWebSyncLimit(teamId);
+  }
 }
 
 export default NextAPI(handler);
