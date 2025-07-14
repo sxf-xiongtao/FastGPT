@@ -1,20 +1,18 @@
 import axios from 'axios';
 
-interface BingConversionConfig {
+type BingConversionConfig = {
   customerId: string;
   customerAccountId: string;
   developerToken: string;
   endpoint: string;
-}
+};
 
 const config: BingConversionConfig = {
   customerId: process.env.BING_ADS_CUSTOMER_ID || '',
   customerAccountId: process.env.BING_ADS_CUSTOMER_ACCOUNT_ID || '',
   developerToken: process.env.BING_ADS_DEVELOPER_TOKEN || '',
   endpoint:
-    process.env.BING_API_ENVIRONMENT === 'PRODUCTION'
-      ? 'https://campaign.api.bingads.microsoft.com/CampaignManagement/v13/OfflineConversions/Apply'
-      : 'https://campaign.api.sandbox.bingads.microsoft.com/CampaignManagement/v13/OfflineConversions/Apply'
+    'https://campaign.api.bingads.microsoft.com/CampaignManagement/v13/OfflineConversions/Apply'
 };
 
 const refreshAccessToken = async () => {
@@ -30,7 +28,8 @@ const refreshAccessToken = async () => {
     grant_type: 'refresh_token',
     client_id: clientId,
     client_secret: clientSecret,
-    refresh_token: refreshToken
+    refresh_token: refreshToken,
+    scope: 'https://ads.microsoft.com/msads.manage offline_access'
   });
 
   const response = await axios.post(
@@ -58,7 +57,7 @@ export const trackBingConversion = async (msclkid: string) => {
     const postData = {
       OfflineConversions: [
         {
-          ConversionName: process.env.BING_ADS_CONVERSION_Name || 'Registration',
+          ConversionName: process.env.BING_ADS_CONVERSION_NAME || 'fastgptcn',
           ConversionTime: new Date().toISOString(),
           MicrosoftClickId: msclkid
         }
