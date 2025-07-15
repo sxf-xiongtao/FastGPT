@@ -10,6 +10,8 @@ import { NextAPI } from '@/service/middleware/entry';
 import type { ApiRequestProps } from '@fastgpt/service/type/next';
 import type { UserType } from '@fastgpt/global/support/user/type';
 import requestIp from 'request-ip';
+import { trackBaiduConversion } from '@/service/common/tracking/baidu';
+import { trackBingConversion } from '@/service/common/tracking/bing';
 
 export async function authWechat(openid: string) {
   const { APP_ID, APP_SECRET } = await getWechatLoginConfig();
@@ -43,7 +45,7 @@ async function handler(
     }
   | undefined
 > {
-  const { code, inviterId } = req.query;
+  const { code, bd_vid, msclkid, fastgpt_sem, sourceDomain, inviterId } = req.query;
 
   if (!code) {
     return;
@@ -63,8 +65,16 @@ async function handler(
     username,
     avatar: avatarUrl,
     inviterId,
+    fastgpt_sem: fastgpt_sem ? JSON.parse(fastgpt_sem) : undefined,
+    sourceDomain,
     ip: requestIp.getClientIp(req)
   });
+
+  // 百度转化
+  bd_vid && trackBaiduConversion(bd_vid);
+
+  // Bing转化追踪
+  msclkid && trackBingConversion(msclkid);
 
   setCookie(res, token);
   return { user, token };
