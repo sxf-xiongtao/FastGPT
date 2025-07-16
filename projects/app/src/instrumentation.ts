@@ -14,7 +14,8 @@ export async function register() {
         { startTrainingProcess },
         { startMongoWatch },
         { initBullMQWorkers },
-        { preLoadWorker }
+        { preLoadWorker },
+        { connectSignoz }
       ] = await Promise.all([
         import('@fastgpt/service/common/mongo/init'),
         import('@fastgpt/service/common/mongo/index'),
@@ -26,9 +27,11 @@ export async function register() {
         import('@/service/core/dataset/training/utils'),
         import('@/service/middleware/volumnMongoWatch'),
         import('@/service/common/bullmq/index'),
-        import('@fastgpt/service/worker/preload')
+        import('@fastgpt/service/worker/preload'),
+        import('@fastgpt/service/common/otel/trace/register')
       ]);
 
+      connectSignoz();
       initGlobalVariables();
 
       // Preload worker
