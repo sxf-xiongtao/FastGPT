@@ -21,7 +21,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     if (username !== 'root') {
-      throw new Error('用户或密码错误');
+      throw new Error('用户或密码错误!');
     }
 
     const authCert = await MongoUser.findOne({
