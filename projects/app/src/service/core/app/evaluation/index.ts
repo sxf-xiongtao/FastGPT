@@ -40,6 +40,7 @@ import { ModelTypeEnum } from '@fastgpt/global/core/ai/model';
 import { concatUsage } from '@fastgpt/service/support/wallet/usage/controller';
 import { MongoApp } from '@fastgpt/service/core/app/schema';
 import { delay } from '@fastgpt/global/common/system/utils';
+import { removeDatasetCiteText } from '@fastgpt/service/core/ai/utils';
 
 type AppContextType = {
   appData: AppSchema;
@@ -226,7 +227,7 @@ const processEvalItem = async ({
       maxRunTimes: WORKFLOW_MAX_RUN_TIMES
     });
     const totalPoints = flowUsages.reduce((sum, item) => sum + (item.totalPoints || 0), 0);
-    const appAnswer = assistantResponses[0]?.text?.content || '';
+    const appAnswer = removeDatasetCiteText(assistantResponses[0]?.text?.content || '', false);
 
     evalItem.response = appAnswer;
     evalItem.responseTime = new Date();
