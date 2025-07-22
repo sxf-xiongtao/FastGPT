@@ -17,21 +17,13 @@ import { llmCompletionsBodyFormat, formatLLMResponse } from '@fastgpt/service/co
 import { getImageBase64 } from '@fastgpt/service/common/file/image/utils';
 import { DatasetDataIndexTypeEnum } from '@fastgpt/global/core/dataset/data/constants';
 import { pushLLMTrainingUsage } from '@fastgpt/service/support/wallet/usage/controller';
+import { delay } from '@fastgpt/global/common/system/utils';
+import { getErrText } from '@fastgpt/global/common/error/utils';
 
 const reduceQueue = () => {
   global.imageParseQueueLen = global.imageParseQueueLen > 0 ? global.imageParseQueueLen - 1 : 0;
 
   return global.imageParseQueueLen === 0;
-};
-const reduceQueueAndReturn = (delay = 0) => {
-  reduceQueue();
-  if (delay) {
-    setTimeout(() => {
-      generateImageIndex();
-    }, delay);
-  } else {
-    generateImageIndex();
-  }
 };
 
 const matchAndParseTextImageUrl = async (text: string) => {
@@ -141,199 +133,211 @@ export async function generateImageIndex(): Promise<any> {
   if (global.imageParseQueueLen >= max) return;
   global.imageParseQueueLen++;
 
-  // get training data
-  const {
-    data,
-    text,
-    done = false,
-    error = false
-  } = await (async () => {
-    try {
-      const data = await MongoDatasetTraining.findOneAndUpdate(
-        {
-          mode: TrainingModeEnum.image,
-          retryCount: { $gte: -10 },
-          lockTime: { $lte: addMinutes(new Date(), -10) }
-        },
-        {
-          lockTime: new Date(),
-          $inc: { retryCount: -1 }
-        }
-      )
-        .populate<{
-          dataset: { vectorModel: string; agentModel: string; vlmModel: string };
-          collection: { autoIndexes?: boolean };
-        }>([
+  while (true) {
+    // get training data
+    const {
+      data,
+      text,
+      done = false,
+      error = false
+    } = await (async () => {
+      try {
+        const data = await MongoDatasetTraining.findOneAndUpdate(
           {
-            path: 'dataset',
-            select: 'vectorModel agentModel vlmModel'
+            mode: TrainingModeEnum.image,
+            retryCount: { $gte: -10 },
+            lockTime: { $lte: addMinutes(new Date(), -10) }
           },
           {
-            path: 'collection',
-            select: 'autoIndexes'
+            lockTime: new Date(),
+            $inc: { retryCount: -1 }
           }
-        ])
-        .lean();
+        )
+          .populate<{
+            dataset: { vectorModel: string; agentModel: string; vlmModel: string };
+            collection: { autoIndexes?: boolean };
+          }>([
+            {
+              path: 'dataset',
+              select: 'vectorModel agentModel vlmModel'
+            },
+            {
+              path: 'collection',
+              select: 'autoIndexes'
+            }
+          ])
+          .lean();
 
-      // task preemption
-      if (!data) {
+        // task preemption
+        if (!data) {
+          return {
+            done: true
+          };
+        }
         return {
-          done: true
+          data,
+          text: data.q
+        };
+      } catch (error) {
+        return {
+          error: true
         };
       }
-      return {
-        data,
-        text: data.q
-      };
-    } catch (error) {
+    })();
+
+    if (done || !data) {
+      break;
+    }
+    if (error) {
       addLog.error(`[Image index queue] Error`, error);
-      return {
-        error: true
-      };
-    }
-  })();
-
-  if (done || !data) {
-    if (reduceQueue()) {
-      addLog.info(`[Image index queue] Done`);
-    }
-    return;
-  }
-  if (error) {
-    return reduceQueueAndReturn();
-  }
-
-  if (!data.dataset || !data.collection) {
-    addLog.info(`[Image index queue] Dataset or collection not found`, data);
-    // Delete data
-    await MongoDatasetTraining.deleteOne({ _id: data._id });
-    return reduceQueueAndReturn();
-  }
-
-  const nextMode = data.collection.autoIndexes ? TrainingModeEnum.auto : TrainingModeEnum.chunk;
-  const updateImageQueueToChunkQueue = async () => {
-    await MongoDatasetTraining.updateOne(
-      { _id: data._id },
-      {
-        $set: {
-          mode: nextMode,
-          lockTime: new Date('2000/1/1'),
-          retryCount: 5
-        }
-      }
-    );
-  };
-  addLog.info(`[Image index queue] Start`);
-
-  // Auth balance
-  if (!(await checkTeamAiPointsAndLock(data.teamId))) {
-    return reduceQueueAndReturn();
-  }
-
-  // If retryCount is 0, then update to chunk queue
-  if (data.retryCount <= 0) {
-    await updateImageQueueToChunkQueue();
-    return reduceQueueAndReturn();
-  }
-
-  // Get model and check
-  const modelData = getVlmModel(data.dataset.vlmModel);
-  if (!modelData) {
-    addLog.info(`[Image index queue] Model not found: ${data.dataset.vlmModel}`);
-    await updateImageQueueToChunkQueue();
-    return reduceQueueAndReturn();
-  }
-
-  try {
-    const startTime = Date.now();
-
-    // 1. Match text image url
-    const contentMessages = await matchAndParseTextImageUrl(text);
-
-    // Check if there are any images
-    const hasImages = contentMessages.some((msg) => msg.type === 'image_url');
-    if (!hasImages) {
-      addLog.debug(`[Image index queue] No image url found: ${data._id}`);
-      await updateImageQueueToChunkQueue();
-      return reduceQueueAndReturn();
+      await delay(500);
+      continue;
     }
 
-    // 2. request VLM to get image annotation
-    const messages: ChatCompletionMessageParam[] = [
-      {
-        role: ChatCompletionRequestMessageRoleEnum.System,
-        content: getImageIndexPrompt()
-      },
-      {
-        role: ChatCompletionRequestMessageRoleEnum.User,
-        content: contentMessages
-      }
-    ];
-    const { response: chatResponse } = await createChatCompletion({
-      body: llmCompletionsBodyFormat(
+    if (!data.dataset || !data.collection) {
+      addLog.info(`[Image index queue] Dataset or collection not found`, data);
+      // Delete data
+      await MongoDatasetTraining.deleteOne({ _id: data._id });
+      continue;
+    }
+
+    const nextMode = data.collection.autoIndexes ? TrainingModeEnum.auto : TrainingModeEnum.chunk;
+    const updateImageQueueToChunkQueue = async () => {
+      await MongoDatasetTraining.updateOne(
+        { _id: data._id },
         {
-          model: modelData.model,
-          temperature: 0.3,
-          messages: await loadRequestMessages({ messages, useVision: true }),
-          stream: true
-        },
-        modelData
-      )
-    });
-    const { text: answer, usage } = await formatLLMResponse(chatResponse);
-    const { summary, chunks } = formatImageParseResult(answer);
-
-    const inputTokens = usage?.prompt_tokens || (await countGptMessagesTokens(messages));
-    const outputTokens = usage?.completion_tokens || (await countPromptTokens(answer));
-
-    // 3. Concat indexes
-    const indexes = data.indexes.concat({
-      text: summary,
-      type: DatasetDataIndexTypeEnum.image
-    });
-
-    addLog.info(`[Image index queue] Finish: ${(Date.now() - startTime) / 1000}s`);
-
-    // 4. Update training data to chunk queue
-    const imageUrls = contentMessages
-      .map((msg) => (msg.type === 'image_url' ? msg.originalUrl : ''))
-      .filter(Boolean); // Use original URL instead of base64
-    await MongoDatasetTraining.updateOne(
-      { _id: data._id },
-      {
-        $set: {
-          imageDescMap: chunks.reduce(
-            (acc, chunk, index) => {
-              if (chunk.length > 10000) return acc;
-              if (imageUrls[index]) {
-                acc[imageUrls[index]] = chunk;
-              }
-              return acc;
-            },
-            {} as Record<string, string>
-          ),
-          mode: nextMode,
-          lockTime: new Date('2000/1/1'),
-          retryCount: 5,
-          indexes
+          $set: {
+            mode: nextMode,
+            lockTime: new Date('2000/1/1'),
+            retryCount: 5
+          }
         }
+      );
+    };
+
+    // Auth balance
+    if (!(await checkTeamAiPointsAndLock(data.teamId))) {
+      continue;
+    }
+    // If retryCount is 0, then update to chunk queue
+    if (data.retryCount <= 0) {
+      await updateImageQueueToChunkQueue();
+      continue;
+    }
+    // Get model and check
+    const modelData = getVlmModel(data.dataset.vlmModel);
+    if (!modelData) {
+      addLog.warn(`[Image index queue] Model not found: ${data.dataset.vlmModel}`);
+      await updateImageQueueToChunkQueue();
+      continue;
+    }
+
+    addLog.info(`[Image index queue] Start`);
+
+    try {
+      const startTime = Date.now();
+
+      // 1. Match text image url
+      const contentMessages = await matchAndParseTextImageUrl(text);
+
+      // Check if there are any images
+      const hasImages = contentMessages.some((msg) => msg.type === 'image_url');
+      if (!hasImages) {
+        addLog.debug(`[Image index queue] No image url found: ${data._id}`);
+        await updateImageQueueToChunkQueue();
+        continue;
       }
-    );
 
-    // 5. Add usage
-    pushLLMTrainingUsage({
-      teamId: data.teamId,
-      tmbId: data.tmbId,
-      inputTokens,
-      outputTokens,
-      billId: data.billId,
-      model: modelData.model,
-      mode: 'imageIndex'
-    });
+      // 2. request VLM to get image annotation
+      const messages: ChatCompletionMessageParam[] = [
+        {
+          role: ChatCompletionRequestMessageRoleEnum.System,
+          content: getImageIndexPrompt()
+        },
+        {
+          role: ChatCompletionRequestMessageRoleEnum.User,
+          content: contentMessages
+        }
+      ];
+      const { response: chatResponse } = await createChatCompletion({
+        body: llmCompletionsBodyFormat(
+          {
+            model: modelData.model,
+            temperature: 0.3,
+            messages: await loadRequestMessages({ messages, useVision: true }),
+            stream: true
+          },
+          modelData
+        )
+      });
+      const { text: answer, usage } = await formatLLMResponse(chatResponse);
+      const { summary, chunks } = formatImageParseResult(answer);
 
-    reduceQueueAndReturn();
-  } catch (err: any) {
-    addLog.error(`[Image index queue] Error`, err);
-    reduceQueueAndReturn(1000);
+      const inputTokens = usage?.prompt_tokens || (await countGptMessagesTokens(messages));
+      const outputTokens = usage?.completion_tokens || (await countPromptTokens(answer));
+
+      // 3. Concat indexes
+      const indexes = data.indexes.concat({
+        text: summary,
+        type: DatasetDataIndexTypeEnum.image
+      });
+
+      addLog.info(`[Image index queue] Finish: ${(Date.now() - startTime) / 1000}s`);
+
+      // 4. Update training data to chunk queue
+      const imageUrls = contentMessages
+        .map((msg) => (msg.type === 'image_url' ? msg.originalUrl : ''))
+        .filter(Boolean); // Use original URL instead of base64
+      await MongoDatasetTraining.updateOne(
+        { _id: data._id },
+        {
+          $set: {
+            imageDescMap: chunks.reduce(
+              (acc, chunk, index) => {
+                if (chunk.length > 10000) return acc;
+                if (imageUrls[index]) {
+                  acc[imageUrls[index]] = chunk;
+                }
+                return acc;
+              },
+              {} as Record<string, string>
+            ),
+            mode: nextMode,
+            lockTime: new Date('2000/1/1'),
+            retryCount: 5,
+            indexes
+          }
+        }
+      );
+
+      // 5. Add usage
+      pushLLMTrainingUsage({
+        teamId: data.teamId,
+        tmbId: data.tmbId,
+        inputTokens,
+        outputTokens,
+        billId: data.billId,
+        model: modelData.model,
+        mode: 'imageIndex'
+      });
+    } catch (err: any) {
+      addLog.error(`[Image index queue] Error`, err);
+
+      await MongoDatasetTraining.updateOne(
+        {
+          _id: data._id
+        },
+        {
+          errorMsg: getErrText(err, 'Image index error')
+        }
+      );
+
+      await delay(100);
+    }
   }
+
+  if (reduceQueue()) {
+    addLog.info(`[Image index queue] Done`);
+  }
+  addLog.debug(`[Image index queue] break loop, current queue size: ${global.imageParseQueueLen}`);
 }

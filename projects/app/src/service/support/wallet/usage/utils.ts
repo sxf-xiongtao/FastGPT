@@ -27,7 +27,7 @@ export const createUsageRequest = async (data: CreateUsageProps) => {
 };
 
 export const concatUsageRequest = async (data: ConcatUsageProps) => {
-  const { teamId, billId, totalPoints = 0, listIndex, inputTokens = 0, outputTokens = 0 } = data;
+  const { teamId, billId, totalPoints = 0, listIndex, inputTokens, outputTokens, count } = data;
 
   // billId is required and valid
   if (!billId || !Types.ObjectId.isValid(billId)) return;
@@ -35,10 +35,11 @@ export const concatUsageRequest = async (data: ConcatUsageProps) => {
   // In FastGPT pro server
   global.concatBillQueue.push({
     billId,
+    totalPoints,
     listIndex,
     inputTokens,
     outputTokens,
-    totalPoints
+    count
   });
   pushReduceTeamAiPointsTask({ teamId, totalPoints });
 

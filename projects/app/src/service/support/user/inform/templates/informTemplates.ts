@@ -43,7 +43,12 @@ export const expiredTemplate = ({
 export const lackOfPointsTemplate = ({ name }: { name: string }) => {
   return {
     title: `AI积分不足，任务暂停`,
-    content: `尊敬的【${name}】团队，由于您团队的 AI 积分不足，您团队中的知识库训练任务已暂停，并且无法继续使用 AI 模型。为了保障您的服务正常运行，请及时登录平台进行续费。如您已续费，请忽略该通知。`
+    content: `尊敬的【${name}】团队，您的 AI 积分余额不足，相关任务已暂停执行：
+
+• 知识库训练任务已暂停
+• 应用评测任务已暂停  
+
+为确保服务正常运行，请及时充值 AI 积分。如已完成充值，请忽略此通知。`
   };
 };
 

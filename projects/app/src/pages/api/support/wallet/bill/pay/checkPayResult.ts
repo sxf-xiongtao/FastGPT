@@ -29,6 +29,7 @@ import { i18nT } from '@fastgpt/web/i18n/utils';
 import type { PayResult } from '@/service/support/wallet/bill/pay/type';
 import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
 import { AuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
+import { resumePausedEvaluations } from '@/service/core/app/evaluation/utils';
 
 /* 校验支付结果 */
 async function handler(req: NextApiRequest, res: NextApiResponse): Promise<CheckPayResultResponse> {
@@ -208,6 +209,7 @@ export const dealWithSuccessOrder = async (payOrder: BillSchemaType, session: Cl
     return Promise.reject('订单类型错误');
   }
   unLockTrainingData(payOrder.teamId);
+  resumePausedEvaluations(payOrder.teamId);
 };
 
 const unLockTrainingData = async (teamId: string, retry = 3): Promise<any> => {

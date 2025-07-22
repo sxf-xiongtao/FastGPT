@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { jsonRes } from '@fastgpt/service/common/response';
 import axios from 'axios';
 import { parseQueryString } from '@/utils/tools';
 
@@ -13,6 +12,7 @@ import { trackBaiduConversion } from '@/service/common/tracking/baidu';
 import { trackBingConversion } from '@/service/common/tracking/bing';
 import { pushTrack } from '@fastgpt/service/common/middle/tracks/utils';
 import requestIp from 'request-ip';
+import { NextAPI } from '@/service/middleware/entry';
 
 type OauthResponse = {
   username: string;
@@ -23,59 +23,54 @@ type OauthResponse = {
   memberName?: string;
 };
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
-  try {
-    const { type, callbackUrl, inviterId, bd_vid, msclkid, fastgpt_sem, sourceDomain, props } =
-      req.body as OauthLoginProps;
+async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
+  const { type, callbackUrl, inviterId, bd_vid, msclkid, fastgpt_sem, sourceDomain, props } =
+    req.body as OauthLoginProps;
 
-    const { username, avatarUrl, concat, phonePrefix, teamName, memberName } = await (async () => {
-      if (type === OAuthEnum.github) return authGithub(props.code);
-      if (type === OAuthEnum.google) return authGoogle(props.code, callbackUrl);
-      if (type === OAuthEnum.microsoft) return authMicrosoft(props.code, callbackUrl);
-      if (type === OAuthEnum.sso) return authSso(props);
-      return Promise.reject('type error');
-    })();
+  const { username, avatarUrl, concat, phonePrefix, teamName, memberName } = await (async () => {
+    if (type === OAuthEnum.github) return authGithub(props.code);
+    if (type === OAuthEnum.google) return authGoogle(props.code, callbackUrl);
+    if (type === OAuthEnum.microsoft) return authMicrosoft(props.code, callbackUrl);
+    if (type === OAuthEnum.sso) return authSso(props);
+    return Promise.reject('type error');
+  })();
 
-    const { user, token } = await usernameLogin({
-      username,
-      avatar: avatarUrl,
-      notificationAccount: concat,
-      phonePrefix,
-      teamName,
-      memberName,
+  const { user, token } = await usernameLogin({
+    username,
+    avatar: avatarUrl,
+    notificationAccount: concat,
+    phonePrefix,
+    teamName,
+    memberName,
 
-      inviterId,
-      fastgpt_sem,
-      sourceDomain,
-      ip: requestIp.getClientIp(req)
-    });
+    inviterId,
+    fastgpt_sem,
+    sourceDomain,
+    ip: requestIp.getClientIp(req)
+  });
 
-    // 百度转化
-    bd_vid && trackBaiduConversion(bd_vid);
+  // 百度转化
+  bd_vid && trackBaiduConversion(bd_vid);
 
-    // Bing转化追踪
-    msclkid && trackBingConversion(msclkid);
+  // Bing转化追踪
+  msclkid && trackBingConversion(msclkid);
 
-    pushTrack.login({
-      type,
-      uid: user._id,
-      teamId: user.team.teamId,
-      tmbId: user.team.tmbId
-    });
+  pushTrack.login({
+    type,
+    uid: user._id,
+    teamId: user.team.teamId,
+    tmbId: user.team.tmbId
+  });
 
-    setCookie(res, token);
-    jsonRes(res, {
-      data: { user, token }
-    });
-  } catch (err) {
-    console.log(err);
+  setCookie(res, token);
 
-    jsonRes(res, {
-      code: 500,
-      error: err
-    });
-  }
+  return {
+    user,
+    token
+  };
 }
+
+export default NextAPI(handler);
 
 export async function authGithub(code: string): Promise<OauthResponse> {
   const { data: gitAccessToken } = await axios.post<string>(
@@ -87,7 +82,7 @@ export async function authGithub(code: string): Promise<OauthResponse> {
 
   const access_token = jsonGitAccessToken?.access_token;
   if (!access_token) {
-    throw new Error('access_token is null');
+    return Promise.reject('access_token is null');
   }
 
   const { data } = await axios.get<{

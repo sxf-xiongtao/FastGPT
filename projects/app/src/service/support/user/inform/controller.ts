@@ -39,11 +39,13 @@ export async function sendInform2OneUser<
   success: boolean;
   message?: string;
 }> {
-  async function getTeam(teamId: string | undefined, userId: string) {
+  async function getTeam(teamId?: string, userId?: string) {
     if (teamId) {
       return await MongoTeam.findById(teamId).lean();
-    } else {
+    } else if (userId) {
       return await MongoTeam.findOne({ ownerId: userId }).lean();
+    } else {
+      return Promise.reject('teamId or userId is required');
     }
   }
 

@@ -22,4 +22,7 @@ export function beforeUpdateConfig(
 
   fastgpt.feConfigs.show_git = !!process.env.SHOW_GIT;
   fastgpt.feConfigs.show_workorder = !!process.env.WORKORDER_BASE_URL;
+  fastgpt.feConfigs.evalFileMaxLines = process.env.EVAL_LINE_LIMIT
+    ? Number(process.env.EVAL_LINE_LIMIT)
+    : 1000;
 }

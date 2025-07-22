@@ -1,5 +1,4 @@
 import type { ConfigFormType, ConfigStoreType } from '@/global/admin/config';
-import { TeamModeEnum } from '@/global/settings/constants';
 import { SystemConfigsTypeEnum } from '@fastgpt/global/common/system/config/constants';
 import type { FastGPTFeConfigsType } from '@fastgpt/global/common/system/types';
 import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
@@ -19,7 +18,7 @@ export function formatConfigStore2FormSchema({
     show_workorder = false,
     favicon = '',
     concatMd = '',
-    docUrl = 'https://doc.tryfastgpt.ai',
+    docUrl = 'https://doc.fastgpt.io',
     systemPluginCourseUrl = '',
     openAPIDocUrl = '',
     systemTitle = 'FastAI',

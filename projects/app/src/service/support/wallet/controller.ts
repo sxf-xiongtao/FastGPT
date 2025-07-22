@@ -97,93 +97,114 @@ const incTeamAiPoints = async ({
 };
 
 export const reduceAiPointsTimer = async () => {
-  if (global.reduceAiPointsQueue.length > 0) {
-    const list = global.reduceAiPointsQueue.slice();
-    global.reduceAiPointsQueue = [];
+  while (true) {
+    if (global.reduceAiPointsQueue.length > 0) {
+      const list = global.reduceAiPointsQueue.slice();
+      global.reduceAiPointsQueue = [];
 
-    // concat same teamId
-    const map = new Map<string, number>();
-    list.forEach(({ teamId, totalPoints }) => {
-      if (map.has(teamId)) {
-        map.set(teamId, map.get(teamId)! + totalPoints);
-      } else {
-        map.set(teamId, totalPoints);
-      }
-    });
-    const reduceList = Array.from(map).map(([teamId, totalPoints]) => ({ teamId, totalPoints }));
+      // concat same teamId
+      const map = new Map<string, number>();
+      list.forEach(({ teamId, totalPoints }) => {
+        if (map.has(teamId)) {
+          map.set(teamId, map.get(teamId)! + totalPoints);
+        } else {
+          map.set(teamId, totalPoints);
+        }
+      });
+      const reduceList = Array.from(map).map(([teamId, totalPoints]) => ({ teamId, totalPoints }));
 
-    for await (const item of reduceList) {
-      try {
-        await incTeamAiPoints({
-          teamId: item.teamId,
-          totalPoints: -item.totalPoints
-        });
-      } catch (error) {
-        addLog.error('Reduce ai points error', error);
+      for await (const item of reduceList) {
+        try {
+          await incTeamAiPoints({
+            teamId: item.teamId,
+            totalPoints: -item.totalPoints
+          });
+        } catch (error) {
+          addLog.error('Reduce ai points error', error);
+        }
       }
+
+      addLog.info(`Reduce ai points account: ${list.length}`);
     }
 
-    addLog.info(`Reduce ai points account: ${list.length}`);
+    await delay(batchUpdateTime);
   }
-  await delay(batchUpdateTime);
-  reduceAiPointsTimer();
 };
 
 export const concatBillTimer = async () => {
-  if (global.concatBillQueue.length > 0) {
-    const list = global.concatBillQueue.slice();
-    global.concatBillQueue = [];
+  while (true) {
+    if (global.concatBillQueue.length > 0) {
+      const list = global.concatBillQueue.slice();
+      global.concatBillQueue = [];
 
-    // concat same billId
-    const map = new Map<string, ConcatBillQueueItemType>();
-    list.forEach(({ billId, totalPoints, inputTokens, outputTokens, listIndex }) => {
-      const id = `${billId}-${listIndex}`;
-      const data = map.get(id);
-      if (data) {
-        map.set(id, {
-          billId,
-          totalPoints: data.totalPoints + totalPoints,
-          inputTokens: data.inputTokens + inputTokens,
-          outputTokens: data.outputTokens + outputTokens,
-          listIndex
-        });
-      } else {
-        map.set(id, {
-          billId,
-          totalPoints,
-          inputTokens,
-          outputTokens,
-          listIndex
-        });
-      }
-    });
+      // concat same billId
+      const map = new Map<
+        string,
+        ConcatBillQueueItemType & {
+          inputTokens: number;
+          outputTokens: number;
+          count: number;
+        }
+      >();
+      list.forEach(
+        ({ billId, totalPoints = 0, inputTokens = 0, outputTokens = 0, listIndex, count = 0 }) => {
+          const id = `${billId}-${listIndex}`;
+          const data = map.get(id);
 
-    const concatList = Array.from(map).map(([_, data]) => data);
-
-    for await (const item of concatList) {
-      const { billId, listIndex, totalPoints, inputTokens, outputTokens } = item;
-      try {
-        await MongoUsage.updateOne(
-          { _id: billId },
-          {
-            time: new Date(),
-            $inc: {
+          if (data) {
+            map.set(id, {
+              billId,
+              totalPoints: data.totalPoints + totalPoints,
+              inputTokens: data.inputTokens + inputTokens,
+              outputTokens: data.outputTokens + outputTokens,
+              count: data.count + count,
+              listIndex
+            });
+          } else {
+            map.set(id, {
+              billId,
               totalPoints,
-              ...(listIndex !== undefined && {
-                [`list.${listIndex}.amount`]: totalPoints,
-                [`list.${listIndex}.inputTokens`]: inputTokens,
-                [`list.${listIndex}.outputTokens`]: outputTokens
-              })
-            }
+              listIndex,
+              inputTokens: inputTokens ?? 0,
+              outputTokens: outputTokens ?? 0,
+              count: count ?? 0
+            });
           }
-        );
+        }
+      );
+
+      const concatList = Array.from(map).map(([_, data]) => data);
+
+      try {
+        const bulkOps = concatList.map((item) => {
+          const { billId, listIndex, totalPoints, inputTokens, outputTokens, count } = item;
+
+          return {
+            updateOne: {
+              filter: { _id: billId },
+              update: {
+                time: new Date(),
+                $inc: {
+                  totalPoints,
+                  ...(listIndex !== undefined && {
+                    [`list.${listIndex}.amount`]: totalPoints,
+                    ...(inputTokens && { [`list.${listIndex}.inputTokens`]: inputTokens }),
+                    ...(outputTokens && { [`list.${listIndex}.outputTokens`]: outputTokens }),
+                    ...(count && { [`list.${listIndex}.count`]: count })
+                  })
+                }
+              }
+            }
+          };
+        });
+
+        addLog.info(`Concat bill timer: ${concatList.length}`);
+        await MongoUsage.bulkWrite(bulkOps, { ordered: false });
       } catch (error) {
         addLog.error('Concat bill error', error);
       }
     }
-    addLog.info(`Concat bill timer: ${list.length}`);
-  }
 
-  await delay(batchUpdateTime);
-  concatBillTimer();
+    await delay(batchUpdateTime);
+  }
 };

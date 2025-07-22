@@ -18,21 +18,12 @@ import type { DatasetDataIndexItemType } from '@fastgpt/global/core/dataset/type
 import { DatasetDataIndexTypeEnum } from '@fastgpt/global/core/dataset/data/constants';
 import { getErrText } from '@fastgpt/global/common/error/utils';
 import { pushLLMTrainingUsage } from '@fastgpt/service/support/wallet/usage/controller';
+import { delay } from '@fastgpt/global/common/system/utils';
 
 const reduceQueue = () => {
   global.autoTrainingLen = global.autoTrainingLen > 0 ? global.autoTrainingLen - 1 : 0;
 
   return global.autoTrainingLen === 0;
-};
-const returnQueue = (delay = 0) => {
-  reduceQueue();
-  if (delay) {
-    setTimeout(() => {
-      generateAutoTraining();
-    }, delay);
-  } else {
-    generateAutoTraining();
-  }
 };
 
 type PopulateType = {
@@ -60,154 +51,155 @@ export async function generateAutoTraining(): Promise<any> {
   if (global.autoTrainingLen >= max) return;
   global.autoTrainingLen++;
 
-  // get training data
-  const {
-    data,
-    text,
-    done = false,
-    error = false
-  } = await (async () => {
-    try {
-      const data = await MongoDatasetTraining.findOneAndUpdate(
-        {
-          mode: TrainingModeEnum.auto,
-          retryCount: { $gte: 0 },
-          lockTime: { $lte: addMinutes(new Date(), -10) }
-        },
-        {
-          lockTime: new Date(),
-          $inc: { retryCount: -1 }
-        }
-      )
-        .populate<PopulateType>([
+  while (true) {
+    // get training data
+    const {
+      data,
+      text,
+      done = false,
+      error = false
+    } = await (async () => {
+      try {
+        const data = await MongoDatasetTraining.findOneAndUpdate(
           {
-            path: 'dataset',
-            select: 'vectorModel agentModel'
+            mode: TrainingModeEnum.auto,
+            retryCount: { $gte: 0 },
+            lockTime: { $lte: addMinutes(new Date(), -10) }
+          },
+          {
+            lockTime: new Date(),
+            $inc: { retryCount: -1 }
           }
-        ])
-        .lean();
+        )
+          .populate<PopulateType>([
+            {
+              path: 'dataset',
+              select: 'vectorModel agentModel'
+            }
+          ])
+          .lean();
 
-      // task preemption
-      if (!data) {
+        // task preemption
+        if (!data) {
+          return {
+            done: true
+          };
+        }
         return {
-          done: true
+          data,
+          text: data.q
+        };
+      } catch (error) {
+        return {
+          error: true
         };
       }
-      return {
-        data,
-        text: data.q
-      };
-    } catch (error) {
+    })();
+
+    if (done || !data) {
+      break;
+    }
+    if (error) {
       addLog.error(`[Auto index queue] Error`, error);
-      return {
-        error: true
-      };
+      await delay(500);
+      continue;
     }
-  })();
 
-  if (done || !data) {
-    if (reduceQueue()) {
-      addLog.info(`[Auto index queue] Done`);
+    if (!data.dataset) {
+      addLog.info(`[Auto index queue] Dataset not found`, data);
+      // Delete data
+      await MongoDatasetTraining.deleteOne({ _id: data._id });
+      continue;
     }
-    return;
-  }
-  if (error) {
-    return returnQueue();
-  }
-  addLog.info(`[Auto index queue] Start`);
+    // auth balance
+    if (!(await checkTeamAiPointsAndLock(data.teamId))) {
+      continue;
+    }
 
-  if (!data.dataset) {
-    addLog.info(`[Auto index queue] Dataset not found`, data);
-    // Delete data
-    await MongoDatasetTraining.deleteOne({ _id: data._id });
-    return returnQueue();
-  }
+    addLog.info(`[Auto index queue] Start`);
 
-  // auth balance
-  if (!(await checkTeamAiPointsAndLock(data.teamId))) {
-    return returnQueue();
-  }
+    try {
+      const startTime = Date.now();
+      // 1. Get model
+      const modelData = getLLMModel(data.dataset.agentModel)!;
 
-  try {
-    const startTime = Date.now();
-    // 1. Get model
-    const modelData = getLLMModel(data.dataset.agentModel)!;
-
-    // 2. request LLM to get response
-    const prompt = getAutoTrainingPrompt({ text });
-    const messages: ChatCompletionMessageParam[] = [
-      {
-        role: ChatCompletionRequestMessageRoleEnum.User,
-        content: prompt
-      }
-    ];
-    const { response: chatResponse } = await createChatCompletion({
-      body: llmCompletionsBodyFormat(
+      // 2. request LLM to get response
+      const prompt = getAutoTrainingPrompt({ text });
+      const messages: ChatCompletionMessageParam[] = [
         {
-          model: modelData.model,
-          temperature: 0.3,
-          messages: await loadRequestMessages({ messages, useVision: false }),
-          stream: true
-        },
-        modelData
-      )
-    });
-    const { text: answer, usage } = await formatLLMResponse(chatResponse);
-    const inputTokens = usage?.prompt_tokens || (await countGptMessagesTokens(messages));
-    const outputTokens = usage?.completion_tokens || (await countPromptTokens(answer));
-
-    // 3. Format answer to indexes and concat
-    const autoIndexResult = formatSplitText2Index({ answer }); // 格式化后的索引
-    const newIndexes = data.indexes.concat(autoIndexResult);
-
-    // 4. Update training data to chunk queue
-    await MongoDatasetTraining.updateOne(
-      { _id: data._id },
-      {
-        $set: {
-          mode: TrainingModeEnum.chunk,
-          lockTime: new Date('2000/1/1'),
-          retryCount: 5,
-          indexes: newIndexes
+          role: ChatCompletionRequestMessageRoleEnum.User,
+          content: prompt
         }
-      }
-    );
+      ];
+      const { response: chatResponse } = await createChatCompletion({
+        body: llmCompletionsBodyFormat(
+          {
+            model: modelData.model,
+            temperature: 0.3,
+            messages: await loadRequestMessages({ messages, useVision: false }),
+            stream: true
+          },
+          modelData
+        )
+      });
+      const { text: answer, usage } = await formatLLMResponse(chatResponse);
+      const inputTokens = usage?.prompt_tokens || (await countGptMessagesTokens(messages));
+      const outputTokens = usage?.completion_tokens || (await countPromptTokens(answer));
 
-    // 5. Push bill
-    pushLLMTrainingUsage({
-      teamId: data.teamId,
-      tmbId: data.tmbId,
-      inputTokens,
-      outputTokens,
-      billId: data.billId,
-      model: modelData.model,
-      mode: 'autoIndex'
-    });
+      // 3. Format answer to indexes and concat
+      const autoIndexResult = formatSplitText2Index({ answer }); // 格式化后的索引
+      const newIndexes = data.indexes.concat(autoIndexResult);
 
-    addLog.info(`[Auto index queue] Finish`, {
-      time: `${(Date.now() - startTime) / 1000}s`,
-      indexLen: newIndexes.length,
-      usage
-    });
+      // 4. Update training data to chunk queue
+      await MongoDatasetTraining.updateOne(
+        { _id: data._id },
+        {
+          $set: {
+            mode: TrainingModeEnum.chunk,
+            lockTime: new Date('2000/1/1'),
+            retryCount: 5,
+            indexes: newIndexes
+          }
+        }
+      );
 
-    return returnQueue();
-  } catch (err: any) {
-    addLog.error(`[Auto Training Queue] Error`, err);
-
-    await MongoDatasetTraining.updateOne(
-      {
+      // 5. Push bill
+      pushLLMTrainingUsage({
         teamId: data.teamId,
-        datasetId: data.datasetId,
-        _id: data._id
-      },
-      {
-        lockTime: addMinutes(new Date(), -9),
-        errorMsg: getErrText(err, 'unknown error')
-      }
-    );
+        tmbId: data.tmbId,
+        inputTokens,
+        outputTokens,
+        billId: data.billId,
+        model: modelData.model,
+        mode: 'autoIndex'
+      });
 
-    returnQueue(500);
+      addLog.info(`[Auto index queue] Finish`, {
+        time: `${(Date.now() - startTime) / 1000}s`,
+        indexLen: newIndexes.length,
+        usage
+      });
+    } catch (err: any) {
+      addLog.error(`[Auto Training Queue] Error`, err);
+
+      await MongoDatasetTraining.updateOne(
+        {
+          _id: data._id
+        },
+        {
+          lockTime: addMinutes(new Date(), -9),
+          errorMsg: getErrText(err, 'unknown error')
+        }
+      );
+
+      await delay(100);
+    }
   }
+
+  if (reduceQueue()) {
+    addLog.info(`[Auto index queue] Done`);
+  }
+  addLog.debug(`[Auto index queue] break loop, current queue size: ${global.autoTrainingLen}`);
 }
 
 export const formatSplitText2Index = ({
