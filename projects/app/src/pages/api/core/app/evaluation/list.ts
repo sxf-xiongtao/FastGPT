@@ -21,6 +21,7 @@ import { getOrgIdSetWithParentByTmbId } from '@fastgpt/service/support/permissio
 import type { TeamMemberSchema } from '@fastgpt/global/support/user/team/type';
 import type { AppSchema } from '@fastgpt/global/core/app/type';
 import { i18nT } from '@fastgpt/web/i18n/utils';
+import { MongoApp } from '@fastgpt/service/core/app/schema';
 
 async function handler(
   req: ApiRequestProps<listEvaluationsBody, {}>,
@@ -63,18 +64,29 @@ async function handler(
       tmbId
     })
   ]);
-  const myPerList = perList.filter(
-    (item) =>
-      String(item.tmbId) === String(tmbId) ||
-      myGroupMap.has(String(item.groupId)) ||
-      myOrgSet.has(String(item.orgId))
-  );
+  const myPerAppIdList = perList
+    .filter(
+      (item) =>
+        String(item.tmbId) === String(tmbId) ||
+        myGroupMap.has(String(item.groupId)) ||
+        myOrgSet.has(String(item.orgId))
+    )
+    .map((item) => new Types.ObjectId(item.resourceId));
+
+  const myAppIds = await MongoApp.find({
+    teamId: new Types.ObjectId(teamId),
+    $or: [{ tmbId }, { parentId: { $in: myPerAppIdList } }]
+  })
+    .select('_id')
+    .lean();
 
   const match = {
     teamId: new Types.ObjectId(teamId),
     ...(searchKey && { name: { $regex: new RegExp(`${replaceRegChars(searchKey)}`, 'i') } }),
     ...(!teamPer.isOwner && {
-      appId: { $in: myPerList.map((item) => new Types.ObjectId(item.resourceId)) }
+      appId: {
+        $in: [...myPerAppIdList, ...myAppIds.map((item) => item._id)]
+      }
     })
   };
 
