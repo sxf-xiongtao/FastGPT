@@ -37,6 +37,7 @@ type UserProps = {
   avatar?: string;
   inviterId?: string;
   fastgpt_sem?: {
+    search?: string;
     keyword?: string;
   };
   sourceDomain?: string;

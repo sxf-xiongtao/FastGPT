@@ -36,7 +36,7 @@ export async function authWechat(openid: string) {
 }
 
 async function handler(
-  req: ApiRequestProps<{}, WxLoginProps>,
+  req: ApiRequestProps<WxLoginProps, {}>,
   res: NextApiResponse
 ): Promise<
   | {
@@ -45,7 +45,7 @@ async function handler(
     }
   | undefined
 > {
-  const { code, bd_vid, msclkid, fastgpt_sem, sourceDomain, inviterId } = req.query;
+  const { code, bd_vid, msclkid, fastgpt_sem, sourceDomain, inviterId } = req.body;
 
   if (!code) {
     return;
@@ -61,11 +61,13 @@ async function handler(
   }
   const { username, avatarUrl } = await authWechat(verifyInfo.openid);
 
+  const parsedFastgptSem = fastgpt_sem && typeof fastgpt_sem === 'object' ? fastgpt_sem : undefined;
+
   const { user, token } = await usernameLogin({
     username,
     avatar: avatarUrl,
     inviterId,
-    fastgpt_sem: fastgpt_sem ? JSON.parse(fastgpt_sem) : undefined,
+    fastgpt_sem: parsedFastgptSem,
     sourceDomain,
     ip: requestIp.getClientIp(req)
   });
