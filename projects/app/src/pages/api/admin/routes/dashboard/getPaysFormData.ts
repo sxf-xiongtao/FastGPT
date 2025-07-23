@@ -36,7 +36,7 @@ async function handler(
     {
       $match: {
         status: { $in: [BillStatusEnum.SUCCESS, BillStatusEnum.NOTPAY] },
-        'metadata.payWay': { $in: [BillPayWayEnum.wx, BillPayWayEnum.alipay] },
+        'metadata.payWay': { $in: [BillPayWayEnum.wx, BillPayWayEnum.alipay, BillPayWayEnum.bank] },
         createTime: {
           $gte: new Date(startTime)
         }

@@ -35,7 +35,6 @@ async function handler(
       const tmbs = await MongoTeamMember.find({ userId: { $in: userIds } }, 'teamId');
       const teamIds = tmbs.map((tmb) => tmb.teamId);
 
-      console.log(userIds, teamIds);
       return {
         status: status ? status : { $ne: 'CLOSED' },
         teamId: { $in: teamIds },

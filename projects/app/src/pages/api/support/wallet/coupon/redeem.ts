@@ -22,6 +22,8 @@ import {
 } from '@/service/support/wallet/sub/controller';
 import { useIPFrequencyLimit } from '@fastgpt/service/common/middle/reqFrequencyLimit';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
+import { CouponTypeEnum } from '@fastgpt/global/support/wallet/sub/coupon/constants';
+import { PRICE_SCALE } from '@fastgpt/global/support/wallet/constants';
 
 export type RedeemCouponQuery = {
   key: string;
@@ -54,8 +56,6 @@ async function handler(req: ApiRequestProps<{}, RedeemCouponQuery>, res: NextApi
       level,
       extraDatasetSize
     } of coupon.subscriptions) {
-      const startTime = new Date();
-
       // Create Order
       const orderType = subTypeMap[type]?.orderType;
       if (!orderType) return Promise.reject('Invalid subscription type');
@@ -74,19 +74,29 @@ async function handler(req: ApiRequestProps<{}, RedeemCouponQuery>, res: NextApi
           };
         }
       })();
-      await MongoBill.create({
-        teamId,
-        tmbId,
-        orderId: `coupon-${coupon.key}-${getNanoid(5)}`,
-        price: 0,
-        status: BillStatusEnum.SUCCESS,
-        type: orderType,
-        metadata: {
-          payWay: BillPayWayEnum.coupon,
-          month: (durationDay / 30).toFixed(2),
-          ...metadata
+
+      await MongoBill.create(
+        [
+          {
+            teamId,
+            tmbId,
+            orderId: `coupon-${coupon.key}-${getNanoid(5)}`,
+            price: coupon.price ? coupon.price * PRICE_SCALE : 0,
+            status: BillStatusEnum.SUCCESS,
+            type: orderType,
+            metadata: {
+              payWay:
+                coupon.type === CouponTypeEnum.bank ? BillPayWayEnum.bank : BillPayWayEnum.coupon,
+              month: (durationDay / 30).toFixed(2),
+              ...metadata
+            }
+          }
+        ],
+        {
+          session,
+          ordered: true
         }
-      });
+      );
 
       // Create bub
       if (type === SubTypeEnum.extraDatasetSize) {
@@ -121,6 +131,7 @@ async function handler(req: ApiRequestProps<{}, RedeemCouponQuery>, res: NextApi
 
     // Update coupon status
     coupon.redeemedAt = new Date();
+    coupon.redeemedTeamId = teamId;
     await coupon.save({ session });
   });
 }
