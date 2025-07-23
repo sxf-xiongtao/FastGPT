@@ -21,6 +21,7 @@ import { subModeMap } from '@fastgpt/global/support/wallet/sub/constants';
 import { BillPayWayEnum } from '@fastgpt/global/support/wallet/bill/constants';
 import { createPaymentController } from '@/service/support/wallet/bill/pay/base';
 import { i18nT } from '@fastgpt/web/i18n/utils';
+import { calculatePrice, getMonthByPoints } from '@fastgpt/global/support/wallet/bill/tools';
 
 /* 创建支付订单 */
 async function handler(
@@ -72,7 +73,11 @@ async function handler(
       const DatasetStorePrice = getExtraDatasetSizePrice('read');
 
       return {
-        readPrice: extraDatasetSize * month * DatasetStorePrice,
+        readPrice: calculatePrice(DatasetStorePrice, {
+          type: 'dataset',
+          size: extraDatasetSize,
+          month
+        }),
         metadata: {
           month,
           datasetSize: extraDatasetSize * SUB_DATASET_SIZE_RATE
@@ -82,11 +87,14 @@ async function handler(
     if (billType === BillTypeEnum.extraPoints) {
       const { extraPoints } = req.body;
 
+      const month = getMonthByPoints(extraPoints);
       const pointsPrice = getExtraPointsPrice('read');
-      const month = 1;
 
       return {
-        readPrice: extraPoints * month * pointsPrice,
+        readPrice: calculatePrice(pointsPrice, {
+          type: 'points',
+          points: extraPoints
+        }),
         metadata: {
           month,
           extraPoints: extraPoints * SUB_EXTRA_POINT_RATE
