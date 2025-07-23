@@ -1,4 +1,5 @@
 import { type CreateCouponBody } from '@/pages/api/admin/support/wallet/coupon/create';
+import { CouponTypeEnum } from '@fastgpt/global/support/wallet/sub/coupon/constants';
 
 export const invalidCouponTypeBody: CreateCouponBody = {
   count: 1,
@@ -27,6 +28,7 @@ export const invalidCouponLevelBody: CreateCouponBody = {
 
 export const oneCouponBody: CreateCouponBody = {
   count: 1,
+  type: CouponTypeEnum.activity,
   subscriptions: [
     {
       type: 'standard',
@@ -39,6 +41,7 @@ export const oneCouponBody: CreateCouponBody = {
 
 export const twoCouponBody: CreateCouponBody = {
   count: 2,
+  type: CouponTypeEnum.activity,
   subscriptions: [
     {
       type: 'standard',

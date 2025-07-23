@@ -25,7 +25,7 @@ async function handler(
   };
 
   const [records, total] = await Promise.all([
-    MongoUser.find(match).sort({ createTime: -1 }).skip(offset).limit(pageSize).lean(),
+    MongoUser.find(match).sort({ _id: -1 }).skip(offset).limit(pageSize).lean(),
     MongoUser.countDocuments(match)
   ]);
   return {

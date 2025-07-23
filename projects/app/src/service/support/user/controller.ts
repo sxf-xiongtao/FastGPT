@@ -28,7 +28,7 @@ import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSc
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { sendInform2OneUser } from './inform/controller';
 import { getAndCreateUserDefaultTeam, getTeamByUsername } from './team/controller';
-import { createUserSession } from '@fastgpt/service/support/user/session';
+import { createUserSession, delUserAllSession } from '@fastgpt/service/support/user/session';
 
 type UserProps = {
   username: string;
@@ -440,15 +440,6 @@ export async function syncOrg({ teamId, latestOrgList, session }: syncOrgParams)
   await Promise.all([
     MongoOrgModel.deleteMany({ teamId }, { session }),
     MongoOrgMemberModel.deleteMany({ teamId }, { session })
-    // MongoResourcePermission.deleteMany(
-    //   {
-    //     teamId,
-    //     orgId: {
-    //       $exists: true
-    //     }
-    //   },
-    //   { session }
-    // )
   ]);
 
   // 3. create new orgs
@@ -508,76 +499,6 @@ export async function syncOrg({ teamId, latestOrgList, session }: syncOrgParams)
   }
   console.log(JSON.stringify(resourcePermissionOps));
   await MongoResourcePermission.bulkWrite(resourcePermissionOps, { session, ordered: true });
-  // const pers = permissions.filter((p) => {
-  //   if (!p.orgId) return;
-  //   const oldOrgId = pathId_oldOrgMap.get(String(org.pathId));
-  //   if (String(p.orgId) === String(oldOrgId)) {
-  //     return true;
-  //   }
-  //   return false;
-  // });
-
-  // for (const per of pers) {
-  //   resourcePermissionOps.push({
-  //     insertOne: {
-  //       document: {
-  //         teamId,
-  //         orgId: createOrgResult.insertedIds[Number(per.orgId)],
-  //         permission: per.permission,
-  //         resourceType: per.resourceType,
-  //         resourceId: per.resourceId
-  //       }
-  //     }
-  //   });
-  // }
-  // await MongoResourcePermission.bulkWrite(resourcePermissionOps, { session, ordered: true });
-
-  // for (const org of latestOrgList) {
-  //   // 3.1 create new orgs
-  //   // const [newOrg] = await MongoOrgModel.create(
-  //   //   [
-  //   //     {
-  //   //       teamId,
-  //   //       name: org.name,
-  //   //       pathId: org.pathId,
-  //   //       path: org.path
-  //   //     }
-  //   //   ],
-  //   //   { session, ordered: true }
-  //   // );
-  //   // 3.2 add members
-  //   // for (const tmbId of org.tmbIds) {
-  //   //   await MongoOrgMemberModel.create(
-  //   //     [
-  //   //       {
-  //   //         teamId,
-  //   //         orgId: newOrg._id,
-  //   //         tmbId
-  //   //       }
-  //   //     ],
-  //   //     { session, ordered: true }
-  //   //   );
-  //   // }
-  //   // const pers = permissions.filter((p) => {
-  //   //   if (!p.orgId) return;
-  //   //   const oldOrgId = pathId_oldOrgMap.get(String(org.pathId));
-  //   //   if (String(p.orgId) === String(oldOrgId)) {
-  //   //     return true;
-  //   //   }
-  //   //   return false;
-  //   // });
-  //   // 3.3 add resource Permissions
-  //   // await MongoResourcePermission.create(
-  //   //   pers.map((per) => ({
-  //   //     teamId,
-  //   //     orgId: newOrg._id,
-  //   //     permission: per.permission,
-  //   //     resourceType: per.resourceType,
-  //   //     resourceId: per.resourceId
-  //   //   })),
-  //   //   { session, ordered: true }
-  //   // );
-  // }
 
   addLog.debug(`syncOrg: end`);
 }
@@ -604,6 +525,8 @@ export async function removeUserFromTeam({
     if (!removeTmb) {
       return Promise.reject('member not exist');
     }
+    // Remove session
+    await delUserAllSession(removeTmb.userId);
 
     const ownerTmb = await MongoTeamMember.findOne(
       {

@@ -54,12 +54,7 @@ const UserTable = () => {
       <HStack pb={4}>
         {isPc && <Box className="text-2xl font-bold text-[#405169]">用户信息</Box>}
         <Box className="flex-grow"></Box>
-        <UserAddModal
-          data={{}}
-          updateData={() => {
-            getData(1);
-          }}
-        />
+
         <InputGroup w={['100%', '250px']}>
           <InputLeftElement h={'full'}>
             <MyIcon name="common/searchLight" w={4} color={'myGray.400'} />
@@ -72,6 +67,12 @@ const UserTable = () => {
             size={'sm'}
           ></Input>
         </InputGroup>
+        <UserAddModal
+          data={{}}
+          updateData={() => {
+            getData(1);
+          }}
+        />
       </HStack>
 
       <ScrollData position={'relative'} h={'100%'}>
@@ -151,6 +152,10 @@ function UserDetailModal({ user, onClose }: { user: UserModelSchema; onClose: ()
         <Flex alignItems={'center'} pb={4}>
           <Box flex={'0 0 120px'}>创建时间:</Box>
           <Box>{dayjs(user.createTime).format('YYYY/MM/DD HH:mm:ss')}</Box>
+        </Flex>
+        <Flex alignItems={'center'} pb={4}>
+          <Box flex={'0 0 120px'}>联系方式:</Box>
+          <Box>{user.contact || '-'}</Box>
         </Flex>
         <Flex alignItems={'center'} pb={4}>
           <Box flex={'0 0 120px'}>状态:</Box>

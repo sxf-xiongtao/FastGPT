@@ -12,6 +12,7 @@ export type CreateCouponBody = {
   count: number;
   type: CouponTypeEnum;
   price?: number;
+  description?: string;
 };
 
 async function handler(
@@ -20,7 +21,7 @@ async function handler(
 ): Promise<string[]> {
   await authCert({ req, authRoot: true });
 
-  const { subscriptions, count, type, price } = req.body;
+  const { subscriptions, count, type, price, description } = req.body;
 
   if (!type) {
     return Promise.reject('type 不能为空');
@@ -47,6 +48,7 @@ async function handler(
       key,
       type,
       price,
+      description,
       subscriptions: subscriptions.map((item) => ({
         type: item.type,
         durationDay: item.durationDay,

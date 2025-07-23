@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   FormControl,
   FormLabel,
@@ -18,6 +19,7 @@ import { useToast } from '@fastgpt/web/hooks/useToast';
 import MyModal from '@fastgpt/web/components/common/MyModal';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
 import { checkPasswordRule } from '@fastgpt/global/common/string/password';
+import PopoverConfirm from '@fastgpt/web/components/common/MyPopover/PopoverConfirm';
 
 type TFormData = {
   username: string;
@@ -34,29 +36,23 @@ export default function UserEditModal(props: { data: any; getData: any }) {
     defaultValues: data
   });
 
-  const { runAsync: onSubmit, loading } = useRequest2(async (formData: TFormData) => {
-    try {
-      await POST(`/admin/routes/users/updateUser`, {
+  const { runAsync: onSubmit, loading } = useRequest2(
+    async (formData: TFormData) => {
+      return POST(`/admin/routes/users/updateUser`, {
         _id: data._id,
         username: formData.username,
         status: formData.status,
         password: formData.password ? hashStr(formData.password) : undefined
       });
-
-      toast({
-        title: '更新成功',
-        status: 'success'
-      });
-      getData(1);
-      onClose();
-    } catch (err: any) {
-      toast({
-        title: err.message,
-        status: 'error'
-      });
+    },
+    {
+      successToast: '更新成功',
+      onSuccess() {
+        getData();
+        onClose();
+      }
     }
-  });
-
+  );
   const onSubmitErr = (err: Record<string, any>) => {
     const val = Object.values(err)[0];
     if (!val) return;
@@ -69,6 +65,20 @@ export default function UserEditModal(props: { data: any; getData: any }) {
       });
     }
   };
+
+  const { runAsync: onDeleteUser } = useRequest2(
+    () =>
+      POST(`/admin/routes/users/delete`, {
+        username: data.username
+      }),
+    {
+      successToast: '账号已注销',
+      onSuccess() {
+        onClose();
+        getData();
+      }
+    }
+  );
 
   return (
     <>
@@ -132,7 +142,21 @@ export default function UserEditModal(props: { data: any; getData: any }) {
           </FormControl>
         </ModalBody>
         <ModalFooter>
-          <Button variant={'outline'} mr={4} onClick={onClose}>
+          <Box flex={'1'}>
+            {!data.username.endsWith('deleted') && (
+              <PopoverConfirm
+                content="确认注销该账号？会将该用户下关键资源删除，并修改其用户名成 xx-deleted"
+                type="delete"
+                onConfirm={onDeleteUser}
+                Trigger={
+                  <Button alignSelf={'flex-start'} variant={'dangerFill'}>
+                    注销
+                  </Button>
+                }
+              />
+            )}
+          </Box>
+          <Button variant={'outline'} mr={2} onClick={onClose}>
             关闭
           </Button>
           <Button
