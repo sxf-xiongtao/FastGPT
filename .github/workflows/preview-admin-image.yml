@@ -28,6 +28,11 @@ jobs:
         with:
           driver-opts: network=host
 
+      - name: Clear cache directory
+        run: |
+          sudo rm -rf /tmp/.buildx-cache
+          mkdir -p /tmp/.buildx-cache
+
       - name: Cache Docker layers
         uses: actions/cache@v4
         with:
@@ -51,6 +56,7 @@ jobs:
 
       - name: Build and publish image
         uses: docker/build-push-action@v6
+        continue-on-error: false
         with:
           context: .
           file: projects/app/Dockerfile
@@ -61,8 +67,8 @@ jobs:
             org.opencontainers.image.description=fastgpt-pro image
           push: true
           tags: ${{ env.DOCKER_REPO_TAGGED }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: '@finleyge/github-tools'
         uses: FinleyGe/github-tools@0.0.1
