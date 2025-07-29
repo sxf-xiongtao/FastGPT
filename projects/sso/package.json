@@ -7,7 +7,7 @@
     "build": "bun build src/index.ts --outdir=dist --target=bun"
   },
   "dependencies": {
-    "@node-saml/node-saml": "^5.0.0",
+    "@node-saml/node-saml": "^5.1.0",
     "axios": "^1.8.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

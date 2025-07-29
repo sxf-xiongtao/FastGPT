@@ -70,7 +70,7 @@ importers:
         version: 6.21.0(eslint@8.57.1)(typescript@5.8.2)
       '@vitest/coverage-v8':
         specifier: ^3.0.9
-        version: 3.0.9(vitest@3.0.9(@types/debug@4.1.12)(@types/node@22.13.10)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0))
+        version: 3.0.9(vitest@3.0.9(@types/debug@4.1.12)(@types/node@24.1.0)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0))
       eslint:
         specifier: ^8.57.0
         version: 8.57.1
@@ -103,10 +103,10 @@ importers:
         version: 14.1.2(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       vitest:
         specifier: ^3.0.9
-        version: 3.0.9(@types/debug@4.1.12)(@types/node@22.13.10)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0)
+        version: 3.0.9(@types/debug@4.1.12)(@types/node@24.1.0)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0)
       zhlint:
         specifier: ^0.7.4
-        version: 0.7.4(@types/node@22.13.10)(jsdom@26.0.0(canvas@3.1.0))(sass@1.86.0)(terser@5.39.0)(typescript@5.8.2)
+        version: 0.7.4(@types/node@24.1.0)(jsdom@26.0.0(canvas@3.1.0))(sass@1.86.0)(terser@5.39.0)(typescript@5.8.2)
 
   FastGPT/packages/global:
     dependencies:
@@ -170,7 +170,7 @@ importers:
     dependencies:
       '@fastgpt-sdk/plugin':
         specifier: ^0.1.2
-        version: 0.1.2(@types/node@22.13.10)
+        version: 0.1.2(@types/node@24.1.0)
       '@fastgpt/global':
         specifier: workspace:*
         version: link:../global
@@ -241,8 +241,8 @@ importers:
         specifier: ^19.0.0
         version: 19.6.0
       form-data:
-        specifier: ^4.0.0
-        version: 4.0.2
+        specifier: ^4.0.4
+        version: 4.0.4
       iconv-lite:
         specifier: ^0.6.3
         version: 0.6.3
@@ -1146,8 +1146,8 @@ importers:
   projects/sso:
     dependencies:
       '@node-saml/node-saml':
-        specifier: ^5.0.0
-        version: 5.0.1
+        specifier: ^5.1.0
+        version: 5.1.0
       axios:
         specifier: ^1.8.2
         version: 1.8.3
@@ -3332,8 +3332,8 @@ packages:
     resolution: {integrity: sha512-tnfzXOMqzVQF2dSKMhPC9HrHzzWmN6KheL/zYtGenhOpq/bCKHJWVASSggEnHlkmHgXGeIJHR2N/IuPzewz1BQ==}
     engines: {node: '>= 10'}
 
-  '@node-saml/node-saml@5.0.1':
-    resolution: {integrity: sha512-YQzFPEC+CnsfO9AFYnwfYZKIzOLx3kITaC1HrjHVLTo6hxcQhc+LgHODOMvW4VCV95Gwrz1MshRUWCPzkDqmnA==}
+  '@node-saml/node-saml@5.1.0':
+    resolution: {integrity: sha512-t3cJnZ4aC7HhPZ6MGylGZULvUtBOZ6FzuUndaHGXjmIZHXnLfC/7L8a57O9Q9V7AxJGKAiRM5zu2wNm9EsvQpw==}
     engines: {node: '>= 18'}
 
   '@nodelib/fs.scandir@2.1.5':
@@ -4284,6 +4284,9 @@ packages:
   '@types/node@12.20.55':
     resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
 
+  '@types/node@18.19.120':
+    resolution: {integrity: sha512-WtCGHFXnVI8WHLxDAt5TbnCM4eSE+nI0QN2NJtwzcgMhht2eNz6V9evJrk+lwC8bCY8OWV5Ym8Jz7ZEyGnKnMA==}
+
   '@types/node@18.19.80':
     resolution: {integrity: sha512-kEWeMwMeIvxYkeg1gTc01awpwLbfMRZXdIhwRcakd/KlK53jmRC26LqcbIt7fnAQTu5GzlnWmzA3H6+l1u6xxQ==}
 
@@ -4295,6 +4298,9 @@ packages:
 
   '@types/node@22.13.10':
     resolution: {integrity: sha512-I6LPUvlRH+O6VRUqYOcMudhaIdUVWfsjnZavnsraHvpBwaEyMN29ry+0UVJhImYL16xsscu0aske3yA+uPOWfw==}
+
+  '@types/node@24.1.0':
+    resolution: {integrity: sha512-ut5FthK5moxFKH2T1CUOC6ctR67rQRvvHdFLCD2Ql6KXmMuCrjsSsRI9UsLCm9M18BMwClv4pn327UvB7eeO1w==}
 
   '@types/nodemailer@6.4.17':
     resolution: {integrity: sha512-I9CCaIp6DTldEg7vyUTZi8+9Vo0hi1/T8gv3C89yk1rSAAzoKQ8H8ki/jBYJSFoH/BisgLP8tkZMlQ91CIquww==}
@@ -4319,6 +4325,9 @@ packages:
 
   '@types/qrcode@1.5.5':
     resolution: {integrity: sha512-CdfBi/e3Qk+3Z/fXYShipBT13OJ2fDO2Q2w5CIP5anLTLIndQG9z6P1cnm+8zCWSpm5dnxMFd/uREtb0EXuQzg==}
+
+  '@types/qs@6.14.0':
+    resolution: {integrity: sha512-eOunJqu0K1923aExK6y8p6fsihYEn/BYuQ4g0CxAAgFc4b/ZLN4CrsRZ55srTdqoiLzU2B2evC+apEIxprEzkQ==}
 
   '@types/qs@6.9.18':
     resolution: {integrity: sha512-kK7dgTYDyGqS+e2Q4aK9X3D7q234CIZ1Bv0q/7Z5IwRDoADNU81xXJK/YVyLbLTZCoIwUoDoffFeF+p/eIklAA==}
@@ -6820,6 +6829,10 @@ packages:
 
   form-data@4.0.2:
     resolution: {integrity: sha512-hGfm/slu0ZabnNt4oaRZ6uREyfCj6P4fT/n6A1rGV+Z0VdGXjfOhVUpkn6qVQONHGIFwmveGXyDs75+nr6FM8w==}
+    engines: {node: '>= 6'}
+
+  form-data@4.0.4:
+    resolution: {integrity: sha512-KrGhL9Q4zjj0kiUt5OO4Mr/A/jlI2jDYs5eHBpYHPcBEVSiipAvn2Ko2HnPe20rmcuuvMHNdZFp+4IlGTMF0Ow==}
     engines: {node: '>= 6'}
 
   format@0.2.2:
@@ -10944,6 +10957,9 @@ packages:
   undici-types@6.20.0:
     resolution: {integrity: sha512-Ny6QZ2Nju20vw1SRHe3d9jVu6gJ+4e3+MMpqu7pqE5HT6WsTSlce++GQmK5UXS8mzV8DSYHrQH+Xrf2jVcuKNg==}
 
+  undici-types@7.8.0:
+    resolution: {integrity: sha512-9UJ2xGDvQ43tYyVMpuHlsgApydB8ZKfVYTsLDhXkFL/6gfkp+U8xTGdh8pMJv1SpZna0zxG1DwsKZsreLbXBxw==}
+
   undici@5.28.5:
     resolution: {integrity: sha512-zICwjrDrcrUE0pyyJc1I2QzBkLM8FINsgOrt6WjA+BgajVq9Nxu2PbFFXUrAggLfDXlZGZBVZYw7WNV5KiBiBA==}
     engines: {node: '>=14.0'}
@@ -11549,8 +11565,8 @@ packages:
     engines: {node: '>=0.8'}
     hasBin: true
 
-  xml-crypto@6.0.1:
-    resolution: {integrity: sha512-v05aU7NS03z4jlZ0iZGRFeZsuKO1UfEbbYiaeRMiATBFs6Jq9+wqKquEMTn4UTrYZ9iGD8yz3KT4L9o2iF682w==}
+  xml-crypto@6.1.2:
+    resolution: {integrity: sha512-leBOVQdVi8FvPJrMYoum7Ici9qyxfE4kVi+AkpUoYCSXaQF4IlBm1cneTK9oAxR61LpYxTx7lNcsnBIeRpGW2w==}
     engines: {node: '>=16'}
 
   xml-encryption@3.1.0:
@@ -11974,7 +11990,7 @@ snapshots:
       '@babel/core': 7.26.10
       '@babel/helper-compilation-targets': 7.26.5
       '@babel/helper-plugin-utils': 7.26.5
-      debug: 4.4.0
+      debug: 4.4.1
       lodash.debounce: 4.0.8
       resolve: 1.22.10
     transitivePeerDependencies:
@@ -13677,10 +13693,10 @@ snapshots:
 
   '@faker-js/faker@9.6.0': {}
 
-  '@fastgpt-sdk/plugin@0.1.2(@types/node@22.13.10)':
+  '@fastgpt-sdk/plugin@0.1.2(@types/node@24.1.0)':
     dependencies:
       '@fortaine/fetch-event-source': 3.0.6
-      '@ts-rest/core': 3.52.1(@types/node@22.13.10)(zod@3.25.49)
+      '@ts-rest/core': 3.52.1(@types/node@24.1.0)(zod@3.25.49)
       zod: 3.25.49
     transitivePeerDependencies:
       - '@types/node'
@@ -13775,7 +13791,7 @@ snapshots:
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
       '@humanwhocodes/object-schema': 2.0.3
-      debug: 4.4.0
+      debug: 4.4.1
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -14466,16 +14482,16 @@ snapshots:
       '@node-rs/jieba-win32-ia32-msvc': 2.0.1
       '@node-rs/jieba-win32-x64-msvc': 2.0.1
 
-  '@node-saml/node-saml@5.0.1':
+  '@node-saml/node-saml@5.1.0':
     dependencies:
       '@types/debug': 4.1.12
-      '@types/qs': 6.9.18
+      '@types/qs': 6.14.0
       '@types/xml-encryption': 1.2.4
       '@types/xml2js': 0.4.14
       '@xmldom/is-dom-node': 1.0.1
       '@xmldom/xmldom': 0.8.10
-      debug: 4.4.0
-      xml-crypto: 6.0.1
+      debug: 4.4.1
+      xml-crypto: 6.1.2
       xml-encryption: 3.1.0
       xml2js: 0.6.2
       xmlbuilder: 15.1.1
@@ -15214,7 +15230,7 @@ snapshots:
 
   '@tokenizer/inflate@0.2.7':
     dependencies:
-      debug: 4.4.0
+      debug: 4.4.1
       fflate: 0.8.2
       token-types: 6.0.0
     transitivePeerDependencies:
@@ -15226,9 +15242,9 @@ snapshots:
 
   '@trysound/sax@0.2.0': {}
 
-  '@ts-rest/core@3.52.1(@types/node@22.13.10)(zod@3.25.49)':
+  '@ts-rest/core@3.52.1(@types/node@24.1.0)(zod@3.25.49)':
     optionalDependencies:
-      '@types/node': 22.13.10
+      '@types/node': 24.1.0
       zod: 3.25.49
 
   '@tsconfig/node10@1.0.11': {}
@@ -15546,9 +15562,13 @@ snapshots:
   '@types/node-fetch@2.6.12':
     dependencies:
       '@types/node': 20.17.24
-      form-data: 4.0.2
+      form-data: 4.0.4
 
   '@types/node@12.20.55': {}
+
+  '@types/node@18.19.120':
+    dependencies:
+      undici-types: 5.26.5
 
   '@types/node@18.19.80':
     dependencies:
@@ -15565,6 +15585,11 @@ snapshots:
   '@types/node@22.13.10':
     dependencies:
       undici-types: 6.20.0
+
+  '@types/node@24.1.0':
+    dependencies:
+      undici-types: 7.8.0
+    optional: true
 
   '@types/nodemailer@6.4.17':
     dependencies:
@@ -15591,6 +15616,8 @@ snapshots:
   '@types/qrcode@1.5.5':
     dependencies:
       '@types/node': 20.17.24
+
+  '@types/qs@6.14.0': {}
 
   '@types/qs@6.9.18': {}
 
@@ -15656,7 +15683,7 @@ snapshots:
       '@types/cookiejar': 2.1.5
       '@types/methods': 1.1.4
       '@types/node': 20.17.24
-      form-data: 4.0.2
+      form-data: 4.0.4
 
   '@types/supertest@6.0.2':
     dependencies:
@@ -15912,7 +15939,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/coverage-v8@3.0.9(vitest@3.0.9(@types/debug@4.1.12)(@types/node@22.13.10)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0))':
+  '@vitest/coverage-v8@3.0.9(vitest@3.0.9(@types/debug@4.1.12)(@types/node@24.1.0)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 1.0.2
@@ -15926,7 +15953,7 @@ snapshots:
       std-env: 3.9.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.0.9(@types/debug@4.1.12)(@types/node@22.13.10)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0)
+      vitest: 3.0.9(@types/debug@4.1.12)(@types/node@24.1.0)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -15974,13 +16001,13 @@ snapshots:
     optionalDependencies:
       vite: 6.2.2(@types/node@20.17.24)(jiti@1.21.7)(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0)
 
-  '@vitest/mocker@3.0.9(vite@6.2.2(@types/node@22.13.10)(jiti@1.21.7)(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0))':
+  '@vitest/mocker@3.0.9(vite@6.2.2(@types/node@24.1.0)(jiti@1.21.7)(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0))':
     dependencies:
       '@vitest/spy': 3.0.9
       estree-walker: 3.0.3
       magic-string: 0.30.17
     optionalDependencies:
-      vite: 6.2.2(@types/node@22.13.10)(jiti@1.21.7)(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0)
+      vite: 6.2.2(@types/node@24.1.0)(jiti@1.21.7)(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0)
 
   '@vitest/pretty-format@3.0.8':
     dependencies:
@@ -16705,7 +16732,7 @@ snapshots:
     dependencies:
       bytes: 3.1.2
       content-type: 1.0.5
-      debug: 4.4.0
+      debug: 4.4.1
       http-errors: 2.0.0
       iconv-lite: 0.6.3
       on-finished: 2.4.1
@@ -18627,7 +18654,7 @@ snapshots:
 
   extract-zip@2.0.1:
     dependencies:
-      debug: 4.4.0
+      debug: 4.4.1
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
@@ -18801,7 +18828,7 @@ snapshots:
 
   finalhandler@2.1.0:
     dependencies:
-      debug: 4.4.0
+      debug: 4.4.1
       encodeurl: 2.0.0
       escape-html: 1.0.3
       on-finished: 2.4.1
@@ -18904,6 +18931,14 @@ snapshots:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       es-set-tostringtag: 2.1.0
+      mime-types: 2.1.35
+
+  form-data@4.0.4:
+    dependencies:
+      asynckit: 0.4.0
+      combined-stream: 1.0.8
+      es-set-tostringtag: 2.1.0
+      hasown: 2.0.2
       mime-types: 2.1.35
 
   format@0.2.2: {}
@@ -19062,7 +19097,7 @@ snapshots:
     dependencies:
       basic-ftp: 5.0.5
       data-uri-to-buffer: 6.0.2
-      debug: 4.4.0
+      debug: 4.4.1
     transitivePeerDependencies:
       - supports-color
 
@@ -19363,7 +19398,7 @@ snapshots:
   http-proxy-agent@7.0.2:
     dependencies:
       agent-base: 7.1.3
-      debug: 4.4.0
+      debug: 4.4.1
     transitivePeerDependencies:
       - supports-color
 
@@ -19375,14 +19410,14 @@ snapshots:
   https-proxy-agent@7.0.6:
     dependencies:
       agent-base: 7.1.3
-      debug: 4.4.0
+      debug: 4.4.1
     transitivePeerDependencies:
       - supports-color
 
   httpx@2.3.3:
     dependencies:
       '@types/node': 20.17.24
-      debug: 4.4.0
+      debug: 4.4.1
     transitivePeerDependencies:
       - supports-color
 
@@ -19814,7 +19849,7 @@ snapshots:
 
   istanbul-lib-source-maps@4.0.1:
     dependencies:
-      debug: 4.4.0
+      debug: 4.4.1
       istanbul-lib-coverage: 3.2.2
       source-map: 0.6.1
     transitivePeerDependencies:
@@ -19823,7 +19858,7 @@ snapshots:
   istanbul-lib-source-maps@5.0.6:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
-      debug: 4.4.0
+      debug: 4.4.1
       istanbul-lib-coverage: 3.2.2
     transitivePeerDependencies:
       - supports-color
@@ -20208,7 +20243,7 @@ snapshots:
       cssstyle: 4.3.0
       data-urls: 5.0.0
       decimal.js: 10.5.0
-      form-data: 4.0.2
+      form-data: 4.0.4
       html-encoding-sniffer: 4.0.0
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
@@ -21172,7 +21207,7 @@ snapshots:
   micromark@3.2.0:
     dependencies:
       '@types/debug': 4.1.12
-      debug: 4.4.0
+      debug: 4.4.1
       decode-named-character-reference: 1.1.0
       micromark-core-commonmark: 1.1.0
       micromark-factory-space: 1.1.0
@@ -21194,7 +21229,7 @@ snapshots:
   micromark@4.0.2:
     dependencies:
       '@types/debug': 4.1.12
-      debug: 4.4.0
+      debug: 4.4.1
       decode-named-character-reference: 1.1.0
       devlop: 1.1.0
       micromark-core-commonmark: 2.0.3
@@ -21516,7 +21551,7 @@ snapshots:
 
   new-find-package-json@2.0.0:
     dependencies:
-      debug: 4.4.0
+      debug: 4.4.1
     transitivePeerDependencies:
       - supports-color
 
@@ -21796,7 +21831,7 @@ snapshots:
 
   openai@4.87.3(encoding@0.1.13)(ws@8.18.1)(zod@3.25.49):
     dependencies:
-      '@types/node': 18.19.80
+      '@types/node': 18.19.120
       '@types/node-fetch': 2.6.12
       abort-controller: 3.0.0
       agentkeepalive: 4.6.0
@@ -21924,7 +21959,7 @@ snapshots:
     dependencies:
       '@tootallnate/quickjs-emscripten': 0.23.0
       agent-base: 7.1.3
-      debug: 4.4.0
+      debug: 4.4.1
       get-uri: 6.0.4
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
@@ -22341,7 +22376,7 @@ snapshots:
   proxy-agent@6.5.0:
     dependencies:
       agent-base: 7.1.3
-      debug: 4.4.0
+      debug: 4.4.1
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
       lru-cache: 7.18.3
@@ -22978,7 +23013,7 @@ snapshots:
 
   router@2.2.0:
     dependencies:
-      debug: 4.4.0
+      debug: 4.4.1
       depd: 2.0.0
       is-promise: 4.0.0
       parseurl: 1.3.3
@@ -23134,7 +23169,7 @@ snapshots:
 
   send@1.2.0:
     dependencies:
-      debug: 4.4.0
+      debug: 4.4.1
       encodeurl: 2.0.0
       escape-html: 1.0.3
       etag: 1.8.1
@@ -23285,7 +23320,7 @@ snapshots:
   socks-proxy-agent@8.0.5:
     dependencies:
       agent-base: 7.1.3
-      debug: 4.4.0
+      debug: 4.4.1
       socks: 2.8.4
     transitivePeerDependencies:
       - supports-color
@@ -23575,7 +23610,7 @@ snapshots:
       cookiejar: 2.1.4
       debug: 4.4.0
       fast-safe-stringify: 2.1.1
-      form-data: 4.0.2
+      form-data: 4.0.4
       formidable: 2.1.2
       methods: 1.1.2
       mime: 2.6.0
@@ -24043,6 +24078,9 @@ snapshots:
 
   undici-types@6.20.0: {}
 
+  undici-types@7.8.0:
+    optional: true
+
   undici@5.28.5:
     dependencies:
       '@fastify/busboy': 2.1.1
@@ -24202,7 +24240,7 @@ snapshots:
 
   urllib@4.6.11:
     dependencies:
-      form-data: 4.0.2
+      form-data: 4.0.4
       formstream: 1.5.1
       mime-types: 2.1.35
       qs: 6.14.0
@@ -24351,13 +24389,13 @@ snapshots:
       d3-time: 3.1.0
       d3-timer: 3.0.1
 
-  vite-node@1.6.1(@types/node@22.13.10)(sass@1.86.0)(terser@5.39.0):
+  vite-node@1.6.1(@types/node@24.1.0)(sass@1.86.0)(terser@5.39.0):
     dependencies:
       cac: 6.7.14
-      debug: 4.4.0
+      debug: 4.4.1
       pathe: 1.1.2
       picocolors: 1.1.1
-      vite: 5.4.14(@types/node@22.13.10)(sass@1.86.0)(terser@5.39.0)
+      vite: 5.4.14(@types/node@24.1.0)(sass@1.86.0)(terser@5.39.0)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -24432,13 +24470,13 @@ snapshots:
       - tsx
       - yaml
 
-  vite-node@3.0.9(@types/node@22.13.10)(jiti@1.21.7)(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0):
+  vite-node@3.0.9(@types/node@24.1.0)(jiti@1.21.7)(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0):
     dependencies:
       cac: 6.7.14
       debug: 4.4.0
       es-module-lexer: 1.6.0
       pathe: 2.0.3
-      vite: 6.2.2(@types/node@22.13.10)(jiti@1.21.7)(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0)
+      vite: 6.2.2(@types/node@24.1.0)(jiti@1.21.7)(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -24453,13 +24491,13 @@ snapshots:
       - tsx
       - yaml
 
-  vite@5.4.14(@types/node@22.13.10)(sass@1.86.0)(terser@5.39.0):
+  vite@5.4.14(@types/node@24.1.0)(sass@1.86.0)(terser@5.39.0):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.5.3
       rollup: 4.35.0
     optionalDependencies:
-      '@types/node': 22.13.10
+      '@types/node': 24.1.0
       fsevents: 2.3.3
       sass: 1.86.0
       terser: 5.39.0
@@ -24490,20 +24528,20 @@ snapshots:
       terser: 5.39.0
       yaml: 2.7.0
 
-  vite@6.2.2(@types/node@22.13.10)(jiti@1.21.7)(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0):
+  vite@6.2.2(@types/node@24.1.0)(jiti@1.21.7)(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0):
     dependencies:
       esbuild: 0.25.1
       postcss: 8.5.3
       rollup: 4.35.0
     optionalDependencies:
-      '@types/node': 22.13.10
+      '@types/node': 24.1.0
       fsevents: 2.3.3
       jiti: 1.21.7
       sass: 1.86.0
       terser: 5.39.0
       yaml: 2.7.0
 
-  vitest@1.6.1(@types/node@22.13.10)(jsdom@26.0.0(canvas@3.1.0))(sass@1.86.0)(terser@5.39.0):
+  vitest@1.6.1(@types/node@24.1.0)(jsdom@26.0.0(canvas@3.1.0))(sass@1.86.0)(terser@5.39.0):
     dependencies:
       '@vitest/expect': 1.6.1
       '@vitest/runner': 1.6.1
@@ -24512,7 +24550,7 @@ snapshots:
       '@vitest/utils': 1.6.1
       acorn-walk: 8.3.4
       chai: 4.5.0
-      debug: 4.4.0
+      debug: 4.4.1
       execa: 8.0.1
       local-pkg: 0.5.1
       magic-string: 0.30.17
@@ -24522,11 +24560,11 @@ snapshots:
       strip-literal: 2.1.1
       tinybench: 2.9.0
       tinypool: 0.8.4
-      vite: 5.4.14(@types/node@22.13.10)(sass@1.86.0)(terser@5.39.0)
-      vite-node: 1.6.1(@types/node@22.13.10)(sass@1.86.0)(terser@5.39.0)
+      vite: 5.4.14(@types/node@24.1.0)(sass@1.86.0)(terser@5.39.0)
+      vite-node: 1.6.1(@types/node@24.1.0)(sass@1.86.0)(terser@5.39.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 22.13.10
+      '@types/node': 24.1.0
       jsdom: 26.0.0(canvas@3.1.0)
     transitivePeerDependencies:
       - less
@@ -24658,10 +24696,10 @@ snapshots:
       - tsx
       - yaml
 
-  vitest@3.0.9(@types/debug@4.1.12)(@types/node@22.13.10)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0):
+  vitest@3.0.9(@types/debug@4.1.12)(@types/node@24.1.0)(jiti@1.21.7)(jsdom@26.0.0(canvas@3.1.0))(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0):
     dependencies:
       '@vitest/expect': 3.0.9
-      '@vitest/mocker': 3.0.9(vite@6.2.2(@types/node@22.13.10)(jiti@1.21.7)(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0))
+      '@vitest/mocker': 3.0.9(vite@6.2.2(@types/node@24.1.0)(jiti@1.21.7)(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0))
       '@vitest/pretty-format': 3.0.9
       '@vitest/runner': 3.0.9
       '@vitest/snapshot': 3.0.9
@@ -24677,12 +24715,12 @@ snapshots:
       tinyexec: 0.3.2
       tinypool: 1.0.2
       tinyrainbow: 2.0.0
-      vite: 6.2.2(@types/node@22.13.10)(jiti@1.21.7)(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0)
-      vite-node: 3.0.9(@types/node@22.13.10)(jiti@1.21.7)(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0)
+      vite: 6.2.2(@types/node@24.1.0)(jiti@1.21.7)(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0)
+      vite-node: 3.0.9(@types/node@24.1.0)(jiti@1.21.7)(sass@1.86.0)(terser@5.39.0)(yaml@2.7.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/debug': 4.1.12
-      '@types/node': 22.13.10
+      '@types/node': 24.1.0
       jsdom: 26.0.0(canvas@3.1.0)
     transitivePeerDependencies:
       - jiti
@@ -24932,7 +24970,7 @@ snapshots:
 
   xlsx@https://cdn.sheetjs.com/xlsx-0.20.2/xlsx-0.20.2.tgz: {}
 
-  xml-crypto@6.0.1:
+  xml-crypto@6.1.2:
     dependencies:
       '@xmldom/is-dom-node': 1.0.1
       '@xmldom/xmldom': 0.8.10
@@ -25049,7 +25087,7 @@ snapshots:
 
   yoctocolors-cjs@2.1.2: {}
 
-  zhlint@0.7.4(@types/node@22.13.10)(jsdom@26.0.0(canvas@3.1.0))(sass@1.86.0)(terser@5.39.0)(typescript@5.8.2):
+  zhlint@0.7.4(@types/node@24.1.0)(jsdom@26.0.0(canvas@3.1.0))(sass@1.86.0)(terser@5.39.0)(typescript@5.8.2):
     dependencies:
       chalk: 4.1.2
       glob: 10.4.5
@@ -25058,7 +25096,7 @@ snapshots:
       remark-frontmatter: 1.3.3
       remark-parse: 7.0.2
       unified: 8.4.2
-      vitest: 1.6.1(@types/node@22.13.10)(jsdom@26.0.0(canvas@3.1.0))(sass@1.86.0)(terser@5.39.0)
+      vitest: 1.6.1(@types/node@24.1.0)(jsdom@26.0.0(canvas@3.1.0))(sass@1.86.0)(terser@5.39.0)
       vue: 3.5.13(typescript@5.8.2)
     transitivePeerDependencies:
       - '@edge-runtime/vm'
