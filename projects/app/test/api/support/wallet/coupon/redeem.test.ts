@@ -25,18 +25,8 @@ describe('Redeem coupon', async () => {
       auth: user.manager,
       body: invalidCouponTypeBody
     });
-    const key1 = data1[0];
-    expect(typeof key1).toBe('string');
-    expect(data1.length).toBe(1);
 
-    // Redeem the coupon
-    const res = await Call<{}, RedeemCouponQuery>(redeem.default, {
-      auth: user.manager,
-      query: {
-        key: key1
-      }
-    });
-    expect(res.error).equal('Invalid subscription type');
+    expect(data1).equal(undefined);
   });
   it('Create invalid sub level coupon', async () => {
     const user = await getFakeUsers();
@@ -46,20 +36,11 @@ describe('Redeem coupon', async () => {
       auth: user.manager,
       body: invalidCouponLevelBody
     });
-    const key1 = data1[0];
-    expect(typeof key1).toBe('string');
-    expect(data1.length).toBe(1);
 
-    // Redeem the coupon
-    const res = await Call<{}, RedeemCouponQuery>(redeem.default, {
-      auth: user.manager,
-      query: {
-        key: key1
-      }
-    });
-    expect(res.error).equal('Invalid subscription level');
+    expect(data1).equal(undefined);
   });
-  it('Redeem again', async () => {
+
+  it('Create standard coupon and redeem again', async () => {
     const user = await getFakeUsers();
 
     // Create one coupon

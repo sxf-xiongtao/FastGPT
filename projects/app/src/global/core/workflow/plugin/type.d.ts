@@ -12,7 +12,7 @@ export type EditCustomPluginType = {
   originCost?: number;
   currentCost?: number;
   hasTokenFee?: boolean;
-  isActive: boolean;
+  isActive?: boolean;
   associatedPluginId?: string;
   userGuide?: string;
   author?: string;

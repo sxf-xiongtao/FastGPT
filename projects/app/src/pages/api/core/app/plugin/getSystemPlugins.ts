@@ -2,7 +2,7 @@ import { NextAPI } from '@/service/middleware/entry';
 import { parseI18nString } from '@fastgpt/global/common/i18n/utils';
 import type { SystemPluginTemplateListItemType } from '@fastgpt/global/core/app/plugin/type';
 import { getLocale } from '@fastgpt/service/common/middle/i18n';
-import { getSystemPluginById, getSystemPlugins } from '@fastgpt/service/core/app/plugin/controller';
+import { getSystemToolById, getSystemTools } from '@fastgpt/service/core/app/plugin/controller';
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
 
 export type getSystemPluginsQuery = {
@@ -20,13 +20,13 @@ async function handler(
   const lang = getLocale(req);
   const { toolId } = req.query;
   if (!toolId) {
-    return (await getSystemPlugins()).map((item) => ({
+    return (await getSystemTools()).map((item) => ({
       ...item,
       name: parseI18nString(item.name, lang),
       intro: parseI18nString(item.intro, lang)
     }));
   } else {
-    const res = await getSystemPluginById(toolId);
+    const res = await getSystemToolById(toolId);
     return res
       ? [
           {

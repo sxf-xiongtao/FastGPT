@@ -14,6 +14,8 @@ import type {
   SystemPluginTemplateItemType,
   SystemPluginTemplateListItemType
 } from '@fastgpt/global/core/app/plugin/type';
+import { PluginSourceEnum } from '@fastgpt/global/core/app/plugin/constants';
+import { splitCombinePluginId } from '@fastgpt/global/core/app/plugin/utils';
 
 const PluginCard = ({
   plugin,
@@ -34,13 +36,13 @@ const PluginCard = ({
 }) => {
   const { t } = useTranslation();
   const { runAsync: updateSystemPlugin, loading } = useRequest2(
-    async (e: SystemPluginTemplateItemType) => {
-      return putUpdatePlugin({
+    async (e: SystemPluginTemplateItemType) =>
+      putUpdatePlugin({
         pluginId: plugin.id,
         ...e
-      }).then(() => {
-        refreshPlugins();
-      });
+      }),
+    {
+      onSuccess: refreshPlugins
     }
   );
 
@@ -68,7 +70,15 @@ const PluginCard = ({
       fontSize={'mini'}
       alignItems={'center'}
       onClick={() => {
-        setConfigPlugin(plugin);
+        const { source } = splitCombinePluginId(plugin.id);
+        if (source === PluginSourceEnum.systemTool) {
+          setConfigPlugin(plugin);
+        } else {
+          setEditCustomPlugin({
+            ...plugin,
+            workflow: undefined
+          });
+        }
       }}
     >
       <Box display={'flex'} w={2 / 10} pr={6}>
