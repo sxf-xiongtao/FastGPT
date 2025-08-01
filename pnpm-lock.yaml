@@ -169,8 +169,8 @@ importers:
   FastGPT/packages/service:
     dependencies:
       '@fastgpt-sdk/plugin':
-        specifier: ^0.1.4
-        version: 0.1.4(@types/node@24.1.0)
+        specifier: ^0.1.7
+        version: 0.1.7(@types/node@24.1.0)
       '@fastgpt/global':
         specifier: workspace:*
         version: link:../global
@@ -2630,8 +2630,8 @@ packages:
     resolution: {integrity: sha512-3vm4by+B5lvsFPSyep3ELWmZfE3kicDtmemVpuwl1yH7tqtnHdsA6hG8fbXedMVdkzgtvzWoRgjSB4Q+FHnZiw==}
     engines: {node: '>=18.0.0', npm: '>=9.0.0'}
 
-  '@fastgpt-sdk/plugin@0.1.4':
-    resolution: {integrity: sha512-/wDpUvof6f2Elher295D+Z7YDLKY8+PuMORmA7RT+IfQ1sq6OgmTFDYrACrsqxq3Y5mgU8bt4zd5og2U+SmgDQ==}
+  '@fastgpt-sdk/plugin@0.1.7':
+    resolution: {integrity: sha512-/9szNeb1zLqThHenBYhYTyJr25dqRJwbXiWHFaf99tHWBjgMdMt2tfJhM9E6fz/zlAE3XlJIn/Dlgv82LJa7RQ==}
 
   '@fastify/accept-negotiator@1.1.0':
     resolution: {integrity: sha512-OIHZrb2ImZ7XG85HXOONLcJWGosv7sIvM2ifAPQVhg9Lv7qdmMBNVaai4QTdyuaqbKM5eO6sLSQOYI7wEQeCJQ==}
@@ -13693,7 +13693,7 @@ snapshots:
 
   '@faker-js/faker@9.6.0': {}
 
-  '@fastgpt-sdk/plugin@0.1.4(@types/node@24.1.0)':
+  '@fastgpt-sdk/plugin@0.1.7(@types/node@24.1.0)':
     dependencies:
       '@fortaine/fetch-event-source': 3.0.6
       '@ts-rest/core': 3.52.1(@types/node@24.1.0)(zod@3.25.49)
