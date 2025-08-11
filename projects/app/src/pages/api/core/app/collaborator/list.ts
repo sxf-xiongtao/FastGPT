@@ -35,7 +35,7 @@ async function handler(req: NextApiRequest): Promise<CollaboratorItemType[]> {
       return {
         tmbId: item.tmb._id,
         teamId: item.teamId,
-        permission: new AppPermission({ per: item.permission }),
+        permission: new AppPermission({ role: item.permission }),
         name: item.tmb.name,
         avatar: item.tmb.avatar
       };
@@ -46,7 +46,7 @@ async function handler(req: NextApiRequest): Promise<CollaboratorItemType[]> {
     return {
       groupId: item.group._id,
       teamId: item.teamId,
-      permission: new AppPermission({ per: item.permission }),
+      permission: new AppPermission({ role: item.permission }),
       name: item.group.name,
       avatar: item.group.avatar
     };
@@ -55,7 +55,7 @@ async function handler(req: NextApiRequest): Promise<CollaboratorItemType[]> {
   const orgsWithInfo = orgs.map((item) => ({
     orgId: item.org._id,
     teamId: item.teamId,
-    permission: new AppPermission({ per: item.permission }),
+    permission: new AppPermission({ role: item.permission }),
     name: item.org.name,
     avatar: item.org.avatar || DEFAULT_ORG_AVATAR
   }));

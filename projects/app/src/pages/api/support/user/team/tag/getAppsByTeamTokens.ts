@@ -6,7 +6,7 @@ import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
 import { authTokenFromTeamDomain } from '@/service/support/user/team/tagController';
 import type { AuthTeamTagTokenProps } from '@fastgpt/global/support/user/team/tag';
 import type { AppListItemType } from '@fastgpt/global/core/app/type';
-import { AppDefaultPermissionVal } from '@fastgpt/global/support/permission/app/constant';
+import { AppDefaultRoleVal } from '@fastgpt/global/support/permission/app/constant';
 import { ReadPermissionVal } from '@fastgpt/global/support/permission/constant';
 import { AppPermission } from '@fastgpt/global/support/permission/app/controller';
 import { AppTypeEnum } from '@fastgpt/global/core/app/constants';
@@ -52,9 +52,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           intro: app.intro,
           updateTime: app.updateTime,
           isOwner: false,
-          defaultPermission: AppDefaultPermissionVal,
+          defaultPermission: AppDefaultRoleVal,
           type: app.type,
-          permission: new AppPermission({ per: ReadPermissionVal }),
+          permission: new AppPermission({ role: ReadPermissionVal }),
           inheritPermission: app.inheritPermission,
           sourceMember: {
             name: tmb.name,

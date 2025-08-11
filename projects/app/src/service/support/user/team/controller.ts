@@ -1,7 +1,10 @@
 import { TeamErrEnum } from '@fastgpt/global/common/error/code/team';
 import { LOGO_ICON } from '@fastgpt/global/common/system/constants';
 import { PerResourceTypeEnum } from '@fastgpt/global/support/permission/constant';
-import { TeamDefaultPermissionVal } from '@fastgpt/global/support/permission/user/constant';
+import {
+  TeamDefaultPermissionVal,
+  TeamDefaultRoleVal
+} from '@fastgpt/global/support/permission/user/constant';
 import { TeamPermission } from '@fastgpt/global/support/permission/user/controller';
 import {
   TeamMemberRoleEnum,
@@ -20,7 +23,7 @@ import type {
 import type { TeamMemberWithTeamAndUserSchema } from '@fastgpt/global/support/user/team/type.d';
 import type { ClientSession } from '@fastgpt/service/common/mongo';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
-import { concatPer, getResourcePermission } from '@fastgpt/service/support/permission/controller';
+import { getResourcePermission } from '@fastgpt/service/support/permission/controller';
 import { MongoResourcePermission } from '@fastgpt/service/support/permission/schema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
@@ -37,16 +40,18 @@ import { MongoOrgMemberModel } from '@fastgpt/service/support/permission/org/org
 import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema';
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { getGroupsByTeamId } from './group/controller';
+import { sumPer } from '@fastgpt/global/support/permission/utils';
 
 /* -------- format --------- */
 export async function teamMemberSchema2TeamItemType(
   data: TeamMemberWithTeamAndUserSchema
 ): Promise<TeamTmbItemType> {
-  const per = await getResourcePermission({
-    resourceType: PerResourceTypeEnum.team,
-    teamId: data.teamId,
-    tmbId: data._id
-  });
+  const role =
+    (await getResourcePermission({
+      resourceType: PerResourceTypeEnum.team,
+      teamId: data.teamId,
+      tmbId: data._id
+    })) ?? TeamDefaultRoleVal;
 
   return {
     userId: String(data.userId),
@@ -60,7 +65,7 @@ export async function teamMemberSchema2TeamItemType(
     role: data.role,
     status: data.status,
     permission: new TeamPermission({
-      per: per ?? TeamDefaultPermissionVal,
+      role: role,
       isOwner: data.role === TeamMemberRoleEnum.owner
     }),
     notificationAccount: data.team.notificationAccount,
@@ -298,9 +303,9 @@ export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType
       .map((g) => g.permission)
       .filter((p) => p !== undefined);
 
-    const groupPer = concatPer(groupPermission);
+    const groupPer = sumPer(...groupPermission);
 
-    const per =
+    const role =
       permissions.find((p) => String(p.tmbId) === String(member._id))?.permission ??
       groupPer ??
       TeamDefaultPermissionVal;
@@ -314,7 +319,7 @@ export async function getTeamMembers(teamId: string): Promise<TeamMemberItemType
       role: member.role,
       status: member.status,
       permission: new TeamPermission({
-        per,
+        role,
         isOwner
       }),
       contact: member.user.contact,
@@ -334,7 +339,7 @@ export async function getTeamMember({
   teamId: string;
   tmbId: string;
 }): Promise<TeamMemberItemType> {
-  const [member, team, per] = await Promise.all([
+  const [member, team, role] = await Promise.all([
     MongoTeamMember.findOne({
       teamId,
       _id: tmbId
@@ -364,7 +369,7 @@ export async function getTeamMember({
     role: member.role,
     status: member.status,
     permission: new TeamPermission({
-      per: per ?? TeamDefaultPermissionVal,
+      role: role ?? TeamDefaultRoleVal,
       isOwner: String(team.ownerId) === String(member.userId)
     }),
     createTime: member.createTime,
@@ -487,15 +492,15 @@ export async function getMembersPermission<T extends TeamMemberSchema[]>({
       .filter(Boolean)
       .value() as PermissionValueType[];
 
-    const per =
+    const role =
       memberPermissions.find((p) => String(p.tmbId) === String(member._id))?.permission ??
-      concatPer([...groupPermission, ...orgPermission]) ??
+      sumPer(...groupPermission, ...orgPermission) ??
       TeamDefaultPermissionVal;
 
     return {
       ...member,
       permission: new TeamPermission({
-        per: per,
+        role,
         isOwner
       })
     };

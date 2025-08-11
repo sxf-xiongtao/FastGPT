@@ -59,7 +59,7 @@ async function handler(
 
     if (!target) return Promise.reject(TeamErrEnum.notUser);
 
-    const hasManagePer = new TeamPermission({ per: target.permission }).hasManagePer;
+    const hasManagePer = new TeamPermission({ role: target.permission }).hasManagePer;
     if (hasManagePer && !userPer.isOwner) {
       return Promise.reject(TeamErrEnum.unAuthTeam);
     }

@@ -45,7 +45,7 @@ async function handler(
       return {
         tmbId: item.tmb._id,
         teamId: item.teamId,
-        permission: new DatasetPermission({ per: item.permission }),
+        permission: new DatasetPermission({ role: item.permission }),
         name: item.tmb.name,
         avatar: item.tmb.avatar
       };
@@ -56,7 +56,7 @@ async function handler(
     return {
       groupId: item.group._id,
       teamId: item.teamId,
-      permission: new DatasetPermission({ per: item.permission }),
+      permission: new DatasetPermission({ role: item.permission }),
       name: item.group.name,
       avatar: item.group.avatar
     };
@@ -65,7 +65,7 @@ async function handler(
   const orgsWithInfo = orgs.map((item) => ({
     orgId: item.org._id,
     teamId: item.teamId,
-    permission: new DatasetPermission({ per: item.permission }),
+    permission: new DatasetPermission({ role: item.permission }),
     name: item.org.name,
     avatar: item.org.avatar || DEFAULT_ORG_AVATAR
   }));

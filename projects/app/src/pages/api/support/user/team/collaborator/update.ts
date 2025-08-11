@@ -138,7 +138,7 @@ async function handler(
   }
 
   // Auth
-  const updatePer = new TeamPermission({ per: permission });
+  const updatePer = new TeamPermission({ role: permission });
   await (async () => {
     if (isRoot || userPer.isOwner) return;
 
@@ -156,7 +156,7 @@ async function handler(
     ).lean();
 
     const hasManagePer = targets.some((v) => {
-      const Per = new TeamPermission({ per: v.permission });
+      const Per = new TeamPermission({ role: v.permission });
       return Per.hasManagePer;
     });
 
@@ -176,7 +176,7 @@ async function handler(
         ...v
       },
       update: {
-        $set: { permission: updatePer.value }
+        $set: { permission: updatePer.role }
       },
       upsert: true
     }
@@ -207,7 +207,7 @@ async function handler(
       event: AuditEventEnum.ASSIGN_PERMISSION,
       params: {
         objectName: targetNames.join(', '),
-        permission: updatePer.value.toString()
+        permission: updatePer.role.toString() // TODO: remove toString()
       }
     });
   })();

@@ -61,14 +61,14 @@ async function handler(
 
   return Promise.all(
     orgs.map(async (org) => {
-      const per = permissions?.find(
+      const role = permissions?.find(
         (permission) => String(permission.orgId) === String(org._id)
       )?.permission;
 
       return <OrgListItemType>{
         ...org,
         avatar: org.avatar || DEFAULT_ORG_AVATAR,
-        permission: per ? new TeamPermission({ per }) : undefined,
+        permission: role ? new TeamPermission({ role }) : undefined,
         total: await countOrgChildren({ teamId, path: getOrgChildrenPath(org), orgId: org._id })
       };
     })

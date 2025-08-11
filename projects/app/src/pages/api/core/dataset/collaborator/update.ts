@@ -76,7 +76,7 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
     }
 
     // can not update admin's permission unless I am owner
-    if (new DatasetPermission({ per: permission }).hasManagePer && !myPer.isOwner) {
+    if (new DatasetPermission({ role: permission }).hasManagePer && !myPer.isOwner) {
       return Promise.reject(DatasetErrEnum.unAuthDataset);
     }
   })();
@@ -85,8 +85,8 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
   const checkAdminPerChanged = async (clbOrGroups: ResourcePermissionType[]) => {
     if (
       clbOrGroups.some((clb) => {
-        const oldPer = new DatasetPermission({ per: clb.permission });
-        const newPer = new DatasetPermission({ per: permission });
+        const oldPer = new DatasetPermission({ role: clb.permission });
+        const newPer = new DatasetPermission({ role: permission });
         const updatedClbAndGroups = [...tmbIds, ...groupIds, ...orgIds];
         if (
           (oldPer.hasManagePer !== newPer.hasManagePer && // manage permission changed

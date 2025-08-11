@@ -11,6 +11,7 @@ import {
   getGroupMembersByGroupId
 } from '@fastgpt/service/support/permission/memberGroup/controllers';
 import { refreshSourceAvatar } from '@fastgpt/service/common/file/image/controller';
+import { UserError } from '@fastgpt/global/common/error/utils';
 
 export type GroupUpdateQuery = {};
 export type GroupUpdateBody = putUpdateGroupData;

@@ -35,7 +35,7 @@ async function handler(
         tmbId: item.tmb._id,
         teamId: item.teamId,
         permission: new TeamPermission({
-          per: item.permission,
+          role: item.permission,
           isOwner: item.tmb.role === TeamMemberRoleEnum.owner
         }),
         name: item.tmb.name,
@@ -48,7 +48,7 @@ async function handler(
     return {
       groupId: item.group._id,
       teamId: item.teamId,
-      permission: new TeamPermission({ per: item.permission }),
+      permission: new TeamPermission({ role: item.permission }),
       name: item.group.name,
       avatar: item.group.avatar
     };
@@ -57,7 +57,7 @@ async function handler(
   const orgsWithInfo = orgs.map((item) => ({
     orgId: item.org._id,
     teamId: item.teamId,
-    permission: new TeamPermission({ per: item.permission }),
+    permission: new TeamPermission({ role: item.permission }),
     name: item.org.name,
     avatar: item.org.avatar || DEFAULT_ORG_AVATAR
   }));

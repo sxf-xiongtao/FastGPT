@@ -3,7 +3,7 @@ import { changeOwner } from '@/service/core/changeOwner';
 import { licenseAuth } from '@/service/common/license/auth';
 import { getNanoid, hashStr } from '@fastgpt/global/common/string/tools';
 import { GroupMemberRole } from '@fastgpt/global/support/permission/memberGroup/constant';
-import { TeamReadPermissionVal } from '@fastgpt/global/support/permission/user/constant';
+import { TeamReadRoleVal } from '@fastgpt/global/support/permission/user/constant';
 import { TeamPermission } from '@fastgpt/global/support/permission/user/controller';
 import { UserStatusEnum } from '@fastgpt/global/support/user/constant';
 import { InformLevelEnum } from '@fastgpt/global/support/user/inform/constants';
@@ -152,7 +152,7 @@ export async function createUserByUsername({
           tmbId: tmbs[0]._id,
           teamDomain: teams[0].teamDomain,
           permission: new TeamPermission({
-            per: TeamReadPermissionVal
+            role: TeamReadRoleVal
           })
         };
       }
@@ -481,7 +481,21 @@ export async function syncOrg({ teamId, latestOrgList, session }: syncOrgParams)
     const oldOrgId = per.orgId;
     const pathId = oldOrgId_pathId_Map.get(String(oldOrgId));
     const newOrgIndex = latestOrgList.findIndex((i) => i.pathId === pathId);
-    if (newOrgIndex === -1) continue;
+    if (newOrgIndex === -1) {
+      // no new org, delete old permission
+      resourcePermissionOps.push({
+        deleteOne: {
+          filter: {
+            teamId,
+            orgId: oldOrgId,
+            resourceType: per.resourceType,
+            resourceId: per.resourceId,
+            permission: per.permission
+          }
+        }
+      });
+      continue;
+    }
     resourcePermissionOps.push({
       updateOne: {
         filter: {
@@ -497,7 +511,6 @@ export async function syncOrg({ teamId, latestOrgList, session }: syncOrgParams)
       }
     });
   }
-  console.log(JSON.stringify(resourcePermissionOps));
   await MongoResourcePermission.bulkWrite(resourcePermissionOps, { session, ordered: true });
 
   addLog.debug(`syncOrg: end`);

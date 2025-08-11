@@ -15,7 +15,7 @@ import type { TeamMemberSchema } from '@fastgpt/global/support/user/team/type';
 import type { GetGroupListBody } from '@fastgpt/global/support/permission/memberGroup/api';
 import { getTeamOwner } from '@fastgpt/service/support/user/team/controller';
 import { Permission } from '@fastgpt/global/support/permission/controller';
-import { ManagePermissionVal, NullPermission } from '@fastgpt/global/support/permission/constant';
+import { ManageRoleVal, NullRoleVal } from '@fastgpt/global/support/permission/constant';
 
 export type GroupListQuery = {};
 export type GroupListBody = GetGroupListBody;
@@ -123,9 +123,9 @@ async function handler(
           members: members.map((item) => membersMap.get(String(item.tmbId))!).filter(Boolean),
           totalMembers: members.length,
           permission: new Permission({
-            per: members.some((item) => String(item.tmbId) === tmbId && item.role === 'admin')
-              ? ManagePermissionVal
-              : NullPermission,
+            role: members.some((item) => String(item.tmbId) === tmbId && item.role === 'admin')
+              ? ManageRoleVal
+              : NullRoleVal,
             isOwner:
               permission.hasManagePer ||
               members.some((item) => String(item.tmbId) === tmbId && item.role === 'owner')
@@ -167,7 +167,7 @@ async function handler(
             }
           : undefined,
         permission: new Permission({
-          per: NullPermission,
+          role: NullRoleVal,
           isOwner: false
         })
       };

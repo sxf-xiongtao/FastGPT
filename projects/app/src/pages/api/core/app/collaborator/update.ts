@@ -87,7 +87,7 @@ async function handler(req: NextApiRequest) {
     }
 
     // can not update admin's permission unless I am owner
-    if (new AppPermission({ per: permission }).hasManagePer && !myPer.isOwner) {
+    if (new AppPermission({ role: permission }).hasManagePer && !myPer.isOwner) {
       return Promise.reject(AppErrEnum.unAuthApp);
     }
   })();
@@ -96,8 +96,8 @@ async function handler(req: NextApiRequest) {
   const checkAdminPerChanged = async (clbOrGroups: ResourcePermissionType[]) => {
     if (
       clbOrGroups.some((clb) => {
-        const oldPer = new AppPermission({ per: clb.permission });
-        const newPer = new AppPermission({ per: permission });
+        const oldPer = new AppPermission({ role: clb.permission });
+        const newPer = new AppPermission({ role: permission });
         const updatedClbAndGroups = [...tmbIds, ...groupIds, orgIds];
         if (
           oldPer.hasManagePer !== newPer.hasManagePer && // manage permission changed
