@@ -34,12 +34,12 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
     members: tmbIds = [],
     groups: groupIds = [],
     orgs: orgIds = [],
-    permission
+    permission: role
   } = req.body;
 
   if (
     (tmbIds === undefined && groupIds === undefined && orgIds === undefined) ||
-    permission === undefined
+    role === undefined
   ) {
     return Promise.reject(CommonErrEnum.missingParams);
   }
@@ -61,32 +61,35 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
     if (isRoot) return;
 
     // can not update own permission
-    // if (tmbIds.includes(tmbId)) {
-    //   return Promise.reject(DatasetErrEnum.unAuthDataset);
-    // }
-    // can not update my group's permission unless I am owner
-    const myGroupIds = (await getGroupsByTmbId({ tmbId, teamId })).map((item) => String(item._id));
-    if (groupIds.some((groupId) => myGroupIds.includes(groupId)) && !myPer.isOwner) {
-      return Promise.reject(DatasetErrEnum.unAuthDataset);
+    if (tmbIds.includes(tmbId)) {
+      return Promise.reject(DatasetErrEnum.canNotEditAdminPermission);
     }
+    // can not update my group's permission unless I am owner
+    const [myGroupIds, myOrgIds] = await Promise.all([
+      getGroupsByTmbId({ tmbId, teamId }).then((groups) => groups.map((item) => String(item._id))),
+      getOrgsByTmbId({ tmbId, teamId }).then((orgs) => orgs.map((item) => String(item.orgId)))
+    ]);
 
-    const myOrgIds = (await getOrgsByTmbId({ teamId, tmbId })).map((item) => String(item.orgId));
-    if (orgIds?.some((orgId) => myOrgIds.includes(orgId)) && !myPer.isOwner) {
+    if (
+      (groupIds.some((groupId) => myGroupIds.includes(groupId)) ||
+        orgIds?.some((orgId) => myOrgIds.includes(orgId))) &&
+      !myPer.isOwner
+    ) {
       return Promise.reject(DatasetErrEnum.unAuthDataset);
     }
 
     // can not update admin's permission unless I am owner
-    if (new DatasetPermission({ role: permission }).hasManagePer && !myPer.isOwner) {
+    if (new DatasetPermission({ role: role }).hasManagePer && !myPer.isOwner) {
       return Promise.reject(DatasetErrEnum.unAuthDataset);
     }
   })();
 
   const isFolder = dataset.type === DatasetTypeEnum.folder;
-  const checkAdminPerChanged = async (clbOrGroups: ResourcePermissionType[]) => {
+  const checkAdminPerChanged = (clbs: ResourcePermissionType[]) => {
     if (
-      clbOrGroups.some((clb) => {
+      clbs.some((clb) => {
         const oldPer = new DatasetPermission({ role: clb.permission });
-        const newPer = new DatasetPermission({ role: permission });
+        const newPer = new DatasetPermission({ role: role });
         const updatedClbAndGroups = [...tmbIds, ...groupIds, ...orgIds];
         if (
           (oldPer.hasManagePer !== newPer.hasManagePer && // manage permission changed
@@ -96,11 +99,12 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
         ) {
           return true;
         }
-      }) &&
-      !myPer.isOwner
+      })
     ) {
-      return Promise.reject(DatasetErrEnum.unAuthDataset);
+      if (myPer.isOwner) return true;
+      return false;
     }
+    return true;
   };
 
   await mongoSessionRun(async (session) => {
@@ -126,40 +130,41 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
         session
       });
 
-      await checkAdminPerChanged(FolderClbsAndGroups);
+      if (!checkAdminPerChanged(FolderClbsAndGroups))
+        return Promise.reject(DatasetErrEnum.canNotEditAdminPermission);
 
       const updateClbsAndGroups = <UpdateCollaboratorItem[]>[];
 
       updateClbsAndGroups.push(
         ...tmbIds?.map((tmbId) => ({
           tmbId,
-          permission
+          permission: role
         })),
         ...groupIds?.map((groupId) => ({
           groupId,
-          permission
+          permission: role
         })),
         ...orgIds?.map((orgId) => ({
           orgId,
-          permission
+          permission: role
         })),
         ...FolderClbsAndGroups.filter(
           (item) => !!item.tmbId && !tmbIds?.includes(String(item.tmbId))
         ).map((item) => ({
           tmbId: item.tmbId!,
-          permission: tmbIds?.includes(String(item.tmbId)) ? permission : item.permission
+          permission: tmbIds?.includes(String(item.tmbId)) ? role : item.permission
         })),
         ...FolderClbsAndGroups.filter(
           (item) => !!item.groupId && !groupIds?.includes(String(item.groupId))
         ).map((item) => ({
           groupId: item.groupId!,
-          permission: groupIds?.includes(String(item.groupId)) ? permission : item.permission
+          permission: groupIds?.includes(String(item.groupId)) ? role : item.permission
         })),
         ...FolderClbsAndGroups.filter(
           (item) => !!item.orgId && !orgIds?.includes(String(item.orgId))
         ).map((item) => ({
           orgId: item.orgId!,
-          permission: orgIds?.includes(String(item.orgId)) ? permission : item.permission
+          permission: orgIds?.includes(String(item.orgId)) ? role : item.permission
         }))
       );
 
@@ -181,6 +186,9 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
           session
         });
 
+        if (!checkAdminPerChanged(parentClbsAndGroups))
+          return Promise.reject(DatasetErrEnum.canNotEditAdminPermission);
+
         const updateClbsAndGroups: UpdateCollaboratorItem[] = [];
 
         updateClbsAndGroups.push(
@@ -189,21 +197,21 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
             resourceId: datasetId,
             resourceType: PerResourceTypeEnum.dataset,
             groupId,
-            permission
+            permission: role
           })),
           ...tmbIds?.map((tmbId) => ({
             teamId,
             resourceId: datasetId,
             resourceType: PerResourceTypeEnum.dataset,
             tmbId,
-            permission
+            permission: role
           })),
           ...orgIds?.map((orgId) => ({
             teamId,
             resourceId: datasetId,
             resourceType: PerResourceTypeEnum.dataset,
             orgId,
-            permission
+            permission: role
           }))
         );
 
@@ -226,6 +234,16 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
           })),
           { session, ordered: true }
         );
+      } else {
+        const oldClbs = await getResourceClbsAndGroups({
+          resourceId: datasetId,
+          teamId,
+          resourceType: PerResourceTypeEnum.dataset,
+          session
+        });
+
+        if (!checkAdminPerChanged(oldClbs))
+          return Promise.reject(DatasetErrEnum.canNotEditAdminPermission);
       }
     }
     // 更新的协作者
@@ -237,7 +255,7 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
       tmbIdList: tmbIds,
       groupIdList: groupIds,
       orgIdList: orgIds,
-      permission
+      permission: role
     });
   });
 
@@ -248,7 +266,7 @@ async function handler(req: ApiRequestProps<UpdateDatasetCollaboratorBody>) {
     groupIds,
     orgIds,
     dataset,
-    permission
+    permission: role
   });
 }
 

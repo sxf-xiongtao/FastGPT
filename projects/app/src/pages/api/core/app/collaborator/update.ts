@@ -41,7 +41,7 @@ async function handler(req: NextApiRequest) {
   // Authorization
   const {
     appId,
-    permission,
+    permission: role,
     members: tmbIds = [],
     groups: groupIds = [],
     orgs: orgIds = []
@@ -50,7 +50,7 @@ async function handler(req: NextApiRequest) {
   // check params
   if (
     (tmbIds === undefined && groupIds === undefined && orgIds === undefined) ||
-    permission === undefined
+    role === undefined
   ) {
     return Promise.reject(CommonErrEnum.missingParams);
   }
@@ -72,33 +72,39 @@ async function handler(req: NextApiRequest) {
     if (isRoot) return;
 
     // can not update own permission
-    // if (tmbIds?.includes(tmbId)) {
-    //   return Promise.reject(AppErrEnum.unAuthApp);
-    // }
-    // can not update my group's permission unless I am owner
-    const myGroupIds = (await getGroupsByTmbId({ tmbId, teamId })).map((item) => String(item._id));
-    if (groupIds?.some((groupId) => myGroupIds.includes(groupId)) && !myPer.isOwner) {
-      return Promise.reject(AppErrEnum.unAuthApp);
+    if (tmbIds?.includes(tmbId)) {
+      return Promise.reject(AppErrEnum.canNotEditAdminPermission);
     }
+    // can not update my group's permission unless I am owner
+    const [myGroupIds, myOrgIds] = await Promise.all([
+      getGroupsByTmbId({ tmbId, teamId }),
+      getOrgsByTmbId({ tmbId, teamId })
+    ]).then(([groups, orgs]) => [
+      groups.map((item) => String(item._id)),
+      orgs.map((item) => String(item.orgId))
+    ]);
 
-    const myOrgIds = (await getOrgsByTmbId({ teamId, tmbId })).map((item) => String(item.orgId));
-    if (orgIds?.some((orgId) => myOrgIds.includes(orgId)) && !myPer.isOwner) {
+    if (
+      (groupIds?.some((groupId) => myGroupIds.includes(groupId)) ||
+        orgIds?.some((orgId) => myOrgIds.includes(orgId))) &&
+      !myPer.isOwner
+    ) {
       return Promise.reject(AppErrEnum.unAuthApp);
     }
 
     // can not update admin's permission unless I am owner
-    if (new AppPermission({ role: permission }).hasManagePer && !myPer.isOwner) {
+    if (new AppPermission({ role }).hasManagePer && !myPer.isOwner) {
       return Promise.reject(AppErrEnum.unAuthApp);
     }
   })();
 
   const isFolder = AppFolderTypeList.includes(app.type);
-  const checkAdminPerChanged = async (clbOrGroups: ResourcePermissionType[]) => {
+  const checkAdminPerChanged = (clbs: ResourcePermissionType[]) => {
     if (
-      clbOrGroups.some((clb) => {
+      clbs.some((clb) => {
         const oldPer = new AppPermission({ role: clb.permission });
-        const newPer = new AppPermission({ role: permission });
-        const updatedClbAndGroups = [...tmbIds, ...groupIds, orgIds];
+        const newPer = new AppPermission({ role: role });
+        const updatedClbAndGroups = [...tmbIds, ...groupIds, ...orgIds];
         if (
           oldPer.hasManagePer !== newPer.hasManagePer && // manage permission changed
           (updatedClbAndGroups.includes(String(clb.tmbId)) || // clb is updated
@@ -107,11 +113,12 @@ async function handler(req: NextApiRequest) {
         ) {
           return true;
         }
-      }) &&
-      !myPer.isOwner
+      })
     ) {
-      return Promise.reject(AppErrEnum.unAuthApp);
+      if (myPer.isOwner) return true;
+      return false;
     }
+    return true;
   };
 
   await mongoSessionRun(async (session) => {
@@ -137,40 +144,43 @@ async function handler(req: NextApiRequest) {
         resourceType: PerResourceTypeEnum.app,
         session
       });
-      await checkAdminPerChanged(FolderClbsAndGroups);
+
+      if (!checkAdminPerChanged(FolderClbsAndGroups))
+        return Promise.reject(AppErrEnum.canNotEditAdminPermission);
+
       // only owner could change manager's permission
       const updateClbsAndGroups: UpdateCollaboratorItem[] = [];
 
       updateClbsAndGroups.push(
         ...tmbIds.map((tmbId) => ({
           tmbId,
-          permission
+          permission: role
         })),
         ...groupIds.map((groupId) => ({
           groupId,
-          permission
+          permission: role
         })),
         ...orgIds.map((orgId) => ({
           orgId,
-          permission
+          permission: role
         })),
         ...FolderClbsAndGroups.filter(
           (item) => !!item.tmbId && !tmbIds.includes(String(item.tmbId))
         ).map((item) => ({
           tmbId: item.tmbId!,
-          permission: tmbIds.includes(String(item.tmbId)) ? permission : item.permission
+          permission: tmbIds.includes(String(item.tmbId)) ? role : item.permission
         })),
         ...FolderClbsAndGroups.filter(
           (item) => !!item.groupId && !groupIds?.includes(String(item.groupId))
         ).map((item) => ({
           groupId: item.groupId!,
-          permission: groupIds?.includes(String(item.groupId)) ? permission : item.permission
+          permission: groupIds?.includes(String(item.groupId)) ? role : item.permission
         })),
         ...FolderClbsAndGroups.filter(
           (item) => !!item.orgId && !orgIds?.includes(String(item.orgId))
         ).map((item) => ({
           orgId: item.orgId!,
-          permission: orgIds?.includes(String(item.orgId)) ? permission : item.permission
+          permission: orgIds?.includes(String(item.orgId)) ? role : item.permission
         }))
       );
 
@@ -193,7 +203,8 @@ async function handler(req: NextApiRequest) {
           session
         });
 
-        await checkAdminPerChanged(parentClbsAndGroups);
+        if (!checkAdminPerChanged(parentClbsAndGroups))
+          return Promise.reject(AppErrEnum.canNotEditAdminPermission);
 
         // 找到在变更 member 列表中的协作者，单独更新
         const updateClbsAndGroups: UpdateCollaboratorItem[] = [];
@@ -203,21 +214,21 @@ async function handler(req: NextApiRequest) {
             resourceId: appId,
             resourceType: PerResourceTypeEnum.app,
             tmbId,
-            permission
+            permission: role
           })),
           ...groupIds.map((groupId) => ({
             teamId,
             resourceId: appId,
             resourceType: PerResourceTypeEnum.app,
             groupId,
-            permission
+            permission: role
           })),
           ...orgIds.map((orgId) => ({
             teamId,
             resourceId: appId,
             resourceType: PerResourceTypeEnum.app,
             orgId,
-            permission
+            permission: role
           }))
         );
 
@@ -247,6 +258,16 @@ async function handler(req: NextApiRequest) {
           })),
           { session, ordered: true }
         );
+      } else {
+        const oldClbs = await getResourceClbsAndGroups({
+          resourceId: appId,
+          teamId,
+          resourceType: PerResourceTypeEnum.app,
+          session
+        });
+
+        if (!checkAdminPerChanged(oldClbs))
+          return Promise.reject(AppErrEnum.canNotEditAdminPermission);
       }
     }
 
@@ -259,7 +280,7 @@ async function handler(req: NextApiRequest) {
       tmbIdList: tmbIds,
       groupIdList: groupIds,
       orgIdList: orgIds,
-      permission
+      permission: role
     });
   });
 
@@ -270,7 +291,7 @@ async function handler(req: NextApiRequest) {
     groupIds,
     orgIds,
     app,
-    permission
+    permission: role
   });
 }
 
