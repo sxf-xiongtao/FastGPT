@@ -39,19 +39,19 @@ async function handler(
 
   const where = {
     teamId,
-    time: {
-      $gte: new Date(dateStart),
-      $lte: new Date(dateEnd)
-    },
     // 非管理员只能看自己。管理员可以看所有人或者指定人。
     ...(permission.hasManagePer
       ? teamMemberIds
         ? {
             tmbId: { $in: teamMemberIds }
           }
-        : {}
+        : { tmbId: { $exists: true } }
       : { tmbId }),
-    ...(sources && { source: { $in: sources } }),
+    source: sources ? { $in: sources } : { $exists: true },
+    time: {
+      $gte: new Date(dateStart),
+      $lte: new Date(dateEnd)
+    },
     ...(projectName && { appName: { $regex: new RegExp(`${replaceRegChars(projectName)}`, 'i') } })
   };
 

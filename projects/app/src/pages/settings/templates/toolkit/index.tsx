@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Box, Button, Flex, useDisclosure } from '@chakra-ui/react';
+import { Box, Button, Flex, HStack, useDisclosure } from '@chakra-ui/react';
 import { useRequest2 } from '@fastgpt/web/hooks/useRequest';
 import { getPluginGroups, getSystemPlugins, putUpdatePluginOrder } from '@/web/core/app/plugin/api';
 import Avatar from '@fastgpt/web/components/common/Avatar';
@@ -9,7 +9,7 @@ import type {
   SystemPluginTemplateListItemType
 } from '@fastgpt/global/core/app/plugin/type';
 import dynamic from 'next/dynamic';
-import { defaultCustomPluginForm } from '../../../../pageComponents/templates/toolkit/CustomPluginConfig';
+import { defaultCustomPluginForm } from '@/pageComponents/templates/toolkit/CustomPluginConfig';
 import type { EditCustomPluginType } from '@/global/core/workflow/plugin/type.d';
 import { serviceSideProps } from '@/web/common/i18n/utils';
 import MyIcon from '@fastgpt/web/components/common/Icon';
@@ -23,36 +23,30 @@ import MyBox from '@fastgpt/web/components/common/MyBox';
 import type { getSystemPluginsResponse } from '@/pages/api/admin/core/app/plugin/list';
 
 const CustomPluginConfig = dynamic(
-  () => import('../../../../pageComponents/templates/toolkit/CustomPluginConfig'),
+  () => import('@/pageComponents/templates/toolkit/CustomPluginConfig'),
   {
     ssr: false
   }
 );
-const SystemPluginConfig = dynamic(
-  () => import('../../../../pageComponents/templates/toolkit/SystemPluginConfig'),
+const SystemToolConfigModal = dynamic(
+  () => import('@/pageComponents/templates/toolkit/SystemToolConfigModal'),
   {
     ssr: false
   }
 );
-const GroupModal = dynamic(
-  () => import('../../../../pageComponents/templates/toolkit/GroupConfigModal'),
-  {
-    ssr: false
-  }
-);
-const PluginCard = dynamic(
-  () => import('../../../../pageComponents/templates/toolkit/PluginCard'),
-  {
-    ssr: false
-  }
-);
+const GroupModal = dynamic(() => import('@/pageComponents/templates/toolkit/GroupConfigModal'), {
+  ssr: false
+});
+const PluginCard = dynamic(() => import('@/pageComponents/templates/toolkit/PluginCard'), {
+  ssr: false
+});
 
-const SystemPlugin = () => {
+const Index = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const router = useRouter();
-  const [configPlugin, setConfigPlugin] = useState<SystemPluginTemplateItemType>();
-  const [editCustomPlugin, setEditCustomPlugin] = useState<EditCustomPluginType>();
+  const [configPlugin, setConfigSystemTool] = useState<SystemPluginTemplateItemType>();
+  const [editCustomPlugin, setEditCustomTool] = useState<EditCustomPluginType>();
 
   const setSelectedGroup = (groupId: string) => {
     router.push(
@@ -66,12 +60,13 @@ const SystemPlugin = () => {
   };
 
   const {
-    data: plugins = [],
-    run: refreshPlugins,
-    loading: loadingPlugins
+    data: tools = [],
+    run: refreshTools,
+    loading: loadingTools
   } = useRequest2(getSystemPlugins, {
     manual: false
   });
+
   const {
     data: groups = [],
     run: refreshGroups,
@@ -79,13 +74,11 @@ const SystemPlugin = () => {
   } = useRequest2(getPluginGroups, {
     manual: false
   });
-
   const {
     isOpen: isOpenGroupModal,
     onOpen: onOpenGroupModal,
     onClose: onCloseGroupModal
   } = useDisclosure();
-
   const selectedGroup = (router.query.group as string) || groups[0]?.groupId;
   const currentGroup = useMemo(() => {
     return groups.find((item) => item.groupId === selectedGroup) || groups[0];
@@ -94,14 +87,14 @@ const SystemPlugin = () => {
   const [localPlugins, setLocalPlugins] = useState<getSystemPluginsResponse>([]);
 
   useEffect(() => {
-    if (!currentGroup?.groupTypes || !plugins.length) {
+    if (!currentGroup?.groupTypes || !tools.length) {
       setLocalPlugins([]);
       return;
     }
 
     const pluginMap = new Map(currentGroup.groupTypes.map((type) => [type.typeId, type.typeName]));
 
-    const newPlugins = plugins
+    const newPlugins = tools
       .filter((item) => pluginMap.has(item.templateType))
       .map((item) => ({
         ...item,
@@ -114,10 +107,10 @@ const SystemPlugin = () => {
       }
       return newPlugins;
     });
-  }, [currentGroup?.groupId, currentGroup?.groupTypes, plugins]);
+  }, [currentGroup?.groupId, currentGroup?.groupTypes, tools]);
 
   return (
-    <MyBox isLoading={loadingPlugins || loadingGroups}>
+    <MyBox isLoading={loadingTools || loadingGroups}>
       <Flex alignItems={'center'}>
         <Flex flex={'1'} overflow={'auto'}>
           {groups?.map((group) => {
@@ -170,7 +163,7 @@ const SystemPlugin = () => {
                 title: '请先添加属性',
                 status: 'warning'
               });
-            setEditCustomPlugin(defaultCustomPluginForm);
+            setEditCustomTool(defaultCustomPluginForm);
           }}
         >
           添加插件
@@ -181,15 +174,17 @@ const SystemPlugin = () => {
         bg={'white'}
         h={8}
         mt={5}
-        pl={8}
+        mr={2}
         rounded={'md'}
         alignItems={'center'}
         fontSize={'mini'}
         fontWeight={'medium'}
       >
-        <Box w={2 / 10}>名称</Box>
+        <Box w={1.5 / 10} pl={8}>
+          名称
+        </Box>
         <Box w={1 / 10}>属性</Box>
-        <Box w={4 / 10}>介绍</Box>
+        <Box w={3.5 / 10}>介绍</Box>
         <Box w={1 / 10} pl={4}>
           启用
         </Box>
@@ -205,6 +200,17 @@ const SystemPlugin = () => {
           />
         </Box>
         <Box w={1 / 10}>调用积分</Box>
+        <HStack spacing={0} w={1 / 10}>
+          <Box>系统密钥</Box>
+          <QuestionTip
+            display={'flex'}
+            alignItems={'center'}
+            ml={1}
+            label={
+              '对于需要密钥的工具，您可为其配置系统密钥，用户可通过支付积分的方式使用系统密钥。'
+            }
+          />
+        </HStack>
       </Flex>
 
       <Box overflow={'auto'} mt={2} h={'calc(100vh - 200px)'}>
@@ -216,7 +222,7 @@ const SystemPlugin = () => {
             }));
             setLocalPlugins(list);
             await putUpdatePluginOrder({ plugins: newOrder });
-            refreshPlugins();
+            refreshTools();
           }}
           dataList={localPlugins}
         >
@@ -234,9 +240,9 @@ const SystemPlugin = () => {
                       <PluginCard
                         key={item.id}
                         plugin={item}
-                        setEditCustomPlugin={setEditCustomPlugin}
-                        setConfigPlugin={setConfigPlugin}
-                        refreshPlugins={refreshPlugins}
+                        setEditCustomTool={setEditCustomTool}
+                        setConfigSystemTool={setConfigSystemTool}
+                        refreshTools={refreshTools}
                         provided={provided}
                         snapshot={snapshot}
                       />
@@ -252,18 +258,18 @@ const SystemPlugin = () => {
       </Box>
 
       {!!configPlugin && (
-        <SystemPluginConfig
+        <SystemToolConfigModal
           plugin={configPlugin}
-          onSuccess={refreshPlugins}
-          onClose={() => setConfigPlugin(undefined)}
+          onSuccess={refreshTools}
+          onClose={() => setConfigSystemTool(undefined)}
         />
       )}
       {!!editCustomPlugin && (
         <CustomPluginConfig
           group={currentGroup}
           defaultForm={editCustomPlugin}
-          onSuccess={refreshPlugins}
-          onClose={() => setEditCustomPlugin(undefined)}
+          onSuccess={refreshTools}
+          onClose={() => setEditCustomTool(undefined)}
         />
       )}
       {!!isOpenGroupModal && (
@@ -277,7 +283,7 @@ const SystemPlugin = () => {
   );
 };
 
-export default SystemPlugin;
+export default Index;
 
 export async function getServerSideProps(content: any) {
   return {

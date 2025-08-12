@@ -17,32 +17,35 @@ import type {
 import { PluginSourceEnum } from '@fastgpt/global/core/app/plugin/constants';
 import { splitCombinePluginId } from '@fastgpt/global/core/app/plugin/utils';
 
+type PluginItemType = SystemPluginTemplateListItemType & {
+  typeLabel?: string;
+};
 const PluginCard = ({
   plugin,
-  setEditCustomPlugin,
-  setConfigPlugin,
-  refreshPlugins,
+  setEditCustomTool,
+  setConfigSystemTool,
+  refreshTools,
   provided,
   snapshot
 }: {
-  plugin: SystemPluginTemplateListItemType & {
-    typeLabel?: string;
-  };
-  setEditCustomPlugin: (value: React.SetStateAction<EditCustomPluginType | undefined>) => void;
-  setConfigPlugin: (value: React.SetStateAction<SystemPluginTemplateItemType | undefined>) => void;
-  refreshPlugins: () => void;
+  plugin: PluginItemType;
+  setEditCustomTool: (value: React.SetStateAction<EditCustomPluginType | undefined>) => void;
+  setConfigSystemTool: (
+    value: React.SetStateAction<SystemPluginTemplateItemType | undefined>
+  ) => void;
+  refreshTools: () => void;
   provided: DraggableProvided;
   snapshot: DraggableStateSnapshot;
 }) => {
   const { t } = useTranslation();
   const { runAsync: updateSystemPlugin, loading } = useRequest2(
-    async (e: SystemPluginTemplateItemType) =>
+    async (e: PluginItemType) =>
       putUpdatePlugin({
         pluginId: plugin.id,
         ...e
       }),
     {
-      onSuccess: refreshPlugins
+      onSuccess: refreshTools
     }
   );
 
@@ -56,7 +59,6 @@ const PluginCard = ({
         ...provided.draggableProps.style,
         opacity: snapshot.isDragging ? 0.8 : 1
       }}
-      pl={2}
       cursor={'pointer'}
       bg={'white'}
       borderRadius={'md'}
@@ -72,16 +74,16 @@ const PluginCard = ({
       onClick={() => {
         const { source } = splitCombinePluginId(plugin.id);
         if (source === PluginSourceEnum.systemTool) {
-          setConfigPlugin(plugin);
+          setConfigSystemTool(plugin);
         } else {
-          setEditCustomPlugin({
+          setEditCustomTool({
             ...plugin,
             workflow: undefined
           });
         }
       }}
     >
-      <Box display={'flex'} w={2 / 10} pr={6}>
+      <Box display={'flex'} w={1.5 / 10} pl={2}>
         <Flex
           h={'full'}
           rounded={'xs'}
@@ -110,15 +112,15 @@ const PluginCard = ({
           </Box>
         )}
       </Box>
-      <Box w={1 / 10} overflow={'hidden'} textOverflow={'ellipsis'} whiteSpace={'nowrap'} pl={4}>
+      <Box w={1 / 10} overflow={'hidden'} textOverflow={'ellipsis'} whiteSpace={'nowrap'}>
         <Box as={'span'} bg={'myGray.100'} px={2} py={1} color={'myGray.700'} borderRadius={'8px'}>
           {t(plugin?.typeLabel as any)}
         </Box>
       </Box>
-      <Box w={4 / 10} overflow={'hidden'} textOverflow={'ellipsis'} whiteSpace={'nowrap'} pr={6}>
+      <Box w={3.5 / 10} overflow={'hidden'} textOverflow={'ellipsis'} whiteSpace={'nowrap'}>
         {plugin?.intro}
       </Box>
-      <Box w={1 / 10} pl={8}>
+      <Box w={1 / 10} pl={4}>
         <Box
           as={'span'}
           onClick={(e: React.MouseEvent) => {
@@ -134,24 +136,35 @@ const PluginCard = ({
           <Switch isChecked={plugin?.isActive} size={'sm'} />
         </Box>
       </Box>
-      <Box w={1 / 10} pl={8}>
-        <Box
-          as={'span'}
-          onClick={(e: React.MouseEvent) => {
-            e.stopPropagation();
-            e.preventDefault();
-            const newPlugin = {
-              ...plugin,
-              hasTokenFee: !plugin?.hasTokenFee
-            };
-            updateSystemPlugin(newPlugin);
-          }}
-        >
-          <Switch isChecked={plugin?.hasTokenFee} size={'sm'} />
-        </Box>
+      <Box w={1 / 10}>
+        {plugin?.associatedPluginId ? (
+          <Box
+            as={'span'}
+            onClick={(e: React.MouseEvent) => {
+              e.stopPropagation();
+              e.preventDefault();
+              const newPlugin = {
+                ...plugin,
+                hasTokenFee: !plugin?.hasTokenFee
+              };
+              updateSystemPlugin(newPlugin);
+            }}
+          >
+            <Switch isChecked={plugin?.hasTokenFee} size={'sm'} />
+          </Box>
+        ) : (
+          '-'
+        )}
       </Box>
-      <Box w={1 / 10} pl={8}>
-        {plugin?.currentCost ?? 0}
+      <Box w={1 / 10}>{plugin?.associatedPluginId ? plugin?.currentCost ?? 0 : '-'}</Box>
+      <Box w={1 / 10}>
+        {!!plugin?.inputList ? (
+          <Box color={plugin?.hasSystemSecret ? 'green.600' : 'myGray.500'}>
+            {plugin?.hasSystemSecret ? '已配置' : '未配置'}
+          </Box>
+        ) : (
+          '-'
+        )}
       </Box>
     </MyBox>
   );

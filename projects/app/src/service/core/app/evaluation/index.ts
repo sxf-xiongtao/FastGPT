@@ -11,6 +11,7 @@ import { dispatchWorkFlow } from '@fastgpt/service/core/workflow/dispatch';
 import { MongoEvaluation } from '@fastgpt/service/core/app/evaluation/evalSchema';
 import { getNanoid } from '@fastgpt/global/common/string/tools';
 import { getUserChatInfoAndAuthTeamPoints } from '@fastgpt/service/support/permission/auth/team';
+import { getRunningUserInfoByTmbId } from '@fastgpt/service/support/user/team/utils';
 import { getAppLatestVersion } from '@fastgpt/service/core/app/version/controller';
 import {
   getWorkflowEntryNodeIds,
@@ -212,10 +213,7 @@ const processEvalItem = async ({
         teamId: String(appData.teamId),
         tmbId: String(appData.tmbId)
       },
-      runningUserInfo: {
-        teamId: String(evaluation.teamId),
-        tmbId: String(evaluation.tmbId)
-      },
+      runningUserInfo: await getRunningUserInfoByTmbId(evaluation.tmbId),
       uid: String(evaluation.tmbId),
       runtimeNodes: storeNodes2RuntimeNodes(nodes, getWorkflowEntryNodeIds(nodes)),
       runtimeEdges: storeEdges2RuntimeEdges(edges),

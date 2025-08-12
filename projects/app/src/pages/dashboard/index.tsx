@@ -15,6 +15,7 @@ import MyBox from '@fastgpt/web/components/common/MyBox';
 import type { GetPaysFormDataResponse } from '../api/admin/routes/dashboard/getPaysFormData';
 import type { GetChatFormDataResponse } from '../api/admin/routes/dashboard/getChatFormData';
 import type { GetCostChartsResponse } from '../api/admin/routes/dashboard/getCostFormData';
+import AreaChartComponent from '@fastgpt/web/components/common/charts/AreaChartComponent';
 
 // Type definitions
 type ViewMode = 'traffic' | 'active' | 'payment' | 'cost';
@@ -182,7 +183,7 @@ const ChartsContainer = ({
       {trafficData && (
         <>
           <Box {...ChartsBoxStyles}>
-            <LineChartComponent
+            <AreaChartComponent
               data={trafficData.registeredUserCount}
               startDateValue={trafficData.startUserCount}
               title={'总用户数'}
@@ -201,7 +202,7 @@ const ChartsContainer = ({
             />
           </Box>
           <Box {...ChartsBoxStyles} mt={4}>
-            <LineChartComponent
+            <AreaChartComponent
               data={trafficData.registeredUserCount}
               title={'注册用户数'}
               lines={[
@@ -225,7 +226,7 @@ const ChartsContainer = ({
       {paysData && isSubscriptionEnabled && (
         <>
           <Box {...ChartsBoxStyles}>
-            <LineChartComponent
+            <AreaChartComponent
               data={paysData.payAmounts}
               title={'付费金额'}
               lines={[
@@ -245,7 +246,7 @@ const ChartsContainer = ({
             />
           </Box>
           <Box {...ChartsBoxStyles} mt={4}>
-            <LineChartComponent
+            <AreaChartComponent
               data={paysData.orderAmounts}
               title={'订单数'}
               HeaderLeftChildren={
@@ -273,7 +274,7 @@ const ChartsContainer = ({
             />
           </Box>
           <Box {...ChartsBoxStyles} mt={4}>
-            <LineChartComponent
+            <AreaChartComponent
               data={paysData.payTeams}
               title={'付费团队数'}
               lines={[
@@ -293,7 +294,7 @@ const ChartsContainer = ({
       {activeData && (
         <>
           <Box {...ChartsBoxStyles}>
-            <LineChartComponent
+            <AreaChartComponent
               data={activeData.chatItemAmounts}
               title={'总对话数'}
               lines={[
@@ -313,7 +314,7 @@ const ChartsContainer = ({
             />
           </Box>
           <Box {...ChartsBoxStyles} mt={4}>
-            <LineChartComponent
+            <AreaChartComponent
               data={activeData.chatAmounts}
               title={'总会话数'}
               lines={[
@@ -329,7 +330,7 @@ const ChartsContainer = ({
             />
           </Box>
           <Box {...ChartsBoxStyles} mt={4}>
-            <LineChartComponent
+            <AreaChartComponent
               data={activeData.chatItemAmounts}
               title={'每个会话平均对话数'}
               lines={[
@@ -353,7 +354,7 @@ const ChartsContainer = ({
       {costData && (
         <>
           <Box {...ChartsBoxStyles}>
-            <LineChartComponent
+            <AreaChartComponent
               data={costData.pointUsages}
               title={'积分消耗'}
               lines={[

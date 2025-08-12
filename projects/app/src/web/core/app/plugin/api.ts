@@ -1,5 +1,5 @@
 import { DELETE, GET, POST, PUT } from '@/service/common/request';
-import type { getSystemPluginsResponse } from '@/pages/api/core/app/plugin/getSystemPlugins';
+import type { getSystemPluginsResponse } from '@/pages/api/admin/core/app/plugin/list';
 import type { createPluginGroupBody } from '@/pages/api/admin/core/app/pluginGroup/create';
 import type { updatePluginGroupBody } from '@/pages/api/admin/core/app/pluginGroup/update';
 import type { deletePluginGroupQuery } from '@/pages/api/admin/core/app/pluginGroup/delete';
@@ -12,7 +12,10 @@ import type { deletePluginQuery } from '@/pages/api/admin/core/app/plugin/delete
 import type { ListAppBody } from '@/pages/api/admin/core/app/plugin/allPlugin';
 import type { getPluginGroupsResponse } from '@/pages/api/core/app/plugin/getPluginGroups';
 
-export const getSystemPlugins = () => GET<getSystemPluginsResponse>('/admin/core/app/plugin/list');
+export const getSystemPlugins = (parentId?: string) =>
+  GET<getSystemPluginsResponse>(
+    `/admin/core/app/plugin/list${parentId && typeof parentId === 'string' ? `?parentId=${parentId}` : ''}`
+  );
 
 export const putUpdatePlugin = (data: updatePluginBody) =>
   PUT('/admin/core/app/plugin/update', data);

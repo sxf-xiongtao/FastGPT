@@ -61,7 +61,8 @@ const map = {
   [AppTypeEnum.folder]: '文件夹',
   [AppTypeEnum.httpPlugin]: 'HTTP 插件',
   [AppTypeEnum.toolSet]: '工具集',
-  [AppTypeEnum.tool]: '工具'
+  [AppTypeEnum.tool]: '工具',
+  [AppTypeEnum.hidden]: '隐藏'
 };
 
 const TemplateConfigModal = ({

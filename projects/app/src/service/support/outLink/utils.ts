@@ -18,6 +18,7 @@ import { getChatItems } from '@fastgpt/service/core/chat/controller';
 import { saveChat } from '@fastgpt/service/core/chat/saveChat';
 import { dispatchWorkFlow } from '@fastgpt/service/core/workflow/dispatch';
 import { getUserChatInfoAndAuthTeamPoints } from '@fastgpt/service/support/permission/auth/team';
+import { getRunningUserInfoByTmbId } from '@fastgpt/service/support/user/team/utils';
 import type { NextApiResponse } from 'next';
 import { authOutLinkLimit } from './auth';
 import { addOutLinkUsage } from '@fastgpt/service/support/outLink/tools';
@@ -163,10 +164,7 @@ export async function outlinkInvokeChat<T extends OutlinkAppType>({
         teamId: app.teamId,
         tmbId: app.tmbId
       },
-      runningUserInfo: {
-        teamId: outLinkConfig.teamId,
-        tmbId: outLinkConfig.tmbId
-      },
+      runningUserInfo: await getRunningUserInfoByTmbId(app.tmbId),
       uid: chatUserId || outLinkConfig.tmbId,
       timezone,
       externalProvider,

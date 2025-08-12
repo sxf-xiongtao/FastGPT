@@ -4,6 +4,7 @@ dist
 node_modules
 docSite/
 *.md
+*.mdx
 pnpm-lock.yaml
 
 cl100l_base.ts

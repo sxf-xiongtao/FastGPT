@@ -44,12 +44,12 @@ export const getSystemConfig = async () => {
     MongoSystemConfigs.findOne({
       type: SystemConfigsTypeEnum.fastgpt
     }).sort({
-      createTime: -1
+      _id: -1
     }),
     MongoSystemConfigs.findOne({
       type: SystemConfigsTypeEnum.fastgptPro
     }).sort({
-      createTime: -1
+      _id: -1
     })
   ]);
 

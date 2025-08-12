@@ -17,6 +17,7 @@ export const getProInitData = async () => {
       const cloneFastGPTProConfig = cloneDeep(fastgptProConfig);
 
       beforeUpdateConfig(cloneFastGPTConfigValue, cloneFastGPTProConfig);
+
       if (
         JSON.stringify(fastgptConfig) !== JSON.stringify(cloneFastGPTConfigValue) ||
         JSON.stringify(fastgptProConfig) !== JSON.stringify(cloneFastGPTProConfig)

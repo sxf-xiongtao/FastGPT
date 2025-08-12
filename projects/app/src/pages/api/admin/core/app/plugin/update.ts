@@ -5,23 +5,28 @@ import { getNanoid } from '@fastgpt/global/common/string/tools';
 import type { WorkflowTemplateBasicType } from '@fastgpt/global/core/workflow/type/index';
 import { MongoSystemPlugin } from '@fastgpt/service/core/app/plugin/systemPluginSchema';
 import type { ApiRequestProps, ApiResponseType } from '@fastgpt/service/type/next';
-import { isEqual } from 'lodash';
 import { addAuditLog } from '@fastgpt/service/support/user/audit/util';
 import { AdminAuditEventEnum } from '@fastgpt/global/support/user/audit/constants';
 import { getUserDetail } from '@fastgpt/service/support/user/controller';
 import { getLocale } from '@fastgpt/service/common/middle/i18n';
 import { parseI18nString } from '@fastgpt/global/common/i18n/utils';
+import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 
 export type updatePluginQuery = {};
 
-export type updatePluginBody = {
-  pluginId: string;
-  // 基础字段
+export type UpdateToolFormType = {
+  isActive?: boolean;
   originCost?: number;
   currentCost?: number;
+  systemKeyCost?: number;
   hasTokenFee?: boolean;
-  isActive?: boolean;
-  inputListVal?: Record<string, any>;
+
+  inputListVal?: Record<string, any>; // for internal form render
+  childConfigs?: ({ pluginId: string } & UpdateToolFormType)[];
+};
+
+export type updatePluginBody = UpdateToolFormType & {
+  pluginId: string;
 
   // 自定义插件字段
   name?: I18nStringType | string;
@@ -47,18 +52,16 @@ async function handler(
 
   // 查找插件
   const plugin = await MongoSystemPlugin.findOne({ pluginId });
-  // if (!plugin) {
-  //   return Promise.reject('plugin not found');
-  // }
 
   // 基础更新字段
   const baseUpdateFields = {
     pluginId,
     isActive: updateFields.isActive,
-    inputListVal: updateFields.inputListVal,
     originCost: updateFields.originCost,
     currentCost: updateFields.currentCost,
-    hasTokenFee: updateFields.hasTokenFee
+    hasTokenFee: updateFields.hasTokenFee,
+    systemKeyCost: updateFields.systemKeyCost,
+    inputListVal: updateFields.inputListVal ?? null //Important
   };
 
   // 如果是自定义插件,需要更新 customConfig
@@ -66,8 +69,7 @@ async function handler(
     const isUpdateVersion =
       plugin.customConfig.name !== updateFields.name ||
       plugin.customConfig.avatar !== updateFields.avatar ||
-      plugin.customConfig.intro !== updateFields.intro ||
-      !isEqual(plugin.inputListVal, updateFields.inputListVal);
+      plugin.customConfig.intro !== updateFields.intro;
 
     await MongoSystemPlugin.findOneAndUpdate(
       { pluginId },
@@ -88,8 +90,27 @@ async function handler(
       }
     );
   } else {
-    // 系统插件只更新基础字段
-    await MongoSystemPlugin.updateOne({ pluginId }, baseUpdateFields, { upsert: true });
+    // 系统插件只更新基础字段, 如果有 child，需要更新 child
+    await mongoSessionRun(async (session) => {
+      await MongoSystemPlugin.updateOne({ pluginId }, baseUpdateFields, { upsert: true, session });
+
+      for await (const tool of updateFields.childConfigs || []) {
+        await MongoSystemPlugin.updateOne(
+          { pluginId: tool.pluginId },
+          {
+            pluginId: tool.pluginId,
+            isActive: tool.isActive,
+            originCost: tool.originCost,
+            currentCost: tool.currentCost,
+            hasTokenFee: tool.hasTokenFee,
+            systemKeyCost: tool.systemKeyCost,
+
+            inputListVal: updateFields.inputListVal ?? null
+          },
+          { upsert: true, session }
+        );
+      }
+    });
   }
 
   const lang = getLocale(req);
