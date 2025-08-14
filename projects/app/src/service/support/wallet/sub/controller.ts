@@ -1,12 +1,12 @@
-import type {
-  StandardSubLevelEnum,
-  SubModeEnum
-} from '@fastgpt/global/support/wallet/sub/constants';
+import type { SubModeEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import { StandardSubLevelEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import type { ClientSession } from '@fastgpt/service/common/mongo';
+import { addLog } from '@fastgpt/service/common/system/log';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
 import { sortStandPlans, clearTeamPointsCache } from '@fastgpt/service/support/wallet/sub/utils';
 import { addDays } from 'date-fns';
+import { incTeamAiPoints } from '../controller';
 
 /* 
   标准套餐从新计算开始和结束时间
@@ -154,7 +154,57 @@ export const addExtraPointsSub = async ({
     ],
     { session }
   );
-
+  await clearFreeSubOverPoints({
+    teamId,
+    session
+  });
   // 清除积分缓存，确保下次获取时重新计算
   await clearTeamPointsCache(teamId);
+};
+
+// 将免费套餐多扣的积分，清除，进行一次额外扣费
+export const clearFreeSubOverPoints = async ({
+  teamId,
+  session
+}: {
+  teamId: string;
+  session: ClientSession;
+}) => {
+  const sub = await MongoTeamSub.findOne(
+    {
+      teamId,
+      type: SubTypeEnum.standard,
+      currentSubLevel: StandardSubLevelEnum.free
+    },
+    undefined,
+    { session }
+  );
+  if (!sub) {
+    addLog.error(`用户 ${teamId} 没有 free 套餐`);
+    return;
+  }
+
+  if (sub.surplusPoints >= 0) {
+    return;
+  }
+
+  // 负数的，需要更新
+  const val = sub.surplusPoints;
+
+  // 没超过-100 的话，就给免费抵扣了，减少用户疑惑。
+  if (val < -100) {
+    await incTeamAiPoints({
+      teamId,
+      totalPoints: val,
+      session
+    });
+  }
+
+  sub.surplusPoints = 0;
+  await sub.save({ session });
+
+  addLog.info(`用户 ${teamId} 的 free 套餐多扣的积分，已清除`, {
+    teamId,
+    totalPoints: val
+  });
 };

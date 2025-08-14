@@ -5,7 +5,7 @@ import { MongoUsage } from '@fastgpt/service/support/wallet/usage/schema';
 import type { ConcatBillQueueItemType } from '@fastgpt/service/support/wallet/usage/type';
 import type { ClientSession } from '@fastgpt/service/common/mongo';
 import { MongoTeamSub } from '@fastgpt/service/support/wallet/sub/schema';
-import { SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
+import { StandardSubLevelEnum, SubTypeEnum } from '@fastgpt/global/support/wallet/sub/constants';
 import { incrTeamPointsCache } from '@fastgpt/service/support/wallet/sub/utils';
 
 const batchUpdateTime = Number(process.env.BATCH_UPDATE_TIME || 3000);
@@ -40,9 +40,9 @@ export async function updateTeamBalance({
   );
 }
 
-const incTeamAiPoints = async ({
+export const incTeamAiPoints = async ({
   teamId,
-  totalPoints,
+  totalPoints, // 减积分，需要传负数
   session
 }: {
   teamId: string;
@@ -73,20 +73,19 @@ const incTeamAiPoints = async ({
       })
       .lean();
 
-    // 如果没有一个扣除成功，就直接扣余额多的
+    // 如果没有一个扣除成功，就直接扣 free 套餐的
     if (!updateResult) {
       await MongoTeamSub.updateOne(
         {
           teamId,
-          type: [SubTypeEnum.standard, SubTypeEnum.extraPoints]
+          type: SubTypeEnum.standard,
+          currentSubLevel: StandardSubLevelEnum.free
         },
         {
           $inc: { surplusPoints: totalPoints }
         },
         { session }
-      ).sort({
-        surplusPoints: -1
-      });
+      );
     }
 
     incrTeamPointsCache({
