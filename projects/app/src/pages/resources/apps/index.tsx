@@ -15,7 +15,6 @@ import {
   ModalBody
 } from '@chakra-ui/react';
 import MyIcon from '@fastgpt/web/components/common/Icon';
-import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import { getApps } from '@/web/admin/apps/api';
 import MyModal from '@fastgpt/web/components/common/MyModal';
 import BoxCard from '@/components/common/BoxContainer/Card';

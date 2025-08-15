@@ -36,7 +36,7 @@ const TeamTable = () => {
     ScrollData,
     getData
   } = usePagination(getTeams, {
-    pageSize: 20,
+    defaultPageSize: 20,
     params: {
       search
     },

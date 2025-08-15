@@ -46,7 +46,7 @@ const InvoiceManageTable = () => {
     ScrollData,
     getData
   } = usePagination(getInvoiceList, {
-    pageSize: 20,
+    defaultPageSize: 20,
     params: {
       search
     },

@@ -41,7 +41,7 @@ const LogTable = () => {
     isLoading,
     ScrollData
   } = usePagination(getSystemLogList, {
-    pageSize: 20,
+    defaultPageSize: 20,
     params: {
       search,
       logLevel

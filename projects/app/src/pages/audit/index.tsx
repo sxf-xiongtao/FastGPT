@@ -44,8 +44,8 @@ const AuditTable = () => {
 
   // 获取团队成员列表
   const { data: members } = usePagination(getTeamMembers, {
-    pageSize: 100,
-    type: 'button',
+    defaultPageSize: 50,
+    type: 'scroll',
     params: {}
   });
 
@@ -102,7 +102,7 @@ const AuditTable = () => {
     isLoading,
     ScrollData
   } = usePagination(getOperationLogs, {
-    pageSize: 20,
+    defaultPageSize: 20,
     params: apiParams,
     type: 'scroll',
     refreshDeps: [apiParams]

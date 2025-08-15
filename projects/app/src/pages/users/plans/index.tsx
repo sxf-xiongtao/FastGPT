@@ -56,7 +56,7 @@ const PlanTable = () => {
     ScrollData,
     getData
   } = usePagination(getPlans, {
-    pageSize: 20,
+    defaultPageSize: 20,
     params: {
       search
     },

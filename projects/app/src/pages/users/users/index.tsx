@@ -41,7 +41,7 @@ const UserTable = () => {
     ScrollData,
     getData
   } = usePagination(getUsers, {
-    pageSize: 20,
+    defaultPageSize: 20,
     params: {
       username: search
     },

@@ -115,7 +115,7 @@ const BillTable = () => {
     isLoading,
     ScrollData
   } = usePagination(getPays, {
-    pageSize: 20,
+    defaultPageSize: 20,
     params: {
       type: billType === '' ? undefined : billType,
       status: billStatus === '' ? undefined : billStatus,
