@@ -13,7 +13,7 @@ import {
 } from '@fastgpt/global/support/user/team/constant';
 import type { TeamTmbItemType } from '@fastgpt/global/support/user/team/type';
 import type { UserType } from '@fastgpt/global/support/user/type';
-import type { ClientSession } from '@fastgpt/service/common/mongo';
+import type { AnyBulkWriteOperation, ClientSession } from '@fastgpt/service/common/mongo';
 import { Types } from '@fastgpt/service/common/mongo';
 import { mongoSessionRun } from '@fastgpt/service/common/mongo/sessionRun';
 import { addLog } from '@fastgpt/service/common/system/log';
@@ -291,15 +291,13 @@ export type SyncUserParams = {
     contact?: string;
     avatar?: string;
   }[];
-  // source: `${SyncOrgSourceEnum}`;
-  session?: ClientSession;
 };
 
 /** Sync The Team Members
  * delete un-exist users
  * create new users
  * */
-export async function syncUser({ teamId, latestUserList, session }: SyncUserParams) {
+export async function syncUser({ teamId, latestUserList }: SyncUserParams) {
   addLog.debug(`syncing users start, users count: ${latestUserList.length}`);
   if (!latestUserList.length) {
     return;
@@ -311,8 +309,7 @@ export async function syncUser({ teamId, latestUserList, session }: SyncUserPara
     {
       teamId
     },
-    '_id userId',
-    { session }
+    '_id userId'
   ).lean();
 
   const usersInDB = (
@@ -321,14 +318,15 @@ export async function syncUser({ teamId, latestUserList, session }: SyncUserPara
         _id: { $in: tmbs.map((tmb) => tmb.userId) },
         username: { $regex: new RegExp(`^${prefix}`) }
       },
-      undefined,
-      { session }
+      undefined
     ).lean()
   ).filter((user) => user.username.startsWith(prefix) && user.username !== 'root');
 
   // 2. remove deleted users
   const newUserIds = latestUserList.map((item) => item.username);
-  const deletedUsers = usersInDB.filter((user) => !newUserIds.includes(user.username));
+  const deletedUsers = usersInDB.filter(
+    (user) => !newUserIds.includes(user.username) && user.status === UserStatusEnum.active
+  );
 
   const deletedTmbUsers = tmbs.filter((tmb) => {
     return deletedUsers.map((user) => String(user._id)).includes(String(tmb.userId));
@@ -339,7 +337,7 @@ export async function syncUser({ teamId, latestUserList, session }: SyncUserPara
   );
   // 2.1 remove user from team
   for await (const tmb of deletedTmbUsers) {
-    await removeUserFromTeam({ teamId, memberId: tmb._id, session });
+    await removeUserFromTeam({ teamId, memberId: tmb._id });
   }
 
   // 2.2 disable the deleted users
@@ -349,8 +347,7 @@ export async function syncUser({ teamId, latestUserList, session }: SyncUserPara
     },
     {
       status: UserStatusEnum.forbidden
-    },
-    { session }
+    }
   );
 
   // 3. create new users (without default team)
@@ -360,44 +357,45 @@ export async function syncUser({ teamId, latestUserList, session }: SyncUserPara
 
   addLog.debug(`syncing users, new users count: ${newUsers.length}`);
 
-  const userOps = [];
-  const teamMemberOps = [];
+  await mongoSessionRun(async (session) => {
+    const userOps = [];
+    const teamMemberOps = [];
 
-  for (const user of newUsers) {
-    userOps.push({
-      insertOne: {
-        document: {
-          username: user.username,
-          avatar: user.avatar,
-          status: UserStatusEnum.active,
-          password: getNanoid(),
-          contact: user.contact
+    for (const user of newUsers) {
+      userOps.push({
+        insertOne: {
+          document: {
+            username: user.username,
+            avatar: user.avatar,
+            status: UserStatusEnum.active,
+            password: getNanoid(),
+            contact: user.contact
+          }
         }
-      }
-    });
-    teamMemberOps.push({
-      insertOne: {
-        document: {
-          teamId,
-          userId: null,
-          name: user.memberName || user.username,
-          status: TeamMemberStatusEnum.active,
-          createTime: new Date()
+      });
+      teamMemberOps.push({
+        insertOne: {
+          document: {
+            teamId,
+            userId: null,
+            name: user.memberName || user.username,
+            status: TeamMemberStatusEnum.active,
+            createTime: new Date()
+          }
         }
-      }
+      });
+    }
+    const userResult = await MongoUser.bulkWrite(userOps, { session, ordered: true });
+    const userIdMap = new Map<string, Types.ObjectId>();
+    Object.entries(userResult.insertedIds).forEach(([index, userId]) => {
+      userIdMap.set(newUsers[Number(index)].username, userId);
     });
-  }
+    teamMemberOps.forEach((op, index) => {
+      op.insertOne.document.userId = userIdMap.get(newUsers[index].username) as any;
+    });
 
-  const userResult = await MongoUser.bulkWrite(userOps, { session, ordered: true });
-  const userIdMap = new Map<string, Types.ObjectId>();
-  Object.entries(userResult.insertedIds).forEach(([index, userId]) => {
-    userIdMap.set(newUsers[Number(index)].username, userId);
+    await MongoTeamMember.bulkWrite(teamMemberOps, { session, ordered: true });
   });
-  teamMemberOps.forEach((op, index) => {
-    op.insertOne.document.userId = userIdMap.get(newUsers[index].username) as any;
-  });
-
-  await MongoTeamMember.bulkWrite(teamMemberOps, { session, ordered: true });
   addLog.debug(`syncing users end`);
 }
 
@@ -437,10 +435,8 @@ export async function syncOrg({ teamId, latestOrgList, session }: syncOrgParams)
 
   // 2. Delete all orgs of a team
   addLog.debug(`syncOrg: clean old orgs`);
-  await Promise.all([
-    MongoOrgModel.deleteMany({ teamId }, { session }),
-    MongoOrgMemberModel.deleteMany({ teamId }, { session })
-  ]);
+  await MongoOrgModel.deleteMany({ teamId }, { session });
+  await MongoOrgMemberModel.deleteMany({ teamId }, { session });
 
   // 3. create new orgs
   addLog.debug(`syncOrg: create new orgs`);

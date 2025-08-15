@@ -56,13 +56,10 @@ export async function syncUserAndOrg() {
 
   if (latestUserList.length === 0) return; // do nothing
   addLog.info(`syncUserAndOrg: sync user`);
-  await mongoSessionRun(async (session) =>
-    syncUser({
-      teamId,
-      latestUserList,
-      session
-    })
-  );
+  syncUser({
+    teamId,
+    latestUserList
+  });
   addLog.info(`syncUserAndOrg: sync org`);
   await mongoSessionRun(async (session) => {
     if (orgListRes.orgList.length === 0) return; // do not sync org
