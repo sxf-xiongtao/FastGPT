@@ -109,11 +109,11 @@ async function handler(
       [
         {
           $match: {
+            isFirstChat: true,
             teamId: new Types.ObjectId(teamId),
             appId: new Types.ObjectId(appId),
             source: source && source.length > 0 ? { $in: source } : { $exists: true },
-            createTime: { $gte: dateStart, $lte: dateEnd },
-            isFirstChat: true
+            createTime: { $gte: dateStart, $lte: dateEnd }
           }
         },
         {

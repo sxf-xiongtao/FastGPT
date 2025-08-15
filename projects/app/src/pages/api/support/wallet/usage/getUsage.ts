@@ -52,7 +52,9 @@ async function handler(
       $gte: new Date(dateStart),
       $lte: new Date(dateEnd)
     },
-    ...(projectName && { appName: { $regex: new RegExp(`${replaceRegChars(projectName)}`, 'i') } })
+    appName: projectName
+      ? { $regex: new RegExp(`${replaceRegChars(projectName)}`, 'i') }
+      : { $exists: true }
   };
 
   // get bill record and total by record
