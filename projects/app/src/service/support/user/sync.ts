@@ -56,7 +56,7 @@ export async function syncUserAndOrg() {
 
   if (latestUserList.length === 0) return; // do nothing
   addLog.info(`syncUserAndOrg: sync user`);
-  syncUser({
+  await syncUser({
     teamId,
     latestUserList
   });
