@@ -80,7 +80,7 @@ export type ConfigFormType = {
     bank: NonNullable<SystemConfigType['pay']>['bank'];
     subPlans: {
       planDescriptionUrl: string;
-      standard: string;
+      standard?: string;
       extraDatasetSizePrice: number;
       extraPointsPrice: number;
     };

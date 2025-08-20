@@ -20,7 +20,7 @@ interface titleType {
   subTitles: string[];
 }
 
-let defaultStandardValue =
+let defaultStandardValue: string | undefined =
   '{"free":{"name":"免费版","price":0,"pointPrice":0,"totalPoints":100,"maxTeamMember":1,"maxAppAmount":10,"maxDatasetAmount":10,"chatHistoryStoreDuration":30,"maxDatasetSize":600,"trainingWeight":1,"permissionCustomApiKey":false,"permissionCustomCopyright":false,"permissionWebsiteSync":false,"permissionTeamOperationLog":false},"experience":{"name":"体验版","price":59,"pointPrice":30,"totalPoints":3000,"maxTeamMember":3,"maxAppAmount":30,"maxDatasetAmount":30,"chatHistoryStoreDuration":180,"maxDatasetSize":5000,"trainingWeight":2,"permissionCustomApiKey":true,"permissionCustomCopyright":false,"permissionWebsiteSync":true,"permissionTeamOperationLog":false},"team":{"name":"团队版","price":399,"pointPrice":200,"totalPoints":20000,"maxTeamMember":10,"maxAppAmount":100,"maxDatasetAmount":100,"chatHistoryStoreDuration":360,"maxDatasetSize":40000,"trainingWeight":3,"permissionCustomApiKey":true,"permissionCustomCopyright":true,"permissionWebsiteSync":true,"permissionTeamOperationLog":true},"enterprise":{"name":"企业版","price":999,"pointPrice":600,"totalPoints":60000,"maxTeamMember":100,"maxAppAmount":500,"maxDatasetAmount":500,"chatHistoryStoreDuration":720,"maxDatasetSize":150000,"trainingWeight":4,"permissionCustomApiKey":true,"permissionCustomCopyright":true,"permissionWebsiteSync":true,"permissionTeamOperationLog":true}}';
 
 export const ModelSettings = () => {
@@ -105,7 +105,7 @@ export const ModelSettings = () => {
                 const standard = getValues('subPlans.standard');
                 defaultStandardValue = standard;
 
-                setValue('subPlans.standard', '{}');
+                setValue('subPlans.standard', undefined);
                 setOpenPlan(false);
               }
             }}

@@ -278,7 +278,7 @@ export function formatFormData2ConfigStore({
 
   const standardSubPlanJson = (() => {
     try {
-      return JSON.parse(subPlans.standard);
+      return JSON.parse(subPlans.standard || '{}');
     } catch (error) {
       return {};
     }
