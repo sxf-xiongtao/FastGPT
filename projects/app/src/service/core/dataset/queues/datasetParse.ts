@@ -55,13 +55,9 @@ const requestLLMPargraph = async ({
     };
   }
 
+  // Check is markdown text(Include 1 group of title)
   if (paragraphChunkAIMode === ParagraphChunkAIModeEnum.auto) {
-    // Check if the text contains Markdown header structure
-    const hasMarkdownHeaders = /^(#+)\s/m.test(rawText);
-    const hasMultipleHeaders = (rawText.match(/^(#+)\s/g) || []).length > 1;
-
-    const isMarkdown = hasMarkdownHeaders && hasMultipleHeaders;
-
+    const isMarkdown = /^(#+)\s/.test(rawText);
     if (isMarkdown) {
       return {
         resultText: rawText,
@@ -75,24 +71,44 @@ const requestLLMPargraph = async ({
     resultText: string;
     totalInputTokens: number;
     totalOutputTokens: number;
-  }>(
-    '/core/dataset/training/llmPargraph',
-    {
-      rawText,
-      model,
-      billId
-    },
-    { timeout: 600000 }
-  );
+  }>('/core/dataset/training/llmPargraph', {
+    rawText,
+    model,
+    billId
+  });
 
   return data;
 };
 
+const reduceQueue = () => {
+  global.parseQueueLen = global.parseQueueLen > 0 ? global.parseQueueLen - 1 : 0;
+
+  return global.parseQueueLen === 0;
+};
+
 export const datasetParseQueue = async (): Promise<any> => {
+  const raw = global.systemEnv?.parseMaxProcess;
+  let max;
+
+  // 处理空值情况（null, undefined, 空字符串）
+  if (raw == null || raw === '') {
+    max = Infinity;
+  } else {
+    // 尝试安全转换为数字
+    const num = Number(raw);
+
+    // 检查是否转换成功（非NaN）
+    max = isNaN(num) ? Infinity : num;
+  }
+
+  if (global.parseQueueLen >= max) return;
+  global.parseQueueLen++;
+
   const startTime = Date.now();
+  const timeout = global.systemEnv.customPdfParse?.timeout || 10;
 
   while (true) {
-    // 1. Get task and lock 20 minutes ago
+    // 1. Get task and lock 120 minutes ago
     const {
       data,
       done = false,
@@ -103,7 +119,7 @@ export const datasetParseQueue = async (): Promise<any> => {
           {
             mode: TrainingModeEnum.parse,
             retryCount: { $gt: 0 },
-            lockTime: { $lte: addMinutes(new Date(), -10) }
+            lockTime: { $lte: addMinutes(new Date(), -timeout) }
           },
           {
             lockTime: new Date(),
@@ -364,5 +380,8 @@ export const datasetParseQueue = async (): Promise<any> => {
     }
   }
 
-  addLog.debug(`[Parse Queue] break loop`);
+  if (reduceQueue()) {
+    addLog.info(`[Parse Queue] Done`);
+  }
+  addLog.debug(`[Parse Queue] break loop, current queue size: ${global.parseQueueLen}`);
 };
