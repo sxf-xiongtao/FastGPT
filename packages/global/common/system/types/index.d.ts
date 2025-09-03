@@ -129,7 +129,7 @@ export type FastGPTFeConfigsType = {
 
 export type SystemEnvType = {
   openapiPrefix?: string;
-  parseMaxProcess?: string;
+  parseMaxProcess?: number;
   vectorMaxProcess: number;
   qaMaxProcess: number;
   vlmMaxProcess: number;

@@ -87,25 +87,14 @@ const reduceQueue = () => {
 };
 
 export const datasetParseQueue = async (): Promise<any> => {
-  const raw = global.systemEnv?.parseMaxProcess;
-  let max;
-
-  // 处理空值情况（null, undefined, 空字符串）
-  if (raw == null || raw === '') {
-    max = Infinity;
-  } else {
-    // 尝试安全转换为数字
-    const num = Number(raw);
-
-    // 检查是否转换成功（非NaN）
-    max = isNaN(num) ? Infinity : num;
-  }
+  const max = global.systemEnv?.parseMaxProcess || 6;
+  addLog.debug(`[Parse Queue] Queue size: ${global.parseQueueLen}`);
 
   if (global.parseQueueLen >= max) return;
   global.parseQueueLen++;
 
   const startTime = Date.now();
-  const timeout = global.systemEnv.customPdfParse?.timeout || 10;
+  const timeout = global.systemEnv.customPdfParse?.timeout || 120;
 
   while (true) {
     // 1. Get task and lock 120 minutes ago
