@@ -80,8 +80,22 @@ const requestLLMPargraph = async ({
   return data;
 };
 
+const reduceQueue = () => {
+  global.parseQueueLen = global.parseQueueLen > 0 ? global.parseQueueLen - 1 : 0;
+
+  return global.parseQueueLen === 0;
+};
+
 export const datasetParseQueue = async (): Promise<any> => {
+  const max = global.systemEnv?.parseMaxProcess || 6;
+  addLog.debug(`[Parse Queue] Queue size: ${global.parseQueueLen}`);
+
+  if (global.parseQueueLen >= max) return;
+  global.parseQueueLen++;
+
   const startTime = Date.now();
+  const timeout =  global.systemEnv.customPdfParse?.timeout;
+
 
   while (true) {
     // 1. Get task and lock 20 minutes ago
@@ -95,7 +109,7 @@ export const datasetParseQueue = async (): Promise<any> => {
           {
             mode: TrainingModeEnum.parse,
             retryCount: { $gt: 0 },
-            lockTime: { $lte: addMinutes(new Date(), -10) }
+            lockTime: { $lte: addMinutes(new Date(), -timeout) }
           },
           {
             lockTime: new Date(),
@@ -354,6 +368,10 @@ export const datasetParseQueue = async (): Promise<any> => {
 
       await delay(100);
     }
+  }
+
+  if (reduceQueue()) {
+    addLog.info(`[Parse Queue] Done`);
   }
 
   addLog.debug(`[Parse Queue] break loop`);
