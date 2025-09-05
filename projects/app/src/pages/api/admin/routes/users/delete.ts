@@ -11,8 +11,6 @@ import { MongoOrgModel } from '@fastgpt/service/support/permission/org/orgSchema
 import { MongoOrgMemberModel } from '@fastgpt/service/support/permission/org/orgMemberSchema';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { MongoImage } from '@fastgpt/service/common/file/image/schema';
-import { MongoEvaluation } from '@fastgpt/service/core/app/evaluation/evalSchema';
-import { removeEvaluationJob } from '@fastgpt/service/core/app/evaluation/mq';
 import { MongoDataset } from '@fastgpt/service/core/dataset/schema';
 import { deleteDatasets } from '@fastgpt/service/core/dataset/controller';
 import { MongoApp } from '@fastgpt/service/core/app/schema';
