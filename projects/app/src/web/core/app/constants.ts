@@ -3,7 +3,8 @@ import { type AppDetailType } from '@fastgpt/global/core/app/type';
 import type {
   DingtalkAppType,
   FeishuAppType,
-  OutLinkEditType
+  OutLinkEditType,
+  ShareOutLinkEditType
 } from '@fastgpt/global/support/outLink/type';
 import { AppPermission } from '@fastgpt/global/support/permission/app/controller';
 export const defaultApp: AppDetailType = {
@@ -23,13 +24,14 @@ export const defaultApp: AppDetailType = {
   inheritPermission: false
 };
 
-export const defaultOutLinkForm: OutLinkEditType = {
+export const defaultOutLinkForm: ShareOutLinkEditType = {
   name: '',
   showRunningStatus: true,
   showSkillReferences: false,
   showCite: false,
   showFullText: false,
   canDownloadSource: false,
+  allowAnonymous: true,
   limit: {
     QPM: 100,
     maxUsagePoints: -1

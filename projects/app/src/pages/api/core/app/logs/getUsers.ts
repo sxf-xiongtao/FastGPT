@@ -123,14 +123,25 @@ async function handler(req: ApiRequestProps): Promise<GetLogUsersResponse> {
         '_id name avatar'
       ).lean()
     : [];
-  const tmbMap = new Map(teamMembers.map((member) => [String(member._id), member]));
+  const teamMemberMap = new Map(teamMembers.map((member) => [String(member._id), member]));
+
+  // Protected shares can be opened by a member from another team. Their ID is stored as the
+  // out-link identity, so resolve it without restricting the lookup to the app team.
+  const outLinkMemberIds = userIds
+    .filter((id) => Types.ObjectId.isValid(id) && !teamMemberMap.has(id))
+    .map((id) => new Types.ObjectId(id));
+  const outLinkMembers = outLinkMemberIds.length
+    ? await MongoTeamMember.find({ _id: { $in: outLinkMemberIds } }, '_id name avatar').lean()
+    : [];
+  const outLinkMemberMap = new Map(outLinkMembers.map((member) => [String(member._id), member]));
 
   const list = userGroups.map((item): LogUserType => {
     const userId = String(item._id);
-    const member = tmbMap.get(userId);
+    const teamMember = teamMemberMap.get(userId);
+    const member = teamMember ?? outLinkMemberMap.get(userId);
     return {
-      outLinkUid: member ? null : userId,
-      tmbId: member ? userId : null,
+      outLinkUid: teamMember ? null : userId,
+      tmbId: teamMember ? userId : null,
       name: member?.name || userId,
       avatar: member?.avatar || DEFAULT_USER_AVATAR,
       count: item.count
