@@ -6,9 +6,8 @@ import { type ApiRequestProps } from '@fastgpt/next/type';
 import { NextAPI } from '@/service/middleware/entry';
 import { type AuthModeType } from '@fastgpt/service/support/permission/type';
 import { AuthUserTypeEnum } from '@fastgpt/global/support/permission/constant';
-import { authOutLinkValid } from '@fastgpt/service/support/permission/publish/authLink';
-import { authOutLinkInit } from '@fastgpt/service/support/outLink/runtime/auth';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
+import { authOutLink } from '@/service/support/permission/auth/outLink';
 import { getDefaultLLMModelData } from '@fastgpt/service/core/ai/model';
 import {
   CreateQuestionGuideBodySchema,
@@ -73,11 +72,7 @@ async function authChatCert(props: AuthModeType): Promise<{
       .outLinkAuthData || {};
 
   if (shareId && outLinkUid) {
-    const { outLinkConfig } = await authOutLinkValid({ shareId });
-    const { uid } = await authOutLinkInit({
-      outLinkUid,
-      tokenUrl: outLinkConfig.limit?.hookUrl
-    });
+    const { outLinkConfig, uid } = await authOutLink({ shareId, outLinkUid, req: props.req });
 
     return {
       teamId: String(outLinkConfig.teamId),

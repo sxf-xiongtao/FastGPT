@@ -28,7 +28,7 @@ async function handler(
   /** 外链不能信任客户端成员 ID，只使用发布链接服务端保存的 team/tmb 身份。 */
   const catalogIdentity = await (async () => {
     if (outLinkAuthData) {
-      const { outLinkConfig } = await authOutLink(outLinkAuthData);
+      const { outLinkConfig } = await authOutLink({ ...outLinkAuthData, req });
       const teamId = String(outLinkConfig.teamId);
       const tmbId = String(outLinkConfig.tmbId);
       const tmb = await MongoTeamMember.findOne({ _id: tmbId, teamId }, 'role').lean();

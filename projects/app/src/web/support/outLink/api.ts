@@ -6,7 +6,8 @@ import type {
 import type {
   OutLinkSchemaType as CoreOutLinkSchemaType,
   OutlinkAppType,
-  PlaygroundVisibilityConfigType
+  PlaygroundVisibilityConfigType,
+  ShareOutLinkSchemaType
 } from '@fastgpt/global/support/outLink/type';
 import type {
   OutLinkCreateBodyType,
@@ -21,6 +22,7 @@ import type {
   OutLinkUpdateResponseType
 } from '@fastgpt/global/openapi/support/outLink/api';
 import { GET, POST, DELETE, PUT } from '@/web/common/api/request';
+import { PublishChannelEnum } from '@fastgpt/global/support/outLink/constant';
 
 // create a shareChat
 export function createShareChat(data: OutLinkCreateBodyType) {
@@ -31,6 +33,9 @@ export const putShareChat = (data: OutLinkUpdateBodyType) =>
   PUT<OutLinkUpdateResponseType>(`/support/outLink/update`, data);
 
 // get shareChat
+export function getShareChatList(
+  data: OutLinkListQueryType & { type: PublishChannelEnum.share }
+): Promise<ShareOutLinkSchemaType[]>;
 export function getShareChatList(data: OutLinkListQueryType): Promise<OutLinkListResponseType>;
 export function getShareChatList<T extends OutlinkAppType>(
   data: OutLinkListQueryType

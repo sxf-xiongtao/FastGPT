@@ -1,4 +1,7 @@
 {
+  "anonymous_login": "免登录",
+  "anonymous_login_enabled_tip": "开启后，任何获得链接的用户无需登录即可访问应用。",
+  "anonymous_login_disabled_tip": "关闭后，用户必须登录且拥有应用访问权限。",
   "basic_info": "基本信息",
   "copy_link_hint": "将下面链接复制到指定位置",
   "create_api_key": "创建新 key",
