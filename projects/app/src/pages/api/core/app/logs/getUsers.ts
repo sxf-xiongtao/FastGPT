@@ -75,6 +75,10 @@ async function handler(req: ApiRequestProps): Promise<GetLogUsersResponse> {
     .filter((item) => item._id.tmbId && !item._id.outLinkUid)
     .map((item) => item._id.tmbId);
 
+  const outLinkTmbIds = aggregateResult
+    .filter((item) => item._id.outLinkUid && Types.ObjectId.isValid(item._id.outLinkUid))
+    .map((item) => new Types.ObjectId(item._id.outLinkUid));
+
   const teamMembers = tmbIds.length
     ? await MongoTeamMember.find(
         {
@@ -85,7 +89,17 @@ async function handler(req: ApiRequestProps): Promise<GetLogUsersResponse> {
       ).lean()
     : [];
 
-  const tmbMap = new Map(teamMembers.map((m) => [String(m._id), m]));
+  // A protected share can be opened by a member from another team, so this lookup cannot use app teamId.
+  const outLinkMembers = outLinkTmbIds.length
+    ? await MongoTeamMember.find(
+        {
+          _id: { $in: outLinkTmbIds }
+        },
+        '_id name avatar'
+      ).lean()
+    : [];
+
+  const tmbMap = new Map([...teamMembers, ...outLinkMembers].map((m) => [String(m._id), m]));
 
   const searchPattern = searchKey ? new RegExp(replaceRegChars(searchKey), 'i') : null;
 
@@ -95,7 +109,9 @@ async function handler(req: ApiRequestProps): Promise<GetLogUsersResponse> {
 
     const { name, avatar } = (() => {
       if (outLinkUid) {
-        return { name: outLinkUid, avatar: DEFAULT_USER_AVATAR };
+        const member = tmbMap.get(String(outLinkUid));
+        if (member) return { name: member.name, avatar: member.avatar };
+        return { name: String(outLinkUid), avatar: DEFAULT_USER_AVATAR };
       }
       if (tmbId) {
         const member = tmbMap.get(tmbId);

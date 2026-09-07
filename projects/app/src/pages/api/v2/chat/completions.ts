@@ -155,6 +155,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         });
 
         return authShareChat({
+          req,
           shareId,
           outLinkUid,
           chatId,
@@ -594,10 +595,12 @@ export default NextAPI(handler);
 
 const authShareChat = async ({
   chatId,
+  req,
   ...data
 }: AuthOutLinkChatProps & {
   shareId: string;
   chatId?: string;
+  req: NextApiRequest;
 }): Promise<AuthResponseType> => {
   const {
     teamId,
@@ -609,7 +612,7 @@ const authShareChat = async ({
     showSkillReferences,
     uid,
     sourceName
-  } = await authOutLinkChatStart(data);
+  } = await authOutLinkChatStart({ ...data, req });
   const app = await MongoApp.findById(appId).lean();
 
   if (!app) {

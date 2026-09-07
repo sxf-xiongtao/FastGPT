@@ -1,4 +1,7 @@
 {
+  "anonymous_login": "免登入",
+  "anonymous_login_enabled_tip": "開啟後，任何取得連結的使用者無需登入即可存取應用。",
+  "anonymous_login_disabled_tip": "關閉後，使用者必須登入且擁有應用存取權限。",
   "basic_info": "基本資訊",
   "copy_link_hint": "請將下方連結複製到指定位置",
   "create_api_key": "建立新金鑰",

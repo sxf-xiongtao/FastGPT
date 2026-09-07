@@ -16,7 +16,9 @@ import {
   Switch,
   Link,
   IconButton,
-  HStack
+  HStack,
+  UnorderedList,
+  ListItem
 } from '@chakra-ui/react';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { useLoading } from '@fastgpt/web/hooks/useLoading';
@@ -31,7 +33,10 @@ import { formatTimeToChatTime } from '@fastgpt/global/common/string/time';
 import { useCopyData } from '@fastgpt/web/hooks/useCopyData';
 import { useForm } from 'react-hook-form';
 import { defaultOutLinkForm } from '@/web/core/app/constants';
-import type { OutLinkEditType, OutLinkSchemaType } from '@fastgpt/global/support/outLink/type';
+import type {
+  ShareOutLinkEditType,
+  ShareOutLinkSchemaType
+} from '@fastgpt/global/support/outLink/type';
 import { PublishChannelEnum } from '@fastgpt/global/support/outLink/constant';
 import { useSafeTranslation } from '@fastgpt/web/hooks/useSafeTranslation';
 import { useToast } from '@fastgpt/web/hooks/useToast';
@@ -62,8 +67,8 @@ const Share = ({
   const { setIsLoading } = useLoading();
   const { feConfigs } = useSystemStore();
   const { copyData } = useCopyData();
-  const [editLinkData, setEditLinkData] = useState<OutLinkEditType>();
-  const [selectedLinkData, setSelectedLinkData] = useState<OutLinkSchemaType>();
+  const [editLinkData, setEditLinkData] = useState<ShareOutLinkEditType>();
+  const [selectedLinkData, setSelectedLinkData] = useState<ShareOutLinkSchemaType>();
   const { toast } = useToast();
   const { ConfirmModal, openConfirm } = useConfirm({
     content: t('common:support.outlink.Delete link tip'),
@@ -129,6 +134,7 @@ const Share = ({
             <Tr>
               <Th>{t('common:Name')}</Th>
               <Th>{t('common:support.outlink.Usage points')}</Th>
+              <Th>{t('publish:anonymous_login')}</Th>
               {feConfigs?.isPlus && <Th>{t('common:expired_time')}</Th>}
               <Th>{t('common:last_use_time')}</Th>
               <Th>{t('common:Action')}</Th>
@@ -148,6 +154,7 @@ const Share = ({
                       }`
                     : ''}
                 </Td>
+                <Td>{item.allowAnonymous ? '✔' : '✖'}</Td>
                 {feConfigs?.isPlus && (
                   <Td>
                     {item.limit?.expiredTime
@@ -160,7 +167,7 @@ const Share = ({
                 </Td>
                 <Td display={'flex'} alignItems={'center'}>
                   <Button
-                    onClick={() => setSelectedLinkData(item as OutLinkSchemaType)}
+                    onClick={() => setSelectedLinkData(item)}
                     size={'sm'}
                     mr={3}
                     variant={'whitePrimary'}
@@ -187,6 +194,7 @@ const Share = ({
                               setEditLinkData({
                                 _id: item._id,
                                 name: item.name,
+                                allowAnonymous: item.allowAnonymous,
                                 showCite: item.showCite,
                                 canDownloadSource: item.canDownloadSource,
                                 showFullText: item.showFullText,
@@ -273,8 +281,8 @@ function EditLinkModal({
   onEdit
 }: {
   appId: string;
-  type: PublishChannelEnum;
-  defaultData: OutLinkEditType;
+  type: PublishChannelEnum.share;
+  defaultData: ShareOutLinkEditType;
   onClose: () => void;
   onCreate: (id: string) => void;
   onEdit: () => void;
@@ -286,7 +294,7 @@ function EditLinkModal({
     setValue,
     watch,
     handleSubmit: submitShareChat
-  } = useForm<OutLinkEditType>({
+  } = useForm<ShareOutLinkEditType>({
     defaultValues: defaultData
   });
 
@@ -298,7 +306,7 @@ function EditLinkModal({
   const isEdit = useMemo(() => !!defaultData._id, [defaultData]);
 
   const { runAsync: onclickCreate, loading: creating } = useRequest(
-    async (e: OutLinkEditType) =>
+    async (e: ShareOutLinkEditType) =>
       createShareChat({
         ...e,
         appId,
@@ -423,6 +431,21 @@ function EditLinkModal({
           <Box fontSize={'sm'} fontWeight={'500'} color={'myGray.600'}>
             {t('publish:private_config')}
           </Box>
+          <Flex alignItems={'center'} mt={4} justify={'space-between'} minH={'36px'}>
+            <Flex alignItems={'center'}>
+              <FormLabel>{t('publish:anonymous_login')}</FormLabel>
+              <QuestionTip
+                ml={1}
+                label={
+                  <UnorderedList>
+                    <ListItem>{t('publish:anonymous_login_enabled_tip')}</ListItem>
+                    <ListItem>{t('publish:anonymous_login_disabled_tip')}</ListItem>
+                  </UnorderedList>
+                }
+              />
+            </Flex>
+            <Switch {...register('allowAnonymous')} />
+          </Flex>
           <Flex alignItems={'center'} mt={4} justify={'space-between'} height={'36px'}>
             <FormLabel>{t('publish:show_node')}</FormLabel>
             <Switch {...register('showRunningStatus')} />

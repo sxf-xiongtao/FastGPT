@@ -1,4 +1,7 @@
 {
+  "anonymous_login": "Login-free",
+  "anonymous_login_enabled_tip": "When enabled, anyone with the link can access the app without logging in.",
+  "anonymous_login_disabled_tip": "When disabled, users must log in and have permission to access the app.",
   "basic_info": "Basic Info",
   "copy_link_hint": "Copy the link below to the specified location",
   "create_api_key": "Create New Key",

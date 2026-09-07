@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Box, Flex, IconButton } from '@chakra-ui/react';
+import { Box, Flex, IconButton, Spinner } from '@chakra-ui/react';
 import { streamFetch } from '@/web/common/api/fetch';
 import SideBar from '@/components/SideBar';
 
@@ -11,9 +11,10 @@ import PageContainer from '@/components/PageContainer';
 import { serviceSideProps } from '@/web/common/i18n/utils';
 import { LANG_KEY, SHARE_LANG_KEY } from '@fastgpt/web/i18n/utils';
 import { useTranslation } from 'next-i18next';
-import { getInitOutLinkChatInfo } from '@/web/core/chat/api';
+import { getInitChatInfo, getInitOutLinkChatInfo } from '@/web/core/chat/api';
 import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
 import { getLogger, LogCategories } from '@fastgpt/service/common/logger';
+import { normalizeShareOutLinkAllowAnonymous } from '@fastgpt/service/support/outLink/compatibility';
 
 import NextHead from '@/components/common/NextHead';
 import { useContextSelector } from 'use-context-selector';
@@ -52,6 +53,12 @@ import { postMarkChatRead } from '@/web/core/chat/history/api';
 import { useSandboxEditor, useSandboxStatus } from '@/pageComponents/chat/SandboxEditor/hook';
 import type { GetHistoriesBodyType } from '@fastgpt/global/openapi/core/chat/history/api';
 import MyTooltip from '@fastgpt/web/components/common/MyTooltip';
+import LoginModal from '@/pageComponents/login/LoginModal';
+import type { LoginSuccessResponseType } from '@fastgpt/global/openapi/support/user/account/login/api';
+import { getTokenLogin } from '@/web/support/user/api';
+import { useSystemStore } from '@/web/common/system/useSystemStore';
+import { PublishChannelEnum } from '@fastgpt/global/support/outLink/constant';
+import { getShareChatOutLinkUid } from '@/web/core/chat/utils/shareChat';
 
 const logger = getLogger(LogCategories.MODULE.CHAT.ITEM);
 
@@ -70,6 +77,7 @@ type Props = {
   isShowFullText: boolean;
   showRunningStatus: boolean;
   showSkillReferences: boolean;
+  allowAnonymous: boolean;
 };
 
 const OutLink = (props: Props) => {
@@ -490,19 +498,55 @@ const OutLink = (props: Props) => {
 const Render = (props: Props) => {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const { shareId, authToken, customUid, appId } = props;
+  const { shareId, authToken, customUid, appId, allowAnonymous } = props;
+  const { feConfigs } = useSystemStore();
   const { localUId, setLocalUId, loaded } = useShareChatStore();
   const {
     source,
     chatId,
     appId: chatStoreAppId,
+    outLinkAuthData: chatStoreOutLinkAuthData,
     setSource,
     setAppId,
     setOutLinkAuthData,
     loaded: chatStoreLoaded
   } = useChatStore();
+  const [verifiedAppId, setVerifiedAppId] = useState<string>();
+  const [checkedAppId, setCheckedAppId] = useState<string>();
+  const [loginUid, setLoginUid] = useState('');
 
-  const outLinkUid = authToken || customUid || localUId || '';
+  useEffect(() => {
+    if (allowAnonymous) return;
+
+    let active = true;
+
+    void (async () => {
+      try {
+        const user = await getTokenLogin();
+        await getInitChatInfo({ appId, chatId: getNanoid() });
+        if (active && user?.team?.tmbId) {
+          setLoginUid(user.team.tmbId);
+          setVerifiedAppId(appId);
+        }
+      } catch {
+        // The login screen also lets an authenticated user switch to an account with access.
+      } finally {
+        if (active) setCheckedAppId(appId);
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [allowAnonymous, appId]);
+
+  const outLinkUid = getShareChatOutLinkUid({
+    allowAnonymous,
+    authToken,
+    customUid,
+    anonymousUid: localUId,
+    loginUid
+  });
   const chatHistoryProviderParams = useMemoEnhance<GetHistoriesBodyType>(() => {
     return {
       outLinkAuthData: {
@@ -517,6 +561,25 @@ const Render = (props: Props) => {
       outLinkUid
     };
   }, [outLinkUid, shareId]);
+
+  const handleLoginSuccess = useCallback(
+    async (response: LoginSuccessResponseType) => {
+      const tmbId = response.user?.team?.tmbId;
+      if (!tmbId) throw new Error('Missing login identity');
+
+      await getInitChatInfo({ appId, chatId: getNanoid() });
+      setLoginUid(tmbId);
+
+      // LoginContainer clears the chat store. Restore the current share context before rendering it.
+      setSource(ChatSourceEnum.share);
+      setAppId(appId);
+      setOutLinkAuthData(outLinkAuthData);
+      setVerifiedAppId(appId);
+      setCheckedAppId(appId);
+    },
+    [appId, outLinkAuthData, setAppId, setOutLinkAuthData, setSource]
+  );
+
   const chatRecordProviderParams = useMemoEnhance(() => {
     return {
       outLinkAuthData,
@@ -533,12 +596,12 @@ const Render = (props: Props) => {
 
   // Set default localUId
   useEffect(() => {
-    if (loaded) {
+    if (loaded && allowAnonymous) {
       if (!localUId) {
         setLocalUId(`shareChat-${Date.now()}-${getNanoid(24)}`);
       }
     }
-  }, [loaded, localUId, setLocalUId]);
+  }, [allowAnonymous, loaded, localUId, setLocalUId]);
 
   // Init outLinkAuthData
   useEffect(() => {
@@ -569,10 +632,25 @@ const Render = (props: Props) => {
     chatStoreLoaded &&
     source === ChatSourceEnum.share &&
     chatStoreAppId === appId &&
-    outLinkAuthData.shareId === shareId &&
-    outLinkAuthData.outLinkUid === outLinkUid &&
+    chatStoreOutLinkAuthData.shareId === shareId &&
+    chatStoreOutLinkAuthData.outLinkUid === outLinkUid &&
     !!appId &&
     !!outLinkUid;
+
+  if (!allowAnonymous && verifiedAppId !== appId) {
+    return (
+      <>
+        <NextHead title={feConfigs?.systemTitle} />
+        {checkedAppId !== appId ? (
+          <Flex h="100vh" alignItems="center" justifyContent="center">
+            <Spinner />
+          </Flex>
+        ) : (
+          <LoginModal onSuccess={handleLoginSuccess} />
+        )}
+      </>
+    );
+  }
 
   return isCurrentChatLinkReady ? (
     <ChatContextProvider params={chatHistoryProviderParams}>
@@ -604,14 +682,17 @@ export async function getServerSideProps(context: any) {
 
   const app = await (async () => {
     try {
-      return MongoOutLink.findOne(
+      const outLink = await MongoOutLink.findOne(
         {
-          shareId
+          shareId,
+          type: PublishChannelEnum.share
         },
-        'appId canDownloadSource showCite showFullText showRunningStatus showSkillReferences'
+        'appId canDownloadSource showCite showFullText showRunningStatus showSkillReferences allowAnonymous'
       )
         .populate<{ associatedApp: AppSchemaType }>('associatedApp', 'name avatar intro')
         .lean();
+
+      return outLink ? normalizeShareOutLinkAllowAnonymous(outLink) : undefined;
     } catch (error) {
       logger.error('getServerSideProps failed', {
         error,
@@ -632,6 +713,7 @@ export async function getServerSideProps(context: any) {
       isShowFullText: app?.showFullText ?? false,
       showRunningStatus: app?.showRunningStatus ?? false,
       showSkillReferences: app?.showSkillReferences ?? false,
+      allowAnonymous: app ? app.allowAnonymous : true,
       shareId: shareId ?? '',
       authToken: authToken ?? '',
       customUid,

@@ -9,6 +9,7 @@ import { NextAPI } from '@/service/middleware/entry';
 import { readFromSecondary } from '@fastgpt/service/common/mongo/utils';
 import { parsePaginationRequest } from '@fastgpt/service/common/api/pagination';
 import { addSourceMember } from '@fastgpt/service/support/user/utils';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 import { replaceRegChars } from '@fastgpt/global/common/string/tools';
 import { getLocationFromIp } from '@fastgpt/service/common/geo';
 import { AppReadChatLogPerVal } from '@fastgpt/global/support/permission/app/constant';
@@ -22,7 +23,7 @@ import {
   type getAppChatLogsResponseType
 } from '@fastgpt/global/openapi/core/app/log/api';
 import { parseApiInput } from '@fastgpt/service/common/zod/requestParseError';
-import { ChatSourceTypeEnum } from '@fastgpt/global/core/chat/constants';
+import { ChatSourceEnum, ChatSourceTypeEnum } from '@fastgpt/global/core/chat/constants';
 import { isUnselectedLogUserFilter } from '@fastgpt/global/core/app/logs/utils';
 
 const appChatSourceMatch = {
@@ -341,12 +342,40 @@ async function handler(req: ApiRequestProps): Promise<getAppChatLogsResponseType
     };
   });
 
-  // 获取有 tmbId 的人员
+  // Resolve the normal online/API member first. For an out-link, tmbId belongs to the publisher.
   const listWithSourceMember = await addSourceMember({ list: listWithRegion });
-  // 获取没有 tmbId 的人员
-  const listWithoutTmbId = listWithRegion.filter((item) => !item.tmbId);
+  const sourceMemberMap = new Map(listWithSourceMember.map((item) => [String(item._id), item]));
+
+  // Protected share links put the visitor's member ID in outLinkUid.
+  const shareItemsWithOutLinkUid = listWithRegion.filter(
+    (item) => item.source === ChatSourceEnum.share && item.outLinkUid
+  );
+  const candidateTmbIds = shareItemsWithOutLinkUid
+    .filter((item) => Types.ObjectId.isValid(item.outLinkUid))
+    .map((item) => new Types.ObjectId(item.outLinkUid));
+  const outLinkMembers = candidateTmbIds.length
+    ? ((await MongoTeamMember.find(
+        { _id: { $in: candidateTmbIds } },
+        '_id name avatar status'
+      ).lean()) as unknown as {
+        _id: Types.ObjectId;
+        name: string;
+        avatar: string;
+        status: string;
+      }[])
+    : [];
+  const outLinkMemberMap = new Map(outLinkMembers.map((member) => [String(member._id), member]));
+
+  const finalList = listWithRegion.map((item) => {
+    const result = sourceMemberMap.get(String(item._id)) || { ...item, sourceMember: undefined };
+    if (item.source !== ChatSourceEnum.share || !item.outLinkUid) return result;
+
+    const member = outLinkMemberMap.get(String(item.outLinkUid));
+    return { ...result, sourceMember: member };
+  });
+
   return GetAppChatLogsResponseSchema.parse({
-    list: listWithSourceMember.concat(listWithoutTmbId),
+    list: finalList,
     total
   });
 }
