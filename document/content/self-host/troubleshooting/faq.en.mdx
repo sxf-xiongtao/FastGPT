@@ -102,7 +102,7 @@ There are three ways:
 3. **If you forgot the password**: reset it from the server with the container script. No restart is needed:
 
    ```bash
-   docker exec -e ROOT_PSW='your-new-password' fastgpt node /app/scripts/reset-root-password.mjs
+   docker exec -e ROOT_PSW='your-new-password' fastgpt node /app/scripts/reset-root-password.cjs
    ```
 
    Use the container name shown by `docker ps`. If the new password does not meet the strength requirement, append `--force`.

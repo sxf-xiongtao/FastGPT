@@ -690,7 +690,7 @@ normalize_deploy_base_url() {
 }
 
 # root 初始密码固定为 123456，首次登录会强制要求修改；
-# 忘记密码时用容器脚本重置：docker exec -e ROOT_PSW='新密码' <容器> node /app/scripts/reset-root-password.mjs
+# 忘记密码时用容器脚本重置：docker exec -e ROOT_PSW='新密码' <容器> node /app/scripts/reset-root-password.cjs
 ROOT_LOGIN_PASSWORD="123456"
 
 randomize_compose_credentials() {

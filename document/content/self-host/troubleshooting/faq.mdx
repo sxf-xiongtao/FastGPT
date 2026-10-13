@@ -109,7 +109,7 @@ description: FastGPT 私有部署常见问题排查方式
 3. **忘记密码时**：在服务器上通过容器脚本重置，无需重启服务：
 
    ```bash
-   docker exec -e ROOT_PSW='你的新密码' fastgpt node /app/scripts/reset-root-password.mjs
+   docker exec -e ROOT_PSW='你的新密码' fastgpt node /app/scripts/reset-root-password.cjs
    ```
 
    容器名以 `docker ps` 输出为准。若新密码不满足强度要求，需追加 `--force`。

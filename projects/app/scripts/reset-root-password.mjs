@@ -2,6 +2,10 @@
 /**
  * 在容器内重置指定用户的密码，无需重启服务、无需改动环境变量。
  *
+ * 这是**源文件**：镜像里跑的是 esbuild 打包产物 `scripts/dist/reset-root-password.cjs`
+ * （见 scripts/build-cli-scripts.ts）。打包原因：Next.js standalone 在 pnpm 工作区下
+ * 只产出 node_modules/.pnpm，顶层没有包入口，运行镜像里 `import 'mongodb'` 解析不到。
+ *
  * 设计约束见 设计文档-ROOT_PASSWORD.md §3.8：
  * - 绕过 mongoose schema 直写 users 集合，因此必须自己完成两层哈希；
  * - 不吊销会话（session 只存 userId/teamId/tmbId/isRoot，不校验密码）；
@@ -9,13 +13,12 @@
  * - 目标账号不存在时报错退出，不静默创建。
  *
  * 用法：
- *   docker exec -e ROOT_PSW='Xxx@12345' fastgpt node /app/scripts/reset-root-password.mjs
- *   docker exec -i fastgpt node /app/scripts/reset-root-password.mjs --stdin < ./new-psw.txt
- *   docker exec -e ROOT_PSW='...' fastgpt node /app/scripts/reset-root-password.mjs --dry-run
+ *   docker exec -e ROOT_PSW='Xxx@12345' fastgpt node /app/scripts/reset-root-password.cjs
+ *   docker exec -i fastgpt node /app/scripts/reset-root-password.cjs --stdin < ./new-psw.txt
+ *   docker exec -e ROOT_PSW='...' fastgpt node /app/scripts/reset-root-password.cjs --dry-run
  */
 import { createHash } from 'node:crypto';
 import process from 'node:process';
-import { pathToFileURL } from 'node:url';
 import { MongoClient } from 'mongodb';
 
 /** 与 packages/service/support/user/schema.ts 的 hashStr 保持一致。 */
@@ -27,13 +30,13 @@ const hashStr = (value) => createHash('sha256').update(value).digest('hex');
  * 业务层传入的是 hashStr(明文)，schema 的 set 钩子会再哈希一次，
  * 因此库中实际存储 hashStr(hashStr(明文))。脚本绕过 schema，必须自己补上第二层。
  */
-export const computeStoredPasswordHash = (plaintext) => hashStr(hashStr(plaintext));
+const computeStoredPasswordHash = (plaintext) => hashStr(hashStr(plaintext));
 
-/** 与 systemUser.ts 的 LEGACY_WEAK_ROOT_PASSWORDS 保持一致（单测锁定）。 */
-export const LEGACY_WEAK_ROOT_PASSWORDS = ['1234', '123456'];
+/** 与 systemUser.ts 的 LEGACY_WEAK_ROOT_PASSWORDS 保持一致。 */
+const LEGACY_WEAK_ROOT_PASSWORDS = ['1234', '123456'];
 
-/** 与 @fastgpt/global/common/string/password 的 checkPasswordRule 保持一致（单测锁定）。 */
-export const checkPasswordRule = (password) => {
+/** 与 @fastgpt/global/common/string/password 的 checkPasswordRule 保持一致（字面量逐字节比对）。 */
+const checkPasswordRule = (password) => {
   const patterns = [
     /\d/, // 数字
     /[a-z]/, // 小写字母
@@ -48,7 +51,7 @@ export const checkPasswordRule = (password) => {
 const HELP = `重置用户密码（容器内执行）
 
 用法：
-  node reset-root-password.mjs [选项]
+  node reset-root-password.cjs [选项]
 
 密码来源（二选一，优先 stdin）：
   --stdin            从标准输入读取密码
@@ -61,8 +64,8 @@ const HELP = `重置用户密码（容器内执行）
   --help, -h         显示本帮助
 
 示例：
-  docker exec -e ROOT_PSW='Xxx@12345' <容器> node /app/scripts/reset-root-password.mjs
-  docker exec -i <容器> node /app/scripts/reset-root-password.mjs --stdin < ./new-psw.txt
+  docker exec -e ROOT_PSW='Xxx@12345' <容器> node /app/scripts/reset-root-password.cjs
+  docker exec -i <容器> node /app/scripts/reset-root-password.cjs --stdin < ./new-psw.txt
 `;
 
 const parseArgs = (argv) => {
@@ -163,13 +166,12 @@ const main = async () => {
   }
 };
 
-// 仅在被当作入口执行时跑 main；被单测 import 时不应产生副作用（如连 Mongo）。
-const isEntryPoint = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
-if (isEntryPoint) {
-  main().catch((error) => {
-    process.stderr.write(
-      `重置密码失败：${error instanceof Error ? error.message : String(error)}\n`
-    );
-    process.exitCode = 1;
-  });
-}
+// 本文件是 CLI 入口而非可导入模块：无条件执行 main()。
+// 刻意不做"是否作为入口"的判断——打包成 CJS 后 import.meta 为空，
+// 守卫在产物里会静默失效，而 esbuild 也会为此刷 warning。
+main().catch((error) => {
+  process.stderr.write(
+    `重置密码失败：${error instanceof Error ? error.message : String(error)}\n`
+  );
+  process.exitCode = 1;
+});

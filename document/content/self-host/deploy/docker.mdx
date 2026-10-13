@@ -256,7 +256,7 @@ docker compose up -d
 首次登录后系统会强制要求修改密码。root 密码不再由环境变量托管，**重启容器不会重置密码**。若忘记密码，可在服务器上通过容器脚本重置：
 
 ```bash
-docker exec -e ROOT_PSW='新密码' fastgpt node /app/scripts/reset-root-password.mjs
+docker exec -e ROOT_PSW='新密码' fastgpt node /app/scripts/reset-root-password.cjs
 ```
 
 ### 6. 配置模型

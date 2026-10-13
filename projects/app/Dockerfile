@@ -87,10 +87,11 @@ RUN node -e "require('/app/worker/node_modules/@fastgpt-sdk/anydoc')"
 
 COPY --from=maindeps /app/node_modules/@zilliz/milvus2-sdk-node ./node_modules/@zilliz/milvus2-sdk-node
 
-# 容器内重置 root 密码脚本。纯 ESM，无需构建；构建期断言其运行时依赖可解析，
-# 避免把"脚本解析不到 mongodb 驱动"的问题拖到线上才发现。
-COPY --from=builder --chown=nextjs:nodejs /app/projects/app/scripts/reset-root-password.mjs /app/scripts/reset-root-password.mjs
-RUN node -e "require.resolve('mongodb', { paths: ['/app/scripts'] })"
+# 容器内重置 root 密码脚本。由 build:cli-scripts 用 esbuild 打成自包含 CJS，
+# 依赖已 inline，运行镜像里无需解析 node_modules（standalone 在 pnpm 工作区下只产出
+# .pnpm，顶层没有包入口）。构建期直接跑一次 --help，验证产物在运行镜像里可执行。
+COPY --from=builder --chown=nextjs:nodejs /app/projects/app/scripts/dist/reset-root-password.cjs /app/scripts/reset-root-password.cjs
+RUN node /app/scripts/reset-root-password.cjs --help
 
 # copy package.json to version file
 COPY --from=builder /app/projects/app/package.json ./package.json

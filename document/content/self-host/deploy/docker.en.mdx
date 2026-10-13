@@ -271,7 +271,7 @@ Login username is `root`, and the initial password is `123456`.
 The first login forces a password change. The root password is no longer managed by an environment variable, so **restarting the container no longer resets it**. If you forget the password, reset it from the server with the container script:
 
 ```bash
-docker exec -e ROOT_PSW='your-new-password' fastgpt node /app/scripts/reset-root-password.mjs
+docker exec -e ROOT_PSW='your-new-password' fastgpt node /app/scripts/reset-root-password.cjs
 ```
 
 ### 6. Configure Models
