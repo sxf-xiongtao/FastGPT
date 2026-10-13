@@ -102,7 +102,10 @@ export const updatePasswordWithChangeSession = async ({
       {
         $set: {
           password: newPassword,
-          passwordUpdateTime: new Date()
+          passwordUpdateTime: new Date(),
+          // 两条改密路径对标记的处理必须一致：密码已变更即满足强制改密要求。
+          // 否则处于 mustChangePassword 的账号从本路径改密后标记滞留，会被强制弹窗反复拦下。
+          mustChangePassword: false
         }
       },
       { session }
@@ -121,6 +124,61 @@ export const updatePasswordWithChangeSession = async ({
     if (deleted.deletedCount !== 1) {
       throw new UserError(UserErrEnum.passwordChangeAuthorizationInvalid);
     }
+  });
+
+/**
+ * 强制改密路径：账号处于「必须改密」状态时的专用写入。
+ *
+ * 不依赖 pro 签发的一次性改密 Session（社区版同样可用），授权由两件事共同构成：
+ * 1. 账号确实处于 `mustChangePassword: true` 状态；
+ * 2. 提交的旧密码与库中一致。
+ *
+ * 判定与写入共用同一个 `mustChangePassword: true` 过滤条件并同处一个 Mongo 事务，
+ * 保证判定期与写期条件一致，杜绝并发下的重复利用（fail-closed）。
+ * 标记缺失时返回与凭证失效同一错误语义，避免泄露账号当前状态。
+ */
+export const forceUpdatePassword = async ({
+  userId,
+  oldPassword,
+  newPassword
+}: {
+  userId: string;
+  oldPassword: string;
+  newPassword: string;
+}) =>
+  mongoSessionRun(async (session) => {
+    const isForcedChangePending = await MongoUser.exists({
+      _id: userId,
+      mustChangePassword: true
+    }).session(session);
+    if (!isForcedChangePending) {
+      throw new UserError(UserErrEnum.passwordChangeAuthorizationInvalid);
+    }
+
+    // 旧密码比对：入参是客户端算好的 SHA-256 摘要，schema setter 会再哈希一次，
+    // 因此与库中的双层值直接匹配（与 assertNewPasswordDiffersFromCurrent 同协议）。
+    const isOldPasswordMatched = await MongoUser.exists({
+      _id: userId,
+      password: oldPassword
+    }).session(session);
+    if (!isOldPasswordMatched) {
+      throw new UserError(UserErrEnum.oldPasswordError);
+    }
+
+    await assertNewPasswordDiffersFromCurrent({ userId, newPassword, session });
+
+    const updateResult = await MongoUser.updateOne(
+      { _id: userId, mustChangePassword: true },
+      {
+        $set: {
+          password: newPassword,
+          passwordUpdateTime: new Date(),
+          mustChangePassword: false
+        }
+      },
+      { session }
+    );
+    if (updateResult.matchedCount !== 1) throw new Error('Failed to update password');
   });
 
 /** 拒绝将当前持久化密码再次设置为新密码。Schema setter 负责沿用现有双层哈希协议。 */

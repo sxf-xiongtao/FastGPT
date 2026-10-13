@@ -15,6 +15,7 @@ export enum UserErrEnum {
   registrationMethodNotSupported = 'registrationMethodNotSupported',
   passwordChangeAuthorizationInvalid = 'passwordChangeAuthorizationInvalid',
   newPasswordSameAsOld = 'newPasswordSameAsOld',
+  oldPasswordError = 'oldPasswordError',
   ssoPasswordUnavailable = 'ssoPasswordUnavailable',
   verificationChannelUnavailable = 'verificationChannelUnavailable'
 }
@@ -30,6 +31,12 @@ const errList = [
   {
     statusText: UserErrEnum.account_psw_error,
     message: i18nT('common:code_error.account_error')
+  },
+  {
+    // 强制改密时服务端自行比对旧密码失败。与登录用的 account_psw_error 区分，
+    // 避免把「账号或密码错误」这种登录语境的文案暴露在改密表单里。
+    statusText: UserErrEnum.oldPasswordError,
+    message: i18nT('common:user.Old password is error')
   },
   {
     statusText: UserErrEnum.unAuthSso,

@@ -31,6 +31,14 @@ const UserSchema = new Schema({
     select: false
   },
   passwordUpdateTime: Date,
+  /**
+   * 标记账号必须先修改密码才能正常使用。
+   * 字段是通用能力，当前只有内置 root 会在初始化时被置位（见 systemUser.ts）。
+   */
+  mustChangePassword: {
+    type: Boolean,
+    default: false
+  },
   createTime: {
     type: Date,
     default: () => new Date()

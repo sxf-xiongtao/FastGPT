@@ -19,14 +19,19 @@ import { delUserAllSession } from '@fastgpt/service/support/user/session';
 import { withUserLock } from '@fastgpt/service/support/user/lock';
 import { NextAPI } from '@/service/middleware/entry';
 
-/** 使用当前登录 Session 和一次性改密 Session 更新密码，并仅保留发起请求的 Session。 */
+/**
+ * 使用当前登录 Session 和一次性改密 Session 更新密码，并仅保留发起请求的 Session。
+ *
+ * 目标账号恒为 authCert 解析出的 userId，不接受请求体指定。
+ * 账号处于 mustChangePassword 状态时的专用改密入口见 password/forceUpdate。
+ */
 async function handler(req: ApiRequestProps<UpdatePasswordBody>): Promise<void> {
   const { body } = parseApiInput({ req, bodySchema: UpdatePasswordBodySchema });
-  const { userId, sessionId, tmbId, teamId, isRoot } = await authCert({
+  const { userId, sessionId, tmbId, teamId } = await authCert({
     req,
     authToken: true
   });
-  if (!sessionId || isRoot) return Promise.reject(ERROR_ENUM.unAuthorization);
+  if (!sessionId) return Promise.reject(ERROR_ENUM.unAuthorization);
 
   await assertPasswordUpdateRateLimit({
     account: userId,

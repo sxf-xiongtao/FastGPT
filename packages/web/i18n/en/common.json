@@ -1303,6 +1303,8 @@
   "password_send_code": "Get verification code",
   "password_set_success": "Password set successfully",
   "password_set_title": "Set password",
+  "password_force_change_title": "Change your initial password",
+  "password_force_change_tip": "For account security, please change the initial password before continuing.",
   "password_tip": "Use at least 8 characters and include any two types: uppercase letters, lowercase letters, numbers, or special characters",
   "password_update_error": "Exception when changing password",
   "password_verification_description": "To protect your account, complete identity verification first.",

@@ -1303,6 +1303,8 @@
   "password_send_code": "取得驗證碼",
   "password_set_success": "密碼設定成功",
   "password_set_title": "設定密碼",
+  "password_force_change_title": "請修改初始密碼",
+  "password_force_change_tip": "為保障帳號安全，請先修改初始密碼後再繼續使用。",
   "password_tip": "至少 8 位，需包含任意兩類：大寫字母、小寫字母、數字、特殊字元",
   "password_update_error": "修改密碼異常",
   "password_verification_description": "為保護帳號安全，請先完成身分驗證。",

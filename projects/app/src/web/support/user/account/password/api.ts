@@ -28,3 +28,19 @@ export const updatePassword = ({
     newPsw: hashStr(newPassword),
     passwordChangeSession
   });
+
+/**
+ * 强制改密：使用独立端点，不依赖 pro 签发的一次性改密 Session，
+ * 改为提交旧密码摘要由服务端比对。
+ */
+export const forceUpdatePassword = ({
+  oldPassword,
+  newPassword
+}: {
+  oldPassword: string;
+  newPassword: string;
+}) =>
+  POST<void>('/support/user/account/password/forceUpdate', {
+    oldPsw: hashStr(oldPassword),
+    newPsw: hashStr(newPassword)
+  });

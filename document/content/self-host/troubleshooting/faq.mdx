@@ -102,7 +102,17 @@ description: FastGPT 私有部署常见问题排查方式
 
 ### 如何修改 root 密码
 
-修改环境变量中的 `DEFAULT_ROOT_PSW`，然后重启 FastGPT。
+三种方式：
+
+1. **首次登录时**：使用初始密码 `123456` 登录后，系统会强制要求修改密码。
+2. **日常修改**（专业版）：进入 `账号 - 个人信息`，点击密码行的「修改」按钮，按提示完成身份验证后设置新密码。
+3. **忘记密码时**：在服务器上通过容器脚本重置，无需重启服务：
+
+   ```bash
+   docker exec -e ROOT_PSW='你的新密码' fastgpt node /app/scripts/reset-root-password.mjs
+   ```
+
+   容器名以 `docker ps` 输出为准。若新密码不满足强度要求，需追加 `--force`。
 
 ---
 
