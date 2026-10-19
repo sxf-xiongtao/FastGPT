@@ -1,4 +1,6 @@
 import { ERROR_ENUM } from '@fastgpt/global/common/error/errorCode';
+import { UserErrEnum } from '@fastgpt/global/common/error/code/user';
+import { UserError } from '@fastgpt/global/common/error/utils';
 import type { ApiRequestProps } from '@fastgpt/next/type';
 import {
   ForceUpdatePasswordBodySchema,
@@ -20,8 +22,8 @@ import { withUserLock } from '@fastgpt/service/support/user/lock';
 import { NextAPI } from '@/service/middleware/entry';
 
 /**
- * 账号处于 needToChangePassword 状态时的专用改密入口：只认标记，不再校验旧密码，
- * 改密后仅保留发起请求的 Session。
+ * 账号处于 needToChangePassword 状态时的专用改密入口：只认标记，不再校验旧密码。
+ * 商业版授权有效时非 root 账号必须走二次认证，root 只有密码凭据，仍可直接改密。
  */
 async function handler(req: ApiRequestProps<ForceUpdatePasswordBody>): Promise<void> {
   const { body } = parseApiInput({ req, bodySchema: ForceUpdatePasswordBodySchema });
@@ -40,6 +42,10 @@ async function handler(req: ApiRequestProps<ForceUpdatePasswordBody>): Promise<v
     // 开启 SSO 禁用密码策略后，受限 SSO 用户不允许继续维护平台密码。
     const user = await MongoUser.findById(userId);
     if (!user) throw new Error('Failed to update password');
+    // 商业版授权有效时普通账号必须完成二次认证：改密 Session 的签发在 pro，本地端点已关闭。
+    if (global.feConfigs?.isPlus && user.username !== 'root') {
+      throw new UserError(UserErrEnum.passwordChangeAuthorizationInvalid);
+    }
     assertUserPasswordAvailable(user.username);
 
     await forceUpdatePassword({

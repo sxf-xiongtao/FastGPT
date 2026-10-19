@@ -39,7 +39,7 @@ describe('password/forceUpdate API', () => {
   beforeEach(async () => {
     mocks.withUserLock.mockImplementation((_userId: string, fn: () => Promise<unknown>) => fn());
     mocks.assertPasswordUpdateRateLimit.mockResolvedValue(undefined);
-    global.feConfigs = { ...global.feConfigs, sso: undefined };
+    global.feConfigs = { ...global.feConfigs, sso: undefined, isPlus: false };
 
     // 处于强制改密状态的账号（新口令落库后标记应被清除）。
     pendingUser = await MongoUser.create({
@@ -127,6 +127,46 @@ describe('password/forceUpdate API', () => {
     expect(delUserAllSession).not.toHaveBeenCalled();
     expect(
       await MongoUser.exists({ _id: normalUser._id, password: hashStr(OLD_PASSWORD) })
+    ).toBeTruthy();
+  });
+
+  it('rejects non-root accounts when the commercial license is active', async () => {
+    global.feConfigs = { ...global.feConfigs, isPlus: true };
+    const response = await Call<ForceUpdatePasswordBody, Record<string, never>, undefined>(
+      forceUpdatePasswordApi,
+      { body: getBody(), auth: getAuth() }
+    );
+
+    // 商业版授权有效时普通账号必须走二次认证，不能再用只认标记的强制端点绕过。
+    expect(response.code).toBe(500);
+    expect(response.error).toMatchObject({
+      message: UserErrEnum.passwordChangeAuthorizationInvalid
+    });
+    expect(delUserAllSession).not.toHaveBeenCalled();
+    expect(
+      await MongoUser.exists({
+        _id: pendingUser._id,
+        password: hashStr(OLD_PASSWORD),
+        needToChangePassword: true
+      })
+    ).toBeTruthy();
+  });
+
+  it('keeps root exempt from verification when the commercial license is active', async () => {
+    await MongoUser.updateOne({ _id: pendingUser._id }, { username: 'root' });
+    global.feConfigs = { ...global.feConfigs, isPlus: true };
+    const response = await Call<ForceUpdatePasswordBody, Record<string, never>, undefined>(
+      forceUpdatePasswordApi,
+      { body: getBody(), auth: getAuth() }
+    );
+
+    expect(response.code).toBe(200);
+    expect(
+      await MongoUser.exists({
+        _id: pendingUser._id,
+        password: hashStr(NEW_PASSWORD),
+        needToChangePassword: false
+      })
     ).toBeTruthy();
   });
 
