@@ -41,7 +41,7 @@ describe('password/update API', () => {
   beforeEach(async () => {
     mocks.withUserLock.mockImplementation((_userId: string, fn: () => Promise<unknown>) => fn());
     mocks.assertPasswordUpdateRateLimit.mockResolvedValue(undefined);
-    global.feConfigs = { ...global.feConfigs, sso: undefined };
+    global.feConfigs = { ...global.feConfigs, sso: undefined, isPlus: false };
     testUser = await MongoUser.create({
       username: 'password-update-user',
       password: hashStr('old-password')
@@ -244,14 +244,36 @@ describe('password/update API', () => {
     ).toBeTruthy();
   });
 
-  it('rejects a missing token and non-string password input', async () => {
-    const missingTokenResponse = await Call<any, Record<string, never>, undefined>(
+  it('updates the password from the login Session when the commercial license is inactive', async () => {
+    const response = await Call<UpdatePasswordBody, Record<string, never>, undefined>(
       updatePasswordApi,
-      {
-        body: { newPsw: hashStr('new-password') },
-        auth: getAuth()
-      }
+      { body: { newPsw: hashStr('new-password') }, auth: getAuth() }
     );
+
+    expect(response.code).toBe(200);
+    expect(
+      await MongoUser.exists({ _id: testUser._id, password: hashStr('new-password') })
+    ).toBeTruthy();
+    expect(delUserAllSession).toHaveBeenCalledWith(String(testUser._id), ['current-session']);
+  });
+
+  it('rejects a missing password change session when the commercial license is active', async () => {
+    global.feConfigs = { ...global.feConfigs, isPlus: true };
+    const response = await Call<UpdatePasswordBody, Record<string, never>, undefined>(
+      updatePasswordApi,
+      { body: { newPsw: hashStr('new-password') }, auth: getAuth() }
+    );
+
+    expect(response.code).toBe(500);
+    expect(response.error).toMatchObject({
+      message: UserErrEnum.passwordChangeAuthorizationInvalid
+    });
+    expect(
+      await MongoUser.exists({ _id: testUser._id, password: hashStr('old-password') })
+    ).toBeTruthy();
+  });
+
+  it('rejects non-string password input', async () => {
     const invalidPasswordResponse = await Call<any, Record<string, never>, undefined>(
       updatePasswordApi,
       {
@@ -268,7 +290,6 @@ describe('password/update API', () => {
       }
     );
 
-    expect(missingTokenResponse.code).toBe(500);
     expect(invalidPasswordResponse.code).toBe(500);
   });
 
