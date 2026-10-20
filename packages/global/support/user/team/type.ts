@@ -93,6 +93,8 @@ export type TeamMemberItemType<
   avatar: string;
   role: `${TeamMemberRoleEnum}`;
   status: `${TeamMemberStatusEnum}`;
+  /** 是否为内置 Agent 用户，内置 Agent 成员不允许被移出团队。 */
+  isAgentUser?: boolean;
   contact?: string | null;
   createTime: Date;
   updateTime?: Date;

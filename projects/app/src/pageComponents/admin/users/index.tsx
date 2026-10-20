@@ -2,6 +2,7 @@
 import React, { useRef, useState } from 'react';
 import {
   Button,
+  Checkbox,
   Table,
   Thead,
   Tbody,
@@ -17,20 +18,36 @@ import {
 import dayjs from 'dayjs';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import MyModal from '@fastgpt/web/components/v2/common/MyModal';
+import MyMenu from '@fastgpt/web/components/common/MyMenu';
 import { usePagination } from '@fastgpt/web/hooks/usePagination';
 import { getUsers } from '@/web/admin/user/api';
 import UserEditModal from './components/UserEditModal';
-import type { UserItemType } from '@fastgpt/global/openapi/admin/user/api';
+import type {
+  AdminUserStatusFilterType,
+  UserItemType
+} from '@fastgpt/global/openapi/admin/user/api';
 import UserAddModal from './components/UserAddModal';
 import BoxPageRoot from '@/components/admin/BoxContainer/PageRoot';
 import { FixedTableContainer } from '@fastgpt/web/components/common/FixedTable';
 import { accountTitleTextStyles } from '@/pageComponents/account/styles';
 
+const allStatuses: AdminUserStatusFilterType[] = ['active', 'forbidden', 'deleted'];
+const defaultStatuses: AdminUserStatusFilterType[] = ['active', 'forbidden'];
+const statusOptions: { label: string; value: AdminUserStatusFilterType }[] = [
+  { label: '正常', value: 'active' },
+  { label: '已禁用', value: 'forbidden' },
+  { label: '已注销', value: 'deleted' }
+];
+
 const UserTable = () => {
   // const [username, setUsername] = useState<string>();
   const [userDetail, setUserDetail] = useState<UserItemType>();
   const [search, setSearch] = useState<string>();
+  const [statuses, setStatuses] = useState<AdminUserStatusFilterType[]>(defaultStatuses);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const isAllStatusSelected = statuses.length === allStatuses.length;
+  const isStatusFilterActive = !isAllStatusSelected;
 
   const {
     data: users,
@@ -43,9 +60,10 @@ const UserTable = () => {
     defaultPageSize: 20,
     pageSizeCacheKey: 'users-users-list',
     params: {
-      username: search
+      username: search,
+      statuses
     },
-    refreshDeps: [search],
+    refreshDeps: [search, statuses],
     scrollContainerRef
   });
 
@@ -104,7 +122,67 @@ const UserTable = () => {
             <Tr>
               <Th>用户名</Th>
               <Th>创建时间</Th>
-              <Th>状态</Th>
+              <Th>
+                <MyMenu
+                  trigger="hover"
+                  placement="bottom-start"
+                  Button={
+                    <Flex
+                      alignItems={'center'}
+                      cursor={'pointer'}
+                      w={'fit-content'}
+                      color={isStatusFilterActive ? 'primary.600' : 'inherit'}
+                    >
+                      <Box>状态</Box>
+                      <MyIcon
+                        name={isStatusFilterActive ? 'common/filter' : 'core/chat/chevronDown'}
+                        w={isStatusFilterActive ? 3.5 : 4}
+                        ml={1}
+                        fill={isStatusFilterActive ? 'none' : 'currentColor'}
+                      />
+                    </Flex>
+                  }
+                  menuList={[
+                    {
+                      children: [
+                        {
+                          label: (
+                            <Checkbox
+                              size={'sm'}
+                              isChecked={isAllStatusSelected}
+                              isIndeterminate={statuses.length > 0 && !isAllStatusSelected}
+                              pointerEvents={'none'}
+                            >
+                              全部
+                            </Checkbox>
+                          ),
+                          closeOnClick: false,
+                          onClick: () =>
+                            setStatuses(isAllStatusSelected ? [] : [...allStatuses])
+                        },
+                        ...statusOptions.map((item) => ({
+                          label: (
+                            <Checkbox
+                              size={'sm'}
+                              isChecked={statuses.includes(item.value)}
+                              pointerEvents={'none'}
+                            >
+                              {item.label}
+                            </Checkbox>
+                          ),
+                          closeOnClick: false,
+                          onClick: () =>
+                            setStatuses((current) =>
+                              current.includes(item.value)
+                                ? current.filter((value) => value !== item.value)
+                                : [...current, item.value]
+                            )
+                        }))
+                      ]
+                    }
+                  ]}
+                />
+              </Th>
               <Th></Th>
             </Tr>
           </Thead>

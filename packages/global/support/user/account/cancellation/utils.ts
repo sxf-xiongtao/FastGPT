@@ -144,7 +144,12 @@ export const isAccountCancellationMethod = (method: string) =>
 
 /**
  * 判断用户名是否由账号注销流程生成，同时兼容已落库的历史匿名用户名格式。
+ * 导出规则列表，供管理端列表查询与判定保持同源。
  */
+export const accountCancellationAnonymizedUsernameRegexList: readonly RegExp[] = [
+  accountCancellationAnonymizedUsernameReg,
+  ...legacyAccountCancellationUsernameRegs
+];
+
 export const isAccountCancellationAnonymizedUsername = (username: string) =>
-  accountCancellationAnonymizedUsernameReg.test(username) ||
-  legacyAccountCancellationUsernameRegs.some((reg) => reg.test(username));
+  accountCancellationAnonymizedUsernameRegexList.some((reg) => reg.test(username));

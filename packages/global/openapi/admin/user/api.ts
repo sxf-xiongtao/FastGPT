@@ -24,13 +24,24 @@ export type UserItemType = z.infer<typeof UserItemSchema>;
  * Tags: ['Admin', 'Users', 'Read']
  * ============================================================================ */
 
+export const AdminUserStatusFilterEnum = z.enum(['active', 'forbidden', 'deleted']);
+export type AdminUserStatusFilterType = z.infer<typeof AdminUserStatusFilterEnum>;
+
 export const GetUsersBodySchema = PaginationSchema.extend({
   username: z
     .string()
     .trim()
     .max(100)
     .optional()
-    .meta({ description: '搜索用户名（支持模糊匹配）' })
+    .meta({ description: '搜索用户名（支持模糊匹配）' }),
+  statuses: z
+    .array(AdminUserStatusFilterEnum)
+    .max(3)
+    .optional()
+    .meta({
+      description:
+        '状态多选过滤：不传默认 active+forbidden（未删除）；空数组返回空列表；deleted 表示已注销'
+    })
 });
 export type GetUsersBodyType = z.infer<typeof GetUsersBodySchema>;
 export const GetUsersResponseSchema = PaginationResponseSchema(UserItemSchema);

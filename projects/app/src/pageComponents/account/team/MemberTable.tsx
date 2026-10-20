@@ -365,29 +365,31 @@ function MemberTable({ Tabs }: { Tabs: React.ReactNode }) {
                             hoverColor={'blue.500'}
                             onClick={() => handleEditMemberName(member.tmbId, member.memberName)}
                           />
-                          <PopoverConfirm
-                            Trigger={
-                              <Box>
-                                <MyIconButton
-                                  icon={'common/trash'}
-                                  hoverColor={'red.500'}
-                                  hoverBg="red.50"
-                                  size={'1rem'}
-                                />
-                              </Box>
-                            }
-                            type="delete"
-                            content={
-                              isSyncMode
-                                ? t('account_team:forbidden_tip', {
-                                    username: member.memberName
-                                  })
-                                : t('account_team:remove_tip', {
-                                    username: member.memberName
-                                  })
-                            }
-                            onConfirm={() => onRemoveMember(member.tmbId)}
-                          />
+                          {!member.isAgentUser && (
+                            <PopoverConfirm
+                              Trigger={
+                                <Box>
+                                  <MyIconButton
+                                    icon={'common/trash'}
+                                    hoverColor={'red.500'}
+                                    hoverBg="red.50"
+                                    size={'1rem'}
+                                  />
+                                </Box>
+                              }
+                              type="delete"
+                              content={
+                                isSyncMode
+                                  ? t('account_team:forbidden_tip', {
+                                      username: member.memberName
+                                    })
+                                  : t('account_team:remove_tip', {
+                                      username: member.memberName
+                                    })
+                              }
+                              onConfirm={() => onRemoveMember(member.tmbId)}
+                            />
+                          )}
                         </HStack>
                       ) : (
                         <PopoverConfirm
